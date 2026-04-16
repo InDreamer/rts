@@ -1,0 +1,510 @@
+     1	# 完整项目交接提示词 — Transformation Rule System
+     2	
+     3	- 生成日期：2026-04-15
+     4	- 用途：在一台没有任何背景的新主机上，让 AI Agent 完全理解项目并继续剩余工作。
+     5	
+     6	---
+     7	
+     8	## 一、项目背景
+     9	
+    10	### 1.1 你是谁
+    11	
+    12	你是一个 AI Agent，负责维护和推进一个名为 **Transformation Rule System** 的项目。这个项目属于 Standard Chartered Bank 的 VPA (Virtual Processing Agent) 体系，服务于金融交易系统间的报文转换（transformation）场景。
+    13	
+    14	### 1.2 这个项目是什么
+    15	
+    16	这是一套面向 `source_system -> target_system` 转换场景的 **规则真相源和知识库（Rule Truth Source）**。它不是运行时引擎，也不是 Java/XSLT 代码的镜像。它的目标是：
+    17	
+    18	- **用 YAML 定义规则真相源**（canonical rule）
+    19	- **用 Git 做版本控制与追溯**
+    20	- **用 PostgreSQL 做规则查询与索引**（规划中）
+    21	- **让 AI 可检索、人工审核、治理可追溯**
+    22	
+    23	当前以 **Tradition -> Stella** 作为第一批验证样本。Tradition 是源系统（发送 FpML 交易报文），Stella 是目标系统（接收 SCBM/FpML 格式报文）。
+    24	
+    25	### 1.3 核心思想
+    26	
+    27	1. **规则最小抽象层**：所有规则都围绕 `source + logic + target` 这个核心表达。source 回答从哪里取数，logic 回答如何转换，target 回答写到哪里。
+    28	2. **规则对象和实现边界分离**：YAML 规则文件是规则对象；Java/XSLT/Excel 是实现证据（evidence），不混入主对象。
+    29	3. **AI 可查询优先**：规则对象要天然支持 AI 问“某个 target 字段的值从哪里来”“某个节点为什么这么生成”“某个 lookup 等”问题。
+    30	4. **渐进式分层管理**：规则库不平铺展开，而是分三层架构 —— 先按 source-target 系统、再按产品、再按 fragment/业务片段，逐步缩小范围。
+    31	
+    32	### 1.4 业务领域
+    33	
+    34	- **产品范围**：FXD（外汇远期，含 NDF 无本金交割远期）、FXO（外汇期权，含 NDO 无本金交割期权）、COMMON（共用的 header/party/portfolio 规则）
+    35	- **源系统报文格式**：FpML XML
+    36	- **目标系统报文格式**：SCBM/FpML XML（Standard Chartered 自有格式扩展）
+    37	- **现行事实来源**：Java extractor + XSLT template（不在本项目中，但作为 evidence 材料）
+    38	- **映射表**：Excel workbook `Tradition_SCBM_mapping.xlsx`（9 sheets） + 数据库静态映射表
+    39	
+    40	---
+    41	
+    42	## 二、项目架构
+    43	
+    44	### 2.1 分层架构（四层分离）
+    45	
+    46	每个 Rule Pack 必须按以下四层组织：
+    47	
+    48	| 层 | 目录 | 职责 |
+    49	|---|---|---|
+    50	| **主对象层** | `rules/` `lookups/` `helpers/` | 规则是什么（source + logic + target），AI 直接使用 |
+    51	| **Evidence 层** | `evidence/evidence-index.yaml` | 规则依据是什么，追溯到 Java/XSLT/Excel |
+    52	| **Review 层** | `review/review-index.yaml` | 未决点、风险、审核结论 |
+    53	| **Report 层** | `reports/*.md` | 阶段汇总、交接沟通 |
+    54	
+    55	### 2.2 三种主对象
+    56	
+    57	| 对象类型 | 文件名格式 | 作用 |
+    58	|---|---|---|
+    59	| `target_rule` | `rules/rule_*.yaml` | 表达目标字段或 block 的生成逻辑（核心） |
+    60	| `lookup_definition` | `lookups/lk_*.yaml` | 表达查表逻辑（映射时 lookup 或静态查询封装） |
+    61	| `helper_definition` | `helpers/hlp_*.yaml` | 表达复用的稳定中间概念（仅在高度复用或稳定业务概念时建立） |
+    62	
+    63	### 2.3 主对象只保留什么
+    64	
+    65	- `id`、`status`、`signoff_status`
+    66	- `source`（输入及 XPath）
+    67	- `logic`（summary + pipeline）
+    68	- `target/output`（目标 XPath 或输出字段）
+    69	- `dependencies`（依赖的 lookups/helpers/rules）
+    70	- `8 型 example`（结果向示例：input + key_decision + result）
+    71	
+    72	**不放入主对象的**：evidence、review、ambiguities、approval、长 trace
+    73	
+    74	### 2.4 Pack 目录结构模板
+    75	
+    76	```text
+    77	<pack-root>/
+    78	  metadata.yaml             # pack 元信息：scope、对象计数、材料清单
+    79	  README.md                 # pack 概述与对象清单
+    80	  ops-reference.md          # 仅在 pipeline op 需要解释时保留
+    81	  rules/
+    82	    rule_*.yaml
+    83	  lookups/
+    84	    lk_*.yaml
+    85	  helpers/
+    86	    hlp_*.yaml
+    87	  evidence/
+    88	    evidence-index.yaml     # pack 级横切证据索引
+    89	  review/
+    90	    review-index.yaml       # pack 级横切审核索引
+    91	  reports/
+    92	    extraction-report.md    # authoring 阶段产出
+    93	    closure-check.md        # review 阶段产出
+    94	    review-checklist.md     # review 阶段产出
+    95	```
+    96	
+    97	---
+    98	
+    99	## 三、工作流系统
+   100	
+   101	### 3.1 双主 Skill
+   102	
+   103	项目应该两个核心 Skill 运转：
+   104	
+   105	| Skill | 路径 | 职责 |
+   106	|---|---|---|
+   107	| **rule-pack-authoring** | `skills/rule-pack-authoring/SKILL.md` | 从 Excel/Java/XSLT/BA notes 抽取规则，生成 draft pack |
+   108	| **rule-pack-review** | `skills/rule-pack-review/SKILL.md` | 检查 draft 的结构完整性、引用闭环、生成 review 与 report |
+   109	
+   110	还有一个查询 Skill：
+   111	
+   112	| Skill | 路径 | 职责 |
+   113	|---|---|---|
+   114	| **kb-query** | `skills/kb-query/SKILL.md` | 渐进式查询 Knowledge-Bases/ 中的规则 |
+   115	
+   116	### 3.2 工作流流程
+   117	
+   118	输入材料（Excel/Java/XSLT/BA notes）
+   119	
+   120	↓
+   121	
+   122	rule-pack-authoring -> Draft Pack (rules/lookups/helpers/evidence/review)
+   123	
+   124	↓
+   125	
+   126	rule-pack-review -> Review-Ready Pack (closure-check/review-checklist)
+   127	
+   128	↓
+   129	
+   130	BA/Dev signoff
+   131	
+   132	### 3.3 Skill 参考文件
+   133	
+   134	Authoring Skill 有 5 个 references：
+   135	
+   136	- `references/supported-scope.md` - scope 切分规范
+   137	- `references/storage-split.md` - 存储层分离详细规则
+   138	- `references/output-pack-shape.md` - 最小输出结构要求
+   139	- `references/object-boundary-guide.md` - 何时建 rule/lookup/helper
+   140	- `references/evidence-guidelines.md` - 证据处理规范
+   141	
+   142	Review Skill 有 2 个 references：
+   143	
+   144	- `references/closure-criteria.md` - 闭环检查标准
+   145	- `references/review-output-shape.md` - review 报告格式
+   146	
+   147	---
+   148	
+   149	## 四、Knowledge Base 结构
+   150	
+   151	```text
+   152	Knowledge-Bases/
+   153	  index.yaml                       # Layer 0: 列出 workflows
+   154	  TRADITION-STELLA/
+   155	    index.yaml                     # Layer 1: 列出 products (COMMON, FXD_NDF, FXO)
+   156	    COMMON/
+   157	      index.yaml                   # Layer 2: 列出 COMMON 下的 packs
+   158	    FXD_NDF/
+   159	      index.yaml                   # Layer 2: 列出 FXD 下的 packs（含 AI 可查询版本）
+   160	    FXO/
+   161	      index.yaml                   # Layer 2: 列出 FXO 下的 packs
+   162	```
+   163	
+   164	KB 要给 AI 查询用的“可发现层”，与 `generated_pack/` 下的规范 pack 物件互为映射。
+   165	
+   166	---
+   167	
+   168	## 五、材料位置
+   169	
+   170	所有源材料位于另一个 Java 项目中：
+   171	
+   172	```text
+   173	C:\Users\1664901\Desktop\VPA_TRADITION_RTNS\54982-flow-traditionStella-plugin\
+   174	```
+   175	
+   176	| 材料类型 | 路径 |
+   177	|---|---|
+   178	| workbook | `Tradition_SCBM_mapping.xlsx`（9 sheets） |
+   179	| rule doc inspect | `Tradition_SCBM_mapping-Inspect.md` |
+   180	| AI bundle | `Tradition_SCBM_mapping_ai-bundle.jsonl` |
+   181	| XSLT (header) | `src/main/resources/xslt/header/*.xsl` |
+   182	| XSLT (module) | `src/main/resources/xslt/module/*.xsl` |
+   183	| java extractors (common) | `extractor/common/MessageFields.java`、`TradeHeaderFields.java`、`TradePartyFields.java`、`PortfolioFields.java`、`OtherPartyPaymentFields.java` |
+   184	| java extractors (fxd) | `extractor/fx/FXDBasicFields.java`、`FXDCurrencyFields.java`、`FXDExchangeRateFields.java`、`FXDNdfFields.java` |
+   185	| java extractors (fxo) | `extractor/fx/FXOBasicFields.java`、`FXOCurrencyFields.java`、`FXOPremiumFields.java`、`FXOSettlementFields.java` |
+   186	| lookup utility | `utils/StaticMappingLookupUtils.java`、`StaticMappingLookupCore.java` |
+   187	
+   188	---
+   189	
+   190	## 六、当前完成状态（2026-04-16 快照）
+   191	
+   192	### 6.1 合计 18 个 Pack
+   193	
+   194	| 产品线 | Pack 数 | 已 Authored | 已 Reviewed |
+   195	|---|---:|---:|---:|
+   196	| COMMON | 4 | 4 | 4 |
+   197	| FXD_NDF | 5 | 5 | 5 |
+   198	| FXO | 9 | 9 | 0 |
+   199	| **合计** | **18** | **18** | **9** |
+   200	
+   201	### 6.2 已完成 Authoring + Review 的 Pack（9 个）
+   202	
+   203	| Pack | 产品线 | Review 结论 | Open Items |
+   204	|---|---|---|---|
+   205	| `rule-pack-cutoff-split` | FXD_NDF | ready for BA review | 0 |
+   206	| `rule-pack-party-split` | FXD_NDF | ready for BA review | 6 ambiguities |
+   207	| `rule-pack-scbml-header` | COMMON | ready for BA review | 1 ambiguity（trackingId source） |
+   208	| `rule-pack-trade-identifiers` | COMMON | ready for BA review | 1 ambiguity（UTI issuer） |
+   209	| `rule-pack-trade-date-product-summary` | COMMON | ready for Dev review | 0 |
+   210	| `rule-pack-portfolio` | COMMON | ready for Dev review | 0 |
+   211	| `rule-pack-fxd-product-identification` | FXD_NDF | ready for BA review | 0 |
+   212	| `rule-pack-fxd-currency-legs` | FXD_NDF | ready for BA review | 1 ambiguity |
+   213	| `rule-pack-fxd-exchange-rate` | FXD_NDF | ready for BA review | 1 ambiguity |
+   214	
+   215	### 6.3 Authored 但未 Review 的 Pack（9 个 FXO Pack）
+   216	
+   217	| Pack | 类别 | 规则数 | lookups | helpers |
+   218	|---|---|---|---|---|
+   219	| `rule-pack-fxo-product-identification` | O-01 | 9 rules | 0 | 0 |
+   220	| `rule-pack-fxo-currency` | O-02 | 3 rules | 0 | 0 |
+   221	| `rule-pack-fxo-expiry-and-strike` | O-03 | 5 rules | 0 | 0 |
+   222	| `rule-pack-fxo-premium` | O-04 | 5 rules | 0 | 1 (`hlp_fxo_premium_rate_to_percent`) |
+   223	| `rule-pack-fxo-cutoff` | O-05 | 4 rules | 1 | 0 |
+   224	| `rule-pack-fxo-party` | O-06 | 4 rules | 2 (refs) | 0 |
+   225	| `rule-pack-fxo-strategy` | O-07 | 2 rules | 1 | 0 |
+   226	| `rule-pack-fxo-ndo-settlement` | O-08 | 5 rules | 0 (refs O-05) | 0 |
+   227	| `rule-pack-fxo-broker-payment` | O-09 | 5 rules | 0 | 0 |
+   228	
+   229	---
+   230	
+   231	## 七、当前任务
+   232	
+   233	### 任务 A：对 9 个 FXO Pack 进行 Review（覆盖空缺）
+   234	
+   235	对每个 FXO pack，使用 `rule-pack-review` skill 执行 review workflow。
+   236	
+   237	1. 读取 pack 下所有 YAML 对象、evidence-index、review-index
+   238	2. 按 `references/closure-criteria.md` 逐项检查：
+   239	   - 结构完整性
+   240	   - 引用闭环（dependencies 是否都有对应文件）
+   241	   - evidence 覆盖率
+   242	   - example 充分性
+   243	   - placeholder 或未完成痕迹
+   244	   - review-index 中 ambiguity 是否已收敛
+   245	   - ops-reference.md 必要
+   246	3. 产出：
+   247	   - `reports/closure-check.md`
+   248	   - `reports/review-checklist.md`
+   249	   - 更新 `review/review-index.yaml`（如发现新增问题）
+   250	4. 给出状态（ready for BA review / ready for Dev review / needs authoring follow-up）
+   251	
+   252	**建议执行顺序**：O-01 -> O-02 -> O-03 -> O-04 -> O-05 -> O-06 -> O-07 -> O-08 -> O-09
+   253	
+   254	### 任务 B：更新 open-review-items-summary.md
+   255	
+   256	每完成一批 FXO pack review 后，将结果汇总到总目录的 `open-review-items-summary.md`。
+   257	
+   258	### 任务 C：将 reviewed pack 同步到 Knowledge-Bases/（可延迟）
+   259	
+   260	将 review 通过的 pack 映射到 `Knowledge-Bases/TRADITION-STELLA/{PRODUCT}/` 下的 `-for-AI` 目录，供 kb-query skill 可查询。
+   261	
+   262	---
+   263	
+   264	## 八、YAML 对象示例
+   265	
+   266	### 8.1 target_rule 示例（value 类型）
+   267	
+   268	```yaml
+   269	id: rule_scbml_initiated_timestamp
+   270	status: draft
+   271	
+   272	signoff_status: none
+   273	
+   274	source:
+   275	  inputs:
+   276	    - name: creationTimestamp
+   277	      source_path: /fpML/header/creationTimestamp/text()
+   278	
+   279	logic:
+   280	  summary: Read the source creationTimestamp, convert from ISO datetime format to Z-suffixed format, and emit as initiatedTimestamp.
+   281	  pipeline:
+   282	    - op: read_xpath
+   283	      out: raw_timestamp
+   284	      source: /fpML/header/creationTimestamp/text()
+   285	    - op: format_datetime
+   286	      in: raw_timestamp
+   287	      from_format: "yyyy-MM-dd'T'HH:mm:ss"
+   288	      to_format: "yyyy-MM-dd'T'HH:mm:ss'Z'"
+   289	      out: converted_timestamp
+   290	    - op: emit_value
+   291	      path: /scb:SCBM/scb:header/scb:originationDetails/scb:initiatedTimestamp/text()
+   292	      from: converted_timestamp
+   293	
+   294	target:
+   295	  kind: value
+   296	  path: /scb:SCBM/scb:header/scb:originationDetails/scb:initiatedTimestamp/text()
+   297	
+   298	dependencies:
+   299	  lookups: []
+   300	  helpers: []
+   301	  rules: []
+   302	
+   303	examples:
+   304	  - name: iso_to_z_conversion
+   305	    input:
+   306	      creationTimestamp: "2025-09-10T14:30:00"
+   307	    key_decision:
+   308	      conversion: "append Z suffix"
+   309	    result:
+   310	      target_value: "2025-09-10T14:30:00Z"
+   311	```
+   312	
+   313	### 8.2 lookup_definition 示例
+   314	
+   315	```yaml
+   316	id: lk_fxd_ndf_cutoff_by_pair_and_locode
+   317	status: draft
+   318	signoff_status: none
+   319	
+   320	source:
+   321	  mapping_table: TraditionStellaCutoff
+   322	  inputs:
+   323	    - name: fixing_currency1
+   324	      source_path: /FpML/trade/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+   325	    - name: fixing_currency2
+   326	      source_path: /FpML/trade/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+   327	    - name: cutoff_code
+   328	      source_path: /FpML/trade/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+   329	
+   330	logic:
+   331	  summary: Query the cutoff mapping by forward currency-pair order first, then retry the reverse order.
+   332	  pipeline:
+   333	    - op: concat
+   334	      out: forward_pair
+   335	      args: [fixing_currency1, fixing_currency2]
+   336	    - op: compose_key
+   337	      out: forward_key
+   338	      template: "{forward_pair}|{cutoff_code}"
+   339	    - op: lookup_value
+   340	      out: forward_result
+   341	      key: "{forward_key}"
+   342	      return_field: requested_field
+   343	    - op: compose_key
+   344	      out: reverse_key
+   345	      template: "{reverse_pair}|{cutoff_code}"
+   346	    - op: lookup_value
+   347	      out: reverse_result
+   348	      key: "{reverse_key}"
+   349	      return_field: requested_field
+   350	      when: forward_result is empty
+   351	    - op: coalesce
+   352	      out: resolved_value
+   353	      args: [forward_result, reverse_result]
+   354	
+   355	output:
+   356	  fields:
+   357	    - name: cutoff_name
+   358	      return_field: CUTOFF
+   359	    - name: cutoff_description
+   360	      return_field: CUTOFF_DESC
+   361	    - name: fixing_time
+   362	      return_field: FIXING_TIME
+   363	    - name: fixing_business_center
+   364	      return_field: FIXING_BUSINESS_CENTER
+   365	
+   366	dependencies: []
+   367	
+   368	examples:
+   369	  - name: sample_usdtwd_tw
+   370	    input:
+   371	      fixing_currency1: USD
+   372	      fixing_currency2: TWD
+   373	      cutoff_code: TW
+   374	    key_decision:
+   375	      matched_key: USDTWD|TW
+   376	      lookup_path: forward
+   377	    result:
+   378	      cutoff_name: TPE
+   379	```
+   380	
+   381	### 8.3 evidence-index.yaml 示例
+   382	
+   383	```yaml
+   384	entries:
+   385	  - evidence_id: ev_c01_timestamp_java
+   386	    object_id: rule_scbml_initiated_timestamp
+   387	    kind: java
+   388	    role: logic_support
+   389	    summary: MessageFields.CREATION_TIMESTAMP uses DateFormatConverterUtils.convertIsoDatetimeToZ.
+   390	    locator:
+   391	      java:
+   392	        path: extractor/common/MessageFields.java
+   393	        members: [CREATION_TIMESTAMP]
+   394	      utils:
+   395	        path: utils/DateFormatConverterUtils.java
+   396	        members: [convertIsoDatetimeToZ]
+   397	```
+   398	
+   399	### 8.4 review-index.yaml 示例
+   400	
+   401	```yaml
+   402	items:
+   403	  - review_id: rev_c01_tracking_id_source
+   404	    object_id: rule_scbml_tracking_id
+   405	    kind: ambiguity
+   406	    status: open
+   407	    summary: "trackingId source field 'tradeIdUnique' has no matching Java enum definition."
+   408	    follow_up: Confirm with Dev/BA what source produces `tradeIdUnique`.
+   409	    supporting_evidence:
+   410	      - ev_c01_tracking_id_xslt_only
+   411	```
+   412	
+   413	---
+   414	
+   415	## 九、Stella 输出结构摘要
+   416	
+   417	目标 XML 的骨架结构如下，每个区域对应一个或多个 Pack：
+   418	
+   419	```text
+   420	/scb:SCBM
+   421	  /scb:header                                <- C-01 rule-pack-scbml-header
+   422	  /scb:payload/scb:FPMLPayload
+   423	    conf:trade
+   424	      conf:tradeHeader
+   425	        conf:partyTradeIdentifier[*]         <- C-02 rule-pack-trade-identifiers
+   426	        conf:partyTradeInformation           <- F-05/O-06 party packs
+   427	        conf:productSummary                  <- C-03 rule-pack-trade-date-product-summary
+   428	        conf:tradeDate                       <- C-03
+   429	      scbextn:settlementDate                 <- C-03
+   430	
+   431	      --- FXD path ---
+   432	      scbextn:fxSingleLeg
+   433	        conf:primaryAssetClass               <- F-01 fxd-product-identification
+   434	        conf:productType[*]                  <- F-01
+   435	        conf:productId[*]                    <- F-01
+   436	        conf:exchangedCurrency1/2            <- F-02 fxd-currency-legs
+   437	        conf:exchangeRate                    <- F-03 fxd-exchange-rate
+   438	        conf:nonDeliverableForward/fixing    <- F-04 cutoff-split
+   439	
+   440	      --- FXO path ---
+   441	      scbextn:fxOption
+   442	        conf:primaryAssetClass               <- O-01 fxo-product-identification
+   443	        conf:productType[*]                  <- O-01
+   444	        conf:productId[*]                    <- O-01
+   445	        conf:buyer/sellerPartyReference      <- O-06
+   446	        conf:europeanExercise                <- O-03 fxo-expiry-and-strike
+   447	        conf:putCurrencyAmount               <- O-02 fxo-currency
+   448	        conf:callCurrencyAmount              <- O-02
+   449	        conf:strike                          <- O-03
+   450	        conf:fxOptionPremium                 <- O-04 fxo-premium
+   451	        conf:cashSettlementTerms (NDO)       <- O-08 fxo-ndo-settlement
+   452	
+   453	      conf:otherPartyPayment                 <- O-09 fxo-broker-payment
+   454	      conf:party[@id='party1/party2/...']    <- F-05/O-06 party packs
+   455	      portfolio block                        <- C-04 rule-pack-portfolio
+   456	```
+   457	
+   458	---
+   459	
+   460	## 十、关键约束与注意事项
+   461	
+   462	1. **不要发明业务逻辑**：如果原材料中找不到逻辑依据，记录为 ambiguity，不要猜测。
+   463	2. **主对象保持精简**：只保留 source/logic/target/dependencies/examples。
+   464	3. **Evidence 与 Review 是 Pack 级横切层**：不在每个对象文件中重复。
+   465	4. **状态机只能是 `draft` / `in_review` / `approved`，需要人工 signoff。**
+   466	5. **Authoring 不负责 review 结论，Review 不负责重写规则。**
+   467	6. **历史交叉项与 2026-04-02 存储层分离的结论冲突，以后者为准。**
+   468	7. **所有 pack 都放在 `generated_pack/` 目录下。**
+   469	8. **Knowledge-Bases/ 是给 AI 查询的发现层，与 `generated_pack/` 互为映射。**
+   470	
+   471	---
+   472	
+   473	## 十一、快速开始
+   474	
+   475	### 1. 确认项目目录
+   476	
+   477	```bash
+   478	cd transformation-rule-system/
+   479	```
+   480	
+   481	### 2. 先读入口文档了解状态
+   482	
+   483	```bash
+   484	cat open-review-items-summary.md
+   485	```
+   486	
+   487	### 3. 读取 Review Skill 和 references
+   488	
+   489	```bash
+   490	cat skills/rule-pack-review/SKILL.md
+   491	cat skills/rule-pack-review/references/closure-criteria.md
+   492	cat skills/rule-pack-review/references/review-output-shape.md
+   493	```
+   494	
+   495	### 4. 开始 Review 第一个 FXO Pack
+   496	
+   497	```bash
+   498	# 读取 pack 所有 YAML 文件、执行闭环检查，产出 closure-check.md + review-checklist.md
+   499	cd generated_pack/rule-pack-fxo-product-identification/
+   500	```
+   501	
+   502	### 5. 完成后更新汇总
+   503	
+   504	```bash
+   505	# 编辑 open-review-items-summary.md
+   506	```
+   507	
+   508	---
+   509	
+   510	*本文档交接基于 2026-04-16 的项目快照生成。如有疑问，从 README.cn.md 和 2026-04-15-全链Pack生成试跑 开始回溯。*

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformation Rule System / OV Boundary</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: #0f172a;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --cyan: #22d3ee;
+      --emerald: #34d399;
+      --violet: #a78bfa;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --orange: #fb923c;
+      --slate: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "JetBrains Mono", monospace;
+      background:
+        linear-gradient(rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.96)),
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.08), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.08), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px;
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .pulse {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    .card-shell {
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .info {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .info-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot.truth { background: var(--amber); }
+    .dot.boundary { background: var(--rose); }
+    .dot.borrow { background: var(--cyan); }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .footer {
+      color: #64748b;
+      font-size: 10px;
+      margin-top: 12px;
+      text-align: right;
+    }
+
+    @media (max-width: 980px) {
+      .cards { grid-template-columns: 1fr; }
+      body { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="pulse"></div>
+      <h1>Transformation Rule System / OV Boundary</h1>
+    </div>
+    <div class="subtitle">
+      Truth-source ownership stays inside the bank XML transformation rule system. OpenViking is allowed to act as a projection,
+      retrieval, and context-loading shell, but not as the canonical authority.
+    </div>
+
+    <div class="card-shell">
+      <svg viewBox="0 0 1180 760" width="100%" role="img" aria-label="Boundary diagram between truth source, projection, retrieval, and runtime">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <marker id="arrowheadRose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185" />
+          </marker>
+        </defs>
+
+        <rect x="0" y="0" width="1180" height="760" fill="#020617"/>
+        <rect x="0" y="0" width="1180" height="760" fill="url(#grid)"/>
+
+        <text x="26" y="28" fill="#f8fafc" font-size="16" font-weight="700">Layered Responsibility Model</text>
+        <text x="26" y="48" fill="#94a3b8" font-size="10">One-way flow only: truth projects outward; runtime never writes back into canonical banking rules.</text>
+
+        <line x1="590" y1="78" x2="590" y2="610" stroke="#fb7185" stroke-width="2" stroke-dasharray="8,6"/>
+        <text x="606" y="96" fill="#fb7185" font-size="10" font-weight="600">hard boundary: truth ownership never crosses right</text>
+
+        <line x1="150" y1="170" x2="1040" y2="170" stroke="#475569" stroke-width="1.2"/>
+        <line x1="150" y1="308" x2="1040" y2="308" stroke="#475569" stroke-width="1.2"/>
+        <line x1="150" y1="446" x2="1040" y2="446" stroke="#475569" stroke-width="1.2"/>
+
+        <text x="36" y="130" fill="#fbbf24" font-size="10" font-weight="700" transform="rotate(-90 36,130)">TRUTH SOURCE</text>
+        <text x="36" y="268" fill="#22d3ee" font-size="10" font-weight="700" transform="rotate(-90 36,268)">PROJECTION</text>
+        <text x="36" y="406" fill="#34d399" font-size="10" font-weight="700" transform="rotate(-90 36,406)">RETRIEVAL</text>
+        <text x="36" y="544" fill="#a78bfa" font-size="10" font-weight="700" transform="rotate(-90 36,544)">RUNTIME</text>
+
+        <text x="74" y="124" fill="#94a3b8" font-size="9">Layer 1</text>
+        <text x="74" y="262" fill="#94a3b8" font-size="9">Layer 2</text>
+        <text x="74" y="400" fill="#94a3b8" font-size="9">Layer 3</text>
+        <text x="74" y="538" fill="#94a3b8" font-size="9">Layer 4</text>
+
+        <rect x="160" y="88" width="390" height="68" rx="8" fill="#0f172a"/>
+        <rect x="160" y="88" width="390" height="68" rx="8" fill="rgba(120, 53, 15, 0.30)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="355" y="111" fill="#ffffff" font-size="13" font-weight="700" text-anchor="middle">Canonical Pack Repository</text>
+        <text x="355" y="130" fill="#cbd5e1" font-size="9" text-anchor="middle">rules / lookups / helpers / evidence / review / reports</text>
+        <text x="355" y="145" fill="#fbbf24" font-size="8" text-anchor="middle">authoring + review + signoff decide truth</text>
+
+        <rect x="650" y="88" width="390" height="68" rx="8" fill="#0f172a"/>
+        <rect x="650" y="88" width="390" height="68" rx="8" fill="rgba(136, 19, 55, 0.40)" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4,4"/>
+        <text x="845" y="111" fill="#ffffff" font-size="13" font-weight="700" text-anchor="middle">Forbidden Ownership Shift</text>
+        <text x="845" y="130" fill="#cbd5e1" font-size="9" text-anchor="middle">OV must not author, approve, infer, or rewrite banking truth</text>
+        <text x="845" y="145" fill="#fb7185" font-size="8" text-anchor="middle">session memory and runtime convenience stay outside canonical control</text>
+
+        <rect x="190" y="220" width="160" height="62" rx="8" fill="#0f172a"/>
+        <rect x="190" y="220" width="160" height="62" rx="8" fill="rgba(30, 41, 59, 0.50)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="270" y="242" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">State Filter</text>
+        <text x="270" y="259" fill="#94a3b8" font-size="8" text-anchor="middle">approved / review-ready only</text>
+        <text x="270" y="272" fill="#94a3b8" font-size="8" text-anchor="middle">drafts isolated or excluded</text>
+
+        <rect x="395" y="220" width="160" height="62" rx="8" fill="#0f172a"/>
+        <rect x="395" y="220" width="160" height="62" rx="8" fill="rgba(8, 51, 68, 0.40)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="475" y="242" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Projection Adapter</text>
+        <text x="475" y="259" fill="#94a3b8" font-size="8" text-anchor="middle">export pack copy</text>
+        <text x="475" y="272" fill="#94a3b8" font-size="8" text-anchor="middle">generate relation-ready structure</text>
+
+        <rect x="650" y="220" width="160" height="62" rx="8" fill="#0f172a"/>
+        <rect x="650" y="220" width="160" height="62" rx="8" fill="rgba(8, 51, 68, 0.40)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="730" y="242" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Layered Summary Build</text>
+        <text x="730" y="259" fill="#94a3b8" font-size="8" text-anchor="middle">L0 abstract</text>
+        <text x="730" y="272" fill="#94a3b8" font-size="8" text-anchor="middle">L1 overview / navigation</text>
+
+        <rect x="855" y="220" width="160" height="62" rx="8" fill="#0f172a"/>
+        <rect x="855" y="220" width="160" height="62" rx="8" fill="rgba(30, 41, 59, 0.50)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="935" y="242" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Relation Builder</text>
+        <text x="935" y="259" fill="#94a3b8" font-size="8" text-anchor="middle">object -> evidence</text>
+        <text x="935" y="272" fill="#94a3b8" font-size="8" text-anchor="middle">object -> review / dependency</text>
+
+        <rect x="190" y="358" width="188" height="62" rx="8" fill="#0f172a"/>
+        <rect x="190" y="358" width="188" height="62" rx="8" fill="rgba(6, 78, 59, 0.40)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="284" y="380" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">OV Resource Tree</text>
+        <text x="284" y="397" fill="#94a3b8" font-size="8" text-anchor="middle">pack / object / evidence / review projection</text>
+        <text x="284" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">stable URI-like access path</text>
+
+        <rect x="430" y="358" width="188" height="62" rx="8" fill="#0f172a"/>
+        <rect x="430" y="358" width="188" height="62" rx="8" fill="rgba(6, 78, 59, 0.40)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="524" y="380" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Find / Search</text>
+        <text x="524" y="397" fill="#94a3b8" font-size="8" text-anchor="middle">scope narrowing before deep read</text>
+        <text x="524" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">low-noise context selection</text>
+
+        <rect x="670" y="358" width="188" height="62" rx="8" fill="#0f172a"/>
+        <rect x="670" y="358" width="188" height="62" rx="8" fill="rgba(6, 78, 59, 0.40)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="764" y="380" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Object Navigation</text>
+        <text x="764" y="397" fill="#94a3b8" font-size="8" text-anchor="middle">pack -> object -> evidence -> review</text>
+        <text x="764" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">read detail only when needed</text>
+
+        <rect x="910" y="358" width="105" height="62" rx="8" fill="#0f172a"/>
+        <rect x="910" y="358" width="105" height="62" rx="8" fill="rgba(30, 41, 59, 0.50)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="962" y="380" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Context</text>
+        <text x="962" y="397" fill="#94a3b8" font-size="8" text-anchor="middle">loading shell</text>
+        <text x="962" y="410" fill="#94a3b8" font-size="8" text-anchor="middle">not truth owner</text>
+
+        <rect x="190" y="496" width="230" height="72" rx="8" fill="#0f172a"/>
+        <rect x="190" y="496" width="230" height="72" rx="8" fill="rgba(76, 29, 149, 0.40)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="305" y="520" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Agent Session</text>
+        <text x="305" y="539" fill="#94a3b8" font-size="8" text-anchor="middle">asks narrow question, retrieves projected truth</text>
+        <text x="305" y="552" fill="#94a3b8" font-size="8" text-anchor="middle">may store runtime notes elsewhere</text>
+
+        <rect x="470" y="496" width="230" height="72" rx="8" fill="#0f172a"/>
+        <rect x="470" y="496" width="230" height="72" rx="8" fill="rgba(76, 29, 149, 0.40)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="585" y="520" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Constrained Answering</text>
+        <text x="585" y="539" fill="#94a3b8" font-size="8" text-anchor="middle">reader / navigator / explainer</text>
+        <text x="585" y="552" fill="#94a3b8" font-size="8" text-anchor="middle">unknown beats unsupported certainty</text>
+
+        <rect x="750" y="496" width="265" height="72" rx="8" fill="#0f172a"/>
+        <rect x="750" y="496" width="265" height="72" rx="8" fill="rgba(136, 19, 55, 0.40)" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4,4"/>
+        <text x="882" y="520" fill="#ffffff" font-size="11" font-weight="600" text-anchor="middle">Prohibited Write-Back</text>
+        <text x="882" y="539" fill="#94a3b8" font-size="8" text-anchor="middle">no session memory -> pack YAML</text>
+        <text x="882" y="552" fill="#94a3b8" font-size="8" text-anchor="middle">no runtime inference -> approval state</text>
+
+        <line x1="355" y1="156" x2="355" y2="208" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="475" y1="282" x2="730" y2="282" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="935" y1="282" x2="935" y2="346" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="764" y1="420" x2="764" y2="484" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <line x1="524" y1="420" x2="524" y2="484" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+        <line x1="815" y1="533" x2="602" y2="533" stroke="#fb7185" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrowheadRose)"/>
+        <text x="688" y="523" fill="#fb7185" font-size="8" text-anchor="middle">blocked</text>
+
+        <rect x="160" y="628" width="860" height="72" rx="10" fill="#0f172a"/>
+        <rect x="160" y="628" width="860" height="72" rx="10" fill="rgba(251, 146, 60, 0.16)" stroke="#fb923c" stroke-width="1"/>
+        <text x="590" y="652" fill="#fb923c" font-size="11" font-weight="700" text-anchor="middle">Adopt From OV</text>
+        <text x="590" y="671" fill="#cbd5e1" font-size="9" text-anchor="middle">URI discipline + layered summaries + explicit relations + low-noise retrieval entry points</text>
+        <text x="590" y="686" fill="#94a3b8" font-size="8" text-anchor="middle">Do not adopt ownership of truth, runtime memory write-back, or approval logic from OV.</text>
+      </svg>
+
+      <div class="cards">
+        <div class="info">
+          <div class="info-head"><span class="dot truth"></span><span>Truth-source side</span></div>
+          <ul>
+            <li>Canonical packs own banking transformation truth.</li>
+            <li>Evidence, review, ambiguity, and signoff remain governed here.</li>
+            <li>Completed packs become goldensource for their scope.</li>
+          </ul>
+        </div>
+        <div class="info">
+          <div class="info-head"><span class="dot boundary"></span><span>Boundary rule</span></div>
+          <ul>
+            <li>One-way projection only.</li>
+            <li>Runtime memory never rewrites canonical YAML.</li>
+            <li>OV may retrieve truth, but may not decide truth.</li>
+          </ul>
+        </div>
+        <div class="info">
+          <div class="info-head"><span class="dot borrow"></span><span>Useful OV pieces</span></div>
+          <ul>
+            <li>Stable addressability and low-noise navigation.</li>
+            <li>L0/L1/L2 reading model for scope-first retrieval.</li>
+            <li>Relations for object, evidence, and review linkage.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">standalone architecture diagram • generated for the transformation rule system design repository</div>
+  </div>
+</body>
+</html>
