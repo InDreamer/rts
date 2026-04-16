@@ -6,6 +6,8 @@ children:
   - docs/transformation-rule-system/system-constitution-v1.md
   - docs/transformation-rule-system/ov-boundary-and-adoption.md
   - docs/transformation-rule-system/minimal-ov-integration.md
+  - docs/transformation-rule-system/ov-kb-discussion-synthesis-2026-04-16.md
+  - docs/transformation-rule-system/ov-kb-retrieval-design.md
   - docs/transformation-rule-system/session-handoff-2026-04-16.md
 summary: route design questions for the transformation rule system truth source and OV adoption boundary
 read_when:
@@ -31,6 +33,8 @@ This domain covers the design posture for a bank XML transformation rule system 
 - `docs/transformation-rule-system/system-constitution-v1.md` — the formal system constitution: what the system is optimizing for, what the LLM is allowed to do, and what must never drift.
 - `docs/transformation-rule-system/ov-boundary-and-adoption.md` — the clean boundary between the rule truth source and OpenViking, including the parts worth borrowing and the parts that must stay outside.
 - `docs/transformation-rule-system/minimal-ov-integration.md` — a smallest-possible OV integration path with scope, stop rules, rollout phases, and a rough engineering envelope.
+- `docs/transformation-rule-system/ov-kb-discussion-synthesis-2026-04-16.md` — the cleaned full-session synthesis: user goals, key corrections, standout insights, final decisions, and open questions.
+- `docs/transformation-rule-system/ov-kb-retrieval-design.md` — the retrieval architecture: projection model, L0/L1/L2 layered loading, OV capability selection, and validated query scenarios.
 - `docs/transformation-rule-system/session-handoff-2026-04-16.md` — condensed handoff for the next session: what has been concluded, what was corrected, and where to continue learning OV in plain language.
 
 ## Do Not Read This For

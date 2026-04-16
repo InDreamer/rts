@@ -30,6 +30,16 @@ documents:
     layer: 3
     parent: docs/transformation-rule-system/INDEX.md
     summary: smallest OV integration plan that keeps the truth source separate and engineering scope controlled
+  - path: docs/transformation-rule-system/ov-kb-discussion-synthesis-2026-04-16.md
+    role: leaf
+    layer: 3
+    parent: docs/transformation-rule-system/INDEX.md
+    summary: consolidated synthesis of the full OV knowledge base discussion, including user goals, key corrections, standout insights, final decisions, and open questions
+  - path: docs/transformation-rule-system/ov-kb-retrieval-design.md
+    role: leaf
+    layer: 3
+    parent: docs/transformation-rule-system/INDEX.md
+    summary: knowledge base retrieval architecture — projection model, L0/L1/L2 layering, OV capability selection, anti-hallucination design, and validated query scenarios
   - path: docs/transformation-rule-system/session-handoff-2026-04-16.md
     role: leaf
     layer: 3
