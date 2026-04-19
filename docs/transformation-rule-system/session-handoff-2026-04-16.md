@@ -16,6 +16,8 @@ source_of_truth:
   - docs/transformation-rule-system/system-constitution-v1.md
   - docs/transformation-rule-system/ov-boundary-and-adoption.md
   - docs/transformation-rule-system/minimal-ov-integration.md
+  - docs/transformation-rule-system/ov-kb-retrieval-design.md
+  - docs/transformation-rule-system/ov-kb-discussion-synthesis-2026-04-16.md
 -->
 
 # Session Handoff 2026-04-16
@@ -65,8 +67,8 @@ The safest role for OV is:
 - projection shell
 - resource tree
 - layered reading
-- relation graph
 - retrieval helper
+- optional lightweight dependency links later
 
 The unsafe role for OV is:
 
@@ -123,6 +125,26 @@ Another important correction:
 
 This matters because the user is currently more interested in how truth gets found in OV than in how OV imports arbitrary source material.
 
+### 4. Signed-Off Projection Was Narrowed To Runtime Objects Only
+
+An earlier model still carried too much of the canonical pack into the runtime retrieval surface.
+
+That was corrected.
+
+For agent-facing retrieval, the first runtime projection should contain only:
+
+- rules
+- lookups
+- helpers
+
+It should not carry:
+
+- evidence
+- review
+- reports
+
+The projection exists so agents can use approved truth, not replay the approval process.
+
 ## What Was Learned About OV Resource Ingest
 
 The plain-language model reached in the discussion was:
@@ -161,21 +183,23 @@ For this project, that likely means addressability for at least:
 
 - pack
 - rule
-- evidence item
-- review item
+- lookup
+- helper
 
 ### 2. Abstract / Overview
 
 How a truth object gets a short description and a navigation layer so the model does not begin by swallowing full raw content.
 
-### 3. Relations
+### 3. Dependencies
 
-How the system tells the agent what is connected to what, for example:
+How the system tells the agent what runtime objects are connected to what, for example:
 
-- rule -> evidence
-- rule -> review item
-- rule -> dependency
 - pack -> rule
+- rule -> dependency
+- rule -> lookup
+- rule -> helper
+
+This is useful, but no longer treated as a first-phase requirement.
 
 ### 4. Retrieval Order
 
@@ -185,7 +209,7 @@ The preferred mental model is:
 
 - first find the right area
 - then find the right object
-- then use relation links to reach evidence and review
+- then follow dependency hints when needed
 - only then read raw detail
 
 ## One-Line Summary Of OV’s Likely Value
@@ -196,7 +220,7 @@ OV is being evaluated as a way to turn already-confirmed truth into:
 
 - stable addresses
 - low-noise summaries
-- relation-aware navigation
+- dependency-aware navigation when needed
 - less chaotic retrieval
 
 ## Recommended Starting Point For The Next Session
@@ -211,6 +235,6 @@ That keeps the discussion aligned with the user’s actual priority and avoids d
 
 ## Suggested Next-Session Prompts
 
-- “继续讲 OV 里地址、摘要、关系、检索顺序这四件事，但只围绕已 signoff 的 pack 投影。”
-- “把 pack / rule / evidence / review item 映射到 OV 的资源树里，先不要讲 memory 和 session。”
+- “继续讲 OV 里地址、摘要、依赖、检索顺序这四件事，但只围绕已 signoff 的 pack 投影。”
+- “把 pack / rule / lookup / helper 映射到 OV 的资源树里，先不要讲 memory 和 session。”
 - “只讲对低幻觉 retrieval 有帮助的部分，不讲大仓实现细节。”

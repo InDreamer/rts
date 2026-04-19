@@ -22,7 +22,7 @@ This repository now holds two things: the original standalone diagram asset and 
 
 ## Choose A Path
 
-- `docs/INDEX.md` — open for the canonical documentation tree around truth-source design, OV boundary, and minimal integration.
+- `docs/INDEX.md` — open for the canonical documentation tree around truth-source design, OV boundary, retrieval design, discussion synthesis, and minimal integration.
 - `diagram.drawio` — open when you only need to inspect or edit the original diagram asset.
 - `diagram.png` — open when you only need a rendered preview of the original diagram.
 

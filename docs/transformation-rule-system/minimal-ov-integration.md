@@ -45,11 +45,11 @@ This integration does not attempt to:
 
 ### In Scope
 
-- one-way export from governed packs into OV resources
-- pack, object, evidence, and review projection
-- generated short abstracts and overviews
-- explicit relation building
+- one-way export from approved packs into OV resources
+- runtime projection of rules, lookups, and helpers only
+- LLM-assisted, human-confirmed abstracts and overviews
 - deterministic or semi-deterministic retrieval entry points for agents
+- optional lightweight dependency manifests only if they prove necessary
 
 ### Out Of Scope
 
@@ -65,78 +65,67 @@ Project only governed pack material.
 
 ### Resource Tree Shape
 
-Project reviewed or approved pack content into an OV resource subtree shaped roughly like this:
+Project approved pack runtime content into an OV resource subtree shaped roughly like this:
 
 ```text
 resources/transformation-rule-system/tradition-stella/{product}/{pack}/
-  pack-summary.md
-  objects/
-    rules/
-    lookups/
-    helpers/
-  evidence/
-    index.yaml
-    entries/
-  review/
-    index.yaml
-    items/
-  reports/
+  .abstract.md
+  .overview.md
+  rules/
+    rule_*.yaml
+    rule_*.abstract.md
+  lookups/
+    lk_*.yaml
+    lk_*.abstract.md
+  helpers/
+    hlp_*.yaml
+    hlp_*.abstract.md
 ```
 
 ### Projection Rule
 
 - canonical repository remains primary
 - OV receives a generated projection copy
-- only governed states are projected by default
+- only signoff-approved main objects are projected by default
+- evidence, review, and reports remain on the governed side and do not enter the first runtime shell
 
 ## Recommended State Filter
 
 Default projection set:
 
 - `approved`
-- `ready for BA review`
-- `ready for Dev review`
 
-Do not project raw authoring drafts into the same retrieval namespace unless they are clearly isolated and labeled as non-authoritative.
+Do not project review-ready or raw authoring content into the runtime retrieval namespace. The first runtime shell should expose only signoff-approved truth.
 
 ## L0 / L1 / L2 Strategy
 
-### Pack Level
+L0, L1, and L2 are three precision views of the same resource, not separate governance levels.
 
-- **L0**: one-sentence scope and state
-- **L1**: pack overview with objects, dependencies, review status, and open items
-- **L2**: raw projected files
+Recommended layering for the narrowed projection:
 
-### Object Level
+- **channel / product / pack**: L0 + L1
+- **rule / lookup / helper object**: L0 recommended, L2 YAML required
+- **L2**: raw projected runtime files only
 
-- **L0**: target field or lookup purpose in one line
-- **L1**: source, logic summary, dependencies, evidence refs, review refs
-- **L2**: canonical projected object file
+Pack L1 should focus on object list, target coverage, and dependency hints. It should not replay review state, open ambiguities, or evidence discussions.
 
-### Review Item Level
-
-- **L0**: short ambiguity or finding statement
-- **L1**: affected object, why unresolved, supporting evidence
-- **L2**: full review item payload
+There is no review-item layer in the first runtime projection because review does not enter the runtime shell.
 
 ## Relation Set
 
-Build relations explicitly instead of hoping text similarity does all the work.
+Relations are not required for the first usable version.
 
-Minimum relation types:
+If a lightweight dependency layer is added later, start with:
 
 - pack -> rule
 - pack -> lookup
 - pack -> helper
-- object -> evidence entry
-- object -> review item
 - object -> dependency object
-- review item -> supporting evidence
 - pack -> upstream or adjacent pack when needed
 
 ## Runtime Contract
 
-Agent usage may retrieve projected pack material through OV. Runtime sessions may keep their own memory, but that memory must not be treated as truth-source content and must not update canonical pack files.
+Agent usage may retrieve projected pack material through OV. Runtime sessions may keep their own memory, but that memory must not be treated as truth-source content and must not update canonical pack files. Runtime retrieval does not require evidence or review access in the first phase.
 
 ## Delivery Shape
 
@@ -144,12 +133,12 @@ The smallest implementation should be a thin adapter, not a platform rewrite.
 
 ### Adapter Responsibilities
 
-- export governed pack files
-- generate projection metadata
-- generate pack and object overviews
+- export approved main-object files
+- strip governance-only fields from projected YAML
+- generate pack and object summaries
 - push the projection into OV resources
-- build or refresh relations
-- keep state labels visible
+- optionally emit lightweight dependency metadata later
+- preserve read-only semantics
 
 ### Adapter Must Not
 
@@ -157,6 +146,7 @@ The smallest implementation should be a thin adapter, not a platform rewrite.
 - repair incomplete rules
 - decide approval state
 - suppress ambiguity
+- project evidence, review, or reports into the first runtime shell
 
 ## Engineering Envelope
 
@@ -166,20 +156,23 @@ Expected size for a disciplined MVP:
 
 That envelope assumes:
 
+- narrowed runtime projection centered on rules, lookups, and helpers
 - no OV core modification
 - no bidirectional sync
 - no custom runtime memory integration
 - no deep UI
 
+The current narrowed scope should aim for the low end of that range. If evidence, review, or a rich relation graph come back into scope, reassess.
+
 ## Suggested Work Breakdown
 
 ### Phase 1: Exporter
 
-Build a local exporter that reads reviewed or approved packs and writes a clean projection tree.
+Build a local exporter that reads approved packs and writes a clean runtime projection tree.
 
 ### Phase 2: Metadata And Layering
 
-Generate pack-level and object-level summaries plus relation manifests.
+Generate pack-level and object-level summaries plus optional lightweight dependency manifests.
 
 ### Phase 3: OV Ingestion Wrapper
 
@@ -191,8 +184,8 @@ Check whether common questions become easier to answer with less noise:
 
 - where does this target value come from
 - why is this field generated this way
-- what evidence supports this rule
-- what remains ambiguous
+- which pack covers this field
+- which lookup or helper does this rule depend on
 
 ## Stop Rules
 
@@ -210,7 +203,7 @@ The integration is successful only if it produces all of these outcomes:
 
 - lower retrieval noise
 - clearer scope narrowing
-- easier evidence traceability
+- easier dependency traceability
 - no weakening of approval or ambiguity boundaries
 - no truth-source ownership shift away from the pack repository
 

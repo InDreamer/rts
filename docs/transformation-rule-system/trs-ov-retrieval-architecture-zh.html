@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>真相治理与低幻觉检索架构图</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-2: #eef2f7;
+      --text: #0f172a;
+      --muted: #475569;
+      --cyan: #22d3ee;
+      --emerald: #34d399;
+      --violet: #a78bfa;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --orange: #fb923c;
+      --slate: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "JetBrains Mono", "Noto Sans SC", monospace;
+      background:
+        radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(251, 146, 60, 0.1), transparent 24%),
+        linear-gradient(180deg, #f8fafc, #eef6ff 60%, #f8fafc);
+      color: var(--text);
+    }
+
+    .page {
+      width: min(1440px, calc(100vw - 32px));
+      margin: 24px auto 40px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+      padding: 18px 20px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+      box-shadow: 0 16px 40px rgba(148, 163, 184, 0.18);
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 900px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 211, 238, 0.32);
+      background: rgba(186, 230, 253, 0.42);
+      color: #0c4a6e;
+      font-size: 12px;
+    }
+
+    .pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.6);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.55); }
+      70% { box-shadow: 0 0 0 12px rgba(34, 211, 238, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0); }
+    }
+
+    .meta {
+      min-width: 220px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(251, 191, 36, 0.34);
+      background: rgba(254, 243, 199, 0.8);
+    }
+
+    .meta strong {
+      display: block;
+      margin-bottom: 10px;
+      color: #92400e;
+      font-size: 13px;
+    }
+
+    .meta div {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .diagram-shell {
+      border-radius: 22px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+      box-shadow: 0 20px 52px rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+    }
+
+    .diagram-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(241, 245, 249, 0.9);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card {
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+      padding: 16px 18px;
+      min-height: 184px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+
+    .cyan { background: var(--cyan); }
+    .emerald { background: var(--emerald); }
+    .orange { background: var(--orange); }
+
+    .card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .card ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .footer {
+      margin-top: 16px;
+      color: #64748b;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .hero {
+        flex-direction: column;
+      }
+
+      .meta {
+        width: 100%;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div>
+        <div class="badge">
+          <span class="pulse"></span>
+          <span>中文架构图 / Truth Governance + Low-Hallucination Retrieval</span>
+        </div>
+        <h1>真相治理与低幻觉检索架构图</h1>
+        <p>
+          这张图把当前思想压成一条清晰主线：先在治理侧定义真相，再做单向只读投影，然后通过
+          <strong>L0 召回 → L1 重排 → L2 最终加载</strong>
+          把最小必要上下文送进 agent 运行时。运行时可以使用真相，但不能反过来改写真相。
+        </p>
+      </div>
+      <aside class="meta">
+        <strong>图的阅读顺序</strong>
+        <div>1. 先看四层职责</div>
+        <div>2. 再看中间的检索链</div>
+        <div>3. 最后看红色禁止路径</div>
+      </aside>
+    </section>
+
+    <section class="diagram-shell">
+      <div class="diagram-header">
+        <span>主视角：分层责任 + 检索链路</span>
+        <span>核心纪律：先认证真相，再供运行时读取</span>
+      </div>
+
+      <svg viewBox="0 0 1400 980" role="img" aria-label="真相治理与低幻觉检索架构图">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#d7e3f0" stroke-width="0.5" />
+          </pattern>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#334155" />
+          </marker>
+          <marker id="arrowhead-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee" />
+          </marker>
+          <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb923c" />
+          </marker>
+          <marker id="arrowhead-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185" />
+          </marker>
+        </defs>
+
+        <rect x="0" y="0" width="1400" height="980" fill="#f8fafc" />
+        <rect x="0" y="0" width="1400" height="980" fill="url(#grid)" />
+
+        <!-- Arrows behind components -->
+        <path d="M 700 178 L 700 236" fill="none" stroke="#22d3ee" stroke-width="3" marker-end="url(#arrowhead-cyan)" />
+        <path d="M 700 348 L 700 416" fill="none" stroke="#22d3ee" stroke-width="3" marker-end="url(#arrowhead-cyan)" />
+        <path d="M 386 522 L 476 522" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)" />
+        <path d="M 668 522 L 758 522" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)" />
+        <path d="M 950 522 L 1038 522" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrowhead)" />
+        <path d="M 1190 522 L 1248 522 L 1248 736 L 1116 736" fill="none" stroke="#22d3ee" stroke-width="3" marker-end="url(#arrowhead-cyan)" />
+        <path d="M 828 736 L 930 736" fill="none" stroke="#22d3ee" stroke-width="3" marker-end="url(#arrowhead-cyan)" />
+        <path d="M 1032 736 L 1126 736" fill="none" stroke="#22d3ee" stroke-width="3" marker-end="url(#arrowhead-cyan)" />
+        <path d="M 1032 778 L 1096 818" fill="none" stroke="#fb923c" stroke-width="2.5" marker-end="url(#arrowhead-orange)" />
+        <path d="M 1212 824 L 1212 206 L 1118 206" fill="none" stroke="#fb7185" stroke-width="2.5" stroke-dasharray="8,6" marker-end="url(#arrowhead-rose)" />
+
+        <!-- Layer boundaries -->
+        <rect x="34" y="34" width="1332" height="168" rx="16" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="8,4" />
+        <rect x="34" y="224" width="1332" height="148" rx="16" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="8,4" />
+        <rect x="34" y="394" width="1332" height="252" rx="16" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="8,4" />
+        <rect x="34" y="668" width="1332" height="232" rx="16" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="8,4" />
+
+        <!-- Layer titles -->
+        <rect x="54" y="52" width="174" height="34" rx="10" fill="#ffffff" />
+        <rect x="54" y="52" width="174" height="34" rx="10" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5" />
+        <text x="141" y="74" fill="#0f172a" font-size="13" font-weight="700" text-anchor="middle">第一层：真相层</text>
+
+        <rect x="54" y="242" width="174" height="34" rx="10" fill="#ffffff" />
+        <rect x="54" y="242" width="174" height="34" rx="10" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="141" y="264" fill="#0f172a" font-size="13" font-weight="700" text-anchor="middle">第二层：投影层</text>
+
+        <rect x="54" y="412" width="174" height="34" rx="10" fill="#ffffff" />
+        <rect x="54" y="412" width="174" height="34" rx="10" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5" />
+        <text x="141" y="434" fill="#0f172a" font-size="13" font-weight="700" text-anchor="middle">第三层：检索层</text>
+
+        <rect x="54" y="686" width="174" height="34" rx="10" fill="#ffffff" />
+        <rect x="54" y="686" width="174" height="34" rx="10" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5" />
+        <text x="141" y="708" fill="#0f172a" font-size="13" font-weight="700" text-anchor="middle">第四层：运行时层</text>
+
+        <!-- Layer notes -->
+        <text x="256" y="74" fill="#475569" font-size="10">职责：定义什么是真的；这里有 authoring / review / signoff / ambiguity</text>
+        <text x="256" y="264" fill="#475569" font-size="10">职责：把真相压缩成只读运行时知识壳；不重新判定真相</text>
+        <text x="256" y="434" fill="#475569" font-size="10">职责：决定先看什么、后看什么；控制上下文最小化</text>
+        <text x="256" y="708" fill="#475569" font-size="10">职责：消费上下文完成回答；不得把使用过程回写成真相</text>
+
+        <!-- Truth layer components -->
+        <rect x="102" y="110" width="280" height="72" rx="8" fill="#ffffff" />
+        <rect x="102" y="110" width="280" height="72" rx="8" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5" />
+        <text x="242" y="134" fill="#0f172a" font-size="12" font-weight="600" text-anchor="middle">Canonical Pack / 主对象</text>
+        <text x="242" y="152" fill="#475569" font-size="9" text-anchor="middle">rules / lookups / helpers</text>
+        <text x="242" y="167" fill="#475569" font-size="9" text-anchor="middle">这里承载业务规则本体</text>
+
+        <rect x="426" y="110" width="280" height="72" rx="8" fill="#ffffff" />
+        <rect x="426" y="110" width="280" height="72" rx="8" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5" />
+        <text x="566" y="134" fill="#0f172a" font-size="12" font-weight="600" text-anchor="middle">治理侧材料</text>
+        <text x="566" y="152" fill="#475569" font-size="9" text-anchor="middle">evidence / review / reports</text>
+        <text x="566" y="167" fill="#475569" font-size="9" text-anchor="middle">解释“为何成立”，不是运行时首层输入</text>
+
+        <rect x="752" y="104" width="296" height="84" rx="8" fill="#ffffff" />
+        <rect x="752" y="104" width="296" height="84" rx="8" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5" />
+        <text x="900" y="128" fill="#0f172a" font-size="12" font-weight="700" text-anchor="middle">签核边界 / Truth Certification</text>
+        <text x="900" y="147" fill="#be123c" font-size="9" text-anchor="middle">只有通过 signoff，内容才被认证为真相</text>
+        <text x="900" y="164" fill="#be123c" font-size="9" text-anchor="middle">“进入知识库”不等于“成为真相”</text>
+
+        <rect x="1088" y="110" width="218" height="72" rx="8" fill="#ffffff" />
+        <rect x="1088" y="110" width="218" height="72" rx="8" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5" />
+        <text x="1197" y="134" fill="#0f172a" font-size="12" font-weight="600" text-anchor="middle">真相层输出</text>
+        <text x="1197" y="152" fill="#475569" font-size="9" text-anchor="middle">已 signoff 的主对象</text>
+        <text x="1197" y="167" fill="#475569" font-size="9" text-anchor="middle">这是投影层唯一合法输入</text>
+
+        <!-- Projection layer components -->
+        <rect x="112" y="286" width="236" height="60" rx="8" fill="#ffffff" />
+        <rect x="112" y="286" width="236" height="60" rx="8" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5" />
+        <text x="230" y="308" fill="#0f172a" font-size="11" font-weight="600" text-anchor="middle">状态过滤</text>
+        <text x="230" y="326" fill="#475569" font-size="9" text-anchor="middle">approved only</text>
+        <text x="230" y="340" fill="#475569" font-size="9" text-anchor="middle">draft / review-ready 不进入 runtime</text>
+
+        <rect x="392" y="278" width="360" height="76" rx="8" fill="#ffffff" />
+        <rect x="392" y="278" width="360" height="76" rx="8" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="572" y="302" fill="#0f172a" font-size="12" font-weight="700" text-anchor="middle">投影适配器 / Projection Adapter</text>
+        <text x="572" y="321" fill="#475569" font-size="9" text-anchor="middle">剥离治理字段；保持只读；不解释银行逻辑</text>
+        <text x="572" y="338" fill="#475569" font-size="9" text-anchor="middle">生成 .abstract / .overview；只做单向投影</text>
+
+        <rect x="796" y="278" width="234" height="76" rx="8" fill="#ffffff" />
+        <rect x="796" y="278" width="234" height="76" rx="8" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="913" y="302" fill="#0f172a" font-size="11" font-weight="600" text-anchor="middle">运行时投影内容</text>
+        <text x="913" y="321" fill="#475569" font-size="9" text-anchor="middle">rules / lookups / helpers</text>
+        <text x="913" y="338" fill="#475569" font-size="9" text-anchor="middle">evidence / review / reports 留在治理侧</text>
+
+        <rect x="1072" y="286" width="236" height="60" rx="8" fill="#ffffff" />
+        <rect x="1072" y="286" width="236" height="60" rx="8" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5" />
+        <text x="1190" y="308" fill="#0f172a" font-size="11" font-weight="600" text-anchor="middle">输出形态</text>
+        <text x="1190" y="326" fill="#475569" font-size="9" text-anchor="middle">只读资源树 + L0 / L1 / L2</text>
+        <text x="1190" y="340" fill="#475569" font-size="9" text-anchor="middle">给检索层用，不给治理回写</text>
+
+        <!-- Retrieval layer components -->
+        <rect x="84" y="470" width="302" height="108" rx="10" fill="#ffffff" />
+        <rect x="84" y="470" width="302" height="108" rx="10" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5" />
+        <text x="235" y="494" fill="#0f172a" font-size="12" font-weight="700" text-anchor="middle">OV 资源树 / Runtime Knowledge Shell</text>
+        <text x="235" y="513" fill="#475569" font-size="9" text-anchor="middle">channel → product → pack → object</text>
+        <text x="235" y="530" fill="#475569" font-size="9" text-anchor="middle">每个节点可以有 L0 / L1；对象本体是 L2</text>
+
+        <rect x="116" y="544" width="74" height="20" rx="4" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1" />
+        <text x="153" y="558" fill="#fb923c" font-size="7" text-anchor="middle">channel</text>
+
+        <rect x="202" y="544" width="74" height="20" rx="4" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1" />
+        <text x="239" y="558" fill="#fb923c" font-size="7" text-anchor="middle">product</text>
+
+        <rect x="288" y="544" width="74" height="20" rx="4" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1" />
+        <text x="325" y="558" fill="#fb923c" font-size="7" text-anchor="middle">pack + objects</text>
+
+        <rect x="476" y="470" width="192" height="108" rx="10" fill="#ffffff" />
+        <rect x="476" y="470" width="192" height="108" rx="10" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5" />
+        <text x="572" y="494" fill="#0f172a" font-size="12" font-weight="700" text-anchor="middle">① 召回 / Recall</text>
+        <text x="572" y="513" fill="#92400e" font-size="9" text-anchor="middle">读 L0：短摘要，先别漏</text>
+        <text x="572" y="530" fill="#475569" font-size="9" text-anchor="middle">从大范围里找出“可能相关”的 pack / object</text>
+        <text x="572" y="547" fill="#475569" font-size="9" text-anchor="middle">允许不够准，但不能把候选直接当答案</text>
+
+        <rect x="758" y="470" width="192" height="108" rx="10" fill="#ffffff" />
+        <rect x="758" y="470" width="192" height="108" rx="10" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5" />
+        <text x="854" y="494" fill="#0f172a" font-size="12" font-weight="700" text-anchor="middle">② 重排 / Rerank</text>
+        <text x="854" y="513" fill="#92400e" font-size="9" text-anchor="middle">读 L1：结构摘要，先别混</text>
+        <text x="854" y="530" fill="#475569" font-size="9" text-anchor="middle">看 pack 覆盖范围、目标字段、依赖对象</text>
+        <text x="854" y="547" fill="#475569" font-size="9" text-anchor="middle">把相似但不对的候选排掉</text>
+
+        <rect x="1038" y="470" width="192" height="108" rx="10" fill="#ffffff" />
+        <rect x="1038" y="470" width="192" height="108" rx="10" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5" />
+        <text x="1134" y="494" fill="#0f172a" font-size="12" font-weight="700" text-anchor="middle">③ 最终加载 / Load</text>
+        <text x="1134" y="513" fill="#92400e" font-size="9" text-anchor="middle">读 L2：原始 YAML，先别编</text>
+        <text x="1134" y="530" fill="#475569" font-size="9" text-anchor="middle">只加载已确认命中的 rule / lookup / helper</text>
+        <text x="1134" y="547" fill="#475569" font-size="9" text-anchor="middle">依赖跟随优先于再次模糊搜索</text>
+
+        <rect x="1046" y="598" width="262" height="30" rx="8" fill="#ffffff" />
+        <rect x="1046" y="598" width="262" height="30" rx="8" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1.2" />
+        <text x="1177" y="618" fill="#fb923c" font-size="9" text-anchor="middle">输出：最小必要上下文包，不把整库原文塞给模型</text>
+
+        <text x="100" y="620" fill="#334155" font-size="8">L0 负责“别漏” / L1 负责“别混” / L2 负责“别编”</text>
+
+        <!-- Runtime layer components -->
+        <rect x="598" y="700" width="230" height="74" rx="8" fill="#ffffff" />
+        <rect x="598" y="700" width="230" height="74" rx="8" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="713" y="724" fill="#0f172a" font-size="12" font-weight="700" text-anchor="middle">Agent 会话 / Session</text>
+        <text x="713" y="743" fill="#475569" font-size="9" text-anchor="middle">消费最小上下文，完成解释 / 诊断 / 生成</text>
+        <text x="713" y="760" fill="#475569" font-size="9" text-anchor="middle">这里负责“使用真相”，不负责“认证真相”</text>
+
+        <rect x="930" y="700" width="174" height="74" rx="8" fill="#ffffff" />
+        <rect x="930" y="700" width="174" height="74" rx="8" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5" />
+        <text x="1017" y="724" fill="#0f172a" font-size="12" font-weight="600" text-anchor="middle">回答 / 动作</text>
+        <text x="1017" y="743" fill="#475569" font-size="9" text-anchor="middle">字段解释</text>
+        <text x="1017" y="757" fill="#475569" font-size="9" text-anchor="middle">报文生成 / 交易诊断</text>
+
+        <rect x="1126" y="700" width="180" height="74" rx="8" fill="#ffffff" />
+        <rect x="1126" y="700" width="180" height="74" rx="8" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5" />
+        <text x="1216" y="724" fill="#0f172a" font-size="12" font-weight="600" text-anchor="middle">会话记忆（可选）</text>
+        <text x="1216" y="743" fill="#475569" font-size="9" text-anchor="middle">帮助交互，不是业务真相</text>
+        <text x="1216" y="757" fill="#475569" font-size="9" text-anchor="middle">必须和 canonical truth 隔离</text>
+
+        <rect x="1044" y="796" width="328" height="56" rx="10" fill="#ffffff" />
+        <rect x="1044" y="796" width="328" height="56" rx="10" fill="rgba(136, 19, 55, 0.18)" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="1208" y="818" fill="#fb7185" font-size="11" font-weight="700" text-anchor="middle">禁止路径 / Forbidden Feedback Loop</text>
+        <text x="1208" y="836" fill="#be123c" font-size="9" text-anchor="middle">不能把 prompt、推断、session memory 或运行时习惯</text>
+        <text x="1208" y="849" fill="#be123c" font-size="9" text-anchor="middle">倒灌回真相层，升级成 authoritative rule</text>
+
+        <!-- Cross-cutting principle strip -->
+        <rect x="84" y="914" width="1240" height="34" rx="10" fill="#ffffff" />
+        <rect x="84" y="914" width="1240" height="34" rx="10" fill="rgba(251, 146, 60, 0.16)" stroke="#fb923c" stroke-width="1.2" />
+        <text x="704" y="936" fill="#1e293b" font-size="11" text-anchor="middle">
+          核心原则：真相先在治理侧成立，再被单向投影到检索壳；运行时可以消费真相，但没有资格重新定义真相。
+        </text>
+      </svg>
+    </section>
+
+    <section class="cards">
+      <article class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>架构主旨</h3>
+        </div>
+        <ul>
+          <li>• TRS 负责定义“什么是真的”，OV 负责让 agent 更容易找到并读取真相。</li>
+          <li>• 投影层只接受已 signoff 的主对象，不把治理过程原样搬进运行时。</li>
+          <li>• 运行时层只能使用上下文，不允许把使用痕迹反向升级为真相。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>检索链解释</h3>
+        </div>
+        <ul>
+          <li>• 召回读 L0：先保覆盖，避免漏掉正确 pack 或对象。</li>
+          <li>• 重排读 L1：利用结构摘要收紧范围，把相似但错误的候选剔除。</li>
+          <li>• 最终加载读 L2：只拉入已确认命中的原始 YAML，并顺着依赖去拿 lookup / helper。</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div class="card-dot orange"></div>
+          <h3>边界纪律</h3>
+        </div>
+        <ul>
+          <li>• approved only：draft、review-ready 不进入第一阶段 runtime surface。</li>
+          <li>• evidence / review / reports 留在治理侧，因为它们回答“为何成立”，不是运行时首层答案。</li>
+          <li>• 优先用地址、依赖和层级导航控噪，而不是一开始就做全文混合检索。</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="footer">
+      生成时间：2026-04-19 · 主题：真相治理、运行时投影、L0/L1/L2 检索链、禁止回写
+    </div>
+  </div>
+</body>
+</html>

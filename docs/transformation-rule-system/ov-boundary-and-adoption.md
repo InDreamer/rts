@@ -48,7 +48,7 @@ Your system already wants AI-readable and low-noise navigation. OV's layered rea
 
 ### 3. Both Benefit From Stable Addresses
 
-Your packs, objects, evidence, and review items naturally want stable identifiers. OV's URI model is useful here because it turns knowledge traversal into an explicit path problem instead of a vague search problem.
+Your packs and runtime objects naturally want stable identifiers. OV's URI model is useful here because it turns knowledge traversal into an explicit path problem instead of a vague search problem. In the current narrowed runtime projection, the first-phase addressable nodes are pack, rule, lookup, and helper.
 
 ### 4. Both Need Context Retrieval To Be Inspectable
 
@@ -102,11 +102,8 @@ Borrow the idea of stable addressable nodes for:
 - rule
 - lookup
 - helper
-- evidence entry
-- review item
-- report
 
-The exact URI syntax may be yours, but the addressability discipline is worth copying.
+The exact URI syntax may be yours, but the addressability discipline is worth copying. Evidence, review, and reports may keep identifiers on the governed side, but they are not first-phase OV runtime nodes.
 
 ### 2. Layered Reading
 
@@ -118,21 +115,19 @@ Borrow the `navigate before full read` model:
 
 This is one of the highest-value, lowest-risk adoptions because it directly reduces noise and therefore reduces hallucination.
 
-### 3. Explicit Relations
+### 3. Optional Lightweight Relations
 
-Borrow relation links for:
+If relation support is added later, start small:
 
 - pack -> object
-- object -> evidence
-- object -> review item
 - object -> dependency
 - pack -> related pack
 
-This is safer than relying on vector search alone.
+Do not treat evidence or review linkage as a first-phase runtime requirement. The current design keeps relations as a deferred optimization rather than a prerequisite.
 
 ### 4. Resource Projection
 
-Borrow OV's resource ingestion and retrieval idea, but only for projected copies of reviewed or approved packs. That gives agents a retrieval shell without relocating your truth source.
+Borrow OV's resource ingestion and retrieval idea, but only for projected copies of approved packs, and only for stripped runtime objects: rules, lookups, and helpers. That gives agents a retrieval shell without relocating your truth source or replaying approval artifacts at runtime.
 
 ### 5. Find/Search Split
 
@@ -162,8 +157,8 @@ Agent-learned shortcuts, habits, or prompt traces should remain runtime convenie
 The right relationship is not system merger. It is layered responsibility:
 
 - **truth-source layer**: Transformation Rule System
-- **projection layer**: controlled export of approved or review-ready pack material
-- **retrieval layer**: OV resource tree, layered summaries, relations, and bounded retrieval
+- **projection layer**: controlled export of approved runtime objects only: rules, lookups, helpers, plus L0/L1 summaries
+- **retrieval layer**: OV resource tree, layered summaries, optional lightweight dependency links, and bounded retrieval
 - **runtime layer**: agent sessions, tool use, and optional memory that never writes back to truth
 
 The boundary is one-way:

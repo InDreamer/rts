@@ -7,7 +7,7 @@ children:
 summary: main router for the transformation rule system design documentation
 read_when:
   - you need the canonical documentation tree in this repository
-  - you need to choose among constitution, OV boundary, or minimal integration docs
+  - you need to choose among constitution, OV boundary, retrieval design, synthesis, or minimal integration docs
 skip_when:
   - you already know the exact leaf document to open
 source_of_truth:
@@ -23,7 +23,7 @@ This documentation tree covers the design stance for a bank XML transformation r
 
 ## Open This Domain
 
-- `docs/transformation-rule-system/INDEX.md` — the single domain router for system principles, OV boundary, and the smallest acceptable OV adoption path.
+- `docs/transformation-rule-system/INDEX.md` — the single domain router for system principles, OV boundary, retrieval design, discussion synthesis, and the smallest acceptable OV adoption path.
 
 ## Do Not Read This For
 

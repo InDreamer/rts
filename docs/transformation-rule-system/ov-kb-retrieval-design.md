@@ -193,7 +193,7 @@ viking://resources/
 | **OV Skill system** | TRS skills (authoring, review) are business governance workflows, not MCP tool dispatch |
 | **Bidirectional sync / write-back** | Approved packs are read-only projections. OV must have no write channel back to the canonical repository |
 | **Queue processing pipeline** | Not needed for static projections |
-| **Relation graph** | Nice-to-have but not first priority. May revisit when evidence tracing becomes needed at runtime |
+| **Full relation graph** | Defer in the first phase. If needed later, start with lightweight rule→lookup/helper dependencies rather than evidence/review graphs |
 
 ---
 
@@ -282,7 +282,7 @@ The KB structure itself is the primary defense against hallucination, not prompt
 |---------------------|--------------------|
 | Irrelevant context interference | L0/L1/L2 progressive loading → agent sees only precisely relevant rules |
 | Draft vs approved confusion | Only approved content enters projection; no governance status to misread |
-| Evidence chain breakage → fabrication | Relations (when enabled) explicitly link rule→evidence; URI citations required |
+| Hidden dependency chain → fabrication | Pack L1 exposes dependencies early; optional lightweight rule→lookup/helper links may be added later |
 | Cross-domain concept mixing | Channel-level physical isolation + directory-scoped retrieval |
 
 ---
@@ -296,11 +296,11 @@ Phase 0: Validate (current stage — paused for design review)
 
 Phase 1: Single channel projection
   └─ Build lightweight export script: canonical pack → OV resource tree
-     Includes: L0/L1 human-confirmed, relations.json, URI convention
+  Includes: L0/L1 human-confirmed, stripped YAML projection, URI convention
 
 Phase 2: Multi-channel framework
   └─ Replicate Tradition-Stella structure to a second channel
-     Verify isomorphism and retrieval isolation
+  Verify isomorphism and retrieval isolation; add lightweight dependency metadata only if needed
 
 Phase 3: Agent integration
   └─ Define query protocol (prompt constraints)
@@ -325,7 +325,7 @@ Phase 3: Agent integration
 
 | Risk | Severity | Mitigation |
 |------|----------|-----------|
-| OV auto-L0/L1 summary bias leads agent astray | **High** | Approved rule L0/L1 hand-written + reviewed; auto-gen only for auxiliary docs |
+| OV auto-L0/L1 summary bias leads agent astray | **High** | Approved rule L0/L1 should be LLM-assisted and human-reviewed; auto-gen only for auxiliary docs |
 | OV session memory silently learns wrong inferences | **High** | Disable or isolate OV memory extraction feature |
 | Semantic search returns cross-channel/pack irrelevant rules | **Medium** | Force URI prefix (scope) at retrieval time; limit search radius |
 | OV version upgrade breaks resource structure conventions | **Medium** | Projection adapter isolates — canonical structure doesn't depend on OV internals |

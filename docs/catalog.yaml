@@ -14,7 +14,7 @@ documents:
     role: domain
     layer: 2
     parent: docs/INDEX.md
-    summary: route questions about truth-source design, OV boundary, and minimal integration
+    summary: route questions about truth-source design, OV boundary, retrieval design, discussion synthesis, and minimal integration
   - path: docs/transformation-rule-system/system-constitution-v1.md
     role: leaf
     layer: 3

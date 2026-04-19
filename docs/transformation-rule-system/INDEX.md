@@ -9,7 +9,7 @@ children:
   - docs/transformation-rule-system/ov-kb-discussion-synthesis-2026-04-16.md
   - docs/transformation-rule-system/ov-kb-retrieval-design.md
   - docs/transformation-rule-system/session-handoff-2026-04-16.md
-summary: route design questions for the transformation rule system truth source and OV adoption boundary
+summary: route design questions for truth-source governance, OV boundary, retrieval design, and controlled OV adoption
 read_when:
   - the request is about system principles for the transformation rule system
   - the request is about whether and how OpenViking should be used
@@ -26,7 +26,7 @@ source_of_truth:
 
 ## Scope
 
-This domain covers the design posture for a bank XML transformation rule system where pack completion establishes truth, ambiguity must remain explicit, and LLM freedom must be actively constrained rather than celebrated.
+This domain covers the design posture for a bank XML transformation rule system where pack completion establishes truth, ambiguity must remain explicit, LLM freedom must be actively constrained, and approved truth must be projected into retrieval in a narrower runtime form.
 
 ## Open One Of These Leaves
 

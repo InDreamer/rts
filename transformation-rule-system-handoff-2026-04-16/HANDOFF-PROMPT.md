@@ -52,6 +52,8 @@
 | **Review 层** | `review/review-index.yaml` | 未决点、风险、审核结论 |
 | **Report 层** | `reports/*.md` | 阶段汇总、交接沟通 |
 
+补充纠偏：以上四层分离描述的是 **canonical pack 的治理结构**，不是 agent 运行时检索面。按 2026-04-16 的后续设计收敛，进入 OV 或其他 agent retrieval shell 的第一阶段投影应只包含 signoff 后的 `rules/`、`lookups/`、`helpers/` 精简对象；`evidence/`、`review/`、`reports/` 保留在治理侧，不作为第一阶段 runtime surface。
+
 ### 2.2 三种主对象
 
 | 对象类型 | 文件名格式 | 作用 |
@@ -129,6 +131,10 @@ rule-pack-review -> Review-Ready Pack (closure-check/review-checklist)
 
 BA/Dev signoff
 
+↓
+
+runtime projection for agent retrieval (signoff 后仅投影 rules/lookups/helpers 的精简对象)
+
 ### 3.3 Skill 参考文件
 
 Authoring Skill 有 5 个 references：
@@ -162,6 +168,8 @@ Knowledge-Bases/
 ```
 
 KB 要给 AI 查询用的“可发现层”，与 `generated_pack/` 下的规范 pack 物件互为映射。
+
+补充纠偏：当前面向 agent retrieval 的运行时投影边界已经进一步收敛。第一阶段只应投影 signoff 完成后的主对象层（rules/lookups/helpers）以及它们的 L0/L1 导航视图，不应把 evidence/review/reports 一起放入运行时检索面。
 
 ---
 
@@ -255,9 +263,9 @@ C:\Users\1664901\Desktop\VPA_TRADITION_RTNS\54982-flow-traditionStella-plugin\
 
 每完成一批 FXO pack review 后，将结果汇总到总目录的 `open-review-items-summary.md`。
 
-### 任务 C：将 reviewed pack 同步到 Knowledge-Bases/（可延迟）
+### 任务 C：将 signoff 完成的 pack 投影到 Knowledge-Bases/（可延迟）
 
-将 review 通过的 pack 映射到 `Knowledge-Bases/TRADITION-STELLA/{PRODUCT}/` 下的 `-for-AI` 目录，供 kb-query skill 可查询。
+将 signoff 完成的 pack 的主对象层映射到 `Knowledge-Bases/TRADITION-STELLA/{PRODUCT}/` 下的 agent 可查询目录。第一阶段只投影 rules/lookups/helpers 及其分层导航视图，不把 evidence/review/reports 放入运行时检索面。
 
 ---
 
