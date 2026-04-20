@@ -3,6 +3,7 @@ role: domain
 layer: 2
 parent: docs/INDEX.md
 children:
+  - docs/transformation-rule-system/project-alignment-summary-zh.md
   - docs/transformation-rule-system/system-constitution-v1.md
   - docs/transformation-rule-system/ov-boundary-and-adoption.md
   - docs/transformation-rule-system/minimal-ov-integration.md
@@ -15,7 +16,7 @@ read_when:
   - the request is about whether and how OpenViking should be used
   - the request needs a decision between constitution, boundary, or integration scope
 skip_when:
-  - the request is only about the original standalone diagram asset
+  - the request is only about the standalone architecture asset
   - the exact design leaf is already known
 source_of_truth:
   - transformation-rule-system-handoff-2026-04-16/HANDOFF-PROMPT.md
@@ -30,6 +31,7 @@ This domain covers the design posture for a bank XML transformation rule system 
 
 ## Open One Of These Leaves
 
+- `docs/transformation-rule-system/project-alignment-summary-zh.md` — recommended first read for a Chinese global alignment pass across project definition, governance boundary, OV boundary, runtime projection, retrieval layering, current status, and reading order.
 - `docs/transformation-rule-system/system-constitution-v1.md` — the formal system constitution: what the system is optimizing for, what the LLM is allowed to do, and what must never drift.
 - `docs/transformation-rule-system/ov-boundary-and-adoption.md` — the clean boundary between the rule truth source and OpenViking, including the parts worth borrowing and the parts that must stay outside.
 - `docs/transformation-rule-system/minimal-ov-integration.md` — a smallest-possible OV integration path with scope, stop rules, rollout phases, and a rough engineering envelope.

@@ -4,7 +4,7 @@ documents:
     role: entry
     layer: 1
     parent: null
-    summary: repository entry for the diagram asset and transformation rule system design docs
+    summary: repository entry for the Transformation Rule System design docs and architecture assets
   - path: docs/INDEX.md
     role: entry
     layer: 1
@@ -15,6 +15,11 @@ documents:
     layer: 2
     parent: docs/INDEX.md
     summary: route questions about truth-source design, OV boundary, retrieval design, discussion synthesis, and minimal integration
+  - path: docs/transformation-rule-system/project-alignment-summary-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/transformation-rule-system/INDEX.md
+    summary: Chinese project alignment overview covering project definition, governance boundary, OV boundary, runtime projection, retrieval layering, current status, and reading order
   - path: docs/transformation-rule-system/system-constitution-v1.md
     role: leaf
     layer: 3

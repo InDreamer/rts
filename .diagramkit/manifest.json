@@ -1,12 +1,12 @@
 {
   "version": 2,
   "diagrams": {
-    "diagram.drawio": {
+    "trs-architecture.drawio": {
       "hash": "sha256:385c095689bff1c1",
       "generatedAt": "2026-04-19T06:22:32.132Z",
       "outputs": [
         {
-          "file": "diagram-light.png",
+          "file": "trs-architecture-light.png",
           "format": "png",
           "theme": "light",
           "width": 1666,

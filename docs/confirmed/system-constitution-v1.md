@@ -1,7 +1,7 @@
 <!-- docmeta
 role: leaf
 layer: 3
-parent: docs/transformation-rule-system/INDEX.md
+parent: AGENTS.md
 children: []
 summary: formal constitution for a truth-first transformation rule system with explicit LLM constraints
 read_when:
@@ -12,8 +12,8 @@ skip_when:
   - the request is only about OV adoption mechanics
   - the request is only about a specific pack implementation detail
 source_of_truth:
-  - transformation-rule-system-handoff-2026-04-16/HANDOFF-PROMPT.md
-  - docs/transformation-rule-system/system-constitution-v1.md
+  - docs/reference/handoff/HANDOFF-PROMPT.md
+  - docs/confirmed/system-constitution-v1.md
 -->
 
 # System Constitution v1

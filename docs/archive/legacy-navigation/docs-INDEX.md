@@ -24,9 +24,10 @@ This documentation tree covers the design stance for a bank XML transformation r
 ## Open This Domain
 
 - `docs/transformation-rule-system/INDEX.md` — the single domain router for system principles, OV boundary, retrieval design, discussion synthesis, and the smallest acceptable OV adoption path.
+- `docs/transformation-rule-system/project-alignment-summary-zh.md` — start here if you want a Chinese consolidated alignment pass before opening the leaf docs individually.
 
 ## Do Not Read This For
 
-- editing the original diagram asset only
+- editing the standalone architecture asset only
 - deep implementation details of OpenViking internals
 - pack authoring content that already lives in the handoff prompt

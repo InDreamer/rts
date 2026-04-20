@@ -166,9 +166,9 @@ The boundary is one-way:
 - pack truth may project into OV
 - OV runtime state must not silently project back into pack truth
 
-## Diagram
+## Architecture Asset
 
-Open the boundary diagram for the visual version of this layering model:
+Open the boundary architecture asset for the visual version of this layering model:
 
 - `ov-truth-boundary.html`
 
