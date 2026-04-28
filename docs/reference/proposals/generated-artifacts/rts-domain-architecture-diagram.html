@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>RTS 领域架构图</title>
+<style>
+  html, body { margin:0; background:#020617; color:#e2e8f0; font-family:'Noto Sans SC','Noto Sans CJK SC','Microsoft YaHei','PingFang SC',sans-serif; }
+  .wrap { width: 1400px; margin: 0 auto; padding: 24px; box-sizing: border-box; }
+  .frame { border:1px solid #334155; border-radius:18px; overflow:hidden; box-shadow:0 20px 80px rgba(0,0,0,.45); }
+  svg { display:block; width:1400px; height:1100px; }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="frame">
+<!-- inline SVG source: out/rts-domain-architecture-diagram.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1100" viewBox="0 0 1400 1100">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.6"/>
+    </pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0,10 4,0 8" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0,10 4,0 8" fill="#34d399"/>
+    </marker>
+    <style>
+      .bg { fill:#020617; }
+      .title { font: 700 30px 'Noto Sans SC','Microsoft YaHei','PingFang SC',sans-serif; fill:#f8fafc; }
+      .subtitle { font: 400 15px 'Noto Sans SC','Microsoft YaHei','PingFang SC',sans-serif; fill:#94a3b8; }
+      .layerTitle { font: 700 18px 'Noto Sans SC','Microsoft YaHei','PingFang SC',sans-serif; fill:#e2e8f0; }
+      .boxTitle { font: 700 16px 'Noto Sans SC','Microsoft YaHei','PingFang SC',sans-serif; fill:#ffffff; }
+      .boxText { font: 400 12px 'Noto Sans SC','Microsoft YaHei','PingFang SC',sans-serif; fill:#cbd5e1; }
+      .tiny { font: 400 11px 'Noto Sans SC','Microsoft YaHei','PingFang SC',sans-serif; fill:#94a3b8; }
+      .tag { font: 700 12px 'Noto Sans SC','Microsoft YaHei','PingFang SC',sans-serif; fill:#ffffff; }
+      .layer { fill:rgba(15,23,42,0.78); stroke:#334155; stroke-width:1.2; rx:16; }
+      .truth { fill:rgba(76,29,149,0.32); stroke:#a78bfa; stroke-width:1.8; rx:10; }
+      .proj { fill:rgba(6,78,59,0.36); stroke:#34d399; stroke-width:1.8; rx:10; }
+      .index { fill:rgba(8,51,68,0.36); stroke:#22d3ee; stroke-width:1.8; rx:10; }
+      .api { fill:rgba(120,53,15,0.30); stroke:#fbbf24; stroke-width:1.8; rx:10; }
+      .wf { fill:rgba(30,41,59,0.55); stroke:#94a3b8; stroke-width:1.5; rx:10; }
+      .guard { fill:rgba(136,19,55,0.22); stroke:#fb7185; stroke-width:1.5; stroke-dasharray:7 5; rx:14; }
+      .comp { fill:rgba(30,41,59,0.72); stroke:#64748b; stroke-width:1.2; rx:10; }
+      .arrow { stroke:#94a3b8; stroke-width:2.4; fill:none; marker-end:url(#arrow); }
+      .arrowGreen { stroke:#34d399; stroke-width:2.4; fill:none; marker-end:url(#arrowGreen); }
+      .dash { stroke:#fb7185; stroke-width:2; fill:none; stroke-dasharray:8 6; marker-end:url(#arrow); }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="1100"/>
+  <rect x="0" y="0" width="1400" height="1100" fill="url(#grid)" opacity="0.55"/>
+
+  <circle cx="46" cy="42" r="7" fill="#34d399"/>
+  <text x="68" y="52" class="title">RTS 领域架构：受治理的报文转换 AI 语义基座</text>
+  <text x="68" y="80" class="subtitle">不是聊天机器人 / 不是一次性 RAG；RTS 建立规则真相，AI 只做受控读取、导航、解释与流程消费</text>
+
+  <!-- Source materials -->
+  <rect x="70" y="120" width="1260" height="115" class="layer"/>
+  <text x="95" y="153" class="layerTitle">01 源材料层 · Fragmented Transformation Knowledge</text>
+  <rect x="100" y="170" width="170" height="42" class="comp"/><text x="185" y="196" text-anchor="middle" class="boxText">XML / FpML / SCBML</text>
+  <rect x="295" y="170" width="145" height="42" class="comp"/><text x="367" y="196" text-anchor="middle" class="boxText">Mapping 表</text>
+  <rect x="465" y="170" width="145" height="42" class="comp"/><text x="537" y="196" text-anchor="middle" class="boxText">Java / XSLT</text>
+  <rect x="635" y="170" width="145" height="42" class="comp"/><text x="707" y="196" text-anchor="middle" class="boxText">Lookup 表</text>
+  <rect x="805" y="170" width="165" height="42" class="comp"/><text x="887" y="196" text-anchor="middle" class="boxText">Ticket / Defect</text>
+  <rect x="995" y="170" width="145" height="42" class="comp"/><text x="1067" y="196" text-anchor="middle" class="boxText">Confluence</text>
+  <rect x="1165" y="170" width="130" height="42" class="comp"/><text x="1230" y="196" text-anchor="middle" class="boxText">SME 经验</text>
+
+  <path d="M700 235 L700 280" class="arrow"/>
+
+  <!-- Truth layer -->
+  <rect x="70" y="280" width="1260" height="170" class="layer"/>
+  <text x="95" y="313" class="layerTitle">02 真相层 · Governed Rule Truth Layer</text>
+  <text x="95" y="337" class="tiny">Canonical pack 是规则真相的正式记录；草稿不等于 truth，必须经过 evidence / review / signoff。</text>
+  <rect x="105" y="360" width="225" height="62" class="truth"/><text x="217" y="385" text-anchor="middle" class="boxTitle">Rules</text><text x="217" y="407" text-anchor="middle" class="boxText">source → logic → target</text>
+  <rect x="355" y="360" width="190" height="62" class="truth"/><text x="450" y="385" text-anchor="middle" class="boxTitle">Lookups</text><text x="450" y="407" text-anchor="middle" class="boxText">查表 / 映射矩阵</text>
+  <rect x="570" y="360" width="190" height="62" class="truth"/><text x="665" y="385" text-anchor="middle" class="boxTitle">Helpers</text><text x="665" y="407" text-anchor="middle" class="boxText">复用辅助逻辑</text>
+  <rect x="785" y="360" width="165" height="62" class="truth"/><text x="867" y="385" text-anchor="middle" class="boxTitle">Evidence</text><text x="867" y="407" text-anchor="middle" class="boxText">证据与来源</text>
+  <rect x="975" y="360" width="150" height="62" class="truth"/><text x="1050" y="385" text-anchor="middle" class="boxTitle">Review</text><text x="1050" y="407" text-anchor="middle" class="boxText">歧义 / 风险</text>
+  <rect x="1150" y="360" width="145" height="62" class="truth"/><text x="1222" y="385" text-anchor="middle" class="boxTitle">Signoff</text><text x="1222" y="407" text-anchor="middle" class="boxText">批准边界</text>
+
+  <path d="M700 450 L700 500" class="arrowGreen"/>
+
+  <!-- Projection -->
+  <rect x="70" y="500" width="1260" height="135" class="layer"/>
+  <text x="95" y="533" class="layerTitle">03 运行时投影 · Runtime Projection</text>
+  <rect x="105" y="555" width="340" height="54" class="proj"/><text x="275" y="578" text-anchor="middle" class="boxTitle">只读投影</text><text x="275" y="598" text-anchor="middle" class="boxText">仅导出已批准 rules / lookups / helpers</text>
+  <rect x="485" y="555" width="350" height="54" class="proj"/><text x="660" y="578" text-anchor="middle" class="boxTitle">低噪声上下文</text><text x="660" y="598" text-anchor="middle" class="boxText">evidence / review / reports 留在治理侧</text>
+  <rect x="875" y="555" width="385" height="54" class="proj"/><text x="1067" y="578" text-anchor="middle" class="boxTitle">受控追溯引用</text><text x="1067" y="598" text-anchor="middle" class="boxText">审计解释时按需引用证据和评审状态</text>
+
+  <path d="M700 635 L700 685" class="arrowGreen"/>
+
+  <!-- Index / Query -->
+  <rect x="70" y="685" width="1260" height="150" class="layer"/>
+  <text x="95" y="718" class="layerTitle">04 索引 / 查询层 · Scoped Retrieval Surface</text>
+  <rect x="105" y="740" width="200" height="58" class="index"/><text x="205" y="764" text-anchor="middle" class="boxTitle">URI / Metadata</text><text x="205" y="785" text-anchor="middle" class="boxText">稳定寻址</text>
+  <rect x="335" y="740" width="185" height="58" class="index"/><text x="427" y="764" text-anchor="middle" class="boxTitle">L0 / L1 / L2</text><text x="427" y="785" text-anchor="middle" class="boxText">召回 / 导航 / 原文</text>
+  <rect x="550" y="740" width="210" height="58" class="index"/><text x="655" y="764" text-anchor="middle" class="boxTitle">Dependency Graph</text><text x="655" y="785" text-anchor="middle" class="boxText">规则依赖图</text>
+  <rect x="790" y="740" width="220" height="58" class="index"/><text x="900" y="764" text-anchor="middle" class="boxTitle">Scope-aware Retrieval</text><text x="900" y="785" text-anchor="middle" class="boxText">通道 / 产品 / 规则包</text>
+  <rect x="1040" y="740" width="220" height="58" class="index"/><text x="1150" y="764" text-anchor="middle" class="boxTitle">Retrieval Trace</text><text x="1150" y="785" text-anchor="middle" class="boxText">可追溯查询路径</text>
+
+  <path d="M700 835 L700 880" class="arrow"/>
+
+  <!-- API and consumers -->
+  <rect x="70" y="880" width="1260" height="120" class="layer"/>
+  <text x="95" y="913" class="layerTitle">05 API 化 AI 消费 · Controlled Workflow Integration</text>
+  <rect x="105" y="935" width="240" height="45" class="api"/><text x="225" y="963" text-anchor="middle" class="boxTitle">受控 API 接入</text>
+  <rect x="375" y="935" width="185" height="45" class="wf"/><text x="467" y="963" text-anchor="middle" class="boxText">客户 / 上游接入</text>
+  <rect x="585" y="935" width="185" height="45" class="wf"/><text x="677" y="963" text-anchor="middle" class="boxText">发布 / 测试推荐</text>
+  <rect x="795" y="935" width="185" height="45" class="wf"/><text x="887" y="963" text-anchor="middle" class="boxText">Incident 解释</text>
+  <rect x="1005" y="935" width="185" height="45" class="wf"/><text x="1097" y="963" text-anchor="middle" class="boxText">审计 / 准备度</text>
+
+  <!-- Side tools and boundary -->
+  <rect x="1035" y="465" width="295" height="170" class="guard"/>
+  <text x="1182" y="493" text-anchor="middle" class="layerTitle">Copilot / Yoda 边界</text>
+  <text x="1060" y="525" class="boxText">可辅助 authoring / 展示解释</text>
+  <text x="1060" y="550" class="boxText">可消费 RTS 输出</text>
+  <text x="1060" y="575" class="boxText">不能拥有 governed rule truth</text>
+  <text x="1060" y="600" class="boxText">不能替代 signoff / lineage / trace</text>
+  <path d="M1035 520 C950 500 880 455 760 420" class="dash"/>
+  <text x="875" y="488" class="tiny" fill="#fb7185">authoring assistant only</text>
+
+  <!-- Guardrail strip -->
+  <rect x="70" y="1020" width="1260" height="52" class="guard"/>
+  <text x="95" y="1052" class="tag">架构护栏</text>
+  <text x="190" y="1052" class="boxText">AI 不决策、不签核、不改生产；保留歧义；运行时学习不写回规则真相；关键结论必须可追溯。</text>
+</svg>
+
+</div></div></body></html>
