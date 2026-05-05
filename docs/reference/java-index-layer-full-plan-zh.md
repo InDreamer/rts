@@ -1,7 +1,7 @@
 <!-- docmeta
 role: leaf
 layer: 3
-parent: AGENTS.md
+parent: docs/reference/README.md
 children: []
 summary: reference implementation plan for a Java-based RTS index/query layer; not the full RTS system baseline
 read_when:

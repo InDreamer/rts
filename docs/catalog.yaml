@@ -1,0 +1,97 @@
+version: 1
+documents:
+  - path: README.md
+    role: entry
+    layer: 1
+    parent: null
+    summary: repository entry for RTS truth service alignment docs and reference materials
+  - path: AGENTS.md
+    role: agent
+    layer: 1
+    parent: null
+    summary: coding-agent document index and active development navigation for RTS
+  - path: docs/INDEX.md
+    role: entry
+    layer: 1
+    parent: null
+    summary: primary RTS documentation router
+  - path: docs/confirmed/README.md
+    role: domain
+    layer: 2
+    parent: docs/INDEX.md
+    summary: route confirmed RTS baseline documents
+  - path: docs/confirmed/project-alignment-summary-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/confirmed/README.md
+    summary: RTS project alignment summary and service vision
+  - path: docs/confirmed/system-constitution-v1.md
+    role: leaf
+    layer: 3
+    parent: docs/confirmed/README.md
+    summary: RTS constitution for governed truth, LLM boundaries, permissioned access, and runtime safety
+  - path: docs/confirmed/kb-to-index-projection-contract-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/confirmed/README.md
+    summary: KB-to-index runtime projection contract
+  - path: docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/confirmed/README.md
+    summary: Day1 RTS query service, lightweight index, and controlled LLM harness plan
+  - path: docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/confirmed/README.md
+    summary: Day2 controlled agentic retrieval and LLM/MCP evolution plan
+  - path: docs/reference/README.md
+    role: domain
+    layer: 2
+    parent: docs/INDEX.md
+    summary: route RTS reference materials
+  - path: docs/reference/java-index-layer-full-plan-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: Java index/query layer reference implementation plan
+  - path: docs/reference/minimal-ov-integration.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: smallest controlled OV integration reference
+  - path: docs/reference/ov-boundary-and-adoption.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: OV boundary and adoptable surfaces reference
+  - path: docs/reference/ov-kb-retrieval-design.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: OV-inspired KB retrieval design reference
+  - path: docs/reference/project-keywords-glossary-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: Chinese RTS project glossary
+  - path: docs/reference/rts-project-background-and-pack-model.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: RTS project background and pack/object model reference
+  - path: docs/reference/rts-publication-and-refusal-principles.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: RTS publication, refusal, trace, and release safety principles
+  - path: docs/reference/rts-retrieval-principles.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: RTS retrieval principles reference
+  - path: docs/reference/rts-service-interface-and-output-principles.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: RTS service interface and output principles reference

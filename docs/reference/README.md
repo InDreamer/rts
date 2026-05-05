@@ -1,3 +1,29 @@
+<!-- docmeta
+role: domain
+layer: 2
+parent: docs/INDEX.md
+children:
+  - docs/reference/java-index-layer-full-plan-zh.md
+  - docs/reference/minimal-ov-integration.md
+  - docs/reference/ov-boundary-and-adoption.md
+  - docs/reference/ov-kb-retrieval-design.md
+  - docs/reference/project-keywords-glossary-zh.md
+  - docs/reference/rts-project-background-and-pack-model.md
+  - docs/reference/rts-publication-and-refusal-principles.md
+  - docs/reference/rts-retrieval-principles.md
+  - docs/reference/rts-service-interface-and-output-principles.md
+summary: route RTS reference materials that support but do not override confirmed baseline
+read_when:
+  - 需要历史 rationale、OV 背景、检索原则、术语表或早期 Java 参考方案
+  - confirmed docs 指向参考材料以解释背景
+skip_when:
+  - 需要当前 active baseline 或 Day1/Day2 实现方向
+  - 需要 archived archaeology
+source_of_truth:
+  - docs/confirmed/README.md
+  - docs/reference
+-->
+
 # Reference Docs
 
 This directory contains useful supporting materials for RTS, but it is not the default baseline for day-to-day alignment.

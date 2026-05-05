@@ -1,7 +1,8 @@
 <!-- docmeta
 role: leaf
 layer: 3
-parent: docs/transformation-rule-system/INDEX.md
+parent: docs/reference/README.md
+children: []
 summary: knowledge base retrieval architecture using OpenViking — projection model, L0/L1/L2 layering, OV capability selection, and validated query scenarios
 read_when:
   - the request is about how the knowledge base should be structured for agent retrieval
@@ -14,7 +15,7 @@ skip_when:
   - the request is about the raw OV/TRS boundary line (see ov-boundary-and-adoption.md)
   - the request is about the minimal integration engineering plan (see minimal-ov-integration.md)
 source_of_truth:
-  - this file
+  - docs/reference/ov-kb-retrieval-design.md
 -->
 
 # OV Knowledge Base Retrieval Design

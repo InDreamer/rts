@@ -1,7 +1,7 @@
 <!-- docmeta
 role: leaf
 layer: 3
-parent: README.md
+parent: docs/confirmed/README.md
 children: []
 summary: 中文项目总纲，统一 RTS 最终服务愿景、多源真相治理、AI-first review、人工裁决和服务边界
 read_when:
@@ -330,6 +330,9 @@ OV 在 RTS 文档中只作为检索和知识组织思想参考。
 
 - `project-alignment-summary-zh.md`：本文，核心总纲
 - `system-constitution-v1.md`：RTS Constitution v2，定义系统底线和治理原则
+- `kb-to-index-projection-contract-zh.md`：KB 到查询/索引层的运行时投影契约，定义 KB 发布后必须产出的 projection，以及索引层的读取边界
+- `day1-query-service-and-llm-harness-plan-zh.md`：Day1 查询服务、轻量索引层和受控 LLM harness 落地方案
+- `day2-agentic-retrieval-evolution-plan-zh.md`：Day2 受控 agentic retrieval、rerank、MCP 扩展、影响分析和测试规划演进方向
 
 ### `docs/reference/`
 
@@ -350,10 +353,13 @@ OV 在 RTS 文档中只作为检索和知识组织思想参考。
 1. `README.md`
 2. `docs/confirmed/project-alignment-summary-zh.md`
 3. `docs/confirmed/system-constitution-v1.md`
-4. `docs/reference/project-keywords-glossary-zh.md`
-5. 需要工程方案时，再读 `docs/reference/java-index-layer-full-plan-zh.md`
-6. 需要 OV 背景时，再读 `docs/reference/ov-boundary-and-adoption.md` 和 `docs/reference/ov-kb-retrieval-design.md`
-7. 需要历史样例背景或 pack/object model 时，再读 `docs/reference/rts-project-background-and-pack-model.md`
+4. `docs/confirmed/kb-to-index-projection-contract-zh.md`
+5. 需要落地第一版服务时，读 `docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md`
+6. 需要规划 Day1 后的检索/LLM/MCP 增强时，读 `docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md`
+7. `docs/reference/project-keywords-glossary-zh.md`
+8. 需要历史 Java 工程参考时，再读 `docs/reference/java-index-layer-full-plan-zh.md`
+9. 需要 OV 背景时，再读 `docs/reference/ov-boundary-and-adoption.md` 和 `docs/reference/ov-kb-retrieval-design.md`
+10. 需要历史样例背景或 pack/object model 时，再读 `docs/reference/rts-project-background-and-pack-model.md`
 
 ## 当前对齐结论
 

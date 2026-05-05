@@ -1,7 +1,7 @@
 <!-- docmeta
 role: leaf
 layer: 3
-parent: docs/transformation-rule-system/INDEX.md
+parent: docs/reference/README.md
 children: []
 summary: define the smallest OV integration that improves retrieval without merging systems or risking truth pollution
 read_when:

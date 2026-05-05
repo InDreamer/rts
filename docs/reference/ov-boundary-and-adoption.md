@@ -1,7 +1,7 @@
 <!-- docmeta
 role: leaf
 layer: 3
-parent: docs/transformation-rule-system/INDEX.md
+parent: docs/reference/README.md
 children: []
 summary: define the clean boundary between the transformation rule system truth source and OpenViking, and list the safe surfaces to borrow
 read_when:

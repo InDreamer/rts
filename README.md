@@ -2,8 +2,7 @@
 role: entry
 layer: 1
 parent: null
-children:
-  - docs/confirmed/project-alignment-summary-zh.md
+children: []
 summary: repository entry for RTS truth service alignment docs and reference materials
 read_when:
   - first entering this repository
@@ -25,8 +24,12 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 
 ## 先读什么
 
+- `docs/INDEX.md` — 文档主入口；用于在 confirmed、reference、archive 之间选择路径。
 - `docs/confirmed/project-alignment-summary-zh.md` — 当前核心总纲；先读它来统一 RTS 最终服务愿景、多源真相治理、AI-first review、人工裁决和服务边界。
 - `docs/confirmed/system-constitution-v1.md` — 系统底线；定义 truth-first、LLM 角色、证据优先和不确定性处理原则。
+- `docs/confirmed/kb-to-index-projection-contract-zh.md` — KB 到索引/查询层的运行时投影契约。
+- `docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md` — 第一版 RTS 查询服务、轻量索引和受控 LLM harness 方案。
+- `docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md` — Day1 之后的受控 agentic retrieval 和 LLM/MCP 增强路线。
 - `docs/reference/java-index-layer-full-plan-zh.md` — 索引/查询层参考方案；不代表 RTS 全系统基线或最终技术栈决定。
 - `docs/reference/README.md` — 参考材料入口；包含 OV 边界、检索设计、术语表、外部评审和历史交接材料。
 - `docs/archive/README.md` — 历史材料入口；只在需要追溯旧讨论或原型时阅读。
@@ -45,4 +48,5 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 - AI 应尽可能完成整理、结构校验、跨 source 验证、歧义发现和问题简化。
 - 人工 review 结论是冲突和歧义的最终裁决。
 - API 面向系统 pipeline，MCP 面向 agent/问答；底层共享同一个 truth service。
-- 文档可以讨论候选工程方案，但不要把 Java、OV、OpenSearch 等技术写成最终决定。
+- Day1 工程方向是 JDK 17 Java 查询/索引服务 + PostgreSQL + Lucene + local L2 store + controlled LLM harness。
+- 文档可以讨论候选工程方案，但不要把 OV、OpenSearch、向量库等技术写成 Day1 必选。
