@@ -1,146 +1,202 @@
 <!-- docmeta
 role: leaf
 layer: 3
-parent: AGENTS.md
+parent: docs/confirmed/README.md
 children: []
-summary: formal constitution for a truth-first transformation rule system with explicit LLM constraints
+summary: RTS Constitution v2 for a rule truth service with multi-source governance, AI-first review, human final adjudication, permissioned service access, and runtime truth boundaries
 read_when:
-  - the request is about core system principles
+  - the request is about core RTS principles
+  - the request is about AI-first governance or human final adjudication
+  - the request is about API/MCP/pipeline/Q&A service boundaries
   - the request is about hallucination minimization by architecture
-  - the request is about what the LLM may or may not do
 skip_when:
-  - the request is only about OV adoption mechanics
-  - the request is only about a specific pack implementation detail
+  - the request is only about a specific implementation detail
+  - the request is only about historical OV adoption mechanics
 source_of_truth:
-  - docs/reference/handoff/HANDOFF-PROMPT.md
+  - docs/confirmed/project-alignment-summary-zh.md
   - docs/confirmed/system-constitution-v1.md
 -->
 
-# System Constitution v1
+# RTS Constitution v2
 
 ## What This Covers
 
-This document defines the constitutional rules for the Transformation Rule System. It describes what the system exists to protect, how truth is established, and how the LLM must be constrained so that helpfulness never outruns evidence.
+This document defines the constitutional rules for RTS as a rule truth service.
 
-## Source Boundaries
+RTS exists to turn multi-source transformation knowledge into governed rule truth that can be safely used through its internal Knowledge Base, retrieval layer, LLM, APIs, MCP tools, Q&A surfaces, and system pipelines.
 
-- `transformation-rule-system-handoff-2026-04-16/HANDOFF-PROMPT.md` — canonical project shape, pack structure, workflow model, and current operating assumptions.
-- This document — governing interpretation layer for future design and implementation decisions.
+RTS includes LLM as a core internal capability. The LLM may organize, retrieve, explain, analyze, and answer based on governed Knowledge Base content, but an LLM answer is not automatically truth.
+
+The goal is not maximum generative fluency. The goal is controlled truth creation, controlled truth publication, and controlled truth consumption.
 
 ## Constitutional Purpose
 
-The system exists to turn bank XML transformation knowledge into a governed truth source that an LLM can read safely.
+RTS protects five things:
 
-The primary goal is not generative power. The primary goal is controlled truth access:
+- truth must come from traceable sources
+- source conflicts must be exposed, not hidden
+- AI should do as much review work as possible, but must not become the final truth owner
+- human review is the final裁决 for material ambiguity and conflict
+- LLM answers must be separated from approved truth
+- service outputs must stay permissioned, traceable, and state-aware
 
-- truth must be explicit
-- evidence must be traceable
-- unknowns must remain unknown
-- the LLM must operate as a constrained reader, navigator, and explainer
+## Core Objects
+
+RTS truth is built around three object groups that must not be separated in thinking:
+
+- **Rule**: structured transformation logic for target fields, lookups, helpers, constants, conditions, and dependencies
+- **Rule pack**: the governance boundary for related rules, lookups, helpers, evidence, review records, reports, and signoff state
+- **Evidence chain**: the source-backed explanation of why a rule is trusted, disputed, incomplete, or superseded
+
+A rule without evidence is not enough. Evidence without review is not enough. A pack without explicit state is not safe to publish as default service truth.
+
+Canonical packs should keep main transformation objects separate from governance side layers. `rules/`, `lookups/`, and `helpers/` describe what the transformation does. `evidence/`, `review/`, and `reports/` explain why it is trusted, disputed, reviewed, or ready. Long evidence, review history, ambiguity discussion, and approval history should not be mixed into every main rule object.
 
 ## Constitutional Principles
 
-### 1. Pack Completion Establishes Truth
+### 1. Governed Review Establishes Default Service Truth
 
-Once a pack has passed the defined review and signoff boundary, it becomes the goldensource for its scope. It is no longer a draft interpretation or advisory note.
+A rule becomes default service truth only after the relevant source material has been collected, AI review has exposed structure issues and conflicts, human review has裁决 material ambiguity, and signoff/publication state has been recorded.
 
-### 2. Canonical Truth Lives In Pack Objects, Not In Conversations
+Pack completion alone is not sufficient if material conflicts remain unresolved.
 
-The system of record is the governed pack content and its controlled companion layers. Chat logs, agent outputs, and working notes do not redefine truth.
+### 2. Truth Lives In Governed Objects, Not Runtime Behavior
 
-### 3. The LLM Reads Truth; It Does Not Invent Truth
+The system of record is governed rule objects, evidence chains, review/adjudication records, and publication state.
 
-The LLM may:
+Chat logs, prompt outputs, runtime memory, retrieval traces, and agent behavior do not redefine truth.
 
-- locate the right pack
-- locate the right object
-- summarize the canonical rule
-- explain the rule in bounded language
-- point to supporting evidence and open review items
+### 3. AI Is A Governance Accelerator, Not A Final Authority
 
-The LLM may not:
+AI may:
 
-- infer missing business logic
-- repair incomplete rules by intuition
-- fill evidence gaps with plausible language
-- convert open ambiguity into silent certainty
+- extract candidate rules from documents, code, XSLT, Excel, mapping tables, and other source material
+- assemble draft rule packs
+- check structural completeness
+- cross-validate sources
+- detect missing evidence, inconsistent logic, and ambiguity
+- simplify reviewer questions
+- recommend confidence, risk, impact, and test coverage
+- explain signed truth under permission and scope constraints
 
-### 4. Unknown Is Better Than Wrong
+AI may not:
 
-If the available evidence is insufficient, the system should return ambiguity, uncertainty, or not-enough-evidence rather than a polished but unsupported answer.
+- invent missing business logic
+- silently resolve material conflicts
+- override human review裁决
+- publish truth without signoff
+- write runtime learning back into canonical truth
 
-### 5. Evidence Outranks Narrative
+### 4. Human Review Is The Final裁决 For Material Conflict
 
-Every material rule assertion must be traceable to evidence. If explanation and evidence disagree, evidence wins and the explanation must be corrected.
+When sources, rules, historical notes, or AI recommendations conflict, AI should expose and explain the conflict. The final decision must come from human review and must be recorded as governed adjudication.
 
-### 6. Review Is Part Of Truth Governance
+A hidden model judgment is not a裁决.
 
-Open items, risks, ambiguity, and signoff status are not side chatter. They are part of the operational truth boundary that determines whether a rule may be trusted.
+### 5. Unknown Is Better Than Wrong
 
-### 7. Main Objects Must Stay Minimal
+If available evidence is insufficient, RTS should return uncertainty, ambiguity, conflict-open, or not-enough-evidence rather than a polished unsupported answer.
 
-Canonical objects should remain small and stable. They should express source, logic, target, dependencies, and examples without absorbing long traces, meeting notes, or uncontrolled commentary.
+Refusal or qualified output is a correct service behavior when truth state does not support a confident answer.
 
-### 8. Structural Clarity Reduces Hallucination
+### 6. Evidence Outranks Narrative; Adjudication Outranks Raw Conflict
 
-The system must prefer explicit object boundaries over blended prose. The clearer the separation between rule, evidence, review, and report, the less freedom the model has to confuse them.
+Every material rule assertion must be traceable to source evidence.
+
+If a narrative explanation disagrees with evidence, the explanation must be corrected. If sources conflict, the recorded human adjudication determines the governed service truth for that scope.
+
+### 7. Retrieval Tools Are Librarians, Not Truth Owners
+
+Indexing, search, MCP tools, agent memory, vector retrieval, and OV-like systems may help locate and load truth. They must not own truth, certify truth, or mutate truth.
+
+A retrieval result is only useful because it points back to governed rule objects, evidence, review state, and publication state.
+
+### 8. Scope Partitioning Is A Truth Safety Boundary
+
+Different source-target channels, products, packs, and rule scopes must be strongly separated in retrieval and service access.
+
+This is not only an indexing optimization. It is an anti-contamination principle: similar rules from the wrong system are dangerous when presented as relevant truth.
 
 ### 9. Context Must Be Precise, Not Maximal
 
-More text is not safer. Safer context is:
+More context is not safer. Safer context is:
 
-- closer to the requested scope
-- lower in noise
-- higher in structural precision
-- explicit about state and uncertainty
+- within the correct channel/product/pack scope
+- low noise
+- structurally precise
+- explicit about review and publication state
+- traceable back to governed objects
 
-### 10. Navigation Precedes Full Read
+Navigation and scope narrowing should precede full reads.
 
-The model should first determine the correct workflow, product, pack, and object before reading detailed content. Full text should be a last-mile action, not the default starting point.
+### 10. LLM Output Must Not Masquerade As Approved Truth
 
-### 11. Runtime Learning Must Not Pollute Canonical Rules
+RTS outputs should distinguish facts, inferences, unknowns, candidate suggestions, and human decisions.
 
-Session memory, usage traces, and operational learning may inform future authoring or review, but they must never silently rewrite the goldensource.
+The LLM may produce useful answers and analysis, but the service must not present a candidate, hypothesis, retrieval result, or model answer as if it were an approved rule or final human decision.
 
-### 12. Evolution Requires Controlled Schema Change
+### 11. Service Access Must Be Permissioned And State-Aware
 
-The system may evolve, but only through explicit schema, status, and workflow versioning. Silent drift is unacceptable because it weakens trust and breaks explainability.
+RTS may expose facts, explanations, analysis, test planning, and workflow triggers. Access must depend on both caller permission and object state.
 
-## LLM Role Boundary
+Examples:
 
-The LLM is a constrained operating component with four legitimate roles:
+- ordinary Q&A should primarily use signed or approved truth
+- agents may receive rule IDs, dependencies, evidence references, and review state when authorized
+- pipelines may trigger checks, reports, and publication gates
+- governance users may inspect draft, conflict-open, AI-reviewed, adjudicated, deprecated, or superseded material
 
-- **reader**: reads canonical objects and governed side layers
-- **navigator**: chooses which governed object to open next
-- **explainer**: rewrites truth in clearer human language without changing meaning
-- **disputer marker**: explicitly flags ambiguity, evidence gaps, or state conflicts
+Permission is not only user login. It includes service entry point, data state, field visibility, action type, and audit requirement.
 
-The LLM is not:
+### 12. Publication Requires An Explicit Contract
 
-- a rule author of record
-- a business logic interpolator
-- a hidden signoff agent
-- a substitute for missing evidence
+Published service truth must have explicit release boundaries.
+
+RTS must not silently overwrite the rules used by external callers. Every approved truth change should create a new released version or artifact, with recorded activation state and rollback target.
+
+In the first safe stage, the pack is the default release unit: objects from a pack should not enter the default service surface until the pack has passed review/signoff as a whole.
+
+Conflicts must be handled before release, not guessed at query time. This includes object identity conflicts, target coverage conflicts, URI/address conflicts, and COMMON vs product-specific precedence conflicts.
+
+The service must refuse, degrade, or ask for clarification when truth state is insufficient: unresolved scope, unresolved conflict, unreleased dependency, missing active artifact, summary-only result without object truth, or unclear precedence.
+
+L0/L1 navigation outputs affect retrieval behavior, so they must be versioned and reviewable enough to support regression and audit.
+
+Every answer should trace back to canonical truth version, projection/release version, and query result.
+
+Dependency hints may guide display and navigation, but must not silently widen scope or override approval state.
+
+Permissions and retrieval scope must align: callers should not retrieve what they are not allowed to see.
+
+Reopened ambiguity must create a new truth/release path, not an in-place repair of the current answer surface.
+
+### 13. Evolution Requires Controlled Schema And Workflow Change
+
+RTS may evolve, but schema, state, workflow, permissions, and publication semantics must change explicitly.
+
+Silent drift weakens trust, breaks explainability, and makes AI outputs harder to audit.
 
 ## Default Output Discipline
 
-When asked a rule question, the system should prefer answers that:
+When answering a rule or impact question, RTS should prefer outputs that:
 
-- name the exact scope being answered
-- distinguish approved truth from draft or ambiguous content
-- separate rule statement from evidence statement
-- mention open ambiguity when it exists
-- stop short of unsupported conclusions
+- name the answered scope
+- distinguish signed truth, draft material, conflict-open material, and unknowns
+- cite rule IDs or stable object references
+- expose evidence and review state when the caller is allowed to see them
+- separate factual rule statements from AI analysis or recommendations
+- refuse or qualify conclusions when truth state is insufficient
 
-## Non-Goals
+## Service Non-Goals
 
-This system is not trying to:
+RTS is not trying to:
 
 - maximize free-form conversational fluency
-- produce speculative convenience answers
-- treat all project documents as equal sources of truth
-- collapse governance, runtime memory, and authoring into one surface
+- make LLMs final business decision makers
+- treat all documents as equal truth sources
+- collapse source ingestion, governance, publication, retrieval, and runtime memory into one uncontrolled surface
+- let pipeline or agent integrations bypass review/signoff state
 
 ## Decision Rule
 
-When a future design choice is unclear, choose the option that most reduces unauthorized LLM freedom, preserves evidentiary traceability, and keeps the goldensource separate from runtime behavior.
+When a future design choice is unclear, choose the option that best preserves governed truth, exposes source conflict, minimizes unauthorized AI freedom, records human裁决, and keeps service outputs permissioned, state-aware, and traceable.

@@ -1,90 +1,38 @@
-# RTS AI Token Review Materials — 2026-04-27 to 2026-04-28
+# RTS AI Service Strategy Review Materials — 2026-04-27 to 2026-04-28
 
-This folder preserves the RTS discussion and review artifacts from the 2026-04-27 to 2026-04-28 AI/LLM token review workstream.
+This folder keeps the remaining AI service strategy and review materials after broad first-round AI backend service drafts were distilled and removed.
 
-## Final decision
+Current RTS-owned extractions live in:
 
-Start from:
+- `../../rts-service-interface-and-output-principles.md`
+- `../../rts-retrieval-principles.md`
+- `../../../confirmed/project-alignment-summary-zh.md`
+- `../../../confirmed/system-constitution-v1.md`
 
-- [`2026-04-28-rts-final-ai-token-review-decision.md`](./2026-04-28-rts-final-ai-token-review-decision.md)
+## What remains here
 
-Final position:
+Recommended reading order:
 
-```yaml
-verdict: Conditional approve for evidence evaluation only
-not_approved_as: Broad RTS AI Backend Service
-approved_direction: RTS Impact Analysis and Test Planning Evidence Evaluation PoC
-recommended_name_zh: RTS 变更影响分析与测试规划证据评估 PoC
-recommended_name_en: RTS Impact Analysis and Test Planning Evidence Evaluation PoC
-first_round_form: Evaluation harness / decision-support workflow
-not_first_round_form: Multi-caller backend AI service
-```
+1. `2026-04-27-rts-ai-agent-service-strategy.md` — long-term product/architecture strategy: RTS as a governed truth service with internal KB, retrieval, LLM, and service surfaces.
+2. `2026-04-27-rts-four-layer-architecture-audit.md` — four-layer architecture audit: L1 truth, L2 mapping/projection, L3 retrieval, L4 applications.
+3. `2026-04-28-rts-ai-backend-service-deep-recommendations.md` — useful long-term principles around candidate-only outputs, deterministic baseline, comparison, failure taxonomy, data boundaries, and caller policy.
+4. `2026-04-28-rts-final-ai-token-review-decision.md` — historical final review conclusion for the token-specific workstream.
+5. `2026-04-28-rts-ai-backend-service-critical-token-review.md` — historical strict challenge report; useful mainly for risk and failure categories.
 
-In short: do **not** submit the first request as a broad AI backend service. Reframe it as an evidence harness that proves whether LLM adds measurable value over deterministic indexes/templates, Copilot/Yoda, and existing SME workflows.
+## Removed drafts
 
-## Reading order
+The early broad AI backend service drafts were removed after their useful ideas were extracted. They framed RTS too strongly as a first-round broad AI backend service and are no longer the recommended narrative.
 
-1. [`2026-04-28-rts-final-ai-token-review-decision.md`](./2026-04-28-rts-final-ai-token-review-decision.md) — final consolidated review decision.
-2. [`2026-04-28-rts-ai-backend-service-deep-recommendations.md`](./2026-04-28-rts-ai-backend-service-deep-recommendations.md) — actionable recommendations after the strict review.
-3. [`2026-04-28-rts-ai-backend-service-critical-token-review.md`](./2026-04-28-rts-ai-backend-service-critical-token-review.md) — strict AI Factory / token approval challenge report.
-4. [`2026-04-27-rts-ai-analysis-service-key-request-review-brief.md`](./2026-04-27-rts-ai-analysis-service-key-request-review-brief.md) — original review-team brief that positioned RTS as a reusable LLM-backed backend service.
-5. Earlier strategy/background reports:
-   - [`2026-04-27-rts-ai-agent-service-strategy.md`](./2026-04-27-rts-ai-agent-service-strategy.md)
-   - [`2026-04-27-rts-llm-api-key-application-brief.md`](./2026-04-27-rts-llm-api-key-application-brief.md)
-   - [`2026-04-27-rts-four-layer-architecture-audit.md`](./2026-04-27-rts-four-layer-architecture-audit.md)
-   - [`2026-04-27-rts-ai-analysis-service-key-request-brief-simple.md`](./2026-04-27-rts-ai-analysis-service-key-request-brief-simple.md)
-   - [`2026-04-27-rts-ai-analysis-service-key-request-brief-v2.md`](./2026-04-27-rts-ai-analysis-service-key-request-brief-v2.md)
+## Current interpretation
 
-## Generated deliverables
+Do not read this folder as limiting RTS long-term scope.
 
-Generated PDFs, proposal markdown, diagram artifacts, and preview images are stored under:
+The long-term RTS direction remains: RTS is a service that contains Knowledge Base, retrieval/indexing, LLM, governance workflow, and API/MCP/Q&A/pipeline-facing surfaces.
 
-- [`../generated-artifacts/`](../generated-artifacts/)
+The useful ideas preserved from this folder are:
 
-Key generated artifacts include:
-
-- `rts-domain-architecture-proposal-cn-v2.md/pdf`
-- `rts-domain-architecture-proposal-cn.md/pdf`
-- `rts-ai-foundation-mobile.md/pdf`
-- `rts-ai-analysis-service-key-request-review-brief.pdf`
-- `rts-domain-architecture-diagram.*`
-
-## Final recommended next artifact
-
-Prepare a charter before submitting any token/LLM request:
-
-```text
-RTS Impact Analysis and Test Planning Evidence Evaluation Charter
-```
-
-The charter should include:
-
-- first-round scope
-- allowed / forbidden data
-- caller policy
-- goldenset protocol
-- deterministic baseline
-- Copilot/Yoda comparator
-- LLM output schema
-- SME scoring rubric
-- failure taxonomy
-- data-safety evidence
-- RACI
-- service expansion evidence gates
-
-## Boundary summary
-
-First-round scope should preserve only:
-
-- transformation impact analysis
-- test planning / regression checklist
-
-Defer or remove from first request:
-
-- historical transaction sample discovery
-- defect triage / monitor alerts
-- cross-role summaries as token justification
-- release / rollback notes
-- pipeline / monitor / Chatbot / MCP / agent integrations
-- raw production data access
-
+- LLM is an internal RTS capability, but LLM answers are not automatically truth.
+- RTS should distinguish facts, inferences, unknowns, candidates, and human decisions.
+- Agent/API/MCP callers may read and cite approved truth, and submit candidates or open questions, but must not directly rewrite approved truth.
+- Deterministic retrieval, URI, dependency graph, and templates are first-class capabilities, not merely LLM support utilities.
+- RTS should track failure types such as wrong scope, unsupported assertion, hallucinated dependency, over-broad noise, authority drift, and unsafe data handling.

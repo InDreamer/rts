@@ -3,7 +3,7 @@ role: leaf
 layer: 3
 parent: docs/reference/README.md
 children: []
-summary: 中文项目关键词词汇表，解释 TRS 当前真相层、投影层、索引层、查询层的核心术语，并给出最小示例
+summary: 中文项目关键词词汇表，解释 RTS service、Knowledge Base、内部 LLM、治理真相、投影、检索、发布和输出边界等核心术语，并给出最小示例
 read_when:
   - 需要快速理解当前项目里高频出现的术语
   - 需要区分 canonical truth、runtime projection、index、query 各层概念
@@ -14,7 +14,7 @@ skip_when:
 source_of_truth:
   - docs/confirmed/project-alignment-summary-zh.md
   - docs/confirmed/system-constitution-v1.md
-  - docs/confirmed/java-index-layer-full-plan-zh.md
+  - docs/reference/java-index-layer-full-plan-zh.md
   - docs/reference/ov-kb-retrieval-design.md
 -->
 
@@ -22,7 +22,7 @@ source_of_truth:
 
 ## 这篇文档解决什么问题
 
-当前仓库已经有稳定的 constitution、项目总览和 Java 索引层计划，但这些文档更偏架构和边界，不适合拿来做术语速查。
+当前仓库已经有稳定的总纲、constitution 和多份 reference 文档，但这些文档更偏架构和边界，不适合拿来做术语速查。
 
 这篇文档的目标是：
 
@@ -37,28 +37,148 @@ source_of_truth:
 先记住主链路：
 
 ```text
-canonical pack
-  -> approved / signed-off
-  -> runtime projection
-  -> Knowledge-Bases/
-  -> metadata + search index
-  -> query / find / read
+source materials
+  -> evidence / extracted assertions
+  -> candidate rules / conflicts / open questions
+  -> human review / signoff
+  -> approved canonical pack
+  -> published runtime projection
+  -> Knowledge Base + index + retrieval
+  -> RTS internal LLM answer / analysis
+  -> API / MCP / Q&A / pipeline response
 ```
 
 一句话概括：
 
-- TRS 决定什么是真的
-- Projection 决定什么可以进入运行时
-- Index 决定这些真相如何被稳定寻址和检索
-- Query 决定 agent 按什么顺序读取它们
+- RTS 对外是一个服务，不是一堆散文件
+- Knowledge Base、索引/检索和 LLM 都是 RTS 内部能力
+- LLM 可以整理、解释和分析，但它的回答不自动等于 truth
+- truth 来自 source、evidence、review、人工裁决和 signoff
+- 发布后的答案要能 trace 回 rule、evidence、review 和发布版本
 
-## 1. 系统定位词
+## 1. 当前核心定位词
 
-### TRS
+### RTS service
 
-含义：`Transformation Rule System`，整个项目本体。
+含义：RTS 对外表现为一个服务。外部系统、人、agent、pipeline 可以通过 API、MCP、问答界面或其他入口调用它。
 
-最小示例：项目要回答“`Tradition -> Stella` 的某个 target 字段如何生成”，TRS 负责定义这条规则本身。
+最小示例：外部系统问 RTS“这个 target 字段怎么生成？”，RTS 内部读取 Knowledge Base、检索相关规则，并让 LLM 组织答案。
+
+### Knowledge Base
+
+含义：RTS 内部的规则知识基座，不只是文件夹。它承载已治理或可服务的规则对象、索引、摘要、依赖和可追溯信息。
+
+最小示例：某个 signed-off pack 被发布后，会进入 RTS 的 Knowledge Base，供 API/MCP/Q&A 查询。
+
+### internal LLM
+
+含义：RTS 内部的 LLM 能力。它可以整理 source、解释规则、发现冲突、生成候选分析和回答问题。
+
+最小示例：LLM 根据 `rule_cutoff_time` 和 `lk_cutoff_matrix` 解释为什么 cutoff time 是 14:00。
+
+### LLM answer is not truth
+
+含义：LLM 的回答不是自动成立的真相。它必须能追溯到 source、evidence、review、人工裁决和 signoff。
+
+最小示例：LLM 说“这个字段可能来自 trade date”只是候选解释；只有 evidence 和 review 支持后，才能成为 approved truth。
+
+### approved truth
+
+含义：已经经过 review、人工裁决和 signoff，可以作为默认服务答案使用的规则真相。
+
+最小示例：一个 pack 整体 signoff 后，其中的 rules/lookups/helpers 可以进入默认服务面。
+
+### candidate
+
+含义：AI、系统或人提出的候选规则、候选解释、候选影响面或候选问题。candidate 还不是 approved truth。
+
+最小示例：AI 从 XSLT 中抽出一条可能规则，但 reviewer 还没确认，它就是 candidate。
+
+### open question / ambiguity queue
+
+含义：当 source 冲突、证据不足或 AI 无法判断时，RTS 应把问题放入待裁决队列，而不是硬给答案。
+
+最小示例：Excel 和 XSLT 对同一字段给出不同逻辑，RTS 生成一个 open question 交给 reviewer 裁决。
+
+### evidence-first drafting
+
+含义：先有 evidence，再形成 extracted assertion，再生成 candidate rule，最后由 reviewer 决定是否成为 approved truth。
+
+最小示例：先定位 Java extractor 中的字段逻辑，再抽取成候选 rule，而不是让 LLM 凭经验写 rule。
+
+### facts / inference / unknown / candidate / decision
+
+含义：RTS 输出要区分五类内容：事实、推断、不确定点、候选建议、人工决定。
+
+最小示例：`rule_A 依赖 lookup_X` 是事实；“可能需要补测场景 Y”是候选建议；“reviewer confirmed”才是人工决定。
+
+## 2. 四层心智模型词
+
+### L1 Truth Layer
+
+含义：决定什么是真的。保存 evidence、canonical pack、review、ambiguity、人工裁决、signoff 和 truth 版本。
+
+最小示例：reviewer 裁决 Excel 和 XSLT 冲突后，决定写入 canonical pack。
+
+### L2 Mapping / Projection Layer
+
+含义：做两件事：把 source 整理成 candidate；把 approved truth 投影成运行时可用视图。它不决定 truth。
+
+最小示例：L2 可以从 Java/XSLT/Excel 抽取 candidate rule，也可以把 signed-off pack 发布成 runtime projection。
+
+### L3 Retrieval Layer
+
+含义：负责找到信息，例如 URI、索引、L0/L1/L2、dependency hints、query trace。
+
+最小示例：用户问 cutoff time，L3 先定位 FXD_NDF，再找到 cutoff pack 和相关 rule。
+
+### L4 Application Layer
+
+含义：人和系统使用 RTS 的入口，例如 Workbench、Review UI、API、MCP、Q&A、pipeline、agent tools。
+
+最小示例：Q&A 界面调用 RTS，返回带 rule URI 和 trace 的解释。
+
+### Workbench
+
+含义：给人和 AI 协作整理规则的平台。它不直接产生 approved truth，而是帮助生成 candidate、冲突点和待裁决问题。
+
+最小示例：上传 Excel 和 XSLT 后，Workbench 展示候选 rules、证据来源和 open questions。
+
+### truth change summary
+
+含义：approved truth 变化后生成的摘要，说明哪些规则变了、影响什么、下游应使用哪个版本。
+
+最小示例：`rule_cutoff_time` 修改后，RTS 生成 summary，提示 FXD_NDF cutoff 相关测试需要重看。
+
+### publication version
+
+含义：RTS 对外服务使用的已发布 truth 版本。不能悄悄覆盖 latest。
+
+最小示例：Pack A v1 正在服务；Pack A v2 signoff 后生成新发布版本，再显式切换为 active。
+
+### refusal contract
+
+含义：当 scope 不清、冲突未解决、依赖未发布或证据不足时，RTS 应拒答、降级回答或要求澄清。
+
+最小示例：用户没有说明 product，系统不能混搜 COMMON、FXD_NDF、FXO 后硬答。
+
+### dependency hint
+
+含义：提示某条 rule 还关联哪些 lookup/helper/rule。第一阶段只用于展示和导航，不自动扩大搜索范围。
+
+最小示例：命中 `rule_cutoff_time` 后，RTS 提示“还应查看 `lk_cutoff_matrix`”。
+
+### stable URI
+
+含义：规则、pack、lookup、helper 等对象的稳定地址，方便 API/MCP/Q&A 引用和审计。
+
+最小示例：`kb://resources/TRADITION-STELLA/FXD_NDF/rule-pack-cutoff-split/rules/rule_cutoff_time`
+
+
+
+含义：`Rule Truth Source / Transformation Rule System`，整个项目本体。文档中遇到 TRS 时，通常可理解为 RTS 的历史名称或别名。
+
+最小示例：项目要回答“`Tradition -> Stella` 的某个 target 字段如何生成”，RTS 负责定义这条规则本身。
 
 ### truth-first
 
@@ -84,7 +204,7 @@ canonical pack
 
 最小示例：系统里没有任何规则说明 `cutoff time = 14:00`，模型却自行补出一个理由。
 
-## 2. 真相层词
+## 3. 真相层词
 
 ### canonical pack
 
@@ -168,7 +288,7 @@ generated_pack/TRADITION-STELLA/FXD_NDF/rule-pack-cutoff-split/
 
 最小示例：如果 source message 不足以判断参与方数，就不应该硬断言 cutoff time。
 
-## 3. 真相对象字段词
+## 4. 真相对象字段词
 
 ### id
 
@@ -206,7 +326,7 @@ generated_pack/TRADITION-STELLA/FXD_NDF/rule-pack-cutoff-split/
 
 最小示例：输入 `USD/CNY + 2-party`，输出 `14:00 UTC`。
 
-## 4. 投影层词
+## 5. 投影层词
 
 ### Projection Layer
 
@@ -238,7 +358,7 @@ generated_pack/TRADITION-STELLA/FXD_NDF/rule-pack-cutoff-split/
 
 最小示例：Query 层读取过一条 rule，不会把会话里的总结写回原 pack。
 
-## 5. 运行时资源树词
+## 6. 运行时资源树词
 
 ### Knowledge-Bases
 
@@ -284,7 +404,7 @@ rule-pack-cutoff-split/
 
 最小示例：`kb://resources/TRADITION-STELLA/FXD_NDF/rule-pack-cutoff-split/rules/rule_cutoff_time`
 
-## 6. L0 / L1 / L2 词
+## 7. L0 / L1 / L2 词
 
 ### L0
 
@@ -310,7 +430,7 @@ rule-pack-cutoff-split/
 
 最小示例：先读 pack 的 L0 判断是否相关，再读 L1 看对象列表，最后才加载具体 rule YAML。
 
-## 7. 索引层词
+## 8. 索引层词
 
 ### Index Layer
 
@@ -360,7 +480,7 @@ rule-pack-cutoff-split/
 
 最小示例：`before_hash != after_hash`，说明某个对象内容发生了变化。
 
-## 8. 搜索索引词
+## 9. 搜索索引词
 
 ### kb-l0
 
@@ -392,7 +512,7 @@ rule-pack-cutoff-split/
 
 最小示例：`BM25 + vector` 同时考虑字面匹配和语义相似度。
 
-## 9. 查询层词
+## 10. 查询层词
 
 ### Query Layer
 
@@ -448,7 +568,7 @@ rule-pack-cutoff-split/
 
 最小示例：返回 `selected_pack_uri`、`selected_object_uri`、`dependency_hints`、`retrieval_trace`。
 
-## 10. 运维与演进词
+## 11. 运维与演进词
 
 ### full rebuild
 
@@ -468,7 +588,7 @@ rule-pack-cutoff-split/
 
 最小示例：`rule-pack-cutoff-split` 内容变化，则只重建这个 pack，而不是整库重跑。
 
-## 11. LLM 角色词
+## 12. LLM 角色词
 
 ### reader
 
@@ -494,7 +614,7 @@ rule-pack-cutoff-split/
 
 最小示例：如果某条规则还存在 review open item，就必须提示这个风险，而不是假装规则已完全稳定。
 
-## 12. 一个完整的小例子
+## 13. 一个完整的小例子
 
 用户问题：
 
@@ -535,7 +655,7 @@ USD/CNY + 3-party -> 15:00 UTC
 - 再读对 object
 - 最后才回答
 
-## 13. 最容易混淆的几组词
+## 14. 最容易混淆的几组词
 
 ### canonical pack vs runtime projection
 

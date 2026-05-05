@@ -12,8 +12,8 @@ skip_when:
   - the request is only about the formal constitution text
   - the request is already narrowed to the smallest OV integration plan
 source_of_truth:
-  - transformation-rule-system-handoff-2026-04-16/HANDOFF-PROMPT.md
-  - docs/transformation-rule-system/ov-boundary-and-adoption.md
+  - docs/reference/rts-project-background-and-pack-model.md
+  - docs/reference/ov-boundary-and-adoption.md
 -->
 
 # OV Boundary And Adoptable Surfaces
@@ -24,7 +24,7 @@ This document draws the boundary between the Transformation Rule System and Open
 
 ## Source Boundaries
 
-- `transformation-rule-system-handoff-2026-04-16/HANDOFF-PROMPT.md` — defines the governed pack model and truth-source workflow.
+- `docs/reference/rts-project-background-and-pack-model.md` — defines the governed pack model and historical sample context.
 - This document — defines the conceptual boundary and adoption posture.
 
 ## First Principle
@@ -170,7 +170,7 @@ The boundary is one-way:
 
 Open the boundary architecture asset for the visual version of this layering model:
 
-- `ov-truth-boundary.html`
+- `docs/archive/assets/ov-truth-boundary.html`
 
 ## Final Position
 

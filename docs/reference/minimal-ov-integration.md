@@ -12,8 +12,8 @@ skip_when:
   - the request is only about high-level conceptual boundary
   - the request is only about constitutional principles
 source_of_truth:
-  - transformation-rule-system-handoff-2026-04-16/HANDOFF-PROMPT.md
-  - docs/transformation-rule-system/minimal-ov-integration.md
+  - docs/reference/rts-project-background-and-pack-model.md
+  - docs/reference/minimal-ov-integration.md
 -->
 
 # Minimal OV Integration
@@ -24,7 +24,7 @@ This document defines the smallest acceptable OV integration path: one that impr
 
 ## Source Boundaries
 
-- `transformation-rule-system-handoff-2026-04-16/HANDOFF-PROMPT.md` — canonical pack structure, workflow, and current truth-source model.
+- `docs/reference/rts-project-background-and-pack-model.md` — canonical pack structure, object model, and historical sample context.
 - This document — engineering scope guardrails for controlled OV adoption.
 
 ## Goal

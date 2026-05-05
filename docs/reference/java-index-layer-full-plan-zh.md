@@ -3,36 +3,45 @@ role: leaf
 layer: 3
 parent: AGENTS.md
 children: []
-summary: full end-to-end implementation plan for a Java-based TRS index layer, covering architecture, modules, data model, APIs, delivery phases, testing, and production readiness
+summary: reference implementation plan for a Java-based RTS index/query layer; not the full RTS system baseline
 read_when:
-  - 需要把当前 TRS 索引层方案正式落成 Java 项目实施计划
-  - 需要后续开发统一以一份本地文档为基线推进
+  - 需要理解一个 Java index/query layer 参考方案
+  - 需要从已有索引层方案中提取工程实现思路
   - 需要从头到尾的实现范围、节奏与交付物说明
 skip_when:
-  - 只想看 Python 原型或最小 MVP
+  - 只想看当前 RTS 全系统 baseline
+  - 只想看 source governance、AI review 或 human adjudication 设计
 source_of_truth:
   - docs/confirmed/system-constitution-v1.md
   - docs/reference/minimal-ov-integration.md
   - docs/reference/ov-kb-retrieval-design.md
-  - docs/confirmed/java-index-layer-full-plan-zh.md
+  - docs/reference/java-index-layer-full-plan-zh.md
 -->
 
-# Java 索引层完整实施计划
+# Java 索引层参考计划
 
-> 状态：开发基线
+> 状态：参考方案，不是 RTS 全系统基线
 > 日期：2026-04-20
-> 适用范围：Transformation Rule System 的独立索引层项目
+> 适用范围：RTS 的 index/query layer 参考设计
 > 目标语言与主栈：Java
+
+## 0. 当前定位
+
+本文只描述一个 Java index/query layer 的参考实现思路。
+
+它不定义 RTS 的完整系统边界，不覆盖 source ingestion、AI-first governance、human adjudication、service publication、API/MCP/Q&A/pipeline 产品面，也不决定最终技术栈。
+
+当前 RTS 全系统定义以 `docs/confirmed/project-alignment-summary-zh.md` 和 `docs/confirmed/system-constitution-v1.md` 为准。
 
 ## 1. 这份文档的用途
 
 这份文档不是概念讨论，也不是最小原型说明。
 
-它的用途只有一个：
+这份文档记录的是：
 
-**把 TRS 的索引层正式定义成一个可交付、可分阶段推进、可长期维护的 Java 项目计划。**
+**如何把 RTS 的索引/查询层设计成一个可交付、可分阶段推进、可长期维护的 Java 参考方案。**
 
-后续开发如果没有新的架构决议，默认以本文件为基线推进。
+如果它与 confirmed 总纲或 Constitution v2 冲突，以 confirmed 文档为准。
 
 这份文档处理的是：
 
