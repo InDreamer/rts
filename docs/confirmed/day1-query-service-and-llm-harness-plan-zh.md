@@ -7,7 +7,7 @@ summary: Day1 implementation plan for the RTS query service, lightweight index l
 read_when:
   - 需要落地第一版 RTS 查询/索引/LLM 服务
   - 需要判断 Day1 是否应该包含 LLM harness
-  - 需要确定 JDK 17、PostgreSQL、Lucene、本地 L2 存储和 API/MCP 的第一版边界
+  - 需要确定 JDK 17、文件系统 projection store、Lucene、本地 L2 存储和 API/MCP 的第一版边界
   - 需要把 OpenViking、mem0、PageIndex 的检索和 harness 思路映射到 RTS 第一版
 skip_when:
   - 只需要理解 RTS 总纲或系统宪法
@@ -23,7 +23,7 @@ source_of_truth:
 
 > 状态：confirmed baseline  
 > 范围：第一版 RTS 查询/索引/LLM 服务落地方案  
-> 技术约束：JDK 17、对象规模初期约上百、无现成 OpenSearch/SSO/对象存储/审计平台  
+> 技术约束：JDK 17、对象规模初期约上百、无现成 PostgreSQL/OpenSearch/SSO/对象存储/审计平台  
 
 ## 1. Day1 一句话结论
 
@@ -73,7 +73,7 @@ Day1 暂不追求：
 - 不需要 OpenSearch 作为第一版基础设施。
 - 不需要专门向量数据库。
 - 不需要复杂分布式索引更新。
-- PostgreSQL + embedded Lucene 足够支撑 Day1 查询。
+- 文件系统 projection store + embedded Lucene 足够支撑 Day1 查询。
 - 更重要的是把 projection contract、scope gate、L2 回读和 trace 做正确。
 
 ### 3.2 基础设施
@@ -82,9 +82,9 @@ Day1 暂不追求：
 
 这意味着：
 
-- Day1 用本地文件系统保存 L2 runtime content，保留未来切换 S3/MinIO/NAS 的接口。
+- Day1 用本地文件系统保存 runtime projection metadata、trace 和 L2 runtime content，保留未来切换 PostgreSQL/S3/MinIO/NAS 的接口。
 - Day1 用简单 API key / caller profile / local allowlist 表达权限边界，保留未来接 SSO 的接口。
-- Day1 用 PostgreSQL query trace 表和结构化日志表达审计，保留未来接企业审计平台的接口。
+- Day1 用 JSONL query trace 和结构化日志表达审计，保留未来接 PostgreSQL 或企业审计平台的接口。
 - Day1 不引入重型组件，否则会让基础设施先于产品价值膨胀。
 
 ### 3.3 JDK 17
@@ -95,7 +95,7 @@ JDK 17 可以满足 Day1 所有核心能力。
 
 - Spring Boot 3.x 支持 Java 17。
 - Apache Lucene 在 Java 中是一等能力，BM25 是强项。
-- PostgreSQL JDBC、Flyway、Jackson、JUnit、Testcontainers 都成熟。
+- Jackson、JUnit、Testcontainers 都成熟；PostgreSQL JDBC 和 Flyway 可作为 Day1.5/Day2 的可替换存储实现。
 - LLM 接入可以用 OpenAI-compatible HTTP adapter，不需要依赖 Python agent 框架。
 - MCP 可以作为薄适配层，调用内部 query service。
 
@@ -183,7 +183,7 @@ Projection Ingestor
   | validate manifest / schema / hash / signoff / dependencies
   v
 Projection Store
-  |-- PostgreSQL: release, scope, object manifest, cards, edges, refs, trace
+  |-- Filesystem JSON/JSONL: release, scope, object manifest, cards, edges, refs, trace
   |-- Local L2 store: runtime rule/lookup/helper content
   |-- Lucene index: BM25 over card/L0/L1 within scope
   v
@@ -200,16 +200,18 @@ Controlled LLM Harness
   |-- tool selection
   |-- grounded answer shaping
   |-- no direct DB access
+  |-- no direct filesystem access
   v
 REST API / optional MCP Adapter / future UI
 ```
 
 核心原则：
 
-- PostgreSQL 是 Day1 runtime projection 的主查询骨架。
+- 文件系统 projection store 是 Day1 runtime projection 的主查询骨架。
 - Lucene 是辅助候选定位，不是 truth。
 - L2 content 是最终事实读取面。
 - LLM harness 是受控工具调用层，不是独立 truth owner。
+- PostgreSQL/Flyway 是后续可替换持久化实现，不是 Day1 阻塞项。
 
 ## 6. Day1 模块划分
 
@@ -267,7 +269,7 @@ Day1 不负责：
 
 Day1 推荐：
 
-- PostgreSQL 保存结构化 projection。
+- 文件系统 JSON/JSONL 保存结构化 projection。
 - 本地文件系统保存 L2 runtime content。
 - Lucene 保存 card/L0/L1 的 BM25 索引。
 
@@ -278,12 +280,15 @@ Projection Store 必须支持：
 - release rollback 指针
 - query-time active release 读取
 - immutable content hash 校验
+- 通过 `ProjectionStore`、`TraceStore`、`ScopeRegistry`、`ContentStore` 接口访问
+- 未来可替换为 PostgreSQL/Flyway 实现而不改 Query Service 语义
 
 Day1 可以暂缓：
 
 - object-level 增量发布
 - 多 active release 并行服务
 - 分布式索引同步
+- PostgreSQL schema 和 Flyway migration
 
 ### 6.4 Lucene Indexer
 
@@ -322,7 +327,7 @@ Lucene 文档建议字段：
 注意：
 
 - Lucene 只用于候选定位。
-- Lucene 命中必须回 PostgreSQL 校验 state/scope/release。
+- Lucene 命中必须回 ProjectionStore 校验 state/scope/release。
 - Lucene 命中不能直接进入最终答案。
 
 ### 6.5 Query Resolver Lite
@@ -505,8 +510,9 @@ LLM harness 禁止：
 
 推荐：
 
-- PostgreSQL
-- Flyway
+- Filesystem-backed projection store
+- JSON / JSONL
+- Jackson
 
 用途：
 
@@ -519,6 +525,23 @@ LLM harness 禁止：
 - query trace
 - LLM run trace
 - simple caller profile / permission mapping
+
+接口设计：
+
+- `ProjectionStore`
+- `ScopeRegistry`
+- `TraceStore`
+- `CallerProfileStore`
+- future `PostgresProjectionStore`
+- future `PostgresTraceStore`
+
+要求：
+
+- 业务层不能直接依赖文件路径或 JSON 文件布局。
+- 读取必须经过 release/scope/state gate。
+- trace 写入使用 append-only JSONL。
+- projection metadata 可以在启动或 ingest 后装载到内存索引以提升查询速度。
+- PostgreSQL/Flyway 仅作为 Day1.5/Day2 替换实现预留，不是 Day1 必需组件。
 
 ### 7.3 Text Index
 
@@ -536,8 +559,8 @@ LLM harness 禁止：
 注意：
 
 - Lucene index 是 rebuildable artifact。
-- PostgreSQL 仍然是 projection metadata 的主存储。
-- Lucene 目录可以本地持久化，也可以在启动时从 PostgreSQL 重建。
+- 文件系统 projection metadata 是 Day1 主存储。
+- Lucene 目录可以本地持久化，也可以在启动时从 projection metadata 重建。
 
 ### 7.4 L2 Store
 
@@ -602,9 +625,45 @@ MCP 不应该拥有单独查询逻辑。
 - JWT
 - centralized audit
 
-## 8. PostgreSQL 最小表设计
+## 8. Filesystem Projection Store 最小布局
 
-### 8.1 `runtime_release`
+Day1 先不依赖 PostgreSQL。Projection metadata、权限配置和 trace 以本地文件系统 JSON/JSONL 保存，但必须通过存储接口访问，避免未来迁移 PostgreSQL 时改动查询语义。
+
+建议根目录：
+
+```text
+runtime-store/
+  active-release.json
+  releases/
+    <release_id>/
+      release-manifest.json
+      scopes.jsonl
+      object-manifest.jsonl
+      object-cards.jsonl
+      dependency-edges.jsonl
+      content-refs.jsonl
+      caller-profiles.jsonl
+      l2/
+        ...
+      lucene/
+        ...
+  traces/
+    query-trace.jsonl
+    llm-run-trace.jsonl
+```
+
+### 8.1 `active-release.json`
+
+记录当前 active release 指针和 rollback 目标。
+
+关键字段：
+
+- `active_release_id`
+- `rollback_target_release_id`
+- `updated_at`
+- `updated_by`
+
+### 8.2 `release-manifest.json`
 
 记录 released projection。
 
@@ -623,7 +682,7 @@ MCP 不应该拥有单独查询逻辑。
 - `blocking_issues_count`
 - `created_at`
 
-### 8.2 `scope_registry`
+### 8.3 `scopes.jsonl`
 
 记录可查询 scope。
 
@@ -640,7 +699,7 @@ MCP 不应该拥有单独查询逻辑。
 - `deprecated_flag`
 - `superseded_by`
 
-### 8.3 `object_manifest`
+### 8.4 `object-manifest.jsonl`
 
 记录可索引对象。
 
@@ -662,7 +721,7 @@ MCP 不应该拥有单独查询逻辑。
 - `schema_version`
 - `state`
 
-### 8.4 `object_card`
+### 8.5 `object-cards.jsonl`
 
 记录 rule/lookup/helper card。
 
@@ -679,7 +738,7 @@ MCP 不应该拥有单独查询逻辑。
 - `override_refs`
 - `supersession_refs`
 
-### 8.5 `dependency_edge`
+### 8.6 `dependency-edges.jsonl`
 
 记录依赖图。
 
@@ -693,7 +752,7 @@ MCP 不应该拥有单独查询逻辑。
 - `direction`
 - `traversal_purpose`
 
-### 8.6 `runtime_content_ref`
+### 8.7 `content-refs.jsonl`
 
 记录 L2 内容引用。
 
@@ -708,7 +767,7 @@ MCP 不应该拥有单独查询逻辑。
 - `content_type`
 - `schema_version`
 
-### 8.7 `query_trace`
+### 8.8 `traces/query-trace.jsonl`
 
 记录每次查询。
 
@@ -728,7 +787,7 @@ MCP 不应该拥有单独查询逻辑。
 - `duration_ms`
 - `created_at`
 
-### 8.8 `llm_run_trace`
+### 8.9 `traces/llm-run-trace.jsonl`
 
 记录 LLM harness 调用。
 
@@ -745,7 +804,7 @@ MCP 不应该拥有单独查询逻辑。
 - `duration_ms`
 - `created_at`
 
-### 8.9 `caller_profile`
+### 8.10 `caller-profiles.jsonl`
 
 Day1 简化权限。
 
@@ -759,6 +818,22 @@ Day1 简化权限。
 - `allowed_entrypoints`
 - `allowed_output_modes`
 - `active_flag`
+
+### 8.11 PostgreSQL 迁移边界
+
+未来迁移 PostgreSQL 时，上述 JSON/JSONL shape 可以直接映射为关系表：
+
+- `runtime_release`
+- `scope_registry`
+- `object_manifest`
+- `object_card`
+- `dependency_edge`
+- `runtime_content_ref`
+- `query_trace`
+- `llm_run_trace`
+- `caller_profile`
+
+Day1 代码必须保证 Query Service 只依赖 store 接口，不直接依赖 filesystem layout。
 
 ## 9. Day1 API Surface
 
@@ -939,7 +1014,7 @@ Day1 trace 至少展示：
 
 ## 10. LLM Harness 工具契约
 
-LLM 不直接调用内部 Java 方法，也不直接访问 DB。它看到的是受控工具 schema。
+LLM 不直接调用内部 Java 方法，也不直接访问 store 或文件系统。它看到的是受控工具 schema。
 
 ### 10.1 `resolve_scope`
 
@@ -1408,7 +1483,7 @@ Day1 完成标准：
 
 - 能 ingest approved runtime projection。
 - 能校验 manifest/schema/hash/L2 refs。
-- 能把 object/card/dependency 写入 PostgreSQL。
+- 能把 release/scope/object/card/dependency/content ref 写入 filesystem-backed projection store。
 - 能建立 Lucene BM25 索引。
 - 能通过 API 做 deterministic lookup。
 - 能在 scope 内做 BM25 find。
@@ -1465,6 +1540,7 @@ Day1 完成标准：
 控制：
 
 - Lucene document schema 对齐未来 OpenSearch schema。
+- ProjectionStore/TraceStore 接口对齐未来 PostgreSQL schema。
 - ContentStore 抽象。
 - LlmClient 抽象。
 - QueryPlan schema version。
@@ -1475,6 +1551,7 @@ Day1 完成标准：
 Day1 不做：
 
 - OpenSearch
+- PostgreSQL/Flyway 作为 Day1 必需组件
 - vector database
 - full graph database
 - full DSL compiler
@@ -1492,19 +1569,20 @@ Day1 不做：
 
 1. 固定 Day1 API schema、QueryPlan schema、ServiceAnswer schema。
 2. 搭 JDK 17 + Spring Boot 3.x 工程骨架。
-3. 建 PostgreSQL schema 和 Flyway migration。
-4. 实现 projection ingest 和 manifest validation。
-5. 实现 object/card/dependency/content ref 存储。
-6. 实现 local L2 content store。
-7. 实现 deterministic lookup。
-8. 实现 Lucene indexing 和 scoped BM25 find。
-9. 实现 query trace。
-10. 实现 dependency traversal。
-11. 实现 `/query` 和 `/find`。
-12. 实现 Controlled LLM Harness `/ask`。
-13. 实现 final answer validation。
-14. 实现最小 MCP adapter。
-15. 跑 golden set 和 refusal tests。
+3. 固定 `ProjectionStore`、`ScopeRegistry`、`TraceStore`、`CallerProfileStore`、`ContentStore` 接口。
+4. 实现 filesystem-backed projection store 和 JSON/JSONL layout。
+5. 实现 projection ingest 和 manifest validation。
+6. 实现 object/card/dependency/content ref 存储。
+7. 实现 local L2 content store。
+8. 实现 deterministic lookup。
+9. 实现 Lucene indexing 和 scoped BM25 find。
+10. 实现 query trace。
+11. 实现 dependency traversal。
+12. 实现 `/query` 和 `/find`。
+13. 实现 Controlled LLM Harness `/ask`。
+14. 实现 final answer validation。
+15. 实现最小 MCP adapter。
+16. 跑 golden set 和 refusal tests。
 
 ## 21. 最终判断
 

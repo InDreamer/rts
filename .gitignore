@@ -1,0 +1,6 @@
+.gradle/
+build/
+/runtime-store/
+sample-projection/runtime-store/releases/*/lucene/
+sample-projection/runtime-store/traces/*.jsonl
+*.log

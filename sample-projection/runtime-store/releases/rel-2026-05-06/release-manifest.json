@@ -1,0 +1,14 @@
+{
+  "release_id": "rel-2026-05-06",
+  "canonical_revision": "canonical-abc",
+  "projection_schema_version": "day1-v1",
+  "card_schema_version": "card-v1",
+  "summary_schema_version": "summary-v1",
+  "activation_state": "active",
+  "generated_at": "2026-05-06T00:00:00Z",
+  "released_at": "2026-05-06T00:01:00Z",
+  "rollback_target_release_id": null,
+  "content_hash_summary": "sample",
+  "blocking_issues_count": 0,
+  "created_at": "2026-05-06T00:00:00Z"
+}

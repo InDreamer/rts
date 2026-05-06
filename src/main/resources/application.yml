@@ -1,0 +1,12 @@
+rts:
+  store-root: ${RTS_STORE_ROOT:runtime-store}
+  llm-enabled: ${RTS_LLM_ENABLED:false}
+  llm-model: ${RTS_LLM_MODEL:disabled-local}
+  llm-base-url: ${RTS_LLM_BASE_URL:https://api.openai.com/v1}
+  llm-api-key: ${RTS_LLM_API_KEY:}
+  llm-max-tokens: ${RTS_LLM_MAX_TOKENS:600}
+  admin-caller-id: ${RTS_ADMIN_CALLER_ID:admin}
+  admin-api-key-hash: ${RTS_ADMIN_API_KEY_HASH:}
+  max-tool-calls: ${RTS_MAX_TOOL_CALLS:8}
+  max-l2-objects: ${RTS_MAX_L2_OBJECTS:5}
+  max-dependency-depth: ${RTS_MAX_DEPENDENCY_DEPTH:2}

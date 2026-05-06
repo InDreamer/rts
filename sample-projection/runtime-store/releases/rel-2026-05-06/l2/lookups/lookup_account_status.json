@@ -1,0 +1,1 @@
+{"logic":"lookup_account_status maps source account state A to ACTIVE, C to CLOSED, and S to SUSPENDED."}

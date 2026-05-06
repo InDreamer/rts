@@ -1,0 +1,1 @@
+{"logic":"compliance.screening_flag is true when src.sanction_hit equals Y or src.watchlist_hit equals Y."}

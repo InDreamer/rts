@@ -48,5 +48,5 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 - AI 应尽可能完成整理、结构校验、跨 source 验证、歧义发现和问题简化。
 - 人工 review 结论是冲突和歧义的最终裁决。
 - API 面向系统 pipeline，MCP 面向 agent/问答；底层共享同一个 truth service。
-- Day1 工程方向是 JDK 17 Java 查询/索引服务 + PostgreSQL + Lucene + local L2 store + controlled LLM harness。
+- Day1 工程方向是 JDK 17 Java 查询/索引服务 + filesystem projection store + Lucene + local L2 store + controlled LLM harness。
 - 文档可以讨论候选工程方案，但不要把 OV、OpenSearch、向量库等技术写成 Day1 必选。

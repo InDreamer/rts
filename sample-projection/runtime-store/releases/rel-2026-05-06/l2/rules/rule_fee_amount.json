@@ -1,0 +1,1 @@
+{"logic":"fee.amount is generated from src.fee_amount, converted to account currency with lookup_fee_currency, then rounded with helper_rounding."}

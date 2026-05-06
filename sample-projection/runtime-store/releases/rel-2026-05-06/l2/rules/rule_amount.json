@@ -1,0 +1,1 @@
+{"logic":"payment.amount is generated from src.amount, rounded with helper_rounding, and currency-normalized using lookup_currency."}
