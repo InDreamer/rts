@@ -1,0 +1,67 @@
+id: rule_fxd_ndf_fixing_time
+status: draft
+signoff_status: none
+source:
+  reconstructed_from_photos: [IMG_9618.JPG]
+inputs:
+  - name: fixing_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+  - name: fixing_currency2
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+  - name: cutoff_code
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+logic:
+  summary: >
+    Resolve the Stella fixingTime hourMinuteTime and businessCenter by passing fixing_currency1,
+    fixing_currency2, and cutoff_code into the shared cutoff lookup.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+      out: fixing_currency1
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+      out: fixing_currency2
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+      out: cutoff_code
+    - op: lookup_value
+      lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+      return_field: fixing_time
+      using_inputs:
+        fixing_currency1: fixing_currency1
+        fixing_currency2: fixing_currency2
+        cutoff_code: cutoff_code
+      out: fixing_time
+    - op: lookup_value
+      lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+      return_field: fixing_business_center
+      using_inputs:
+        fixing_currency1: fixing_currency1
+        fixing_currency2: fixing_currency2
+        cutoff_code: cutoff_code
+      out: fixing_business_center
+target:
+  kind: block
+  path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingTime
+  emits:
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingTime/conf:hourMinuteTime
+      from_lookup: fixing_time
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingTime/conf:businessCenter
+      from_lookup: fixing_business_center
+dependencies:
+  lookups:
+    - lk_fxd_ndf_cutoff_by_pair_and_locode
+  helpers: []
+  rules: []
+examples:
+  - name: sample_usdtwd_fixing_time
+    input:
+      fixing_currency1: USD
+      fixing_currency2: TWD
+      cutoff_code: TW
+    key_decision:
+      matched_key: USDTWD|TW
+      lookup_path: forward
+    result:
+      fixing_time: "11:00:00"
+      fixing_business_center: TW TPE

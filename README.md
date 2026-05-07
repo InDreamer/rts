@@ -30,6 +30,7 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 - `docs/confirmed/kb-to-index-projection-contract-zh.md` — KB 到索引/查询层的运行时投影契约。
 - `docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md` — 第一版 RTS 查询服务、轻量索引和受控 LLM harness 方案。
 - `docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md` — Day1 之后的受控 agentic retrieval 和 LLM/MCP 增强路线。
+- `docs/confirmed/final-llm-agent-service-plan-zh.md` — 最终面向 LLM agent 的 RTS 服务计划，定义 harness、工具、上下文、memory、answer contract 和治理边界。
 - `docs/reference/java-index-layer-full-plan-zh.md` — 索引/查询层参考方案；不代表 RTS 全系统基线或最终技术栈决定。
 - `docs/reference/README.md` — 参考材料入口；包含 OV 边界、检索设计、术语表、外部评审和历史交接材料。
 - `docs/archive/README.md` — 历史材料入口；只在需要追溯旧讨论或原型时阅读。
@@ -49,4 +50,5 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 - 人工 review 结论是冲突和歧义的最终裁决。
 - API 面向系统 pipeline，MCP 面向 agent/问答；底层共享同一个 truth service。
 - Day1 工程方向是 JDK 17 Java 查询/索引服务 + filesystem projection store + Lucene + local L2 store + controlled LLM harness。
+- 最终服务方向是 LLM agent 通过受控 harness/tools 使用 RTS；RTS 提供 scope、权限、release、L2、trace、refusal、memory/context 和 answer grounding 约束。
 - 文档可以讨论候选工程方案，但不要把 OV、OpenSearch、向量库等技术写成 Day1 必选。

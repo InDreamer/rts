@@ -1,0 +1,77 @@
+id: hlp_fxd_ndf_fixing_quoted_currency_pair
+status: draft
+signoff_status: none
+source:
+  reconstructed_from_photos: [IMG_9611.JPG]
+inputs:
+  - name: source_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+  - name: source_currency2
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+  - name: source_quote_basis
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()
+logic:
+  summary: >
+    Treat the source fixing quoteBasis as an inversion flag when it equals the concatenated input pair;
+    in the inverse case swap the currencies and emit Currency1PerCurrency2, otherwise preserve the
+    source order and emit Currency2PerCurrency1.
+  pipeline:
+    - op: concat
+      args: [source_currency1, source_currency2]
+      out: source_pair
+    - op: equals
+      out: is_inverse_quote
+      left: source_quote_basis
+      right: "{source_pair}"
+    - op: branch
+      condition: is_inverse_quote
+      then:
+        - op: assign
+          from: source_currency2
+          out: target_currency1
+        - op: assign
+          from: source_currency1
+          out: target_currency2
+        - op: constant
+          value: Currency1PerCurrency2
+          out: target_quote_basis
+      else:
+        - op: assign
+          from: source_currency1
+          out: target_currency1
+        - op: assign
+          from: source_currency2
+          out: target_currency2
+        - op: constant
+          value: Currency2PerCurrency1
+          out: target_quote_basis
+output:
+  fields:
+    - target_currency1
+    - target_currency2
+    - target_quote_basis
+    - is_inverse_quote
+dependencies: []
+examples:
+  - name: sample_usdtwd_inverts
+    input:
+      source_currency1: USD
+      source_currency2: TWD
+      source_quote_basis: USDTWD
+    key_decision:
+      is_inverse_quote: true
+    result:
+      target_currency1: TWD
+      target_currency2: USD
+      target_quote_basis: Currency1PerCurrency2
+  - name: preserve_source_order_when_quote_basis_differs
+    input:
+      source_currency1: USD
+      source_currency2: TWD
+      source_quote_basis: Currency2PerCurrency1
+    key_decision:
+      is_inverse_quote: false
+    result:
+      target_currency1: USD
+      target_currency2: TWD
+      target_quote_basis: Currency2PerCurrency1

@@ -1,0 +1,45 @@
+status: draft
+signoff_status: none
+reconstructed_from_photos:
+  directory: /Users/tuziliji/Downloads/IMG_9606等16项文件
+  files:
+    - IMG_9606.JPG
+    - IMG_9607.JPG
+    - IMG_9609.JPG
+    - IMG_9610.JPG
+    - IMG_9611.JPG
+    - IMG_9612.JPG
+    - IMG_9613.JPG
+    - IMG_9614.JPG
+    - IMG_9615.JPG
+    - IMG_9617.JPG
+    - IMG_9618.JPG
+    - IMG_9619.JPG
+    - IMG_9620.JPG
+    - IMG_9621.JPG
+    - IMG_9622.JPG
+    - IMG_9623.JPG
+warnings:
+  - id: photo_ocr_quality
+    severity: medium
+    summary: OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.
+  - id: source_target_case
+    severity: low
+    summary: Source and target element casing was normalized to visible FpML/SCBML conventions.
+  - id: workbook_typo
+    severity: medium
+    summary: Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.
+  - id: draft_not_signoff
+    severity: high
+    summary: The photographed pack status is draft with signoff_status none. It must not be treated as approved truth until reviewed.
+open_questions:
+  - id: target_xpath_exact_suffixes
+    question: Confirm exact target child suffixes for quotedCurrencyPair, primaryRateSource, secondaryRateSource, and fixingTime.
+    current_assumption: Standard Stella/FpML-like child names were generated from visible block names and rule summaries.
+  - id: cutoff_code_semantics
+    question: Confirm whether source fixingTime/hourMinuteTime text is intentionally used as `cutoff_code`/LOCODE.
+    current_assumption: The photographed lookup and rules bind this source field as `cutoff_code`.
+  - id: rate_source_page_secondary
+    question: Confirm whether secondaryRateSource/rateSourcePage should bind the cutoff description field exactly.
+    current_assumption: Photo and evidence text indicate `cutoff_description` is used.
+review_conclusions: []

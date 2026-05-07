@@ -1,0 +1,52 @@
+id: rule_fxd_ndf_fixing_block
+status: draft
+signoff_status: none
+source:
+  reconstructed_from_photos: [IMG_9614.JPG]
+inputs:
+  - name: non_deliverable_forward_exists
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward
+logic:
+  summary: >
+    Render the fixing subtree only when the source trade carries a nonDeliverableForward. This rule
+    scopes the canonical slice to the fixing block inside Stella nonDeliverableSettlement.
+  pipeline:
+    - op: exists
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward
+      out: non_deliverable_forward_exists
+    - op: emit_block
+      when: non_deliverable_forward_exists
+      path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing
+target:
+  kind: block
+  path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing
+  children:
+    - /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/quotedCurrencyPair
+    - /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/fixingDate
+    - /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/primaryRateSource
+    - /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/secondaryRateSource
+    - /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/fixingTime
+dependencies:
+  lookups: []
+  helpers: []
+  rules:
+    - rule_fxd_ndf_fixing_quoted_currency_pair
+    - rule_fxd_ndf_fixing_date
+    - rule_fxd_ndf_primary_rate_source
+    - rule_fxd_ndf_secondary_rate_source
+    - rule_fxd_ndf_fixing_time
+examples:
+  - name: emit_when_ndf_exists
+    input:
+      non_deliverable_forward_exists: true
+    key_decision:
+      gate: true
+    result:
+      block: emitted
+  - name: do_not_emit_when_ndf_missing
+    input:
+      non_deliverable_forward_exists: false
+    key_decision:
+      gate: false
+    result:
+      block: not_emitted

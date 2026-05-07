@@ -1,0 +1,60 @@
+pack:
+  id: tradition-to-stella-fxd-ndf-cutoff-fixing-split
+  name: Tradition -> Stella FXD.NDF cutoff-fixing split
+  status: draft
+  version: 0.2.0-photo-reconstructed
+  created_on: 2026-04-02
+  reconstructed_on: 2026-05-06
+  reconstruction_source: /Users/tuziliji/Downloads/IMG_9606等16项文件
+
+scope:
+  source_system: Tradition
+  target_system: Stella
+  rule_domain: cutoff-fixing
+  product_scope: FXD.NDF
+  target_area:
+    - /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing
+
+objects:
+  lookups: 1
+  helpers: 1
+  rules: 6
+
+indexes:
+  evidence_index: evidence/evidence-index.yaml
+  review_index: review/review-index.yaml
+  extraction_report: reports/extraction-report.md
+  review_checklist: reports/review-checklist.md
+  closure_check: reports/closure-check.md
+
+sources:
+  pointer_file: Tradition_SCBML_mapping-ai-bundle.json
+  schema: Tradition_SCBML_mapping-ai-bundle/schema.md
+  sheets:
+    - sheet: FXD
+      csv: Tradition_SCBML_mapping-ai-bundle/sheets/01-FXD.csv
+      relevant_rows: [129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141]
+    - sheet: STAMP
+      csv: Tradition_SCBML_mapping-ai-bundle/sheets/05-STAMP.csv
+      relevant_rows: [2, 3, 4, 5, 6, 7, 10, 11]
+    - sheet: TraditionStella Cutoff
+      csv: Tradition_SCBML_mapping-ai-bundle/sheets/09-TraditionStella_Cutoff.csv
+      relevant_rows: [20, 26, 40, 42, 43, 50, 51, 52]
+  java:
+    - src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+    - src/main/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupCore.java
+    - src/main/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupUtils.java
+  xslt:
+    - src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+  tests:
+    - src/test/resources/FPML/fxdNdfFpML.xml
+    - src/test/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFieldsTest.java
+    - src/test/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupCoreTest.java
+    - src/test/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupUtilsTest.java
+
+modeling_decisions:
+  - Main objects are kept thin: rule, lookup, and helper files carry stable truth plus examples.
+  - Evidence is held in a pack-level evidence index.
+  - Ambiguities, warnings, and review conclusions are held in a pack-level review index.
+  - The canonical slice is limited to the FXD.NDF fixing subtree.
+  - The reconstructed XPath values use namespace casing and element names inferred from visible source and target paths.

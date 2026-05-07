@@ -1,0 +1,34 @@
+{
+  "id": "lk_fxd_ndf_cutoff_by_pair_and_locode",
+  "status": "draft-photo-reconstructed",
+  "logic": "Query the TraditionStella Cutoff mapping by forward currency-pair order plus cutoff code first, then retry reverse pair when the requested field is not populated. Returned fields include cutoff name, cutoff description, fixing time, fixing business center, hedge primary source, and hedge primary source page.",
+  "source_paths": [
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
+  ],
+  "return_fields": {
+    "cutoff_name": "CUTOFF",
+    "cutoff_description": "CUTOFF_DESC",
+    "fixing_time": "FIXING_TIME",
+    "fixing_business_center": "FIXING_BUSINESS_CENTER",
+    "hedge_primary_source": "PRIMARY_SOUCE_FOR_HEDGE",
+    "hedge_primary_source_page": "PRIMARY_SOUCE_PAGE_FOR_HEDGE"
+  },
+  "examples": [
+    {
+      "name": "sample_usdtwd_tw",
+      "matched_key": "USDTWD|TW",
+      "lookup_path": "forward",
+      "result": {
+        "cutoff_name": "TPE",
+        "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE",
+        "fixing_time": "11:00:00",
+        "fixing_business_center": "TW TPE",
+        "hedge_primary_source": "RTRS",
+        "hedge_primary_source_page": "TAIFX1"
+      }
+    }
+  ],
+  "warnings": ["Column spelling PRIMARY_SOUCE_* is preserved from the photographed workbook evidence."]
+}

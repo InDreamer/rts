@@ -1,0 +1,73 @@
+id: rule_fxd_ndf_secondary_rate_source
+status: draft
+signoff_status: none
+source:
+  reconstructed_from_photos: [IMG_9620.JPG]
+inputs:
+  - name: fixing_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+  - name: fixing_currency2
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+  - name: cutoff_code
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+logic:
+  summary: >
+    Always emit Cortex as the Stella secondary rate source and resolve the Cortex rateSourcePage
+    from the shared cutoff lookup by passing fixing_currency1, fixing_currency2, and cutoff_code.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+      out: fixing_currency1
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+      out: fixing_currency2
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+      out: cutoff_code
+    - op: constant
+      value: Cortex
+      out: secondary_rate_source
+    - op: lookup_value
+      lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+      return_field: cutoff_description
+      using_inputs:
+        fixing_currency1: fixing_currency1
+        fixing_currency2: fixing_currency2
+        cutoff_code: cutoff_code
+      out: cutoff_description
+target:
+  kind: block
+  path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource
+  emits:
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource/conf:rateSource
+      constant: Cortex
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource/conf:rateSourcePage
+      from_lookup: cutoff_description
+dependencies:
+  lookups:
+    - lk_fxd_ndf_cutoff_by_pair_and_locode
+  helpers: []
+  rules: []
+examples:
+  - name: sample_usdtwd_secondary_rate_source
+    input:
+      fixing_currency1: USD
+      fixing_currency2: TWD
+      cutoff_code: TW
+    key_decision:
+      matched_key: USDTWD|TW
+      lookup_path: forward
+    result:
+      secondary_rate_source: Cortex
+      cutoff_description: USDTWD@[TAIFX1]-1100-TW TPE
+  - name: reverse_pair_fallback_twdusd_secondary_rate_source
+    input:
+      fixing_currency1: TWD
+      fixing_currency2: USD
+      cutoff_code: TW
+    key_decision:
+      matched_key: USDTWD|TW
+      lookup_path: reverse_fallback
+    result:
+      secondary_rate_source: Cortex
+      cutoff_description: USDTWD@[TAIFX1]-1100-TW TPE

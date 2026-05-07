@@ -45,6 +45,11 @@ documents:
     layer: 3
     parent: docs/confirmed/README.md
     summary: Day2 controlled agentic retrieval and LLM/MCP evolution plan
+  - path: docs/confirmed/final-llm-agent-service-plan-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/confirmed/README.md
+    summary: Final RTS service plan for LLM-agent-centered consumption, controlled harness, memory/context, tools, governance, and roadmap
   - path: docs/reference/README.md
     role: domain
     layer: 2
@@ -55,6 +60,11 @@ documents:
     layer: 3
     parent: docs/reference/README.md
     summary: Java index/query layer reference implementation plan
+  - path: docs/reference/llm-enhanced-index-and-harness-design-zh.md
+    role: leaf
+    layer: 3
+    parent: docs/reference/README.md
+    summary: LLM-enhanced RTS index mediation, controlled harness, context management, and memory boundary design draft
   - path: docs/reference/minimal-ov-integration.md
     role: leaf
     layer: 3

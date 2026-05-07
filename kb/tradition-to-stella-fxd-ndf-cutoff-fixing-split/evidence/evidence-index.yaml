@@ -1,0 +1,236 @@
+entries:
+  - evidence_id: ev_lookup_cutoff_core
+    object_id: lk_fxd_ndf_cutoff_by_pair_and_locode
+    kind: composite
+    role: logic_support
+    summary: Shared cutoff lookup behavior is supported by workbook table shape, Java static mapping lookup code, XSLT templates, and tests.
+    locator:
+      excel:
+        - sheet: STAMP
+          rows: [2, 3, 4, 5, 6, 7, 10, 11]
+        - sheet: FXD
+          rows: [136, 137, 139, 140, 141]
+        - sheet: TraditionStella Cutoff
+          rows: [26, 42, 43, 50, 51]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupCore.java
+          members: [getCutoffWithFallback, getCutoffValueName]
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members: [FXD_CUTOFF_DESC, FXD_CUTOFF_FIXING_TIME, FXD_CUTOFF_FIXING_BUS_CENTER]
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-non-deliverable-settlement]
+      tests:
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupCoreTest.java
+          scenarios: [shouldUseReverseCutoffLookupBeforeRecordingError]
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupUtilsTest.java
+          scenarios: [shouldRecordCutoffMissingFieldsWithMappingType]
+
+  - evidence_id: ev_lookup_cutoff_blank_hedge_cells
+    object_id: lk_fxd_ndf_cutoff_by_pair_and_locode
+    kind: excel
+    role: diagnostic_trace
+    summary: Representative cutoff rows contain blank hedge source/page cells; blank values are preserved by the draft lookup output.
+    locator:
+      sheet: TraditionStella Cutoff
+      rows: [20, 40, 51]
+      csv: Tradition_SCBML_mapping-ai-bundle/sheets/09-TraditionStella_Cutoff.csv
+
+  - evidence_id: ev_lookup_cutoff_orphan_row_52
+    object_id: lk_fxd_ndf_cutoff_by_pair_and_locode
+    kind: excel
+    role: diagnostic_trace
+    summary: Cutoff row 52 contains values but no CONTRACT or LOCODE key, so it does not participate in the lookup.
+    locator:
+      sheet: TraditionStella Cutoff
+      rows: [52]
+      csv: Tradition_SCBML_mapping-ai-bundle/sheets/09-TraditionStella_Cutoff.csv
+
+  - evidence_id: ev_lookup_cutoff_reverse_fallback
+    object_id: lk_fxd_ndf_cutoff_by_pair_and_locode
+    kind: composite
+    role: diagnostic_trace
+    summary: Reverse-pair fallback is explicit in Java and tests even though workbook rows are keyed in a single currency-pair order.
+    locator:
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupCore.java
+          members: [getCutoffWithFallback]
+      tests:
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupCoreTest.java
+          scenarios: [shouldUseReverseCutoffLookupBeforeRecordingError]
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFieldsTest.java
+          scenarios: [testCutoffDescNoErrorWhenReversedLookupSucceeds]
+
+  - evidence_id: ev_helper_fixing_quoted_currency_pair_core
+    object_id: hlp_fxd_ndf_fixing_quoted_currency_pair
+    kind: composite
+    role: logic_support
+    summary: Quoted-currency-pair normalization is supported by workbook rows, sample XML, Java extractor fields, and XSLT templates.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [131, 132, 133, 134]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members:
+            - FXD_NON_DELIVERABLE_FORWARD_FIXING_CURR1
+            - FXD_NON_DELIVERABLE_FORWARD_FIXING_CURR2
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-non-deliverable-settlement, generate-quoted-currency-pair]
+      tests:
+        - path: src/test/resources/FPML/fxdNdfFpML.xml
+
+  - evidence_id: ev_helper_fixing_quoted_currency_pair_pair_code
+    object_id: hlp_fxd_ndf_fixing_quoted_currency_pair
+    kind: composite
+    role: diagnostic_trace
+    summary: The repo sample uses quoteBasis as a pair code such as USDTWD, while XSLT also emits standard quote basis strings.
+    locator:
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-quoted-currency-pair]
+      tests:
+        - path: src/test/resources/FPML/fxdNdfFpML.xml
+
+  - evidence_id: ev_rule_fixing_block_core
+    object_id: rule_fxd_ndf_fixing_block
+    kind: composite
+    role: logic_support
+    summary: NDF presence gates the fixing block.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [129]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members: [FXD_NON_DELIVERABLE_FORWARD_EXISTS]
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-fx-singleleg, generate-non-deliverable-settlement]
+      tests:
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFieldsTest.java
+          scenarios: [testNdfExistsInDocumentWithNdf, testNdfNotExistsInDocumentWithoutNdf]
+
+  - evidence_id: ev_rule_fixing_quoted_currency_pair_core
+    object_id: rule_fxd_ndf_fixing_quoted_currency_pair
+    kind: composite
+    role: target_support
+    summary: The quotedCurrencyPair block binds helper outputs into the Stella fixing subtree.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [131, 132, 133, 134]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-non-deliverable-settlement, generate-quoted-currency-pair]
+
+  - evidence_id: ev_rule_fixing_quoted_currency_pair_workbook_typo
+    object_id: rule_fxd_ndf_fixing_quoted_currency_pair
+    kind: composite
+    role: diagnostic_trace
+    summary: Workbook rows 131-134 contain path and spelling inconsistencies, so Java/XSLT wording was taken as stronger evidence.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [131, 132, 133, 134]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+
+  - evidence_id: ev_rule_fixing_date_core
+    object_id: rule_fxd_ndf_fixing_date
+    kind: composite
+    role: logic_support
+    summary: fixingDate is copied directly from source fixingDate to Stella fixingDate.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [135]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members: [FXD_NON_DELIVERABLE_FORWARD_FIXING_DATE]
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-non-deliverable-settlement]
+      tests:
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFieldsTest.java
+          scenarios: [testNdfFixingDateFromDocumentWithNdf]
+
+  - evidence_id: ev_rule_primary_rate_source_core
+    object_id: rule_fxd_ndf_primary_rate_source
+    kind: composite
+    role: target_support
+    summary: Primary rate source and source page come from cutoff lookup hedge columns.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [136, 137]
+        - sheet: TraditionStella Cutoff
+          rows: [26, 42, 43, 50, 51]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members: [FXD_CUTOFF_FIXING_OPT_PRIM_SRC, FXD_CUTOFF_FIXING_OPT_PRIM_PAGE]
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/utils/StaticMappingLookupCore.java
+          members: [getCutoffWithFallback]
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-non-deliverable-settlement]
+
+  - evidence_id: ev_rule_primary_rate_source_optprim_naming
+    object_id: rule_fxd_ndf_primary_rate_source
+    kind: composite
+    role: diagnostic_trace
+    summary: Java field names still use OptPrim even though runtime lookup columns are hedge source/page fields.
+    locator:
+      excel:
+        - sheet: STAMP
+          rows: [2, 3, 4, 5, 6, 7, 10, 11]
+        - sheet: TraditionStella Cutoff
+          rows: [26, 42, 43, 50, 51]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members: [FXD_CUTOFF_FIXING_OPT_PRIM_SRC, FXD_CUTOFF_FIXING_OPT_PRIM_PAGE]
+
+  - evidence_id: ev_rule_secondary_rate_source_core
+    object_id: rule_fxd_ndf_secondary_rate_source
+    kind: composite
+    role: target_support
+    summary: Secondary rate source is constant Cortex and source page comes from cutoff description.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [138, 139]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members: [FXD_CUTOFF_DESC]
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-non-deliverable-settlement]
+      tests:
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFieldsTest.java
+          scenarios: [testCutoffDescNoErrorWhenFirstLookupSucceeds, testCutoffDescNoErrorWhenReversedLookupSucceeds]
+
+  - evidence_id: ev_rule_fixing_time_core
+    object_id: rule_fxd_ndf_fixing_time
+    kind: composite
+    role: target_support
+    summary: fixingTime hourMinuteTime and businessCenter both come from the shared cutoff lookup.
+    locator:
+      excel:
+        - sheet: FXD
+          rows: [140, 141]
+        - sheet: TraditionStella Cutoff
+          rows: [26, 42, 43, 50]
+      java:
+        - path: src/main/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFields.java
+          members: [FXD_CUTOFF_FIXING_TIME, FXD_CUTOFF_FIXING_BUS_CENTER]
+      xslt:
+        - path: src/main/resources/xslt/module/fx-singleLeg-templates.xsl
+          templates: [generate-non-deliverable-settlement]
+      tests:
+        - path: src/test/java/com/scb/vpa/processor/engine/tradition/extractor/fxd/FXDNdfFieldsTest.java
+          scenarios: [testCutoffFixingTimeRecordsErrorWhenBothLookupsFail]

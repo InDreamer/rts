@@ -1,0 +1,78 @@
+id: rule_fxd_ndf_primary_rate_source
+status: draft
+signoff_status: none
+source:
+  reconstructed_from_photos: [IMG_9619.JPG]
+inputs:
+  - name: fixing_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+  - name: fixing_currency2
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+  - name: cutoff_code
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+logic:
+  summary: >
+    Resolve the hedge primary rate source and primary rate source page from the shared cutoff lookup
+    by currency pair plus cutoff code, with reverse-pair fallback.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+      out: fixing_currency1
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+      out: fixing_currency2
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+      out: cutoff_code
+    - op: lookup_value
+      lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+      return_field: hedge_primary_source
+      using_inputs:
+        fixing_currency1: fixing_currency1
+        fixing_currency2: fixing_currency2
+        cutoff_code: cutoff_code
+      out: hedge_primary_source
+    - op: lookup_value
+      lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+      return_field: hedge_primary_source_page
+      using_inputs:
+        fixing_currency1: fixing_currency1
+        fixing_currency2: fixing_currency2
+        cutoff_code: cutoff_code
+      out: hedge_primary_source_page
+target:
+  kind: block
+  path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource
+  emits:
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource/conf:rateSource
+      from_lookup: hedge_primary_source
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource/conf:rateSourcePage
+      from_lookup: hedge_primary_source_page
+dependencies:
+  lookups:
+    - lk_fxd_ndf_cutoff_by_pair_and_locode
+  helpers: []
+  rules: []
+examples:
+  - name: sample_usdtwd_primary_rate_source
+    input:
+      fixing_currency1: USD
+      fixing_currency2: TWD
+      cutoff_code: TW
+    key_decision:
+      matched_key: USDTWD|TW
+      lookup_path: forward
+    result:
+      hedge_primary_source: RTRS
+      hedge_primary_source_page: TAIFX1
+  - name: blank_hedge_values_are_preserved_as_empty
+    input:
+      fixing_currency1: AUD
+      fixing_currency2: GBP
+      cutoff_code: NY
+    key_decision:
+      matched_key: AUDGBP|NY
+      lookup_path: forward
+    result:
+      hedge_primary_source: ""
+      hedge_primary_source_page: ""

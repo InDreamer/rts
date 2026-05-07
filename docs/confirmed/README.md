@@ -8,10 +8,12 @@ children:
   - docs/confirmed/kb-to-index-projection-contract-zh.md
   - docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md
   - docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md
+  - docs/confirmed/final-llm-agent-service-plan-zh.md
 summary: route confirmed RTS baseline documents
 read_when:
   - 需要选择当前 RTS confirmed baseline 文档
   - 需要判断 Day1 或 Day2 服务方案该读哪一篇
+  - 需要理解 RTS 最终如何服务 LLM agent
   - 第一次进入 confirmed 文档区
 skip_when:
   - 已经明确要读取某一篇 confirmed leaf
@@ -33,6 +35,7 @@ This directory contains the current internal alignment baseline for RTS.
 3. `kb-to-index-projection-contract-zh.md` — KB 到查询/索引层的运行时投影契约，定义 KB 必须产出什么、索引层只能读取什么、查询层如何解释 projection。
 4. `day1-query-service-and-llm-harness-plan-zh.md` — Day1 查询服务、轻量索引层和受控 LLM harness 落地方案。
 5. `day2-agentic-retrieval-evolution-plan-zh.md` — Day2 受控 agentic retrieval、rerank、MCP 扩展、影响分析和测试规划演进方向。
+6. `final-llm-agent-service-plan-zh.md` — RTS 最终面向 LLM agent 的服务计划，定义 harness、tool surface、context/memory、answer contract、governance、observability 和最终路线图。
 
 ## Read triggers
 
@@ -40,6 +43,7 @@ This directory contains the current internal alignment baseline for RTS.
 - 需要开发 KB 和索引层之间的边界：读 1、2、3。
 - 需要落地第一版服务：读 1、2、3、4。
 - 需要规划 Day1 后的检索/LLM/MCP 增强：读 1、2、3、4、5。
+- 需要规划最终 LLM agent 服务形态、harness、MCP/API/Q&A/pipeline 统一入口：读 1、2、3、4、5、6。
 
 ## Conflict rule
 
@@ -50,8 +54,9 @@ If confirmed documents disagree, use this order:
 3. `kb-to-index-projection-contract-zh.md`
 4. `day1-query-service-and-llm-harness-plan-zh.md`
 5. `day2-agentic-retrieval-evolution-plan-zh.md`
-6. `docs/reference/` materials
-7. `docs/archive/` materials
+6. `final-llm-agent-service-plan-zh.md`
+7. `docs/reference/` materials
+8. `docs/archive/` materials
 
 `docs/reference/java-index-layer-full-plan-zh.md` is an index/query layer reference plan. It is not the full RTS system baseline and does not decide the final technology stack.
 

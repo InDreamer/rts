@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -409,17 +410,19 @@ class Day1ServiceTests {
     }
 
     @Test
-    void openAiAdapterNeverUsesFreeformModelTextAsFactAnswer() {
+    void openAiAdapterUsesResponsesEndpointAndNeverUsesFreeformModelTextAsFactAnswer() {
         HttpServer server;
         try {
             server = HttpServer.create(new java.net.InetSocketAddress(0), 0);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        server.createContext("/chat/completions", exchange -> {
-            byte[] body = ("{\"choices\":[{\"message\":{\"content\":\""
+        AtomicReference<String> requestBody = new AtomicReference<>();
+        server.createContext("/responses", exchange -> {
+            requestBody.set(new String(exchange.getRequestBody().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8));
+            byte[] body = ("{\"id\":\"resp_test\",\"object\":\"response\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\""
                     + TestProjectionFactory.ruleContent().replace("\"", "\\\"")
-                    + " rts://tradition/stella/payments/day1/rules/rule_amount trace-llm-grounded. Unsupported new business claim.\"}}]}").getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                    + " rts://tradition/stella/payments/day1/rules/rule_amount trace-llm-grounded. Unsupported new business claim.\"}]}]}").getBytes(java.nio.charset.StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(200, body.length);
             exchange.getResponseBody().write(body);
             exchange.close();
@@ -430,6 +433,9 @@ class Day1ServiceTests {
         properties.setLlmApiKey("dummy");
         properties.setLlmModel("dummy");
         properties.setLlmBaseUrl("http://localhost:" + server.getAddress().getPort());
+        properties.setLlmWireApi("responses");
+        properties.setLlmStoreResponses(false);
+        properties.setLlmReasoningEffort("xhigh");
         try {
             OpenAiCompatibleLlmClient client = new OpenAiCompatibleLlmClient(properties, new ObjectMapper(), RestClient.builder());
             LlmDraft draft = client.draftAnswer(new AskRequest("payment amount", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6), (toolName, input) -> {
@@ -444,6 +450,12 @@ class Day1ServiceTests {
                 return new ToolResult(toolName, output);
             });
             assertThat(draft.groundedAnswer().answer()).isEqualTo(TestProjectionFactory.ruleContent());
+            assertThat(draft.toolCalls()).contains("responses");
+            assertThat(requestBody.get()).contains("\"model\":\"dummy\"");
+            assertThat(requestBody.get()).contains("\"store\":false");
+            assertThat(requestBody.get()).contains("\"max_output_tokens\":600");
+            assertThat(requestBody.get()).contains("\"reasoning\":{\"effort\":\"xhigh\"}");
+            assertThat(requestBody.get()).contains("Grounded RTS service result");
         } finally {
             server.stop(0);
         }

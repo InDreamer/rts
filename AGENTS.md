@@ -36,8 +36,9 @@ Read these in order:
 3. [docs/confirmed/kb-to-index-projection-contract-zh.md](/home/ubuntu/repos/rts/docs/confirmed/kb-to-index-projection-contract-zh.md)
 4. [docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md](/home/ubuntu/repos/rts/docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md)
 5. [docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md](/home/ubuntu/repos/rts/docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md)
+6. [docs/confirmed/final-llm-agent-service-plan-zh.md](/home/ubuntu/repos/rts/docs/confirmed/final-llm-agent-service-plan-zh.md)
 
-These documents are the active development baseline. For first implementation work, read through Day1. Read Day2 only when planning post-Day1 retrieval, LLM, MCP, rerank, or agentic evolution.
+These documents are the active development baseline. For first implementation work, read through Day1. Read Day2 only when planning post-Day1 retrieval, LLM, MCP, rerank, or agentic evolution. Read the final LLM agent service plan when designing the complete RTS service surface, controlled harness, memory/context, MCP/API/Q&A/pipeline consumption, or agent support boundary.
 
 ## Reference Docs
 

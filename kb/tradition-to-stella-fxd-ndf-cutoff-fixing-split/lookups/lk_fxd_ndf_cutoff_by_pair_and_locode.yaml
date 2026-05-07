@@ -1,0 +1,104 @@
+id: lk_fxd_ndf_cutoff_by_pair_and_locode
+status: draft
+signoff_status: none
+source:
+  mapping_table: TraditionStella Cutoff
+  reconstructed_from_photos: [IMG_9612.JPG, IMG_9613.JPG]
+inputs:
+  - name: fixing_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+  - name: fixing_currency2
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+  - name: cutoff_code
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()
+logic:
+  summary: >
+    Query the cutoff mapping by forward currency-pair order first, then retry the reverse order when the
+    requested field is not populated. The same lookup drives all FXD.NDF fixing rules that need
+    cutoff-derived values.
+  pipeline:
+    - op: concat
+      args: [fixing_currency1, fixing_currency2]
+      out: forward_pair
+    - op: concat
+      args: [fixing_currency2, fixing_currency1]
+      out: reverse_pair
+    - op: compose_key
+      template: "{forward_pair}|{cutoff_code}"
+      out: forward_key
+    - op: lookup_value
+      key: "{forward_key}"
+      return_field: requested_field
+      out: forward_result
+    - op: compose_key
+      template: "{reverse_pair}|{cutoff_code}"
+      out: reverse_key
+    - op: lookup_value
+      key: "{reverse_key}"
+      return_field: requested_field
+      out: reverse_result
+    - op: coalesce
+      when: forward_result is empty
+      args: [forward_result, reverse_result]
+      out: resolved_value
+output:
+  fields:
+    - name: cutoff_name
+      return_field: CUTOFF
+    - name: cutoff_description
+      return_field: CUTOFF_DESC
+    - name: fixing_time
+      return_field: FIXING_TIME
+    - name: fixing_business_center
+      return_field: FIXING_BUSINESS_CENTER
+    - name: hedge_primary_source
+      return_field: PRIMARY_SOUCE_FOR_HEDGE
+    - name: hedge_primary_source_page
+      return_field: PRIMARY_SOUCE_PAGE_FOR_HEDGE
+dependencies: []
+examples:
+  - name: sample_usdtwd_tw
+    input:
+      fixing_currency1: USD
+      fixing_currency2: TWD
+      cutoff_code: TW
+    key_decision:
+      matched_key: USDTWD|TW
+      lookup_path: forward
+    result:
+      cutoff_name: TPE
+      cutoff_description: USDTWD@[TAIFX1]-1100-TW TPE
+      fixing_time: "11:00:00"
+      fixing_business_center: TW TPE
+      hedge_primary_source: RTRS
+      hedge_primary_source_page: TAIFX1
+  - name: reverse_pair_fallback_twdusd_tw
+    input:
+      fixing_currency1: TWD
+      fixing_currency2: USD
+      cutoff_code: TW
+    key_decision:
+      matched_key: USDTWD|TW
+      lookup_path: reverse_fallback
+    result:
+      cutoff_name: TPE
+      cutoff_description: USDTWD@[TAIFX1]-1100-TW TPE
+      fixing_time: "11:00:00"
+      fixing_business_center: TW TPE
+      hedge_primary_source: RTRS
+      hedge_primary_source_page: TAIFX1
+  - name: blank_hedge_source_cells
+    input:
+      fixing_currency1: AUD
+      fixing_currency2: GBP
+      cutoff_code: NY
+    key_decision:
+      matched_key: AUDGBP|NY
+      lookup_path: forward
+    result:
+      cutoff_name: NY
+      cutoff_description: GBPAUD@[GBPX1=]-1000-US NYC
+      fixing_time: "10:00:00"
+      fixing_business_center: US NYC
+      hedge_primary_source: ""
+      hedge_primary_source_page: ""

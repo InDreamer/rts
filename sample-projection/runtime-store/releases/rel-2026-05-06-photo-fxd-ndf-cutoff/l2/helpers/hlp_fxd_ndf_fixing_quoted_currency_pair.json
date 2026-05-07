@@ -1,0 +1,19 @@
+{
+  "id": "hlp_fxd_ndf_fixing_quoted_currency_pair",
+  "status": "draft-photo-reconstructed",
+  "logic": "Treat the source fixing quoteBasis as an inversion flag when it equals the concatenated input pair. If inverse, swap currencies and emit Currency1PerCurrency2; otherwise preserve source order and emit Currency2PerCurrency1.",
+  "source_paths": [
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()"
+  ],
+  "outputs": ["target_currency1", "target_currency2", "target_quote_basis", "is_inverse_quote"],
+  "examples": [
+    {
+      "name": "sample_usdtwd_inverts",
+      "input": {"source_currency1": "USD", "source_currency2": "TWD", "source_quote_basis": "USDTWD"},
+      "result": {"target_currency1": "TWD", "target_currency2": "USD", "target_quote_basis": "Currency1PerCurrency2"}
+    }
+  ],
+  "warnings": ["Reconstructed from photos; not signoff truth."]
+}

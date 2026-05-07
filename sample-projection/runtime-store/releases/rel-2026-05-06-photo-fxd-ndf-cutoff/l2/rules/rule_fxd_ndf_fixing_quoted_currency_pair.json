@@ -1,0 +1,13 @@
+{
+  "id": "rule_fxd_ndf_fixing_quoted_currency_pair",
+  "status": "draft-photo-reconstructed",
+  "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair",
+  "logic": "Read source fixing quotedCurrencyPair currency1, currency2, and quoteBasis; invoke hlp_fxd_ndf_fixing_quoted_currency_pair; emit target quotedCurrencyPair currency1, currency2, and quoteBasis from helper outputs.",
+  "source_paths": [
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()"
+  ],
+  "dependencies": ["hlp_fxd_ndf_fixing_quoted_currency_pair"],
+  "warnings": ["Target child XPaths were reconstructed from visible block names and helper outputs."]
+}

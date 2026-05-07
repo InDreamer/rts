@@ -1,0 +1,82 @@
+id: rule_fxd_ndf_fixing_quoted_currency_pair
+status: draft
+signoff_status: none
+source:
+  reconstructed_from_photos: [IMG_9617.JPG]
+inputs:
+  - name: source_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+  - name: source_currency2
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+  - name: source_quote_basis
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()
+logic:
+  summary: >
+    Normalize the Tradition fixing quotedCurrencyPair into Stella's explicit pair orientation and
+    standard quoteBasis values by invoking the quoted-currency-pair helper and binding its outputs
+    into the emitted target block.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+      out: source_currency1
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()
+      out: source_currency2
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()
+      out: source_quote_basis
+    - op: invoke_helper
+      helper: hlp_fxd_ndf_fixing_quoted_currency_pair
+      using_inputs:
+        source_currency1: source_currency1
+        source_currency2: source_currency2
+        source_quote_basis: source_quote_basis
+      exposes_outputs:
+        - target_currency1
+        - target_currency2
+        - target_quote_basis
+        - is_inverse_quote
+    - op: emit_block
+      path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair
+      children:
+        - target_currency1
+        - target_currency2
+        - target_quote_basis
+target:
+  kind: block
+  path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair
+  emits:
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair/conf:currency1
+      from_helper: target_currency1
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair/conf:currency2
+      from_helper: target_currency2
+    - path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair/conf:quoteBasis
+      from_helper: target_quote_basis
+dependencies:
+  lookups: []
+  helpers:
+    - hlp_fxd_ndf_fixing_quoted_currency_pair
+  rules: []
+examples:
+  - name: sample_usdtwd_pair
+    input:
+      source_currency1: USD
+      source_currency2: TWD
+      source_quote_basis: USDTWD
+    key_decision:
+      helper_branch: inverse
+    result:
+      target_currency1: TWD
+      target_currency2: USD
+      target_quote_basis: Currency1PerCurrency2
+  - name: preserve_source_order_when_quote_basis_is_not_source_pair
+    input:
+      source_currency1: USD
+      source_currency2: TWD
+      source_quote_basis: Currency2PerCurrency1
+    key_decision:
+      helper_branch: preserve_order
+    result:
+      target_currency1: USD
+      target_currency2: TWD
+      target_quote_basis: Currency2PerCurrency1

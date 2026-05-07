@@ -1,0 +1,31 @@
+id: rule_fxd_ndf_fixing_date
+status: draft
+signoff_status: none
+source:
+  reconstructed_from_photos: [IMG_9615.JPG]
+inputs:
+  - name: source_fixing_date
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()
+logic:
+  summary: Copy the source NDF fixingDate directly into the Stella fixingDate element.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()
+      out: source_fixing_date
+    - op: emit_value
+      from: source_fixing_date
+target:
+  kind: value
+  path: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingDate
+dependencies:
+  lookups: []
+  helpers: []
+  rules: []
+examples:
+  - name: sample_fixing_date
+    input:
+      source_fixing_date: 2025-09-09
+    key_decision:
+      copy_mode: direct
+    result:
+      target_fixing_date: 2025-09-09

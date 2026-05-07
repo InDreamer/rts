@@ -7,9 +7,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class RtsProperties {
     private Path storeRoot = Path.of("runtime-store");
     private boolean llmEnabled = false;
-    private String llmModel = "disabled-local";
-    private String llmBaseUrl = "https://api.openai.com/v1";
+    private String llmModel = "gpt-5.5";
+    private String llmBaseUrl = "https://api.jankan.com";
     private String llmApiKey = "";
+    private String llmWireApi = "responses";
+    private boolean llmStoreResponses = false;
+    private String llmReasoningEffort = "xhigh";
     private int llmMaxTokens = 600;
     private String adminCallerId = "admin";
     private String adminApiKeyHash = "";
@@ -55,6 +58,30 @@ public class RtsProperties {
 
     public void setLlmApiKey(String llmApiKey) {
         this.llmApiKey = llmApiKey;
+    }
+
+    public String getLlmWireApi() {
+        return llmWireApi;
+    }
+
+    public void setLlmWireApi(String llmWireApi) {
+        this.llmWireApi = llmWireApi;
+    }
+
+    public boolean isLlmStoreResponses() {
+        return llmStoreResponses;
+    }
+
+    public void setLlmStoreResponses(boolean llmStoreResponses) {
+        this.llmStoreResponses = llmStoreResponses;
+    }
+
+    public String getLlmReasoningEffort() {
+        return llmReasoningEffort;
+    }
+
+    public void setLlmReasoningEffort(String llmReasoningEffort) {
+        this.llmReasoningEffort = llmReasoningEffort;
     }
 
     public int getLlmMaxTokens() {
