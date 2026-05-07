@@ -52,3 +52,21 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 - Day1 工程方向是 JDK 17 Java 查询/索引服务 + filesystem projection store + Lucene + local L2 store + controlled LLM harness。
 - 最终服务方向是 LLM agent 通过受控 harness/tools 使用 RTS；RTS 提供 scope、权限、release、L2、trace、refusal、memory/context 和 answer grounding 约束。
 - 文档可以讨论候选工程方案，但不要把 OV、OpenSearch、向量库等技术写成 Day1 必选。
+
+## 本地运行
+
+Java 服务运行手册见 `docs/java-service-runbook-zh.md`。
+
+最短启动示例：
+
+```bash
+RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
+JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+./gradlew bootRun
+```
+
+默认端口是 `8080`，启动后验证：
+
+```bash
+curl -s http://localhost:8080/mcp/tools | jq
+```
