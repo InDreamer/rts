@@ -1,6 +1,6 @@
 id: rule_fxd_ndf_fixing_block
-status: draft
-signoff_status: none
+status: demo_signoff
+signoff_status: demo_signoff
 source:
   reconstructed_from_photos: [IMG_9614.JPG]
 inputs:

@@ -1,6 +1,6 @@
 {
   "id": "rule_fxd_ndf_primary_rate_source",
-  "status": "draft-photo-reconstructed",
+  "status": "demo-signoff-photo-reconstructed",
   "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource",
   "logic": "Resolve hedge primary rate source and primary rate source page from lk_fxd_ndf_cutoff_by_pair_and_locode by currency pair plus cutoff code, using reverse-pair fallback.",
   "source_paths": [
@@ -8,10 +8,22 @@
     "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
     "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
   ],
-  "dependencies": ["lk_fxd_ndf_cutoff_by_pair_and_locode"],
-  "examples": [
-    {"matched_key": "USDTWD|TW", "hedge_primary_source": "RTRS", "hedge_primary_source_page": "TAIFX1"},
-    {"matched_key": "AUDGBP|NY", "hedge_primary_source": "", "hedge_primary_source_page": ""}
+  "dependencies": [
+    "lk_fxd_ndf_cutoff_by_pair_and_locode"
   ],
-  "warnings": ["Java evidence uses OptPrim naming while runtime lookup columns are hedge source/page fields."]
+  "examples": [
+    {
+      "matched_key": "USDTWD|TW",
+      "hedge_primary_source": "RTRS",
+      "hedge_primary_source_page": "TAIFX1"
+    },
+    {
+      "matched_key": "AUDGBP|NY",
+      "hedge_primary_source": "",
+      "hedge_primary_source_page": ""
+    }
+  ],
+  "warnings": [
+    "Java evidence uses OptPrim naming while runtime lookup columns are hedge source/page fields."
+  ]
 }

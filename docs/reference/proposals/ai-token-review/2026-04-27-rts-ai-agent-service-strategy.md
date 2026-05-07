@@ -4,6 +4,8 @@
 > 范围：战略 / 产品边界 / 架构形态调查  
 > 依据：AGENTS.md、三篇 confirmed baseline docs，以及必要的 OV boundary / retrieval reference docs。
 
+> 2026-05 对齐备注：本文是历史 proposal，保留了当时“runtime projection 剥离治理字段 / 不投影 evidence-review-reports”的旧口径。当前 confirmed baseline 已调整为：KB 和 projection 都是机器优先结构；projection 是 approved truth 的服务运行视图；operational view 默认低噪声，governance-authorized view 可通过权限和 trace 展开 evidence / review / report / adjudication summary 或 pointer。若本文与 confirmed docs 冲突，以 confirmed docs 为准。
+
 ## 1. Executive conclusion
 
 **直接建议：RTS 不应被定位成“一个 AI agent app”。它应被定位成面向人和 agent 的“受治理真相服务”（Governed Truth Service / Governed Knowledge Service）。**

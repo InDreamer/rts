@@ -114,6 +114,8 @@ Ordinary runtime retrieval should be low-noise and focused on signed/approved ob
 
 Evidence, review, reports, conflicts, and adjudication records should remain available through permissioned governance or explanation views when needed.
 
+This does not mean the canonical pack is for humans and the runtime view is for machines. Both should be machine-first. The runtime view is narrower because of release state, service purpose, context budget, and permission boundaries, not because it is allowed to become a lossy summary of rule semantics.
+
 ## 7. Simplified target_rule Shape
 
 ```yaml

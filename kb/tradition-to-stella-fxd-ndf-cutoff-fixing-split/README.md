@@ -1,6 +1,6 @@
 # Tradition -> Stella FXD.NDF cutoff-fixing split pack
 
-This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures draft canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree:
+This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures local demo-signoff canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree:
 
 `/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing`
 
@@ -10,7 +10,7 @@ This pack was reconstructed from photographed VS Code screenshots supplied on 20
 - target_system: Stella
 - rule_domain: cutoff-fixing
 - product_scope: FXD.NDF
-- status: draft
+- status: demo_signoff
 
 ## Contents
 
@@ -35,7 +35,7 @@ This pack was reconstructed from photographed VS Code screenshots supplied on 20
 2. One quoted-currency-pair helper models the inversion logic because the same branch decision drives three sibling target values.
 3. Block rules are used where Stella renders a stable block as a unit.
 4. Evidence and review are pack-level. Main object files stay thin and query-friendly.
-5. This pack remains draft quality. It is reconstructed from photos and does not imply review signoff.
+5. This pack is accepted as local demo signoff material. It remains photo-reconstructed and should be rechecked before production signoff.
 
 ## Intentional Exclusions
 

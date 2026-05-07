@@ -1,6 +1,6 @@
 {
   "id": "rule_fxd_ndf_secondary_rate_source",
-  "status": "draft-photo-reconstructed",
+  "status": "demo-signoff-photo-reconstructed",
   "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource",
   "logic": "Always emit Cortex as the Stella secondary rate source and resolve the secondary rate source page from cutoff description returned by lk_fxd_ndf_cutoff_by_pair_and_locode.",
   "source_paths": [
@@ -8,7 +8,17 @@
     "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
     "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
   ],
-  "dependencies": ["lk_fxd_ndf_cutoff_by_pair_and_locode"],
-  "examples": [{"matched_key": "USDTWD|TW", "secondary_rate_source": "Cortex", "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE"}],
-  "warnings": ["Secondary rate source page binding to cutoff description should be confirmed against original XSLT."]
+  "dependencies": [
+    "lk_fxd_ndf_cutoff_by_pair_and_locode"
+  ],
+  "examples": [
+    {
+      "matched_key": "USDTWD|TW",
+      "secondary_rate_source": "Cortex",
+      "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE"
+    }
+  ],
+  "warnings": [
+    "Secondary rate source page binding to cutoff description was accepted for demo signoff but should be rechecked before production signoff against original XSLT."
+  ]
 }

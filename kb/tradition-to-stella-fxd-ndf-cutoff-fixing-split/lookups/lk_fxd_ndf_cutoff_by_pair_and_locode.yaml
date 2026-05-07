@@ -1,6 +1,6 @@
 id: lk_fxd_ndf_cutoff_by_pair_and_locode
-status: draft
-signoff_status: none
+status: demo_signoff
+signoff_status: demo_signoff
 source:
   mapping_table: TraditionStella Cutoff
   reconstructed_from_photos: [IMG_9612.JPG, IMG_9613.JPG]

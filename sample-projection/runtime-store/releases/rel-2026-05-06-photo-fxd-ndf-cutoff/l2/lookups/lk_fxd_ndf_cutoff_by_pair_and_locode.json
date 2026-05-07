@@ -1,6 +1,6 @@
 {
   "id": "lk_fxd_ndf_cutoff_by_pair_and_locode",
-  "status": "draft-photo-reconstructed",
+  "status": "demo-signoff-photo-reconstructed",
   "logic": "Query the TraditionStella Cutoff mapping by forward currency-pair order plus cutoff code first, then retry reverse pair when the requested field is not populated. Returned fields include cutoff name, cutoff description, fixing time, fixing business center, hedge primary source, and hedge primary source page.",
   "source_paths": [
     "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
@@ -18,6 +18,11 @@
   "examples": [
     {
       "name": "sample_usdtwd_tw",
+      "input": {
+        "fixing_currency1": "USD",
+        "fixing_currency2": "TWD",
+        "cutoff_code": "TW"
+      },
       "matched_key": "USDTWD|TW",
       "lookup_path": "forward",
       "result": {
@@ -28,7 +33,45 @@
         "hedge_primary_source": "RTRS",
         "hedge_primary_source_page": "TAIFX1"
       }
+    },
+    {
+      "name": "reverse_pair_fallback_twdusd_tw",
+      "input": {
+        "fixing_currency1": "TWD",
+        "fixing_currency2": "USD",
+        "cutoff_code": "TW"
+      },
+      "matched_key": "USDTWD|TW",
+      "lookup_path": "reverse_fallback",
+      "result": {
+        "cutoff_name": "TPE",
+        "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE",
+        "fixing_time": "11:00:00",
+        "fixing_business_center": "TW TPE",
+        "hedge_primary_source": "RTRS",
+        "hedge_primary_source_page": "TAIFX1"
+      }
+    },
+    {
+      "name": "blank_hedge_source_cells",
+      "input": {
+        "fixing_currency1": "AUD",
+        "fixing_currency2": "GBP",
+        "cutoff_code": "NY"
+      },
+      "matched_key": "AUDGBP|NY",
+      "lookup_path": "forward",
+      "result": {
+        "cutoff_name": "NY",
+        "cutoff_description": "GBPAUD@[GBPX1=]-1000-US NYC",
+        "fixing_time": "10:00:00",
+        "fixing_business_center": "US NYC",
+        "hedge_primary_source": "",
+        "hedge_primary_source_page": ""
+      }
     }
   ],
-  "warnings": ["Column spelling PRIMARY_SOUCE_* is preserved from the photographed workbook evidence."]
+  "warnings": [
+    "Column spelling PRIMARY_SOUCE_* is preserved from the photographed workbook evidence."
+  ]
 }

@@ -330,9 +330,9 @@ generated_pack/TRADITION-STELLA/FXD_NDF/rule-pack-cutoff-split/
 
 ### Projection Layer
 
-含义：把 canonical truth 转成运行时知识树的那一层。
+含义：把 approved canonical truth 转成服务运行机器视图的那一层。
 
-最小示例：读取已批准 pack，剥离治理字段后，把 `rules/lookups/helpers` 写入 `Knowledge-Bases/`。
+最小示例：读取已批准 pack，生成 operational rule/lookup/helper L2、object cards、dependency edges、index views，以及权限化 governance access refs。
 
 ### approved input
 
@@ -342,9 +342,9 @@ generated_pack/TRADITION-STELLA/FXD_NDF/rule-pack-cutoff-split/
 
 ### runtime projection
 
-含义：给 agent 使用的只读投影，不是 canonical 原件。
+含义：给 query service、索引、AI harness、API/MCP tools 使用的只读投影，不是 canonical authoring 原件，也不是摘要替身。
 
-最小示例：运行时 rule YAML 会保留 `logic`，但不再携带 `review_status`。
+最小示例：运行时 rule L2 保留 inputs、target emits、logic pipeline、dependencies、examples 和允许暴露的 warnings；raw review/report 通过授权 governance view 展开。
 
 ### stripped-down projection
 

@@ -195,13 +195,22 @@ Dependency hints 第一阶段只用于展示和导航。它可以告诉用户“
 
 RTS 对外可以是一个服务，但内部必须分清几件事：什么是 source，什么是 candidate，什么是 approved truth，什么是 retrieval result，什么是 LLM answer。
 
+补充一个必须刻进设计里的前提：KB 和 projection 都不是“给人读的文档”。它们都应该是给索引、AI harness、agent tools、API 和治理流程读取的机器优先知识结构。人类可读性有价值，但不能成为 schema 设计的主目标。
+
+因此 KB 和 projection 的区别不应该被理解成“KB 给人看、projection 给机器看”，也不应该被理解成“KB 是完整规则、projection 是摘要版规则”。更准确的理解是：
+
+- KB 是 governed truth 的完整机器知识图，包含 rule / lookup / helper 逻辑，也包含 source、evidence、review、report、ambiguity、adjudication、signoff 和 lineage。
+- Runtime projection 是 approved truth 的服务运行视图，面向查询、索引、诊断、影响分析、测试规划和 agent 工具。它可以裁剪、重排、分表、加索引视图，但不能丢失服务回答事实所需的结构化规则语义。
+- Index document 是 projection 派生出的召回视图，例如 L0/L1/card text/alias/confusable。它帮助找到对象，不拥有 truth，也不应该替代 L2 runtime object。
+- Governance view 是在权限允许时展开 evidence/review/report/conflict/adjudication 的视图。区别应该主要由 view、权限、purpose 和 output mode 控制，而不是靠让索引层旁路读取 canonical KB 文件。
+
 一个简单的四层模型是：
 
 1. **L1：Truth 层**  
    这里决定什么是真的。它保存 evidence、canonical pack、review、ambiguity、人工裁决、signoff 和 truth 版本。
 
 2. **L2：整理和投影层**  
-   这一层做两件事：一是把 source 整理成 candidate rules、冲突点和待裁决问题；二是把 approved truth 投影成给运行时使用的低噪声视图。它不决定 truth。
+   这一层做两件事：一是把 source 整理成 candidate rules、冲突点和待裁决问题；二是把 approved truth 投影成给运行时使用的机器可读视图。它可以按 operational / governance / index 不同目的产生不同视图，但不决定 truth。
 
 3. **L3：查找和追踪层**  
    这一层负责让 truth 被找到，例如 URI、索引、L0/L1/L2、dependency hints、query trace。它帮助定位 truth，但不拥有 truth。

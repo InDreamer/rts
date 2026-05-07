@@ -33,6 +33,8 @@ source_of_truth:
 
 当前 RTS 全系统定义以 `docs/confirmed/project-alignment-summary-zh.md` 和 `docs/confirmed/system-constitution-v1.md` 为准。
 
+2026-05 对齐备注：本文早期把 projection 描述成“剥离治理字段后的 runtime Knowledge-Bases”。当前 confirmed baseline 已调整为：KB 和 projection 都是机器优先知识结构；projection 是 approved truth 的服务运行视图，不是摘要替身。Operational view 默认低噪声，governance view 可在权限允许时展开 evidence / review / report / adjudication summary 或 pointer。以 confirmed 文档为准。
+
 ## 1. 这份文档的用途
 
 这份文档不是概念讨论，也不是最小原型说明。
@@ -146,8 +148,10 @@ source_of_truth:
 职责：
 
 - 读取 approved input
-- 剥离治理字段
-- 输出运行时 `Knowledge-Bases/`
+- 生成服务运行视图
+- 保留服务事实所需的结构化 rule / lookup / helper L2 语义
+- 生成 operational view、index view 和权限化 governance view
+- 控制 evidence / review / report 的默认可见性，而不是让它们永久不可投影
 
 ### 5.3 Index Layer
 
@@ -157,7 +161,7 @@ source_of_truth:
 
 - URI
 - metadata
-- summary
+- L0/L1/card/index documents
 - search index
 - dependency graph
 
@@ -338,8 +342,9 @@ generated_pack/{CHANNEL}/{PRODUCT}/{PACK}/
 
 进入 runtime projection 时：
 
-- 只投影 `rules / lookups / helpers`
-- 不投影 `evidence / review / reports`
+- 默认 operational view 投影 `rules / lookups / helpers` 及必要 release/governance summary
+- 权限化 governance view 可投影 evidence / review / reports 的 summary、pointer、redaction state 和 adjudication status
+- raw evidence / raw review / full reports 不进入默认 operational query context
 - 只接受 approved / signed-off 状态
 
 这条边界必须写死在实现里，而不是依赖使用者自觉。
@@ -352,19 +357,20 @@ Projection engine 负责把 canonical-ish 输入转成运行时资源树。
 
 - 读取 product / pack / object
 - 筛掉未批准对象
-- 剥离治理字段
-- 写出 runtime YAML
+- 写出 runtime structured objects
 - 复制或生成 object-level L0
 - 生成 pack-level资源骨架
+- 生成权限化 governance access refs
 
-默认剥离字段包括但不限于：
+默认 operational query 不展开的字段包括但不限于：
 
-- signoff_status
 - review_status
 - ambiguities
 - evidence_refs
 - trace
 - approval_history
+
+这些字段不应被简单丢弃。它们应进入 governance-authorized view、summary 或 pointer，并受 caller profile、purpose、redaction state 和 trace 控制。
 
 保留字段集中在：
 

@@ -1,9 +1,18 @@
 {
   "id": "rule_fxd_ndf_fixing_date",
-  "status": "draft-photo-reconstructed",
+  "status": "demo-signoff-photo-reconstructed",
   "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingDate",
   "logic": "Copy /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text() directly into the Stella fixingDate target element.",
-  "source_paths": ["/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()"],
-  "examples": [{"source_fixing_date": "2025-09-09", "target_fixing_date": "2025-09-09"}],
-  "warnings": ["Target XPath suffix was reconstructed from the visible fixing subtree convention."]
+  "source_paths": [
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()"
+  ],
+  "examples": [
+    {
+      "source_fixing_date": "2025-09-09",
+      "target_fixing_date": "2025-09-09"
+    }
+  ],
+  "warnings": [
+    "Target XPath suffix was reconstructed from the visible fixing subtree convention."
+  ]
 }

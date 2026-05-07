@@ -374,7 +374,7 @@ Day2 可以生成测试规划候选。
 
 ### 5.9 Governance-authorized Evidence View
 
-Day2 可以考虑授权 evidence/review summary。
+Day2 可以考虑授权 evidence/review/report summary 和 pointer。
 
 默认 operational query 仍不读取 raw evidence。
 
@@ -382,6 +382,7 @@ Day2 可以考虑授权 evidence/review summary。
 
 - evidence summary
 - review/adjudication pointer
+- report summary or pointer
 - conflict status summary
 - redacted evidence pointer
 
@@ -390,6 +391,8 @@ Day2 可以考虑授权 evidence/review summary。
 - raw evidence 不进入默认 Q&A。
 - review notes 不进入普通 agent context。
 - governance mode 和 operational mode 分开。
+- governance 信息也应通过 projection view、权限和 trace 读取；不要让 agent 直接旁路读取 canonical KB 文件。
+- operational projection 可以保留必要 risk / ambiguity / production gate summary，但不能把完整 review/report 噪声塞进普通上下文。
 
 ## 6. Day2 架构演进
 
@@ -716,7 +719,7 @@ Day2 只建议 pipeline-adjacent，不建议直接作为 release gate。
 - optional vector
 - impact/test planning candidates
 - evaluation harness
-- governance-authorized evidence summary
+- governance-authorized evidence/review/report summary
 
 ### 12.3 Day2 仍不做
 
@@ -725,6 +728,7 @@ Day2 只建议 pipeline-adjacent，不建议直接作为 release gate。
 - agent memory as truth
 - pipeline release gate
 - unrestricted raw evidence search
+- unrestricted raw review/report search
 - unrestricted autonomous agents
 
 ## 13. Day2 Rollout Strategy

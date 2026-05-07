@@ -118,8 +118,8 @@ class PhotoPackCrossValidationTests {
             var content = queryService.readContent(new ObjectContentRequest(entry.uri(), "cross_validate", null, null, "tester", API_KEY));
             assertThat(content.contentHash()).isEqualTo(entry.contentHash()).isEqualTo(ref.contentHash());
             assertThat(Hashing.sha256(content.content())).isEqualTo(entry.contentHash());
-            assertThat(content.content()).contains("\"status\": \"draft-photo-reconstructed\"");
-            assertThat(store.getCard(RELEASE, entry.uri()).orElseThrow().riskFlags()).contains("draft_photo_reconstructed", "not_signoff_truth");
+            assertThat(content.content()).contains("\"status\": \"demo-signoff-photo-reconstructed\"");
+            assertThat(store.getCard(RELEASE, entry.uri()).orElseThrow().riskFlags()).containsExactly("photo_reconstructed_source");
         }
     }
 
@@ -137,7 +137,7 @@ class PhotoPackCrossValidationTests {
         assertThat(answer.citedObjects()).contains(RULE_FIXING_TIME);
         assertThat(answer.facts().get(0).text()).contains("lk_fxd_ndf_cutoff_by_pair_and_locode");
         assertThat(answer.dependencies()).extracting("toUri").contains(LOOKUP_CUTOFF);
-        assertThat(answer.warnings()).anyMatch(warning -> warning.contains("draft_photo_reconstructed"));
+        assertThat(answer.warnings()).anyMatch(warning -> warning.contains("photo_reconstructed_source"));
         assertThat(queryService.trace(answer.traceId()).orElseThrow().l2ReadUris()).containsExactly(RULE_FIXING_TIME);
     }
 
@@ -176,10 +176,11 @@ class PhotoPackCrossValidationTests {
     }
 
     @Test
-    void finalAgentToolsWorkOnPhotoPackWithoutTreatingDraftAsSignoffTruth() {
+    void finalAgentToolsWorkOnDemoSignoffPhotoPack() {
         var summary = agentToolService.getScopeSummary(SCOPE, "tester", API_KEY, "default");
         assertThat(summary.objectCounts()).containsEntry("rule", 6L).containsEntry("lookup", 1L).containsEntry("helper", 1L);
-        assertThat(summary.warnings()).contains("release content hash summary indicates draft material", "scope contains object risk flags; answer views must keep warnings visible");
+        assertThat(summary.warnings()).contains("scope contains object risk flags; answer views must keep warnings visible");
+        assertThat(summary.warnings()).doesNotContain("release content hash summary indicates draft material");
 
         var impact = agentAnalysisService.analyzeImpact(new ImpactAnalysisRequest(LOOKUP_CUTOFF, null, null, SCOPE, "tester", API_KEY, "default", false, 10));
         assertThat(impact.status()).isEqualTo("candidate");
@@ -222,16 +223,37 @@ class PhotoPackCrossValidationTests {
     }
 
     @Test
-    void packRemainsDraftAndIsNotMistakenForSignedTruth() throws Exception {
+    void packCarriesDemoSignoffAndStructuredProjectionCards() throws Exception {
         var reviewIndex = Files.readString(Path.of("kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/review/review-index.yaml"), StandardCharsets.UTF_8);
-        assertThat(reviewIndex).contains("signoff_status: none", "draft_not_signoff", "target_xpath_exact_suffixes");
+        assertThat(reviewIndex).contains("signoff_status: demo_signoff", "local_demo_signoff", "target_xpath_exact_suffixes");
 
         var snapshot = store.loadActiveSnapshot();
         assertThat(snapshot.objectCards())
-                .allSatisfy(card -> assertThat(card.riskFlags()).contains("draft_photo_reconstructed", "not_signoff_truth"));
+                .allSatisfy(card -> {
+                    assertThat(card.riskFlags()).containsExactly("photo_reconstructed_source");
+                    assertThat(card.cardJson()).containsKeys(
+                            "object_id",
+                            "summary",
+                            "status",
+                            "signoff_status",
+                            "source_anchors",
+                            "logic_operation_types",
+                            "lookup_dependencies",
+                            "helper_dependencies",
+                            "rule_dependencies",
+                            "example_summary",
+                            "l2_content_ref",
+                            "l2_content_hash");
+                    assertThat(card.cardJson().get("status")).isEqualTo("demo-signoff-photo-reconstructed");
+                    assertThat(card.cardJson().get("signoff_status")).isEqualTo("demo_signoff");
+                });
+        assertThat(store.getCard(RELEASE, LOOKUP_CUTOFF).orElseThrow().cardJson().get("example_summary").toString())
+                .contains("reverse fallback", "blank hedge cells");
+        var lookupL2 = queryService.readContent(new ObjectContentRequest(LOOKUP_CUTOFF, "cross_validate", null, null, "tester", API_KEY));
+        assertThat(lookupL2.content()).contains("reverse_pair_fallback_twdusd_tw", "blank_hedge_source_cells");
 
         var releaseManifest = Files.readString(store.releaseRoot(RELEASE).resolve("release-manifest.json"), StandardCharsets.UTF_8);
-        assertThat(releaseManifest).contains("photo-reconstructed-draft");
+        assertThat(releaseManifest).contains("photo-reconstructed-demo-signoff");
     }
 
     private void assertFindTop(String query, List<String> objectTypes, String expectedUri) {

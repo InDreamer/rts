@@ -629,6 +629,15 @@ MCP 不应该拥有单独查询逻辑。
 
 Day1 先不依赖 PostgreSQL。Projection metadata、权限配置和 trace 以本地文件系统 JSON/JSONL 保存，但必须通过存储接口访问，避免未来迁移 PostgreSQL 时改动查询语义。
 
+Day1 projection store 不是“把 KB 转成给人看的摘要文件”。它是索引、AI harness、API/MCP tools 和诊断能力共同读取的机器优先 runtime view。
+
+因此：
+
+- object card / L0 / L1 用于定位、召回、消歧和导航。
+- L2 runtime content 用于承载服务事实，应该保留结构化规则语义。
+- governance access refs 可以在权限允许时展开 evidence/review/report summary 或 pointer。
+- Lucene/OpenSearch 文档只是派生 index view，不是 truth source。
+
 建议根目录：
 
 ```text
@@ -642,8 +651,11 @@ runtime-store/
       object-cards.jsonl
       dependency-edges.jsonl
       content-refs.jsonl
+      governance-access-refs.jsonl
       caller-profiles.jsonl
       l2/
+        ...
+      governance/
         ...
       lucene/
         ...
@@ -756,6 +768,8 @@ runtime-store/
 
 记录 L2 内容引用。
 
+L2 内容应该是结构化 runtime object，而不是只有自然语言 `logic` 的摘要文本。它可以裁剪 raw evidence 和长 review/report，但必须保留服务回答、异常诊断、改动分析、测试规划和 grounding 校验需要的 rule / lookup / helper 语义。
+
 关键字段：
 
 - `uri`
@@ -766,6 +780,25 @@ runtime-store/
 - `content_hash`
 - `content_type`
 - `schema_version`
+
+### 8.7.1 `governance-access-refs.jsonl`
+
+记录授权治理视图引用。
+
+关键字段：
+
+- `uri`
+- `release_id`
+- `governance_uri`
+- `storage_kind`
+- `storage_ref`
+- `access_level`
+- `redaction_state`
+- `content_hash`
+- `content_type`
+- `schema_version`
+
+Day1 可以先不实现完整 raw evidence/report 展开，但 schema 边界应预留，避免未来通过旁路读取 KB 文件绕过 release、permission 和 trace。
 
 ### 8.8 `traces/query-trace.jsonl`
 
@@ -908,6 +941,10 @@ API 命名可以后续统一，这里定义语义边界。
 - `release_id`
 
 说明：
+
+- `objects/get` 是导航接口，不是事实读取接口。
+- 默认不读取 L2 是为了控制上下文和成本，不表示 card 可以替代 L2 truth。
+- 当调用方要回答规则事实、诊断逻辑或做 grounding 校验时，必须继续调用 L2 content 读取。
 
 - 不建议把 URI 直接放进 URL path 参数，因为 RTS stable URI 可能包含 `/`、`:` 或其他需要 escaping 的字符。
 - 对象读取接口应使用 JSON body 或 query parameter 传递 `uri`，避免路由层错误截断。
@@ -1363,7 +1400,7 @@ Day1 服务输出应结构化。
 
 人工决定只来自 projection 中已授权暴露的 review/adjudication summary。
 
-Day1 默认 operational query 可以不暴露 raw review。
+Day1 默认 operational query 可以不暴露 raw review。需要治理解释时，应通过 governance-authorized projection view 暴露 review/adjudication/evidence/report summary 或 pointer，而不是让 service/agent 直接读取 canonical KB 文件。
 
 ## 15. MCP Adapter Day1 边界
 
@@ -1558,6 +1595,7 @@ Day1 不做：
 - autonomous multi-agent retrieval
 - runtime memory
 - raw evidence default query
+- raw review/report default query
 - automatic KB writeback
 - pipeline release gate
 - UI workbench

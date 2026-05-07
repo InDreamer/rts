@@ -1,9 +1,11 @@
 {
   "id": "rule_fxd_ndf_fixing_block",
-  "status": "draft-photo-reconstructed",
+  "status": "demo-signoff-photo-reconstructed",
   "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing",
   "logic": "Render the Stella nonDeliverableSettlement fixing subtree only when the source trade carries /FpML/trade/fxSingleLeg/nonDeliverableForward.",
-  "source_paths": ["/FpML/trade/fxSingleLeg/nonDeliverableForward"],
+  "source_paths": [
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward"
+  ],
   "children": [
     "rule_fxd_ndf_fixing_quoted_currency_pair",
     "rule_fxd_ndf_fixing_date",
@@ -11,5 +13,7 @@
     "rule_fxd_ndf_secondary_rate_source",
     "rule_fxd_ndf_fixing_time"
   ],
-  "warnings": ["Reconstructed from photos; not signoff truth."]
+  "warnings": [
+    "Reconstructed from photos; demo signoff fixture."
+  ]
 }

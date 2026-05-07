@@ -49,9 +49,11 @@ L0, L1, and L2 are not directory levels. They are different precision views of t
 
 - **L0**: very short abstract used for cheap recall and scope filtering
 - **L1**: structured overview used for rerank, disambiguation, and navigation
-- **L2**: original governed object or authorized source needed for final answer
+- **L2**: structured runtime object or authorized governed source needed for final answer
 
 RTS should avoid sending L2 content to AI before scope and candidate relevance are clear.
+
+L0/L1 are index views, not replacements for L2. L2 should not be reduced to a natural-language summary when the service needs structured rule logic, target bindings, lookup behavior, helper contracts, examples, warnings, or grounding metadata.
 
 ## 4. L1 Is A Safety Layer, Not Documentation Decoration
 
@@ -89,10 +91,12 @@ However, RTS as a truth service must still support permissioned access to eviden
 
 Therefore the adjusted principle is:
 
-- default runtime view: focused rules / lookups / helpers / essential metadata
-- authorized explanation or governance view: evidence, review, conflict, adjudication, and publication state can be expanded
+- default operational view: focused rules / lookups / helpers / essential metadata and allowed risk or governance summaries
+- authorized explanation or governance view: evidence, review, reports, conflict, adjudication, and publication state can be expanded through permissioned projection views
 
 This replaces the older absolute rule that evidence/review/reports never enter runtime.
+
+The distinction is view and permission control, not human-readable KB versus machine-readable projection. Both KB and projection should be machine-first structures.
 
 ## 7. Generated Summaries Need Governance
 

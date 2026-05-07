@@ -1,5 +1,5 @@
-status: draft
-signoff_status: none
+status: demo_signoff
+signoff_status: demo_signoff
 reconstructed_from_photos:
   directory: /Users/tuziliji/Downloads/IMG_9606等16项文件
   files:
@@ -29,9 +29,9 @@ warnings:
   - id: workbook_typo
     severity: medium
     summary: Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.
-  - id: draft_not_signoff
-    severity: high
-    summary: The photographed pack status is draft with signoff_status none. It must not be treated as approved truth until reviewed.
+  - id: photo_reconstructed_demo_signoff
+    severity: medium
+    summary: The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff.
 open_questions:
   - id: target_xpath_exact_suffixes
     question: Confirm exact target child suffixes for quotedCurrencyPair, primaryRateSource, secondaryRateSource, and fixingTime.
@@ -42,4 +42,7 @@ open_questions:
   - id: rate_source_page_secondary
     question: Confirm whether secondaryRateSource/rateSourcePage should bind the cutoff description field exactly.
     current_assumption: Photo and evidence text indicate `cutoff_description` is used.
-review_conclusions: []
+review_conclusions:
+  - id: local_demo_signoff
+    conclusion: Accepted as local demo signoff material for RTS Java service testing.
+    production_gate: Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff.

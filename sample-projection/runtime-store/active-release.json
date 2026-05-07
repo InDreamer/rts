@@ -1,6 +1,6 @@
 {
-  "active_release_id": "rel-2026-05-06",
-  "rollback_target_release_id": null,
-  "updated_at": "2026-05-06T00:00:00Z",
+  "active_release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "rollback_target_release_id": "rel-2026-05-06",
+  "updated_at": "2026-05-07T00:00:00Z",
   "updated_by": "sample"
 }

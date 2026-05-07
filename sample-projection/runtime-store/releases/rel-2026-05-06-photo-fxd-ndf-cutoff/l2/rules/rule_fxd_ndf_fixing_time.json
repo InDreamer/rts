@@ -1,6 +1,6 @@
 {
   "id": "rule_fxd_ndf_fixing_time",
-  "status": "draft-photo-reconstructed",
+  "status": "demo-signoff-photo-reconstructed",
   "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingTime",
   "logic": "Resolve Stella fixingTime hourMinuteTime and businessCenter by passing fixing_currency1, fixing_currency2, and cutoff_code into lk_fxd_ndf_cutoff_by_pair_and_locode.",
   "source_paths": [
@@ -8,7 +8,17 @@
     "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
     "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
   ],
-  "dependencies": ["lk_fxd_ndf_cutoff_by_pair_and_locode"],
-  "examples": [{"matched_key": "USDTWD|TW", "fixing_time": "11:00:00", "fixing_business_center": "TW TPE"}],
-  "warnings": ["cutoff_code source semantics should be confirmed against original source."]
+  "dependencies": [
+    "lk_fxd_ndf_cutoff_by_pair_and_locode"
+  ],
+  "examples": [
+    {
+      "matched_key": "USDTWD|TW",
+      "fixing_time": "11:00:00",
+      "fixing_business_center": "TW TPE"
+    }
+  ],
+  "warnings": [
+    "cutoff_code source semantics was accepted for demo signoff but should be rechecked before production signoff against original source."
+  ]
 }
