@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FinalAnswerValidator {
+    private final PromptPolicyGuard promptPolicyGuard;
+
+    public FinalAnswerValidator(PromptPolicyGuard promptPolicyGuard) {
+        this.promptPolicyGuard = promptPolicyGuard;
+    }
+
     public void validate(ServiceAnswer answer, Set<String> l2ReadUris) {
         if (answer.traceId() == null || answer.traceId().isBlank()) {
             throw new QueryRefusalException(RefusalReason.unsupported_claim, "Final answer has no trace id");
@@ -23,5 +29,6 @@ public class FinalAnswerValidator {
         if (answer.answer() != null && answer.answer().contains("raw review")) {
             throw new QueryRefusalException(RefusalReason.governance_unauthorized, "Forbidden governance claim");
         }
+        promptPolicyGuard.validateGeneratedAnswer(answer.answer());
     }
 }

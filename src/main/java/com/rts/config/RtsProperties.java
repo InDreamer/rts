@@ -19,6 +19,17 @@ public class RtsProperties {
     private int maxToolCalls = 8;
     private int maxL2Objects = 5;
     private int maxDependencyDepth = 2;
+    private int maxRetrievedTokens = 12000;
+    private int maxModelCalls = 1;
+    private long maxLatencyMs = 30000;
+    private boolean plannerV2Enabled = false;
+    private boolean toolOrchestratorEnabled = true;
+    private boolean rerankerEnabled = false;
+    private boolean confusableCheckEnabled = true;
+    private boolean vectorRecallEnabled = false;
+    private boolean impactCandidatesEnabled = true;
+    private boolean testPlanCandidatesEnabled = true;
+    private boolean mcpExpandedToolsEnabled = true;
 
     public Path getStoreRoot() {
         return storeRoot;
@@ -130,5 +141,93 @@ public class RtsProperties {
 
     public void setMaxDependencyDepth(int maxDependencyDepth) {
         this.maxDependencyDepth = maxDependencyDepth;
+    }
+
+    public int getMaxRetrievedTokens() {
+        return maxRetrievedTokens;
+    }
+
+    public void setMaxRetrievedTokens(int maxRetrievedTokens) {
+        this.maxRetrievedTokens = maxRetrievedTokens;
+    }
+
+    public int getMaxModelCalls() {
+        return maxModelCalls;
+    }
+
+    public void setMaxModelCalls(int maxModelCalls) {
+        this.maxModelCalls = maxModelCalls;
+    }
+
+    public long getMaxLatencyMs() {
+        return maxLatencyMs;
+    }
+
+    public void setMaxLatencyMs(long maxLatencyMs) {
+        this.maxLatencyMs = maxLatencyMs;
+    }
+
+    public boolean isPlannerV2Enabled() {
+        return plannerV2Enabled;
+    }
+
+    public void setPlannerV2Enabled(boolean plannerV2Enabled) {
+        this.plannerV2Enabled = plannerV2Enabled;
+    }
+
+    public boolean isToolOrchestratorEnabled() {
+        return toolOrchestratorEnabled;
+    }
+
+    public void setToolOrchestratorEnabled(boolean toolOrchestratorEnabled) {
+        this.toolOrchestratorEnabled = toolOrchestratorEnabled;
+    }
+
+    public boolean isRerankerEnabled() {
+        return rerankerEnabled;
+    }
+
+    public void setRerankerEnabled(boolean rerankerEnabled) {
+        this.rerankerEnabled = rerankerEnabled;
+    }
+
+    public boolean isConfusableCheckEnabled() {
+        return confusableCheckEnabled;
+    }
+
+    public void setConfusableCheckEnabled(boolean confusableCheckEnabled) {
+        this.confusableCheckEnabled = confusableCheckEnabled;
+    }
+
+    public boolean isVectorRecallEnabled() {
+        return vectorRecallEnabled;
+    }
+
+    public void setVectorRecallEnabled(boolean vectorRecallEnabled) {
+        this.vectorRecallEnabled = vectorRecallEnabled;
+    }
+
+    public boolean isImpactCandidatesEnabled() {
+        return impactCandidatesEnabled;
+    }
+
+    public void setImpactCandidatesEnabled(boolean impactCandidatesEnabled) {
+        this.impactCandidatesEnabled = impactCandidatesEnabled;
+    }
+
+    public boolean isTestPlanCandidatesEnabled() {
+        return testPlanCandidatesEnabled;
+    }
+
+    public void setTestPlanCandidatesEnabled(boolean testPlanCandidatesEnabled) {
+        this.testPlanCandidatesEnabled = testPlanCandidatesEnabled;
+    }
+
+    public boolean isMcpExpandedToolsEnabled() {
+        return mcpExpandedToolsEnabled;
+    }
+
+    public void setMcpExpandedToolsEnabled(boolean mcpExpandedToolsEnabled) {
+        this.mcpExpandedToolsEnabled = mcpExpandedToolsEnabled;
     }
 }

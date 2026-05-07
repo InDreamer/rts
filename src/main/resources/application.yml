@@ -13,3 +13,14 @@ rts:
   max-tool-calls: ${RTS_MAX_TOOL_CALLS:8}
   max-l2-objects: ${RTS_MAX_L2_OBJECTS:5}
   max-dependency-depth: ${RTS_MAX_DEPENDENCY_DEPTH:2}
+  max-retrieved-tokens: ${RTS_MAX_RETRIEVED_TOKENS:12000}
+  max-model-calls: ${RTS_MAX_MODEL_CALLS:1}
+  max-latency-ms: ${RTS_MAX_LATENCY_MS:30000}
+  planner-v2-enabled: ${RTS_PLANNER_V2_ENABLED:false}
+  tool-orchestrator-enabled: ${RTS_TOOL_ORCHESTRATOR_ENABLED:true}
+  reranker-enabled: ${RTS_RERANKER_ENABLED:false}
+  confusable-check-enabled: ${RTS_CONFUSABLE_CHECK_ENABLED:true}
+  vector-recall-enabled: ${RTS_VECTOR_RECALL_ENABLED:false}
+  impact-candidates-enabled: ${RTS_IMPACT_CANDIDATES_ENABLED:true}
+  test-plan-candidates-enabled: ${RTS_TEST_PLAN_CANDIDATES_ENABLED:true}
+  mcp-expanded-tools-enabled: ${RTS_MCP_EXPANDED_TOOLS_ENABLED:true}

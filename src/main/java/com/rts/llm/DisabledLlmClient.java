@@ -39,7 +39,7 @@ public class DisabledLlmClient implements LlmClient {
         }
         @SuppressWarnings("unchecked")
         List<CandidateObject> candidates = (List<CandidateObject>) toolContext.call("find_objects",
-                new FindRequest(request.query(), plan.scope(), List.of(), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
+                new FindRequest(request.query(), plan.scope(), objectTypesForIntent(plan.intent()), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
         if (candidates.isEmpty()) {
             ServiceAnswer refusal = new ServiceAnswer(AnswerType.refusal, plan.scope(), null, List.of(), List.of(),
                     List.of("No released structured object matched the query"), List.of(), List.of(), List.of(), List.of(), "trace-llm-refusal",
@@ -54,12 +54,36 @@ public class DisabledLlmClient implements LlmClient {
         DependencyResult dependencies = (DependencyResult) toolContext.call("get_dependencies",
                 new DependenciesRequest(selected.uri(), Direction.forward, null, 1, "answer", null, request.callerId(), request.apiKey())).output();
         String factText = l2.content();
-        Fact fact = new Fact(factText, selected.uri(), l2.releaseId(), "l2");
+        Fact fact = new Fact(factText, selected.uri(), l2.releaseId(), "l2:" + l2.contentHash());
         ServiceAnswer answer = new ServiceAnswer(AnswerType.answer, plan.scope(), l2.releaseId(), List.of(fact),
                 List.of("Object card loaded for " + object.objectManifest().objectId()), List.of(), List.of(), List.of(),
-                List.of(selected.uri()), dependencies.edges(), "trace-llm-grounded", null, List.of(),
+                List.of(selected.uri()), dependencies.edges(), "trace-llm-grounded", null, warningsFor(object),
                 factText + " (trace: trace-llm-grounded)");
         return new LlmDraft("LLM disabled; controlled tools produced grounded answer.",
                 List.of("resolve_scope", "find_objects", "get_object_card", "read_object_l2", "get_dependencies"), answer);
+    }
+
+    private List<String> objectTypesForIntent(String intent) {
+        if ("lookup_lookup".equals(intent)) {
+            return List.of("lookup");
+        }
+        if ("helper_lookup".equals(intent)) {
+            return List.of("helper");
+        }
+        if ("rule_lookup".equals(intent) || "explain_rule".equals(intent) || "generate_target_message".equals(intent)) {
+            return List.of("rule");
+        }
+        return List.of();
+    }
+
+    private List<String> warningsFor(ObjectEnvelope object) {
+        List<String> warnings = new java.util.ArrayList<>();
+        if (object.objectCard().riskFlags() != null && !object.objectCard().riskFlags().isEmpty()) {
+            warnings.add("Object risk flags: " + object.objectCard().riskFlags());
+        }
+        if (object.objectCard().cardJson() != null && object.objectCard().cardJson().containsKey("status")) {
+            warnings.add("Object governance status: " + object.objectCard().cardJson().get("status"));
+        }
+        return List.copyOf(warnings);
     }
 }

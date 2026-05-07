@@ -23,7 +23,7 @@ public class AnswerAssembler {
     public ServiceAnswer answer(ScopeKey scope, String releaseId, ObjectManifestEntry selected, L2Content content,
             List<DependencyEdge> dependencies, String traceId, List<String> warnings) {
         String factText = extractFactText(content.content());
-        Fact fact = new Fact(factText, selected.uri(), releaseId, "l2");
+        Fact fact = new Fact(factText, selected.uri(), releaseId, "l2:" + content.contentHash());
         String answer = factText + " (trace: " + traceId + ")";
         return new ServiceAnswer(
                 AnswerType.answer,

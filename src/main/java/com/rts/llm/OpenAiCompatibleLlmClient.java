@@ -76,7 +76,7 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
         }
         @SuppressWarnings("unchecked")
         List<CandidateObject> candidates = (List<CandidateObject>) toolContext.call("find_objects",
-                new FindRequest(request.query(), plan.scope(), List.of(), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
+                new FindRequest(request.query(), plan.scope(), objectTypesForIntent(plan.intent()), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
         if (candidates.isEmpty()) {
             throw new QueryRefusalException(com.rts.model.CoreModels.RefusalReason.object_not_found, "No released structured object matched the query");
         }
@@ -87,7 +87,7 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
                 new ObjectContentRequest(selected.uri(), "answer", null, null, request.callerId(), request.apiKey())).output();
         DependencyResult dependencies = (DependencyResult) toolContext.call("get_dependencies",
                 new DependenciesRequest(selected.uri(), Direction.forward, null, 1, "answer", null, request.callerId(), request.apiKey())).output();
-        Fact fact = new Fact(l2.content(), selected.uri(), l2.releaseId(), "l2");
+        Fact fact = new Fact(l2.content(), selected.uri(), l2.releaseId(), "l2:" + l2.contentHash());
         ServiceAnswer answer = new ServiceAnswer(
                 com.rts.model.CoreModels.AnswerType.answer,
                 plan.scope(),
@@ -101,7 +101,7 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
                 dependencies.edges(),
                 "trace-llm-grounded",
                 null,
-                List.of(),
+                warningsFor(object),
                 l2.content());
         return new GroundedContext(answer, l2);
     }
@@ -162,6 +162,30 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
             }
         }
         return String.join("\n", parts).strip();
+    }
+
+    private List<String> objectTypesForIntent(String intent) {
+        if ("lookup_lookup".equals(intent)) {
+            return List.of("lookup");
+        }
+        if ("helper_lookup".equals(intent)) {
+            return List.of("helper");
+        }
+        if ("rule_lookup".equals(intent) || "explain_rule".equals(intent) || "generate_target_message".equals(intent)) {
+            return List.of("rule");
+        }
+        return List.of();
+    }
+
+    private List<String> warningsFor(ObjectEnvelope object) {
+        List<String> warnings = new ArrayList<>();
+        if (object.objectCard().riskFlags() != null && !object.objectCard().riskFlags().isEmpty()) {
+            warnings.add("Object risk flags: " + object.objectCard().riskFlags());
+        }
+        if (object.objectCard().cardJson() != null && object.objectCard().cardJson().containsKey("status")) {
+            warnings.add("Object governance status: " + object.objectCard().cardJson().get("status"));
+        }
+        return List.copyOf(warnings);
     }
 
     private record GroundedContext(ServiceAnswer answer, L2Content l2) {}

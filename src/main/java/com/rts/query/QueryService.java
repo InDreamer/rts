@@ -2,6 +2,12 @@ package com.rts.query;
 
 import com.rts.config.RtsProperties;
 import com.rts.index.LuceneIndexService;
+import com.rts.model.AgentServiceModels.BudgetUsage;
+import com.rts.model.AgentServiceModels.GroundedClaim;
+import com.rts.model.AgentServiceModels.GroundingEvidence;
+import com.rts.model.AgentServiceModels.GroundingMap;
+import com.rts.model.AgentServiceModels.ToolStepTrace;
+import com.rts.model.AgentServiceModels.ValidationStatus;
 import com.rts.model.CoreModels.AnswerType;
 import com.rts.model.CoreModels.CandidateObject;
 import com.rts.model.CoreModels.DependencyResult;
@@ -23,6 +29,7 @@ import com.rts.query.QueryRequests.ObjectGetRequest;
 import com.rts.query.QueryRequests.PlanRequest;
 import com.rts.query.QueryRequests.QueryRequest;
 import com.rts.store.ProjectionValidationException;
+import com.rts.store.Hashing;
 import com.rts.store.StoreContracts.ContentStore;
 import com.rts.store.StoreContracts.ProjectionSnapshot;
 import com.rts.store.StoreContracts.ProjectionStore;
@@ -52,12 +59,15 @@ public class QueryService {
     private final PermissionService permissionService;
     private final AnswerAssembler answerAssembler;
     private final FinalAnswerValidator finalAnswerValidator;
+    private final PromptPolicyGuard promptPolicyGuard;
+    private final AliasEntityService aliasEntityService;
     private final RtsProperties properties;
 
     public QueryService(ProjectionStore projectionStore, ScopeRegistry scopeRegistry, TraceStore traceStore,
             ContentStore contentStore, LuceneIndexService luceneIndexService, QueryResolver queryResolver,
             DependencyService dependencyService, PermissionService permissionService, AnswerAssembler answerAssembler,
-            FinalAnswerValidator finalAnswerValidator, RtsProperties properties) {
+            FinalAnswerValidator finalAnswerValidator, PromptPolicyGuard promptPolicyGuard, AliasEntityService aliasEntityService,
+            RtsProperties properties) {
         this.projectionStore = projectionStore;
         this.scopeRegistry = scopeRegistry;
         this.traceStore = traceStore;
@@ -68,6 +78,8 @@ public class QueryService {
         this.permissionService = permissionService;
         this.answerAssembler = answerAssembler;
         this.finalAnswerValidator = finalAnswerValidator;
+        this.promptPolicyGuard = promptPolicyGuard;
+        this.aliasEntityService = aliasEntityService;
         this.properties = properties;
     }
 
@@ -133,6 +145,7 @@ public class QueryService {
         ScopeKey scope = request.scopeHint();
         String releaseId = null;
         try {
+            promptPolicyGuard.validateUserText(request.query());
             ProjectionSnapshot snapshot = activeSnapshot();
             ReleaseManifest manifest = snapshot.manifest();
             releaseId = manifest.releaseId();
@@ -142,7 +155,7 @@ public class QueryService {
             }
             scope = requireScope(releaseId, plan.scope());
             permissionService.requireAllowed(releaseId, request.callerId(), request.apiKey(), scope, "query", outputMode(request.outputMode()));
-            List<CandidateObject> candidates = findCandidates(releaseId, scope, request.query(), safe(plan.anchors()), List.of(), 10);
+            List<CandidateObject> candidates = findCandidates(releaseId, scope, request.query(), safe(plan.anchors()), objectTypesForIntent(plan.intent()), 10);
             candidateUris.addAll(candidates.stream().map(CandidateObject::uri).toList());
             if (candidates.isEmpty()) {
                 return tracedRefusal(start, traceId, request, plan, scope, releaseId, RefusalReason.object_not_found, "No released structured object matched the query", candidateUris, selectedUris, l2ReadUris);
@@ -157,7 +170,7 @@ public class QueryService {
             l2ReadUris.add(content.uri());
             DependencyResult dependencies = dependencyService.traverse(releaseId, selected.uri(), dependencyDirection(plan.intent()), null, 1, 20);
             requireDependencyResultAllowed(releaseId, request.callerId(), request.apiKey(), dependencies);
-            ServiceAnswer answer = answerAssembler.answer(scope, releaseId, entry, content, dependencies.edges(), traceId, List.of());
+            ServiceAnswer answer = answerAssembler.answer(scope, releaseId, entry, content, dependencies.edges(), traceId, warningsFor(releaseId, entry));
             finalAnswerValidator.validate(answer, Set.copyOf(l2ReadUris));
             appendTrace(start, traceId, "query", request.callerId(), request.query(), plan, scope, releaseId, candidateUris, selectedUris, l2ReadUris, RefusalReason.none, List.of());
             return answer;
@@ -214,7 +227,8 @@ public class QueryService {
             seen.add(candidate.uri());
             combined.add(candidate);
         });
-        List<CandidateObject> bm25 = luceneIndexService.search(releaseId, scope, query == null ? String.join(" ", anchors) : query, objectTypes, limit);
+        String expandedQuery = aliasEntityService.expand(query == null ? String.join(" ", anchors) : query, anchors);
+        List<CandidateObject> bm25 = luceneIndexService.search(releaseId, scope, expandedQuery, objectTypes, limit);
         for (CandidateObject candidate : bm25) {
             if (seen.add(candidate.uri())) {
                 combined.add(candidate);
@@ -304,6 +318,37 @@ public class QueryService {
         return Direction.forward;
     }
 
+    private List<String> objectTypesForIntent(String intent) {
+        if ("lookup_lookup".equals(intent)) {
+            return List.of("lookup");
+        }
+        if ("helper_lookup".equals(intent)) {
+            return List.of("helper");
+        }
+        if ("rule_lookup".equals(intent)
+                || "explain_rule".equals(intent)
+                || "generate_target_message".equals(intent)
+                || "compare_source_target".equals(intent)
+                || "test_planning".equals(intent)
+                || "confidence_check".equals(intent)) {
+            return List.of("rule");
+        }
+        return List.of();
+    }
+
+    private List<String> warningsFor(String releaseId, ObjectManifestEntry entry) {
+        List<String> warnings = new ArrayList<>();
+        projectionStore.getCard(releaseId, entry.uri()).ifPresent(card -> {
+            if (card.riskFlags() != null && !card.riskFlags().isEmpty()) {
+                warnings.add("Object risk flags: " + card.riskFlags());
+            }
+            if (card.cardJson() != null && card.cardJson().containsKey("status")) {
+                warnings.add("Object governance status: " + card.cardJson().get("status"));
+            }
+        });
+        return List.copyOf(warnings);
+    }
+
     private ServiceAnswer tracedRefusal(Instant start, String traceId, QueryRequest request, QueryPlan plan, ScopeKey scope, String releaseId,
             RefusalReason reason, String message, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris) {
         appendTrace(start, traceId, "query", request.callerId(), request.query(), plan, scope, releaseId, candidateUris, selectedUris, l2ReadUris, reason, List.of());
@@ -313,6 +358,27 @@ public class QueryService {
 
     public void appendTrace(Instant start, String traceId, String entrypoint, String callerId, String queryText, QueryPlan plan, ScopeKey scope,
             String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris, RefusalReason refusal, List<String> toolCalls) {
+        appendTrace(start, traceId, entrypoint, callerId, queryText, plan, scope, releaseId, candidateUris, selectedUris, l2ReadUris, refusal, toolCalls, null);
+    }
+
+    public void appendTrace(Instant start, String traceId, String entrypoint, String callerId, String queryText, QueryPlan plan, ScopeKey scope,
+            String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris, RefusalReason refusal, List<String> toolCalls,
+            String answerView) {
+        List<ToolStepTrace> toolSteps = toolSteps(toolCalls, candidateUris, selectedUris, l2ReadUris);
+        GroundingMap groundingMap = groundingMap(releaseId, l2ReadUris);
+        BudgetUsage budgetUsage = new BudgetUsage(
+                toolCalls == null ? 0 : toolCalls.size(),
+                properties.getMaxToolCalls(),
+                l2ReadUris == null ? 0 : l2ReadUris.size(),
+                properties.getMaxL2Objects(),
+                dependencyDepthFromPlan(plan),
+                properties.getMaxDependencyDepth(),
+                estimateRetrievedTokens(candidateUris, selectedUris, l2ReadUris),
+                properties.getMaxRetrievedTokens(),
+                "ask".equals(entrypoint) ? 1 : 0,
+                properties.getMaxModelCalls(),
+                Duration.between(start, Instant.now()).toMillis(),
+                properties.getMaxLatencyMs());
         traceStore.appendQueryTrace(TraceRecord.builder(traceId, entrypoint)
                 .callerId(callerId)
                 .queryText(queryText)
@@ -325,6 +391,11 @@ public class QueryService {
                 .releaseId(releaseId)
                 .durationMs(Duration.between(start, Instant.now()).toMillis())
                 .toolCalls(toolCalls)
+                .toolSteps(toolSteps)
+                .groundingMap(groundingMap)
+                .answerView(answerView == null || answerView.isBlank() ? outputModeFromEntrypoint(entrypoint) : answerView)
+                .budgetUsage(budgetUsage)
+                .status(status(refusal))
                 .build());
     }
 
@@ -342,6 +413,88 @@ public class QueryService {
 
     private String outputMode(String value) {
         return value == null || value.isBlank() ? "default" : value;
+    }
+
+    private List<ToolStepTrace> toolSteps(List<String> toolCalls, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris) {
+        if (toolCalls == null || toolCalls.isEmpty()) {
+            return List.of();
+        }
+        List<ToolStepTrace> steps = new ArrayList<>();
+        for (int i = 0; i < toolCalls.size(); i++) {
+            String tool = toolCalls.get(i);
+            List<String> selected = selectedUris == null ? List.of() : selectedUris;
+            if ("find_objects".equals(tool) && candidateUris != null) {
+                selected = candidateUris;
+            } else if ("read_object_l2".equals(tool) && l2ReadUris != null) {
+                selected = l2ReadUris;
+            }
+            steps.add(new ToolStepTrace(
+                    i + 1,
+                    tool,
+                    Hashing.sha256(tool + ":input:" + i),
+                    Hashing.sha256(tool + ":output:" + selected),
+                    selected,
+                    "allowed"));
+        }
+        return steps;
+    }
+
+    private GroundingMap groundingMap(String releaseId, List<String> l2ReadUris) {
+        if (releaseId == null || l2ReadUris == null || l2ReadUris.isEmpty()) {
+            return GroundingMap.empty();
+        }
+        List<GroundedClaim> claims = l2ReadUris.stream()
+                .distinct()
+                .map(uri -> projectionStore.getContentRef(releaseId, uri)
+                        .map(ref -> new GroundedClaim(
+                                "L2 object read in trace: " + uri,
+                                List.of(new GroundingEvidence(uri, ref.contentHash(), "$")),
+                                ValidationStatus.grounded,
+                                null))
+                        .orElse(new GroundedClaim(
+                                "L2 object read but content ref unavailable: " + uri,
+                                List.of(),
+                                ValidationStatus.warning,
+                                "content ref not available while building trace grounding map")))
+                .toList();
+        return new GroundingMap(claims);
+    }
+
+    private int dependencyDepthFromPlan(QueryPlan plan) {
+        if (plan == null || plan.toolPlan() == null || !plan.toolPlan().contains("get_dependencies")) {
+            return 0;
+        }
+        return 1;
+    }
+
+    private int estimateRetrievedTokens(List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris) {
+        int textChars = 0;
+        for (List<String> values : List.of(candidateUris, selectedUris, l2ReadUris)) {
+            if (values != null) {
+                textChars += values.stream().mapToInt(value -> value == null ? 0 : value.length()).sum();
+            }
+        }
+        return Math.max(0, textChars / 4);
+    }
+
+    private String outputModeFromEntrypoint(String entrypoint) {
+        if ("ask".equals(entrypoint)) {
+            return "human";
+        }
+        if (entrypoint != null && entrypoint.startsWith("analyze")) {
+            return "agent";
+        }
+        return "default";
+    }
+
+    private String status(RefusalReason refusal) {
+        if (refusal == null || refusal == RefusalReason.none) {
+            return "answered";
+        }
+        if (refusal == RefusalReason.scope_unclear) {
+            return "clarification_required";
+        }
+        return "refused";
     }
 
     public record ObjectEnvelope(ObjectManifestEntry objectManifest, ObjectCard objectCard, DependencyResult dependencySummary) {}

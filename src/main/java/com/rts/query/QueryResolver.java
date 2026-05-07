@@ -33,7 +33,23 @@ public class QueryResolver {
         }
         String normalized = query == null ? "" : query.toLowerCase(Locale.ROOT);
         String intent = "rule_lookup";
-        if (normalized.contains("impact") || normalized.contains("影响")) {
+        if (normalized.contains("raw message") || normalized.contains("target message") || normalized.contains("目标报文") || normalized.contains("生成报文")) {
+            intent = "generate_target_message";
+        } else if (normalized.contains("compare") || normalized.contains("对比") || normalized.contains("比较")) {
+            intent = "compare_source_target";
+        } else if (normalized.contains("test") || normalized.contains("测试")) {
+            intent = "test_planning";
+        } else if (normalized.contains("evidence") || normalized.contains("证据")) {
+            intent = "evidence_check";
+        } else if (normalized.contains("confidence") || normalized.contains("可信") || normalized.contains("置信")) {
+            intent = "confidence_check";
+        } else if (normalized.contains("release") || normalized.contains("发布")) {
+            intent = "release_status_check";
+        } else if (normalized.contains("review") || normalized.contains("裁决") || normalized.contains("问题")) {
+            intent = "review_question";
+        } else if (normalized.contains("scope") || normalized.contains("范围")) {
+            intent = "scope_discovery";
+        } else if (normalized.contains("impact") || normalized.contains("影响")) {
             intent = "impact_preview";
         } else if (normalized.contains("depend") || normalized.contains("依赖")) {
             intent = "dependency_lookup";

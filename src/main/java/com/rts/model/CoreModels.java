@@ -2,6 +2,9 @@ package com.rts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.rts.model.AgentServiceModels.BudgetUsage;
+import com.rts.model.AgentServiceModels.GroundingMap;
+import com.rts.model.AgentServiceModels.ToolStepTrace;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -305,7 +308,12 @@ public final class CoreModels {
             String releaseId,
             long durationMs,
             Instant createdAt,
-            List<String> toolCalls
+            List<String> toolCalls,
+            List<ToolStepTrace> toolSteps,
+            GroundingMap groundingMap,
+            String answerView,
+            BudgetUsage budgetUsage,
+            String status
     ) {
         public static Builder builder(String traceId, String entrypoint) {
             return new Builder(traceId, entrypoint);
@@ -326,6 +334,11 @@ public final class CoreModels {
             private long durationMs;
             private Instant createdAt = Instant.now();
             private List<String> toolCalls = new ArrayList<>();
+            private List<ToolStepTrace> toolSteps = new ArrayList<>();
+            private GroundingMap groundingMap = GroundingMap.empty();
+            private String answerView;
+            private BudgetUsage budgetUsage;
+            private String status;
 
             private Builder(String traceId, String entrypoint) {
                 this.traceId = traceId;
@@ -343,10 +356,16 @@ public final class CoreModels {
             public Builder releaseId(String releaseId) { this.releaseId = releaseId; return this; }
             public Builder durationMs(long durationMs) { this.durationMs = durationMs; return this; }
             public Builder toolCalls(List<String> toolCalls) { this.toolCalls = safe(toolCalls); return this; }
+            public Builder toolSteps(List<ToolStepTrace> toolSteps) { this.toolSteps = toolSteps == null ? new ArrayList<>() : new ArrayList<>(toolSteps); return this; }
+            public Builder groundingMap(GroundingMap groundingMap) { this.groundingMap = groundingMap == null ? GroundingMap.empty() : groundingMap; return this; }
+            public Builder answerView(String answerView) { this.answerView = answerView; return this; }
+            public Builder budgetUsage(BudgetUsage budgetUsage) { this.budgetUsage = budgetUsage; return this; }
+            public Builder status(String status) { this.status = status; return this; }
 
             public TraceRecord build() {
                 return new TraceRecord(traceId, callerId, entrypoint, queryText, queryPlan, resolvedScope,
-                        candidateUris, selectedUris, l2ReadUris, refusalReason, releaseId, durationMs, createdAt, toolCalls);
+                        candidateUris, selectedUris, l2ReadUris, refusalReason, releaseId, durationMs, createdAt, toolCalls,
+                        toolSteps, groundingMap, answerView, budgetUsage, status);
             }
 
             private static List<String> safe(List<String> values) {

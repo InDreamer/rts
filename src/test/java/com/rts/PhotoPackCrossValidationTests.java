@@ -3,6 +3,10 @@ package com.rts;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.rts.index.LuceneIndexService;
+import com.rts.agent.AgentAnalysisService;
+import com.rts.agent.AgentToolService;
+import com.rts.model.AgentServiceModels.ImpactAnalysisRequest;
+import com.rts.model.AgentServiceModels.TestPlanRequest;
 import com.rts.model.CoreModels.AnswerType;
 import com.rts.model.CoreModels.Direction;
 import com.rts.model.CoreModels.ObjectManifestEntry;
@@ -77,6 +81,12 @@ class PhotoPackCrossValidationTests {
     @Autowired
     QueryService queryService;
 
+    @Autowired
+    AgentToolService agentToolService;
+
+    @Autowired
+    AgentAnalysisService agentAnalysisService;
+
     @BeforeEach
     void setup() throws Exception {
         store.clearForTests();
@@ -127,6 +137,7 @@ class PhotoPackCrossValidationTests {
         assertThat(answer.citedObjects()).contains(RULE_FIXING_TIME);
         assertThat(answer.facts().get(0).text()).contains("lk_fxd_ndf_cutoff_by_pair_and_locode");
         assertThat(answer.dependencies()).extracting("toUri").contains(LOOKUP_CUTOFF);
+        assertThat(answer.warnings()).anyMatch(warning -> warning.contains("draft_photo_reconstructed"));
         assertThat(queryService.trace(answer.traceId()).orElseThrow().l2ReadUris()).containsExactly(RULE_FIXING_TIME);
     }
 
@@ -162,6 +173,23 @@ class PhotoPackCrossValidationTests {
         assertThat(blockChildren.edges()).hasSize(5);
         assertThat(blockChildren.edges()).extracting("toUri")
                 .contains(RULE_QUOTED_PAIR, RULE_FIXING_TIME, RULE_PRIMARY_RATE_SOURCE, RULE_SECONDARY_RATE_SOURCE);
+    }
+
+    @Test
+    void finalAgentToolsWorkOnPhotoPackWithoutTreatingDraftAsSignoffTruth() {
+        var summary = agentToolService.getScopeSummary(SCOPE, "tester", API_KEY, "default");
+        assertThat(summary.objectCounts()).containsEntry("rule", 6L).containsEntry("lookup", 1L).containsEntry("helper", 1L);
+        assertThat(summary.warnings()).contains("release content hash summary indicates draft material", "scope contains object risk flags; answer views must keep warnings visible");
+
+        var impact = agentAnalysisService.analyzeImpact(new ImpactAnalysisRequest(LOOKUP_CUTOFF, null, null, SCOPE, "tester", API_KEY, "default", false, 10));
+        assertThat(impact.status()).isEqualTo("candidate");
+        assertThat(impact.candidates()).extracting("impactedObjectUri")
+                .contains(RULE_FIXING_TIME, RULE_PRIMARY_RATE_SOURCE, RULE_SECONDARY_RATE_SOURCE);
+        assertThat(impact.warnings()).contains("Impact output is a candidate analysis, not final impact approval.");
+
+        var testPlan = agentAnalysisService.planTests(new TestPlanRequest(RULE_FIXING_TIME, SCOPE, "tester", API_KEY, "default", false, 3));
+        assertThat(testPlan.status()).isEqualTo("candidate");
+        assertThat(testPlan.warnings()).contains("Test plan output is a candidate set, not QA signoff.");
     }
 
     @Test

@@ -59,7 +59,9 @@ public final class TestProjectionFactory {
                         ref(OTHER_RULE_URI, Hashing.sha256(otherContent), "rules/aurora_rule_amount.json")),
                 List.of(
                         new CallerProfile("tester", Hashing.sha256(TESTER_KEY), List.of("tradition"), List.of("stella"), List.of("payments"),
-                                List.of("find", "query", "ask", "objects_get", "objects_content", "objects_dependencies", "trace"), List.of("*"), true),
+                                List.of("find", "query", "ask", "objects_get", "objects_content", "objects_dependencies", "trace",
+                                        "scope_tools", "navigation_tools", "analysis_tools", "feedback_tools", "evidence_tools", "view_tools",
+                                        "governance_tools"), List.of("*"), true),
                         new CallerProfile("admin", Hashing.sha256(ADMIN_KEY), List.of("*"), List.of("*"), List.of("*"), List.of("*"), List.of("*"), true)));
     }
 

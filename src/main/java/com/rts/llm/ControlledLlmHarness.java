@@ -13,6 +13,7 @@ import com.rts.model.CoreModels.Refusal;
 import com.rts.model.CoreModels.RefusalReason;
 import com.rts.model.CoreModels.ServiceAnswer;
 import com.rts.query.FinalAnswerValidator;
+import com.rts.query.PromptPolicyGuard;
 import com.rts.query.QueryRefusalException;
 import com.rts.query.QueryRequests.AskRequest;
 import com.rts.query.QueryRequests.FindRequest;
@@ -35,14 +36,16 @@ public class ControlledLlmHarness {
     private final QueryService queryService;
     private final LlmClient llmClient;
     private final FinalAnswerValidator finalAnswerValidator;
+    private final PromptPolicyGuard promptPolicyGuard;
     private final TraceStore traceStore;
     private final RtsProperties properties;
 
     public ControlledLlmHarness(QueryService queryService, LlmClient llmClient, FinalAnswerValidator finalAnswerValidator,
-            TraceStore traceStore, RtsProperties properties) {
+            PromptPolicyGuard promptPolicyGuard, TraceStore traceStore, RtsProperties properties) {
         this.queryService = queryService;
         this.llmClient = llmClient;
         this.finalAnswerValidator = finalAnswerValidator;
+        this.promptPolicyGuard = promptPolicyGuard;
         this.traceStore = traceStore;
         this.properties = properties;
     }
@@ -53,10 +56,15 @@ public class ControlledLlmHarness {
         String traceId = queryService.newTraceId();
         LlmDraft draft;
         try {
+            if (properties.getMaxModelCalls() < 1) {
+                throw new QueryRefusalException(RefusalReason.tool_budget_exhausted, "LLM model call budget exhausted");
+            }
+            promptPolicyGuard.validateUserText(request.query());
             draft = llmClient.draftAnswer(request, tools);
+            enforceLatencyBudget(start);
         } catch (QueryRefusalException ex) {
             queryService.appendTrace(start, traceId, "ask", request.callerId(), request.query(), null, request.scopeHint(), null,
-                    List.of(), List.of(), List.of(), ex.reason(), tools.calls);
+                    List.of(), List.copyOf(tools.l2ReadUris), List.copyOf(tools.l2ReadUris), ex.reason(), tools.calls, request.outputMode());
             ServiceAnswer refusal = new ServiceAnswer(AnswerType.refusal, request.scopeHint(), null, List.of(), List.of(), List.of(ex.getMessage()),
                     List.of(), List.of(), List.of(), List.of(), traceId, new Refusal(ex.reason(), ex.getMessage(), List.of(), false), List.of(), null);
             traceStore.appendLlmRunTrace(new LlmRunTrace("llm-" + UUID.randomUUID(), traceId, properties.getLlmModel(), "day1-controlled-v1",
@@ -69,9 +77,10 @@ public class ControlledLlmHarness {
             if (grounded.answerType() == AnswerType.answer) {
                 finalAnswerValidator.validate(grounded, Set.copyOf(tools.l2ReadUris));
             }
+            enforceLatencyBudget(start);
             queryService.appendTrace(start, traceId, "ask", request.callerId(), request.query(), null, grounded.scope(), grounded.releaseId(),
                     grounded.citedObjects(), grounded.citedObjects(), tools.l2ReadUris, grounded.refusal() == null ? RefusalReason.none : grounded.refusal().reason(),
-                    draft.toolCalls());
+                    draft.toolCalls(), request.outputMode());
             appendLlmTrace(start, grounded.traceId(), draft, "valid");
             return new ServiceAnswer(
                     grounded.answerType(),
@@ -90,7 +99,7 @@ public class ControlledLlmHarness {
                     grounded.answer() == null ? draft.text() : grounded.answer());
         } catch (QueryRefusalException ex) {
             queryService.appendTrace(start, traceId, "ask", request.callerId(), request.query(), null, grounded.scope(), grounded.releaseId(),
-                    List.of(), List.of(), List.of(), ex.reason(), draft.toolCalls());
+                    List.of(), List.of(), List.of(), ex.reason(), draft.toolCalls(), request.outputMode());
             appendLlmTrace(start, grounded.traceId(), draft, "invalid:" + ex.reason());
             return new ServiceAnswer(AnswerType.refusal, grounded.scope(), grounded.releaseId(), List.of(), List.of(),
                     List.of(ex.getMessage()), List.of(), List.of(), List.of(), List.of(), grounded.traceId(),
@@ -131,6 +140,12 @@ public class ControlledLlmHarness {
                 Instant.now()));
     }
 
+    private void enforceLatencyBudget(Instant start) {
+        if (Duration.between(start, Instant.now()).toMillis() > properties.getMaxLatencyMs()) {
+            throw new QueryRefusalException(RefusalReason.tool_budget_exhausted, "LLM latency budget exhausted");
+        }
+    }
+
     private final class GuardedToolContext implements ToolContext {
         private final int maxCalls;
         private final List<String> calls = new ArrayList<>();
@@ -145,6 +160,12 @@ public class ControlledLlmHarness {
             if (calls.size() >= maxCalls) {
                 throw new QueryRefusalException(RefusalReason.tool_budget_exhausted, "LLM tool budget exhausted");
             }
+            if ("read_object_l2".equals(toolName) && l2ReadUris.size() >= properties.getMaxL2Objects()) {
+                throw new QueryRefusalException(RefusalReason.tool_budget_exhausted, "LLM L2 read budget exhausted");
+            }
+            if (estimateRetrievedTokens(input) >= properties.getMaxRetrievedTokens()) {
+                throw new QueryRefusalException(RefusalReason.tool_budget_exhausted, "LLM retrieved-token budget exhausted");
+            }
             calls.add(toolName);
             Object output = switch (toolName) {
                 case "resolve_scope" -> queryService.plan((PlanRequest) input);
@@ -157,7 +178,14 @@ public class ControlledLlmHarness {
             if ("read_object_l2".equals(toolName) && output instanceof com.rts.model.CoreModels.L2Content l2Content) {
                 l2ReadUris.add(l2Content.uri());
             }
+            if (estimateRetrievedTokens(output) >= properties.getMaxRetrievedTokens()) {
+                throw new QueryRefusalException(RefusalReason.tool_budget_exhausted, "LLM retrieved-token budget exhausted");
+            }
             return new ToolResult(toolName, output);
+        }
+
+        private int estimateRetrievedTokens(Object value) {
+            return String.valueOf(value).length() / 4;
         }
     }
 }
