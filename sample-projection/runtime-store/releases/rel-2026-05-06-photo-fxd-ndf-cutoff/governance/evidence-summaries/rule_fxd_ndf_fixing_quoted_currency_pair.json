@@ -1,0 +1,20 @@
+{
+  "summary_id": "evidence-summary-rule_fxd_ndf_fixing_quoted_currency_pair",
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_quoted_currency_pair",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "summary_type": "evidence",
+  "title": "Evidence summary for rule_fxd_ndf_fixing_quoted_currency_pair",
+  "summary": "The quotedCurrencyPair block binds helper outputs into the Stella fixing subtree. Workbook rows 131-134 contain path and spelling inconsistencies, so Java/XSLT wording was taken as stronger evidence.",
+  "source_locator": {
+    "evidence_ids": [
+      "ev_rule_fixing_quoted_currency_pair_core",
+      "ev_rule_fixing_quoted_currency_pair_workbook_typo"
+    ]
+  },
+  "warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ]
+}

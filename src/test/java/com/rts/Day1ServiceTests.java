@@ -165,6 +165,9 @@ class Day1ServiceTests {
         assertThat(snapshot.manifest().releaseId()).isEqualTo(TestProjectionFactory.RELEASE);
         assertThat(Files.exists(STORE_ROOT.resolve("active-release.json"))).isTrue();
         assertThat(Files.exists(STORE_ROOT.resolve("releases").resolve(TestProjectionFactory.RELEASE).resolve("object-manifest.jsonl"))).isTrue();
+        assertThat(Files.exists(STORE_ROOT.resolve("releases").resolve(TestProjectionFactory.RELEASE).resolve("navigation/object-cards.jsonl"))).isTrue();
+        assertThat(Files.exists(STORE_ROOT.resolve("releases").resolve(TestProjectionFactory.RELEASE).resolve("governance/governance-access-refs.jsonl"))).isTrue();
+        assertThat(Files.exists(STORE_ROOT.resolve("releases").resolve(TestProjectionFactory.RELEASE).resolve("dependencies/field-bindings.jsonl"))).isTrue();
         assertThat(Files.exists(STORE_ROOT.resolve("traces"))).isTrue();
     }
 

@@ -1,17 +1,168 @@
 {
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_quoted_currency_pair",
   "id": "rule_fxd_ndf_fixing_quoted_currency_pair",
+  "object_type": "rule",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
   "status": "demo-signoff-photo-reconstructed",
-  "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair",
-  "logic": "Read source fixing quotedCurrencyPair currency1, currency2, and quoteBasis; invoke hlp_fxd_ndf_fixing_quoted_currency_pair; emit target quotedCurrencyPair currency1, currency2, and quoteBasis from helper outputs.",
-  "source_paths": [
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()"
+  "signoff_status": "demo_signoff",
+  "runtime_state": "released",
+  "risk_flags": [
+    "photo_reconstructed_source"
   ],
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "visibility": "runtime_operational",
+  "production_gate": "Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff.",
+  "source_lineage": {
+    "canonical_pack": "tradition-to-stella-fxd-ndf-cutoff-fixing-split",
+    "reconstructed_on": "2026-05-06",
+    "reconstructed_from_photos": [
+      "IMG_9617.JPG"
+    ],
+    "source_locator_summary": "Photo reconstruction plus workbook/code/XSLT/test locators projected as permission-gated governance summaries."
+  },
+  "review_state": {
+    "status": "demo_signoff",
+    "signoff_status": "demo_signoff",
+    "open_questions": [
+      "target_xpath_exact_suffixes",
+      "cutoff_code_semantics",
+      "rate_source_page_secondary"
+    ],
+    "open_questions_are_production_truth": false
+  },
+  "inputs": [
+    {
+      "name": "source_currency1",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()"
+    },
+    {
+      "name": "source_currency2",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()"
+    },
+    {
+      "name": "source_quote_basis",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()"
+    }
+  ],
+  "logic": {
+    "summary": "Normalize the Tradition fixing quotedCurrencyPair into Stella's explicit pair orientation and standard quoteBasis values by invoking the quoted-currency-pair helper and binding its outputs into the emitted target block.\n",
+    "pipeline": [
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
+        "out": "source_currency1"
+      },
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
+        "out": "source_currency2"
+      },
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()",
+        "out": "source_quote_basis"
+      },
+      {
+        "op": "invoke_helper",
+        "helper": "hlp_fxd_ndf_fixing_quoted_currency_pair",
+        "using_inputs": {
+          "source_currency1": "source_currency1",
+          "source_currency2": "source_currency2",
+          "source_quote_basis": "source_quote_basis"
+        },
+        "exposes_outputs": [
+          "target_currency1",
+          "target_currency2",
+          "target_quote_basis",
+          "is_inverse_quote"
+        ]
+      },
+      {
+        "op": "emit_block",
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair",
+        "children": [
+          "target_currency1",
+          "target_currency2",
+          "target_quote_basis"
+        ]
+      }
+    ]
+  },
   "dependencies": [
-    "hlp_fxd_ndf_fixing_quoted_currency_pair"
+    {
+      "id": "hlp_fxd_ndf_fixing_quoted_currency_pair",
+      "type": "helper",
+      "purpose": "operational_logic"
+    }
   ],
-  "warnings": [
-    "Target child XPaths were reconstructed from visible block names and helper outputs."
-  ]
+  "examples": [
+    {
+      "name": "sample_usdtwd_pair",
+      "input": {
+        "source_currency1": "USD",
+        "source_currency2": "TWD",
+        "source_quote_basis": "USDTWD"
+      },
+      "key_decision": {
+        "helper_branch": "inverse"
+      },
+      "result": {
+        "target_currency1": "TWD",
+        "target_currency2": "USD",
+        "target_quote_basis": "Currency1PerCurrency2"
+      }
+    },
+    {
+      "name": "preserve_source_order_when_quote_basis_is_not_source_pair",
+      "input": {
+        "source_currency1": "USD",
+        "source_currency2": "TWD",
+        "source_quote_basis": "Currency2PerCurrency1"
+      },
+      "key_decision": {
+        "helper_branch": "preserve_order"
+      },
+      "result": {
+        "target_currency1": "USD",
+        "target_currency2": "TWD",
+        "target_quote_basis": "Currency2PerCurrency1"
+      }
+    }
+  ],
+  "operational_warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ],
+  "governance_summary_refs": [
+    "evidence-summary-rule_fxd_ndf_fixing_quoted_currency_pair",
+    "review-summary-rule_fxd_ndf_fixing_quoted_currency_pair",
+    "report-summary-photo-pack-closure"
+  ],
+  "content_hash": "sha256:ec97e12bec92e7c44c639127d96914a38d39f19cd874d3e93f131065b75591d0",
+  "target": {
+    "kind": "block",
+    "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair",
+    "emits": [
+      {
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair/conf:currency1",
+        "from_helper": "target_currency1"
+      },
+      {
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair/conf:currency2",
+        "from_helper": "target_currency2"
+      },
+      {
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:quotedCurrencyPair/conf:quoteBasis",
+        "from_helper": "target_quote_basis"
+      }
+    ]
+  }
 }

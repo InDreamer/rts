@@ -16,6 +16,8 @@ import com.rts.model.AgentServiceModels.ScopeTree;
 import com.rts.model.CoreModels.CandidateObject;
 import com.rts.model.CoreModels.DependencyEdge;
 import com.rts.model.CoreModels.Direction;
+import com.rts.model.CoreModels.GovernanceAccessRef;
+import com.rts.model.CoreModels.GovernanceSummary;
 import com.rts.model.CoreModels.L2Content;
 import com.rts.model.CoreModels.ObjectCard;
 import com.rts.model.CoreModels.ObjectManifestEntry;
@@ -241,14 +243,30 @@ public class AgentToolService {
         String releaseId = snapshot.manifest().releaseId();
         ObjectManifestEntry object = requireObject(releaseId, uri);
         permissionService.requireAllowed(releaseId, callerId, apiKey, object.scope(), "evidence_tools", mode(outputMode));
-        ObjectCard card = projectionStore.getCard(releaseId, uri)
-                .orElseThrow(() -> new QueryRefusalException(RefusalReason.object_not_found, "Object card not found"));
-        Object status = card.cardJson() == null ? null : card.cardJson().get("status");
-        Object source = card.cardJson() == null ? null : card.cardJson().get("source");
-        return new EvidenceSummary(uri, releaseId, status == null ? object.state() : String.valueOf(status),
-                source == null ? "Evidence summary is limited to projection-approved card metadata." : String.valueOf(source),
-                card.riskFlags(), List.of(object.cardRef()), false,
-                List.of("Raw evidence is not included in default operational context."));
+        GovernanceAccessRef accessRef = projectionStore.getGovernanceAccessRef(releaseId, uri)
+                .orElseThrow(() -> new QueryRefusalException(RefusalReason.governance_unauthorized, "Governance access ref not published for object"));
+        List<GovernanceSummary> summaries = projectionStore.governanceSummaries(releaseId, uri);
+        String sourceSummary = summaries.stream()
+                .filter(summary -> "evidence".equals(summary.summaryType()))
+                .map(GovernanceSummary::summary)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(accessRef.sourceLocatorSummary());
+        List<String> reviewPointers = new ArrayList<>();
+        reviewPointers.addAll(safe(accessRef.evidenceSummaryRefs()));
+        reviewPointers.addAll(safe(accessRef.reviewSummaryRefs()));
+        reviewPointers.addAll(safe(accessRef.reportSummaryRefs()));
+        ObjectCard card = projectionStore.getCard(releaseId, uri).orElse(null);
+        List<String> riskFlags = card == null ? List.of() : safe(card.riskFlags());
+        List<String> warnings = new ArrayList<>();
+        warnings.add("Raw evidence is not included in default operational context.");
+        warnings.add("Governance summaries are projection-published and permission-gated.");
+        if (accessRef.openQuestions() != null && !accessRef.openQuestions().isEmpty()) {
+            warnings.add("Open governance questions remain: " + accessRef.openQuestions());
+        }
+        return new EvidenceSummary(uri, releaseId, object.state(),
+                sourceSummary == null ? "No evidence summary was published." : sourceSummary,
+                riskFlags, reviewPointers, false, List.copyOf(warnings));
     }
 
     private ScopeSummary summarizeScope(ProjectionSnapshot snapshot, ScopeRecord scope) {
@@ -353,6 +371,10 @@ public class AgentToolService {
 
     private String normalize(String value) {
         return value == null ? "" : value.toLowerCase(Locale.ROOT);
+    }
+
+    private List<String> safe(List<String> values) {
+        return values == null ? List.of() : values;
     }
 
     private static final class AgentServiceModelsHelper {

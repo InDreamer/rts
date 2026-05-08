@@ -35,7 +35,7 @@ public final class TestProjectionFactory {
         String otherContent = "{\"logic\":\"Aurora amount uses a different source and must not answer Stella queries.\"}";
         return new ProjectionSnapshot(
                 new ActiveReleasePointer(RELEASE, null, Instant.parse("2026-05-06T00:00:00Z"), "test"),
-                manifest(0, "day1-v1"),
+                manifest(0, "runtime-multiview-v1"),
                 List.of(
                         new ScopeRecord(RELEASE, "tradition", "stella", "payments", "core", true, "default", "product-specific", false, null),
                         new ScopeRecord(RELEASE, "tradition", "aurora", "payments", "core", true, "default", "product-specific", false, null)),
@@ -69,7 +69,7 @@ public final class TestProjectionFactory {
         String content = ruleContent();
         return new ProjectionSnapshot(
                 new ActiveReleasePointer(RELEASE, null, Instant.now(), "test"),
-                manifest(0, "day1-v1"),
+                manifest(0, "runtime-multiview-v1"),
                 List.of(new ScopeRecord(RELEASE, "tradition", "stella", "payments", "core", true, "default", "product-specific", false, null)),
                 List.of(object(MISSING_L2_URI, "rule_missing_l2", ObjectType.rule, "tradition", "stella", "payments", "core", "payment.missing", List.of(), Hashing.sha256(content), "rules/missing.json")),
                 List.of(card(MISSING_L2_URI, ObjectType.rule, "missing l2 rule")),

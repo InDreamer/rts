@@ -1,0 +1,22 @@
+{
+  "summary_id": "evidence-summary-lk_fxd_ndf_cutoff_by_pair_and_locode",
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/lookups/lk_fxd_ndf_cutoff_by_pair_and_locode",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "summary_type": "evidence",
+  "title": "Evidence summary for lk_fxd_ndf_cutoff_by_pair_and_locode",
+  "summary": "Shared cutoff lookup behavior is supported by workbook table shape, Java static mapping lookup code, XSLT templates, and tests. Representative cutoff rows contain blank hedge source/page cells; blank values are preserved by the draft lookup output. Cutoff row 52 contains values but no CONTRACT or LOCODE key, so it does not participate in the lookup. Reverse-pair fallback is explicit in Java and tests even though workbook rows are keyed in a single currency-pair order.",
+  "source_locator": {
+    "evidence_ids": [
+      "ev_lookup_cutoff_core",
+      "ev_lookup_cutoff_blank_hedge_cells",
+      "ev_lookup_cutoff_orphan_row_52",
+      "ev_lookup_cutoff_reverse_fallback"
+    ]
+  },
+  "warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ]
+}

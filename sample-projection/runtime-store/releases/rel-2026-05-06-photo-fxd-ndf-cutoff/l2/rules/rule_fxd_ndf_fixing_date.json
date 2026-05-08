@@ -1,18 +1,90 @@
 {
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_date",
   "id": "rule_fxd_ndf_fixing_date",
+  "object_type": "rule",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
   "status": "demo-signoff-photo-reconstructed",
-  "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingDate",
-  "logic": "Copy /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text() directly into the Stella fixingDate target element.",
-  "source_paths": [
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()"
+  "signoff_status": "demo_signoff",
+  "runtime_state": "released",
+  "risk_flags": [
+    "photo_reconstructed_source"
   ],
-  "examples": [
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "visibility": "runtime_operational",
+  "production_gate": "Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff.",
+  "source_lineage": {
+    "canonical_pack": "tradition-to-stella-fxd-ndf-cutoff-fixing-split",
+    "reconstructed_on": "2026-05-06",
+    "reconstructed_from_photos": [
+      "IMG_9615.JPG"
+    ],
+    "source_locator_summary": "Photo reconstruction plus workbook/code/XSLT/test locators projected as permission-gated governance summaries."
+  },
+  "review_state": {
+    "status": "demo_signoff",
+    "signoff_status": "demo_signoff",
+    "open_questions": [
+      "target_xpath_exact_suffixes",
+      "cutoff_code_semantics",
+      "rate_source_page_secondary"
+    ],
+    "open_questions_are_production_truth": false
+  },
+  "inputs": [
     {
-      "source_fixing_date": "2025-09-09",
-      "target_fixing_date": "2025-09-09"
+      "name": "source_fixing_date",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()"
     }
   ],
-  "warnings": [
-    "Target XPath suffix was reconstructed from the visible fixing subtree convention."
-  ]
+  "logic": {
+    "summary": "Copy the source NDF fixingDate directly into the Stella fixingDate element.",
+    "pipeline": [
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()",
+        "out": "source_fixing_date"
+      },
+      {
+        "op": "emit_value",
+        "from": "source_fixing_date"
+      }
+    ]
+  },
+  "dependencies": [],
+  "examples": [
+    {
+      "name": "sample_fixing_date",
+      "input": {
+        "source_fixing_date": "2025-09-09"
+      },
+      "key_decision": {
+        "copy_mode": "direct"
+      },
+      "result": {
+        "target_fixing_date": "2025-09-09"
+      }
+    }
+  ],
+  "operational_warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ],
+  "governance_summary_refs": [
+    "evidence-summary-rule_fxd_ndf_fixing_date",
+    "review-summary-rule_fxd_ndf_fixing_date",
+    "report-summary-photo-pack-closure"
+  ],
+  "content_hash": "sha256:0beceefce6500dab8963e1e406fcceff4f8ad2874b6808eb4e87caa71bb49541",
+  "target": {
+    "kind": "value",
+    "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:fixingDate"
+  }
 }

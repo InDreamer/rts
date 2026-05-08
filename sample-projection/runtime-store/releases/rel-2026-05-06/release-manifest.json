@@ -1,7 +1,7 @@
 {
   "release_id": "rel-2026-05-06",
   "canonical_revision": "canonical-abc",
-  "projection_schema_version": "day1-v1",
+  "projection_schema_version": "runtime-multiview-v1",
   "card_schema_version": "card-v1",
   "summary_schema_version": "summary-v1",
   "activation_state": "active",

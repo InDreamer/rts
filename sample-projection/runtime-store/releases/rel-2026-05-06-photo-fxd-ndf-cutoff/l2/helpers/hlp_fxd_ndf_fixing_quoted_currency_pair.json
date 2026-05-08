@@ -1,18 +1,113 @@
 {
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/helpers/hlp_fxd_ndf_fixing_quoted_currency_pair",
   "id": "hlp_fxd_ndf_fixing_quoted_currency_pair",
+  "object_type": "helper",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
   "status": "demo-signoff-photo-reconstructed",
-  "logic": "Treat the source fixing quoteBasis as an inversion flag when it equals the concatenated input pair. If inverse, swap currencies and emit Currency1PerCurrency2; otherwise preserve source order and emit Currency2PerCurrency1.",
-  "source_paths": [
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()"
+  "signoff_status": "demo_signoff",
+  "runtime_state": "released",
+  "risk_flags": [
+    "photo_reconstructed_source"
   ],
-  "outputs": [
-    "target_currency1",
-    "target_currency2",
-    "target_quote_basis",
-    "is_inverse_quote"
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "visibility": "runtime_operational",
+  "production_gate": "Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff.",
+  "source_lineage": {
+    "canonical_pack": "tradition-to-stella-fxd-ndf-cutoff-fixing-split",
+    "reconstructed_on": "2026-05-06",
+    "reconstructed_from_photos": [
+      "IMG_9611.JPG"
+    ],
+    "source_locator_summary": "Photo reconstruction plus workbook/code/XSLT/test locators projected as permission-gated governance summaries."
+  },
+  "review_state": {
+    "status": "demo_signoff",
+    "signoff_status": "demo_signoff",
+    "open_questions": [
+      "target_xpath_exact_suffixes",
+      "cutoff_code_semantics",
+      "rate_source_page_secondary"
+    ],
+    "open_questions_are_production_truth": false
+  },
+  "inputs": [
+    {
+      "name": "source_currency1",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()"
+    },
+    {
+      "name": "source_currency2",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()"
+    },
+    {
+      "name": "source_quote_basis",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/quoteBasis/text()"
+    }
   ],
+  "logic": {
+    "summary": "Treat the source fixing quoteBasis as an inversion flag when it equals the concatenated input pair; in the inverse case swap the currencies and emit Currency1PerCurrency2, otherwise preserve the source order and emit Currency2PerCurrency1.\n",
+    "pipeline": [
+      {
+        "op": "concat",
+        "args": [
+          "source_currency1",
+          "source_currency2"
+        ],
+        "out": "source_pair"
+      },
+      {
+        "op": "equals",
+        "out": "is_inverse_quote",
+        "left": "source_quote_basis",
+        "right": "{source_pair}"
+      },
+      {
+        "op": "branch",
+        "condition": "is_inverse_quote",
+        "then": [
+          {
+            "op": "assign",
+            "from": "source_currency2",
+            "out": "target_currency1"
+          },
+          {
+            "op": "assign",
+            "from": "source_currency1",
+            "out": "target_currency2"
+          },
+          {
+            "op": "constant",
+            "value": "Currency1PerCurrency2",
+            "out": "target_quote_basis"
+          }
+        ],
+        "else": [
+          {
+            "op": "assign",
+            "from": "source_currency1",
+            "out": "target_currency1"
+          },
+          {
+            "op": "assign",
+            "from": "source_currency2",
+            "out": "target_currency2"
+          },
+          {
+            "op": "constant",
+            "value": "Currency2PerCurrency1",
+            "out": "target_quote_basis"
+          }
+        ]
+      }
+    ]
+  },
+  "dependencies": [],
   "examples": [
     {
       "name": "sample_usdtwd_inverts",
@@ -21,14 +116,50 @@
         "source_currency2": "TWD",
         "source_quote_basis": "USDTWD"
       },
+      "key_decision": {
+        "is_inverse_quote": true
+      },
       "result": {
         "target_currency1": "TWD",
         "target_currency2": "USD",
         "target_quote_basis": "Currency1PerCurrency2"
       }
+    },
+    {
+      "name": "preserve_source_order_when_quote_basis_differs",
+      "input": {
+        "source_currency1": "USD",
+        "source_currency2": "TWD",
+        "source_quote_basis": "Currency2PerCurrency1"
+      },
+      "key_decision": {
+        "is_inverse_quote": false
+      },
+      "result": {
+        "target_currency1": "USD",
+        "target_currency2": "TWD",
+        "target_quote_basis": "Currency2PerCurrency1"
+      }
     }
   ],
-  "warnings": [
-    "Reconstructed from photos; demo signoff fixture."
-  ]
+  "operational_warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ],
+  "governance_summary_refs": [
+    "evidence-summary-hlp_fxd_ndf_fixing_quoted_currency_pair",
+    "review-summary-hlp_fxd_ndf_fixing_quoted_currency_pair",
+    "report-summary-photo-pack-closure"
+  ],
+  "content_hash": "sha256:cdc3144755d85d301f7b85f05c620ec84043d4d96c85be30502bc225d854356a",
+  "output": {
+    "fields": [
+      "target_currency1",
+      "target_currency2",
+      "target_quote_basis",
+      "is_inverse_quote"
+    ]
+  }
 }

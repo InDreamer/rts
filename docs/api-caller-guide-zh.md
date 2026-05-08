@@ -40,7 +40,13 @@ Scope 由四个维度组成，必须全部提供，且必须属于当前 active 
 | `pack` | 规则包 | 见下表 |
 | `domain` | 领域 | `core` / `cutoff-fixing` |
 
-**当前默认 active release (`rel-2026-05-06`) 可用 scope：**
+**当前默认 active release (`rel-2026-05-06-photo-fxd-ndf-cutoff`) 可用 scope：**
+
+| pack | domain | 说明 |
+|---|---|---|
+| `fxd-ndf-cutoff-fixing` | `cutoff-fixing` | NDF fixing cutoff 规则（demo-signoff/photo reconstructed golden） |
+
+**回滚 sample release (`rel-2026-05-06`) 可用 scope：**
 
 | pack | domain | 说明 |
 |---|---|---|
@@ -49,12 +55,6 @@ Scope 由四个维度组成，必须全部提供，且必须属于当前 active 
 | `accounts` | `core` | 账户状态规则 |
 | `fx` | `core` | 汇率类型规则 |
 | `compliance` | `core` | 筛查标志规则 |
-
-**photo reconstructed draft release (`rel-2026-05-06-photo-fxd-ndf-cutoff`) 可用 scope：**
-
-| pack | domain | 说明 |
-|---|---|---|
-| `fxd-ndf-cutoff-fixing` | `cutoff-fixing` | NDF fixing cutoff 规则（draft，未 signoff） |
 
 > 注意：scope 必须属于当前 active release，否则返回 `scope_unclear` 拒答。查询前可先用 `/api/v1/find` 搜索确认对象存在。
 
@@ -254,5 +254,5 @@ curl -sS http://localhost:8080/api/v1/traces/<trace_id> \
 
 - 所有请求 body 字段使用 `snake_case`，不要用 `camelCase`（否则返回 400）。
 - `scope_hint` 中的 scope 必须属于当前 active release，否则返回 `scope_unclear`。
-- `warnings` 中出现 `draft` / `photo-reconstructed` 标注时，返回内容**不能作为 signoff truth 使用**。
+- `warnings` 或 governance summary 中出现 `photo-reconstructed`、`demo-signoff`、`open_questions` 或 production gate 标注时，返回内容**不能作为 production signoff truth 使用**。
 - `facts[].source` 以 `l2:sha256:...` 格式标识来源，可通过 trace 核查引用完整性。

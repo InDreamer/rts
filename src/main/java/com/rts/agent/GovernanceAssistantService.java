@@ -7,6 +7,7 @@ import com.rts.model.AgentServiceModels.GovernanceReviewResult;
 import com.rts.model.AgentServiceModels.HumanDecisionRecord;
 import com.rts.model.AgentServiceModels.HumanDecisionRecordRequest;
 import com.rts.model.AgentServiceModels.ReviewerQuestion;
+import com.rts.model.CoreModels.GovernanceAccessRef;
 import com.rts.model.CoreModels.Fact;
 import com.rts.model.CoreModels.L2Content;
 import com.rts.model.CoreModels.ObjectManifestEntry;
@@ -64,7 +65,8 @@ public class GovernanceAssistantService {
             }
         }
         List<String> conflictCandidates = conflictCandidates(snapshot, objects);
-        List<String> ambiguityCandidates = ambiguityCandidates(snapshot, objects);
+        List<String> ambiguityCandidates = new ArrayList<>(ambiguityCandidates(snapshot, objects));
+        ambiguityCandidates.addAll(openGovernanceQuestions(releaseId, objects));
         List<ReviewerQuestion> questions = objects.stream()
                 .flatMap(object -> List.of(
                         new ReviewerQuestion("rq-" + object.objectId() + "-evidence", object.uri(),
@@ -148,6 +150,17 @@ public class GovernanceAssistantService {
                 .filter(card -> card.riskFlags() != null && !card.riskFlags().isEmpty())
                 .map(card -> "risk flags on " + card.uri() + ": " + card.riskFlags())
                 .toList();
+    }
+
+    private List<String> openGovernanceQuestions(String releaseId, List<ObjectManifestEntry> objects) {
+        List<String> questions = new ArrayList<>();
+        for (ObjectManifestEntry object : objects) {
+            projectionStore.getGovernanceAccessRef(releaseId, object.uri())
+                    .map(GovernanceAccessRef::openQuestions)
+                    .filter(values -> values != null && !values.isEmpty())
+                    .ifPresent(values -> questions.add("open governance questions on " + object.uri() + ": " + values));
+        }
+        return questions;
     }
 
     private void append(String relativePath, Object value) {

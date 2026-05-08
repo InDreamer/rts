@@ -1,24 +1,156 @@
 {
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_secondary_rate_source",
   "id": "rule_fxd_ndf_secondary_rate_source",
+  "object_type": "rule",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
   "status": "demo-signoff-photo-reconstructed",
-  "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource",
-  "logic": "Always emit Cortex as the Stella secondary rate source and resolve the secondary rate source page from cutoff description returned by lk_fxd_ndf_cutoff_by_pair_and_locode.",
-  "source_paths": [
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
+  "signoff_status": "demo_signoff",
+  "runtime_state": "released",
+  "risk_flags": [
+    "photo_reconstructed_source"
   ],
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "visibility": "runtime_operational",
+  "production_gate": "Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff.",
+  "source_lineage": {
+    "canonical_pack": "tradition-to-stella-fxd-ndf-cutoff-fixing-split",
+    "reconstructed_on": "2026-05-06",
+    "reconstructed_from_photos": [
+      "IMG_9620.JPG"
+    ],
+    "source_locator_summary": "Photo reconstruction plus workbook/code/XSLT/test locators projected as permission-gated governance summaries."
+  },
+  "review_state": {
+    "status": "demo_signoff",
+    "signoff_status": "demo_signoff",
+    "open_questions": [
+      "target_xpath_exact_suffixes",
+      "cutoff_code_semantics",
+      "rate_source_page_secondary"
+    ],
+    "open_questions_are_production_truth": false
+  },
+  "inputs": [
+    {
+      "name": "fixing_currency1",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()"
+    },
+    {
+      "name": "fixing_currency2",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()"
+    },
+    {
+      "name": "cutoff_code",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
+    }
+  ],
+  "logic": {
+    "summary": "Always emit Cortex as the Stella secondary rate source and resolve the Cortex rateSourcePage from the shared cutoff lookup by passing fixing_currency1, fixing_currency2, and cutoff_code.\n",
+    "pipeline": [
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
+        "out": "fixing_currency1"
+      },
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
+        "out": "fixing_currency2"
+      },
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()",
+        "out": "cutoff_code"
+      },
+      {
+        "op": "constant",
+        "value": "Cortex",
+        "out": "secondary_rate_source"
+      },
+      {
+        "op": "lookup_value",
+        "lookup": "lk_fxd_ndf_cutoff_by_pair_and_locode",
+        "return_field": "cutoff_description",
+        "using_inputs": {
+          "fixing_currency1": "fixing_currency1",
+          "fixing_currency2": "fixing_currency2",
+          "cutoff_code": "cutoff_code"
+        },
+        "out": "cutoff_description"
+      }
+    ]
+  },
   "dependencies": [
-    "lk_fxd_ndf_cutoff_by_pair_and_locode"
+    {
+      "id": "lk_fxd_ndf_cutoff_by_pair_and_locode",
+      "type": "lookup",
+      "purpose": "operational_logic"
+    }
   ],
   "examples": [
     {
-      "matched_key": "USDTWD|TW",
-      "secondary_rate_source": "Cortex",
-      "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE"
+      "name": "sample_usdtwd_secondary_rate_source",
+      "input": {
+        "fixing_currency1": "USD",
+        "fixing_currency2": "TWD",
+        "cutoff_code": "TW"
+      },
+      "key_decision": {
+        "matched_key": "USDTWD|TW",
+        "lookup_path": "forward"
+      },
+      "result": {
+        "secondary_rate_source": "Cortex",
+        "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE"
+      }
+    },
+    {
+      "name": "reverse_pair_fallback_twdusd_secondary_rate_source",
+      "input": {
+        "fixing_currency1": "TWD",
+        "fixing_currency2": "USD",
+        "cutoff_code": "TW"
+      },
+      "key_decision": {
+        "matched_key": "USDTWD|TW",
+        "lookup_path": "reverse_fallback"
+      },
+      "result": {
+        "secondary_rate_source": "Cortex",
+        "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE"
+      }
     }
   ],
-  "warnings": [
-    "Secondary rate source page binding to cutoff description was accepted for demo signoff but should be rechecked before production signoff against original XSLT."
-  ]
+  "operational_warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ],
+  "governance_summary_refs": [
+    "evidence-summary-rule_fxd_ndf_secondary_rate_source",
+    "review-summary-rule_fxd_ndf_secondary_rate_source",
+    "report-summary-photo-pack-closure"
+  ],
+  "content_hash": "sha256:ce7f8bb33a7192f71a47e987c3fdc1e3ee333dfb279877f1ba5685132e7de70e",
+  "target": {
+    "kind": "block",
+    "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource",
+    "emits": [
+      {
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource/conf:rateSource",
+        "constant": "Cortex"
+      },
+      {
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:secondaryRateSource/conf:rateSourcePage",
+        "from_lookup": "cutoff_description"
+      }
+    ]
+  }
 }

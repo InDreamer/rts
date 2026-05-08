@@ -1,6 +1,7 @@
 package com.rts.index;
 
 import com.rts.model.CoreModels.CandidateObject;
+import com.rts.model.CoreModels.NavigationView;
 import com.rts.model.CoreModels.ObjectCard;
 import com.rts.model.CoreModels.ObjectManifestEntry;
 import com.rts.model.CoreModels.ScopeKey;
@@ -61,10 +62,14 @@ public class LuceneIndexService {
             try (IndexWriter writer = new IndexWriter(FSDirectory.open(indexPath), config)) {
                 for (ObjectManifestEntry entry : store.allObjects(releaseId)) {
                     ObjectCard card = store.getCard(releaseId, entry.uri()).orElse(null);
+                    NavigationView navigation = store.navigationViews(releaseId).stream()
+                            .filter(view -> view.uri().equals(entry.uri()))
+                            .findFirst()
+                            .orElse(null);
                     if (card == null) {
                         continue;
                     }
-                    writer.addDocument(toDocument(entry, card));
+                    writer.addDocument(toDocument(entry, card, navigation));
                 }
             }
         } catch (IOException ex) {
@@ -129,7 +134,7 @@ public class LuceneIndexService {
         }
     }
 
-    private Document toDocument(ObjectManifestEntry entry, ObjectCard card) {
+    private Document toDocument(ObjectManifestEntry entry, ObjectCard card, NavigationView navigation) {
         Document doc = new Document();
         doc.add(new StringField("uri", entry.uri(), Field.Store.YES));
         doc.add(new StringField("release_id", entry.releaseId(), Field.Store.YES));
@@ -148,11 +153,13 @@ public class LuceneIndexService {
         doc.add(new TextField("helper_id", entry.objectId(), Field.Store.NO));
         doc.add(new TextField("rule_id", entry.objectId(), Field.Store.NO));
         String cardText = card.searchText() == null ? "" : card.searchText();
+        String l0Text = navigation == null || navigation.l0Text() == null ? cardText : navigation.l0Text();
+        String l1Text = navigation == null || navigation.searchText() == null ? cardText : navigation.searchText();
         doc.add(new TextField("business_terms", cardText, Field.Store.NO));
-        doc.add(new TextField("searchable_text", entry.objectId() + " " + nullToEmpty(entry.targetPath()) + " " + cardText, Field.Store.NO));
+        doc.add(new TextField("searchable_text", entry.objectId() + " " + nullToEmpty(entry.targetPath()) + " " + cardText + " " + l0Text + " " + l1Text, Field.Store.NO));
         doc.add(new TextField("card_text", cardText, Field.Store.NO));
-        doc.add(new TextField("l0_text", cardText, Field.Store.NO));
-        doc.add(new TextField("l1_text", cardText, Field.Store.NO));
+        doc.add(new TextField("l0_text", l0Text, Field.Store.NO));
+        doc.add(new TextField("l1_text", l1Text, Field.Store.NO));
         return doc;
     }
 
@@ -161,7 +168,7 @@ public class LuceneIndexService {
     }
 
     private Path indexPath(String releaseId) {
-        return store.releaseRoot(releaseId).resolve("lucene");
+        return store.releaseRoot(releaseId).resolve("index-artifacts").resolve("lucene");
     }
 
     private List<String> safe(List<String> values) {

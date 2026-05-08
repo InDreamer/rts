@@ -210,6 +210,16 @@ public class QueryService {
             permissionService.requireAllowed(releaseId, callerId, apiKey, from.scope(), "objects_dependencies", "default");
             permissionService.requireAllowed(releaseId, callerId, apiKey, to.scope(), "objects_dependencies", "default");
         }
+        for (var binding : result.fieldBindings()) {
+            ObjectManifestEntry object = projectionStore.getObject(releaseId, binding.objectUri())
+                    .orElseThrow(() -> new QueryRefusalException(RefusalReason.dependency_unreleased, "Field binding object is not released"));
+            permissionService.requireAllowed(releaseId, callerId, apiKey, object.scope(), "objects_dependencies", "default");
+            if (binding.viaUri() != null && !binding.viaUri().isBlank()) {
+                ObjectManifestEntry via = projectionStore.getObject(releaseId, binding.viaUri())
+                        .orElseThrow(() -> new QueryRefusalException(RefusalReason.dependency_unreleased, "Field binding dependency is not released"));
+                permissionService.requireAllowed(releaseId, callerId, apiKey, via.scope(), "objects_dependencies", "default");
+            }
+        }
     }
 
     private String loadActiveReleaseId() {

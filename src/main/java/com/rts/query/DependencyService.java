@@ -4,6 +4,7 @@ import com.rts.config.RtsProperties;
 import com.rts.model.CoreModels.DependencyEdge;
 import com.rts.model.CoreModels.DependencyResult;
 import com.rts.model.CoreModels.Direction;
+import com.rts.model.CoreModels.FieldBinding;
 import com.rts.model.CoreModels.ObjectManifestEntry;
 import com.rts.store.StoreContracts.ProjectionStore;
 import java.util.ArrayDeque;
@@ -59,7 +60,12 @@ public class DependencyService {
                 .filter(value -> !value.equals(uri))
                 .flatMap(value -> projectionStore.getObject(releaseId, value).stream())
                 .toList();
-        return new DependencyResult(List.copyOf(selected), objects, truncated);
+        List<String> objectUris = new ArrayList<>(seen);
+        List<FieldBinding> fieldBindings = projectionStore.fieldBindings(releaseId).stream()
+                .filter(binding -> objectUris.contains(binding.objectUri())
+                        || (binding.viaUri() != null && objectUris.contains(binding.viaUri())))
+                .toList();
+        return new DependencyResult(List.copyOf(selected), objects, truncated, fieldBindings);
     }
 
     private boolean matchesDirection(DependencyEdge edge, String uri, Direction direction) {

@@ -1,20 +1,109 @@
 {
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/lookups/lk_fxd_ndf_cutoff_by_pair_and_locode",
   "id": "lk_fxd_ndf_cutoff_by_pair_and_locode",
+  "object_type": "lookup",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
   "status": "demo-signoff-photo-reconstructed",
-  "logic": "Query the TraditionStella Cutoff mapping by forward currency-pair order plus cutoff code first, then retry reverse pair when the requested field is not populated. Returned fields include cutoff name, cutoff description, fixing time, fixing business center, hedge primary source, and hedge primary source page.",
-  "source_paths": [
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
+  "signoff_status": "demo_signoff",
+  "runtime_state": "released",
+  "risk_flags": [
+    "photo_reconstructed_source"
   ],
-  "return_fields": {
-    "cutoff_name": "CUTOFF",
-    "cutoff_description": "CUTOFF_DESC",
-    "fixing_time": "FIXING_TIME",
-    "fixing_business_center": "FIXING_BUSINESS_CENTER",
-    "hedge_primary_source": "PRIMARY_SOUCE_FOR_HEDGE",
-    "hedge_primary_source_page": "PRIMARY_SOUCE_PAGE_FOR_HEDGE"
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
   },
+  "visibility": "runtime_operational",
+  "production_gate": "Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff.",
+  "source_lineage": {
+    "canonical_pack": "tradition-to-stella-fxd-ndf-cutoff-fixing-split",
+    "reconstructed_on": "2026-05-06",
+    "reconstructed_from_photos": [
+      "IMG_9612.JPG",
+      "IMG_9613.JPG"
+    ],
+    "source_locator_summary": "Photo reconstruction plus workbook/code/XSLT/test locators projected as permission-gated governance summaries."
+  },
+  "review_state": {
+    "status": "demo_signoff",
+    "signoff_status": "demo_signoff",
+    "open_questions": [
+      "target_xpath_exact_suffixes",
+      "cutoff_code_semantics",
+      "rate_source_page_secondary"
+    ],
+    "open_questions_are_production_truth": false
+  },
+  "inputs": [
+    {
+      "name": "fixing_currency1",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()"
+    },
+    {
+      "name": "fixing_currency2",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()"
+    },
+    {
+      "name": "cutoff_code",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
+    }
+  ],
+  "logic": {
+    "summary": "Query the cutoff mapping by forward currency-pair order first, then retry the reverse order when the requested field is not populated. The same lookup drives all FXD.NDF fixing rules that need cutoff-derived values.\n",
+    "pipeline": [
+      {
+        "op": "concat",
+        "args": [
+          "fixing_currency1",
+          "fixing_currency2"
+        ],
+        "out": "forward_pair"
+      },
+      {
+        "op": "concat",
+        "args": [
+          "fixing_currency2",
+          "fixing_currency1"
+        ],
+        "out": "reverse_pair"
+      },
+      {
+        "op": "compose_key",
+        "template": "{forward_pair}|{cutoff_code}",
+        "out": "forward_key"
+      },
+      {
+        "op": "lookup_value",
+        "key": "{forward_key}",
+        "return_field": "requested_field",
+        "out": "forward_result"
+      },
+      {
+        "op": "compose_key",
+        "template": "{reverse_pair}|{cutoff_code}",
+        "out": "reverse_key"
+      },
+      {
+        "op": "lookup_value",
+        "key": "{reverse_key}",
+        "return_field": "requested_field",
+        "out": "reverse_result"
+      },
+      {
+        "op": "coalesce",
+        "when": "forward_result is empty",
+        "args": [
+          "forward_result",
+          "reverse_result"
+        ],
+        "out": "resolved_value"
+      }
+    ]
+  },
+  "dependencies": [],
   "examples": [
     {
       "name": "sample_usdtwd_tw",
@@ -23,8 +112,10 @@
         "fixing_currency2": "TWD",
         "cutoff_code": "TW"
       },
-      "matched_key": "USDTWD|TW",
-      "lookup_path": "forward",
+      "key_decision": {
+        "matched_key": "USDTWD|TW",
+        "lookup_path": "forward"
+      },
       "result": {
         "cutoff_name": "TPE",
         "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE",
@@ -41,8 +132,10 @@
         "fixing_currency2": "USD",
         "cutoff_code": "TW"
       },
-      "matched_key": "USDTWD|TW",
-      "lookup_path": "reverse_fallback",
+      "key_decision": {
+        "matched_key": "USDTWD|TW",
+        "lookup_path": "reverse_fallback"
+      },
       "result": {
         "cutoff_name": "TPE",
         "cutoff_description": "USDTWD@[TAIFX1]-1100-TW TPE",
@@ -59,8 +152,10 @@
         "fixing_currency2": "GBP",
         "cutoff_code": "NY"
       },
-      "matched_key": "AUDGBP|NY",
-      "lookup_path": "forward",
+      "key_decision": {
+        "matched_key": "AUDGBP|NY",
+        "lookup_path": "forward"
+      },
       "result": {
         "cutoff_name": "NY",
         "cutoff_description": "GBPAUD@[GBPX1=]-1000-US NYC",
@@ -71,7 +166,44 @@
       }
     }
   ],
-  "warnings": [
-    "Column spelling PRIMARY_SOUCE_* is preserved from the photographed workbook evidence."
-  ]
+  "operational_warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ],
+  "governance_summary_refs": [
+    "evidence-summary-lk_fxd_ndf_cutoff_by_pair_and_locode",
+    "review-summary-lk_fxd_ndf_cutoff_by_pair_and_locode",
+    "report-summary-photo-pack-closure"
+  ],
+  "content_hash": "sha256:01f6acdff95122d1a0b77f6440fe78a009fc64635727347e21a5eb8c000c561c",
+  "output": {
+    "fields": [
+      {
+        "name": "cutoff_name",
+        "return_field": "CUTOFF"
+      },
+      {
+        "name": "cutoff_description",
+        "return_field": "CUTOFF_DESC"
+      },
+      {
+        "name": "fixing_time",
+        "return_field": "FIXING_TIME"
+      },
+      {
+        "name": "fixing_business_center",
+        "return_field": "FIXING_BUSINESS_CENTER"
+      },
+      {
+        "name": "hedge_primary_source",
+        "return_field": "PRIMARY_SOUCE_FOR_HEDGE"
+      },
+      {
+        "name": "hedge_primary_source_page",
+        "return_field": "PRIMARY_SOUCE_PAGE_FOR_HEDGE"
+      }
+    ]
+  }
 }

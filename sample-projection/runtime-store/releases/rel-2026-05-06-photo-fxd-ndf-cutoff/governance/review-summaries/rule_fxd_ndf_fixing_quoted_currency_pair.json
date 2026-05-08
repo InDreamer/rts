@@ -1,0 +1,40 @@
+{
+  "summary_id": "review-summary-rule_fxd_ndf_fixing_quoted_currency_pair",
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_quoted_currency_pair",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "summary_type": "review",
+  "title": "Review summary for rule_fxd_ndf_fixing_quoted_currency_pair",
+  "summary": "Local demo signoff accepted for Java service testing. Open questions are not production truth.",
+  "source_locator": {
+    "open_questions": [
+      {
+        "id": "target_xpath_exact_suffixes",
+        "question": "Confirm exact target child suffixes for quotedCurrencyPair, primaryRateSource, secondaryRateSource, and fixingTime.",
+        "current_assumption": "Standard Stella/FpML-like child names were generated from visible block names and rule summaries."
+      },
+      {
+        "id": "cutoff_code_semantics",
+        "question": "Confirm whether source fixingTime/hourMinuteTime text is intentionally used as `cutoff_code`/LOCODE.",
+        "current_assumption": "The photographed lookup and rules bind this source field as `cutoff_code`."
+      },
+      {
+        "id": "rate_source_page_secondary",
+        "question": "Confirm whether secondaryRateSource/rateSourcePage should bind the cutoff description field exactly.",
+        "current_assumption": "Photo and evidence text indicate `cutoff_description` is used."
+      }
+    ],
+    "review_conclusions": [
+      {
+        "id": "local_demo_signoff",
+        "conclusion": "Accepted as local demo signoff material for RTS Java service testing.",
+        "production_gate": "Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff."
+      }
+    ]
+  },
+  "warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ]
+}

@@ -134,8 +134,30 @@ public final class CoreModels {
             String cardRef,
             @NotBlank String contentRef,
             @NotBlank String schemaVersion,
-            @NotBlank String state
+            @NotBlank String state,
+            String l2StorageRef
     ) {
+        public ObjectManifestEntry(
+                String uri,
+                String releaseId,
+                String objectId,
+                ObjectType objectType,
+                String channel,
+                String product,
+                String pack,
+                String domain,
+                String targetPath,
+                List<String> sourceAnchors,
+                String contentHash,
+                String cardRef,
+                String contentRef,
+                String schemaVersion,
+                String state
+        ) {
+            this(uri, releaseId, objectId, objectType, channel, product, pack, domain, targetPath, sourceAnchors,
+                    contentHash, cardRef, contentRef, schemaVersion, state, null);
+        }
+
         public ScopeKey scope() {
             return new ScopeKey(channel, product, pack, domain);
         }
@@ -176,6 +198,74 @@ public final class CoreModels {
             @NotBlank String contentHash,
             @NotBlank String contentType,
             @NotBlank String schemaVersion
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record NavigationView(
+            @NotBlank String uri,
+            @NotBlank String releaseId,
+            @NotBlank String viewType,
+            ScopeKey scope,
+            String l0Text,
+            Map<String, Object> l1Json,
+            String searchText,
+            @NotBlank String contentHash,
+            @NotBlank String schemaVersion
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record AliasRecord(
+            @NotBlank String releaseId,
+            @NotBlank String uri,
+            @NotBlank String alias,
+            String aliasType,
+            double weight
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ConfusableRecord(
+            @NotBlank String releaseId,
+            @NotBlank String uri,
+            @NotBlank String confusableWithUri,
+            String reason
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GovernanceAccessRef(
+            @NotBlank String uri,
+            @NotBlank String releaseId,
+            @NotBlank String accessLevel,
+            @NotBlank String redactionState,
+            List<String> evidenceSummaryRefs,
+            List<String> reviewSummaryRefs,
+            List<String> reportSummaryRefs,
+            List<String> openQuestions,
+            String productionGate,
+            String sourceLocatorSummary
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GovernanceSummary(
+            @NotBlank String summaryId,
+            @NotBlank String uri,
+            @NotBlank String releaseId,
+            @NotBlank String summaryType,
+            String title,
+            String summary,
+            Map<String, Object> sourceLocator,
+            List<String> warnings
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record FieldBinding(
+            @NotBlank String releaseId,
+            @NotBlank String objectUri,
+            @NotBlank String bindingType,
+            String sourceField,
+            String targetField,
+            String outputField,
+            String viaUri,
+            String purpose
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -236,8 +326,13 @@ public final class CoreModels {
     public record DependencyResult(
             List<DependencyEdge> edges,
             List<ObjectManifestEntry> objects,
-            boolean truncated
-    ) {}
+            boolean truncated,
+            List<FieldBinding> fieldBindings
+    ) {
+        public DependencyResult(List<DependencyEdge> edges, List<ObjectManifestEntry> objects, boolean truncated) {
+            this(edges, objects, truncated, List.of());
+        }
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record L2Content(

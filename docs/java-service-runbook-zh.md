@@ -66,13 +66,44 @@ RTS_STORE_ROOT=runtime-store
 sample-projection/runtime-store
 ```
 
+runtime projection 已切到多视图布局：
+
+```text
+runtime-store/
+  active-release.json
+  releases/<release-id>/
+    release-manifest.json
+    scopes.jsonl
+    object-manifest.jsonl
+    caller-profiles.jsonl
+    l2/{rules,lookups,helpers}/
+    navigation/{object-cards,l0-l1-views,aliases,confusables}.jsonl
+    governance/governance-access-refs.jsonl
+    governance/{evidence-summaries,review-summaries,report-summaries}/
+    dependencies/{dependency-edges,field-bindings}.jsonl
+    index-artifacts/{lucene,opensearch-docs.jsonl}
+  traces/
+```
+
 当前 sample 默认 active release 是：
+
+```text
+rel-2026-05-06-photo-fxd-ndf-cutoff
+```
+
+photo reconstructed golden scope：
+
+```text
+tradition / stella / fxd-ndf-cutoff-fixing / cutoff-fixing
+```
+
+回滚 sample release 是：
 
 ```text
 rel-2026-05-06
 ```
 
-可直接验证的 sample scope 包括：
+其中可验证的 sample scope 包括：
 
 ```text
 tradition / stella / payments / core
@@ -82,12 +113,7 @@ tradition / stella / fx / core
 tradition / stella / compliance / core
 ```
 
-另有 photo reconstructed draft sample：
-
-```text
-rel-2026-05-06-photo-fxd-ndf-cutoff
-tradition / stella / fxd-ndf-cutoff-fixing / cutoff-fixing
-```
+photo pack 是 demo-signoff/photo reconstructed golden release，用于验证多视图 runtime projection；其中仍保留 production gate 和 open questions，不能当 production signoff truth。
 
 注意：只有 active release 中存在的 scope 才能查询。scope 不在 active release 时，服务会返回 `scope_unclear`。
 
@@ -141,20 +167,20 @@ curl -s http://localhost:8080/mcp/tools | jq
 
 预期：返回 JSON，包含 `rts_ask`、`rts_find_objects`、`rts_read_object_l2`、`rts_trace_report` 等工具。
 
-### 查询 payments sample
+### 查询 photo pack
 
 ```bash
 curl -sS -X POST http://localhost:8080/api/v1/query \
   -H 'Content-Type: application/json' \
   -H 'X-RTS-API-Key: tester-key' \
   -d '{
-    "query": "payment amount 怎么生成？",
+    "query": "fixing time 怎么生成？",
     "caller_id": "tester",
     "scope_hint": {
       "channel": "tradition",
       "product": "stella",
-      "pack": "payments",
-      "domain": "core"
+      "pack": "fxd-ndf-cutoff-fixing",
+      "domain": "cutoff-fixing"
     },
     "output_mode": "default",
     "use_llm": false
@@ -166,6 +192,11 @@ curl -sS -X POST http://localhost:8080/api/v1/query \
 - `answer_type` 为 `answer`。
 - 返回 `facts`、`cited_objects`、`dependencies`、`trace_id`。
 - fact source 应包含 `l2:sha256:...`。
+- `warnings` 应保留 photo reconstructed / demo signoff 风险提示。
+
+### 查询回滚 sample
+
+如果需要查询 payments 等普通 sample scope，先按第 9 节切换 active release 到 `rel-2026-05-06`，再查询对应 scope。
 
 ### scope 缺失拒答
 
@@ -279,20 +310,20 @@ LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、pe
 
 ## 9. 切换 sample active release
 
-默认 active release 是普通 sample：
+默认 active release 是 photo pack：
 
 ```text
-rel-2026-05-06
+rel-2026-05-06-photo-fxd-ndf-cutoff
 ```
 
-如果要验证 photo reconstructed draft pack，先停止服务，然后写入 active pointer：
+如果要切回普通 sample，先停止服务，然后写入 active pointer：
 
 ```bash
 cat > /Users/tuziliji/projects/rts/sample-projection/runtime-store/active-release.json <<'JSON'
 {
-  "active_release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
-  "rollback_target_release_id": "rel-2026-05-06",
-  "updated_at": "2026-05-07T00:00:00Z",
+  "active_release_id": "rel-2026-05-06",
+  "rollback_target_release_id": null,
+  "updated_at": "2026-05-06T00:00:00Z",
   "updated_by": "manual-validation"
 }
 JSON
@@ -305,29 +336,27 @@ curl -sS -X POST http://localhost:8080/api/v1/query \
   -H 'Content-Type: application/json' \
   -H 'X-RTS-API-Key: tester-key' \
   -d '{
-    "query": "fixing time 怎么生成？",
+    "query": "payment amount 怎么生成？",
     "caller_id": "tester",
     "scope_hint": {
       "channel": "tradition",
       "product": "stella",
-      "pack": "fxd-ndf-cutoff-fixing",
-      "domain": "cutoff-fixing"
+      "pack": "payments",
+      "domain": "core"
     },
     "output_mode": "default",
     "use_llm": false
   }' | jq
 ```
 
-注意：photo pack 是 draft/photo reconstructed 示例，返回内容必须保留 draft/not-signoff warning，不能当 signoff truth。
-
-切回默认 sample：
+切回默认 photo pack：
 
 ```bash
 cat > /Users/tuziliji/projects/rts/sample-projection/runtime-store/active-release.json <<'JSON'
 {
-  "active_release_id": "rel-2026-05-06",
-  "rollback_target_release_id": null,
-  "updated_at": "2026-05-06T00:00:00Z",
+  "active_release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "rollback_target_release_id": "rel-2026-05-06",
+  "updated_at": "2026-05-07T00:00:00Z",
   "updated_by": "sample"
 }
 JSON

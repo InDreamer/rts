@@ -1,29 +1,162 @@
 {
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_primary_rate_source",
   "id": "rule_fxd_ndf_primary_rate_source",
+  "object_type": "rule",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
   "status": "demo-signoff-photo-reconstructed",
-  "target_path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource",
-  "logic": "Resolve hedge primary rate source and primary rate source page from lk_fxd_ndf_cutoff_by_pair_and_locode by currency pair plus cutoff code, using reverse-pair fallback.",
-  "source_paths": [
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
-    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
+  "signoff_status": "demo_signoff",
+  "runtime_state": "released",
+  "risk_flags": [
+    "photo_reconstructed_source"
   ],
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "visibility": "runtime_operational",
+  "production_gate": "Recheck source-photo reconstruction, target XPath suffixes, cutoff_code semantics, and secondary rate source page binding before production signoff.",
+  "source_lineage": {
+    "canonical_pack": "tradition-to-stella-fxd-ndf-cutoff-fixing-split",
+    "reconstructed_on": "2026-05-06",
+    "reconstructed_from_photos": [
+      "IMG_9619.JPG"
+    ],
+    "source_locator_summary": "Photo reconstruction plus workbook/code/XSLT/test locators projected as permission-gated governance summaries."
+  },
+  "review_state": {
+    "status": "demo_signoff",
+    "signoff_status": "demo_signoff",
+    "open_questions": [
+      "target_xpath_exact_suffixes",
+      "cutoff_code_semantics",
+      "rate_source_page_secondary"
+    ],
+    "open_questions_are_production_truth": false
+  },
+  "inputs": [
+    {
+      "name": "fixing_currency1",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()"
+    },
+    {
+      "name": "fixing_currency2",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()"
+    },
+    {
+      "name": "cutoff_code",
+      "source_path": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()"
+    }
+  ],
+  "logic": {
+    "summary": "Resolve the hedge primary rate source and primary rate source page from the shared cutoff lookup by currency pair plus cutoff code, with reverse-pair fallback.\n",
+    "pipeline": [
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()",
+        "out": "fixing_currency1"
+      },
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency2/text()",
+        "out": "fixing_currency2"
+      },
+      {
+        "op": "read_xpath",
+        "source": "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingTime/hourMinuteTime/text()",
+        "out": "cutoff_code"
+      },
+      {
+        "op": "lookup_value",
+        "lookup": "lk_fxd_ndf_cutoff_by_pair_and_locode",
+        "return_field": "hedge_primary_source",
+        "using_inputs": {
+          "fixing_currency1": "fixing_currency1",
+          "fixing_currency2": "fixing_currency2",
+          "cutoff_code": "cutoff_code"
+        },
+        "out": "hedge_primary_source"
+      },
+      {
+        "op": "lookup_value",
+        "lookup": "lk_fxd_ndf_cutoff_by_pair_and_locode",
+        "return_field": "hedge_primary_source_page",
+        "using_inputs": {
+          "fixing_currency1": "fixing_currency1",
+          "fixing_currency2": "fixing_currency2",
+          "cutoff_code": "cutoff_code"
+        },
+        "out": "hedge_primary_source_page"
+      }
+    ]
+  },
   "dependencies": [
-    "lk_fxd_ndf_cutoff_by_pair_and_locode"
+    {
+      "id": "lk_fxd_ndf_cutoff_by_pair_and_locode",
+      "type": "lookup",
+      "purpose": "operational_logic"
+    }
   ],
   "examples": [
     {
-      "matched_key": "USDTWD|TW",
-      "hedge_primary_source": "RTRS",
-      "hedge_primary_source_page": "TAIFX1"
+      "name": "sample_usdtwd_primary_rate_source",
+      "input": {
+        "fixing_currency1": "USD",
+        "fixing_currency2": "TWD",
+        "cutoff_code": "TW"
+      },
+      "key_decision": {
+        "matched_key": "USDTWD|TW",
+        "lookup_path": "forward"
+      },
+      "result": {
+        "hedge_primary_source": "RTRS",
+        "hedge_primary_source_page": "TAIFX1"
+      }
     },
     {
-      "matched_key": "AUDGBP|NY",
-      "hedge_primary_source": "",
-      "hedge_primary_source_page": ""
+      "name": "blank_hedge_values_are_preserved_as_empty",
+      "input": {
+        "fixing_currency1": "AUD",
+        "fixing_currency2": "GBP",
+        "cutoff_code": "NY"
+      },
+      "key_decision": {
+        "matched_key": "AUDGBP|NY",
+        "lookup_path": "forward"
+      },
+      "result": {
+        "hedge_primary_source": "",
+        "hedge_primary_source_page": ""
+      }
     }
   ],
-  "warnings": [
-    "Java evidence uses OptPrim naming while runtime lookup columns are hedge source/page fields."
-  ]
+  "operational_warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ],
+  "governance_summary_refs": [
+    "evidence-summary-rule_fxd_ndf_primary_rate_source",
+    "review-summary-rule_fxd_ndf_primary_rate_source",
+    "report-summary-photo-pack-closure"
+  ],
+  "content_hash": "sha256:bb750362cfa66a1de7b5974f8714d7c3823552c613a113aef289405711262fe0",
+  "target": {
+    "kind": "block",
+    "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource",
+    "emits": [
+      {
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource/conf:rateSource",
+        "from_lookup": "hedge_primary_source"
+      },
+      {
+        "path": "/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing/conf:primaryRateSource/conf:rateSourcePage",
+        "from_lookup": "hedge_primary_source_page"
+      }
+    ]
+  }
 }

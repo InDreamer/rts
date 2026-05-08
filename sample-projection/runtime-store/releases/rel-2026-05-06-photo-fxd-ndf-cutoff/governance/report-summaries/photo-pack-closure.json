@@ -1,0 +1,23 @@
+{
+  "summary_id": "report-summary-photo-pack-closure",
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "summary_type": "report",
+  "title": "Photo FXD.NDF pack closure summary",
+  "summary": "Pack is a local demo signoff golden release for runtime projection validation; production gate remains explicit.",
+  "source_locator": {
+    "reports": {
+      "evidence_index": "evidence/evidence-index.yaml",
+      "review_index": "review/review-index.yaml",
+      "extraction_report": "reports/extraction-report.md",
+      "review_checklist": "reports/review-checklist.md",
+      "closure_check": "reports/closure-check.md"
+    }
+  },
+  "warnings": [
+    "OCR was performed from photographed monitor images; some long target XPaths were truncated and reconstructed by convention.",
+    "Source and target element casing was normalized to visible FpML/SCBML conventions.",
+    "Workbook spelling includes `PRIMARY_SOUCE_*`; this draft preserves visible column spelling in lookup return fields.",
+    "The photographed pack is accepted for local demo signoff, but source-photo reconstruction should be rechecked before production signoff."
+  ]
+}

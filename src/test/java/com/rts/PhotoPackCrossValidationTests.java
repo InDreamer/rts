@@ -108,6 +108,10 @@ class PhotoPackCrossValidationTests {
         assertThat(snapshot.manifest().releaseId()).isEqualTo(RELEASE);
         assertThat(snapshot.scopes()).hasSize(1);
         assertThat(snapshot.objectManifest()).hasSize(8);
+        assertThat(snapshot.navigationViews()).hasSize(8);
+        assertThat(snapshot.governanceAccessRefs()).hasSize(8);
+        assertThat(snapshot.governanceSummaries()).hasSize(17);
+        assertThat(snapshot.fieldBindings()).isNotEmpty();
         assertThat(snapshot.objectManifest()).extracting(ObjectManifestEntry::objectType)
                 .containsExactlyInAnyOrder(
                         ObjectType.rule, ObjectType.rule, ObjectType.rule, ObjectType.rule, ObjectType.rule, ObjectType.rule,
@@ -250,10 +254,42 @@ class PhotoPackCrossValidationTests {
         assertThat(store.getCard(RELEASE, LOOKUP_CUTOFF).orElseThrow().cardJson().get("example_summary").toString())
                 .contains("reverse fallback", "blank hedge cells");
         var lookupL2 = queryService.readContent(new ObjectContentRequest(LOOKUP_CUTOFF, "cross_validate", null, null, "tester", API_KEY));
-        assertThat(lookupL2.content()).contains("reverse_pair_fallback_twdusd_tw", "blank_hedge_source_cells");
+        assertThat(lookupL2.content()).contains(
+                "\"logic\"",
+                "\"pipeline\"",
+                "\"output\"",
+                "\"fields\"",
+                "reverse_pair_fallback_twdusd_tw",
+                "blank_hedge_source_cells");
 
         var releaseManifest = Files.readString(store.releaseRoot(RELEASE).resolve("release-manifest.json"), StandardCharsets.UTF_8);
-        assertThat(releaseManifest).contains("photo-reconstructed-demo-signoff");
+        assertThat(releaseManifest).contains("runtime-multiview-v1", "photo-reconstructed-demo-signoff");
+    }
+
+    @Test
+    void governanceAndFieldBindingViewsArePublishedSeparatelyFromOperationalL2() {
+        var snapshot = store.loadActiveSnapshot();
+        var fixingTimeGovernance = store.getGovernanceAccessRef(RELEASE, RULE_FIXING_TIME).orElseThrow();
+        assertThat(fixingTimeGovernance.openQuestions())
+                .contains("target_xpath_exact_suffixes", "cutoff_code_semantics", "rate_source_page_secondary");
+        assertThat(fixingTimeGovernance.productionGate()).contains("before production signoff");
+        assertThat(fixingTimeGovernance.evidenceSummaryRefs()).contains("evidence-summary-rule_fxd_ndf_fixing_time");
+        assertThat(snapshot.governanceSummaries().stream().filter(summary -> summary.uri().equals(RULE_FIXING_TIME)).toList())
+                .extracting("summaryType")
+                .contains("evidence", "review");
+
+        var fixingTimeBindings = snapshot.fieldBindings().stream()
+                .filter(binding -> binding.objectUri().equals(RULE_FIXING_TIME))
+                .toList();
+        assertThat(fixingTimeBindings).anySatisfy(binding -> {
+            assertThat(binding.bindingType()).isEqualTo("target_emit");
+            assertThat(binding.outputField()).isEqualTo("fixing_time");
+            assertThat(binding.viaUri()).isEqualTo(LOOKUP_CUTOFF);
+        });
+        assertThat(fixingTimeBindings).anySatisfy(binding -> {
+            assertThat(binding.bindingType()).isEqualTo("input");
+            assertThat(binding.outputField()).isEqualTo("cutoff_code");
+        });
     }
 
     private void assertFindTop(String query, List<String> objectTypes, String expectedUri) {
