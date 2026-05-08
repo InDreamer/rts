@@ -1,3 +1,22 @@
+<!-- docmeta
+role: leaf
+layer: 2
+parent: docs/INDEX.md
+children: []
+summary: local runbook for running, validating, configuring, and troubleshooting the RTS Java service
+read_when:
+  - 需要本地启动 RTS Java service
+  - 需要配置 runtime projection、LLM、admin key 或端口
+  - 需要执行测试、校验、排障或服务维护
+skip_when:
+  - 只需要理解 RTS 架构或 LLM harness 设计
+  - 只需要 API 调用字段含义
+source_of_truth:
+  - pom.xml
+  - src/main/resources/application.yml
+  - sample-projection/runtime-store
+-->
+
 # RTS Java Service Runbook
 
 本文说明如何在本地运行 RTS Java 服务、执行校验、调用 API/MCP，并处理常见启动问题。
@@ -22,10 +41,10 @@ macOS 推荐显式指定 JDK 17：
 export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 ```
 
-固定 JDK 路径示例：
+也可以使用固定 JDK 路径示例：
 
 ```bash
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 ```
 
 ## 2. 基本校验
@@ -33,13 +52,13 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
 从仓库根目录执行：
 
 ```bash
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home mvn verify
+JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn verify
 ```
 
 更严格的全量重跑：
 
 ```bash
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home mvn clean verify
+JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn clean verify
 ```
 
 预期结果：
@@ -122,8 +141,8 @@ photo pack 是 demo-signoff/photo reconstructed golden release，用于验证多
 默认使用 Spring Boot 端口 `8080`：
 
 ```bash
-RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run
 ```
 
@@ -132,16 +151,16 @@ Keep this terminal running, then open another terminal for curl commands.
 如果 `8080` 被占用，再指定其他端口：
 
 ```bash
-RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=19091
 ```
 
 如果不确定哪些端口可用，也可以使用随机空闲端口：
 
 ```bash
-RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=0
 ```
 
@@ -301,12 +320,14 @@ RTS_LLM_BASE_URL=https://example.com \
 RTS_LLM_API_KEY=... \
 RTS_LLM_MODEL=... \
 RTS_LLM_WIRE_API=responses \
-RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run
 ```
 
 LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、permission、release、L2、trace 和 grounding validation。
+
+启用 LLM 时，请先确认数据外发边界。RTS 只发送受控工具上下文和必要 L2 片段给配置的模型端点，但这些内容仍可能包含业务规则语义；生产或敏感环境需要使用获批 endpoint、密钥和日志策略。
 
 ## 9. 切换 sample active release
 
@@ -316,10 +337,10 @@ LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、pe
 rel-2026-05-06-photo-fxd-ndf-cutoff
 ```
 
-如果要切回普通 sample，先停止服务，然后写入 active pointer：
+如果要切回普通 sample，先停止服务，然后写入 active pointer。这个手写文件方式只用于本地 sample 验证；生产或共享环境应使用受控发布/切换流程，不要直接改 active pointer：
 
 ```bash
-cat > /Users/tuziliji/projects/rts/sample-projection/runtime-store/active-release.json <<'JSON'
+cat > "$PWD/sample-projection/runtime-store/active-release.json" <<'JSON'
 {
   "active_release_id": "rel-2026-05-06",
   "rollback_target_release_id": null,
@@ -352,7 +373,7 @@ curl -sS -X POST http://localhost:8080/api/v1/query \
 切回默认 photo pack：
 
 ```bash
-cat > /Users/tuziliji/projects/rts/sample-projection/runtime-store/active-release.json <<'JSON'
+cat > "$PWD/sample-projection/runtime-store/active-release.json" <<'JSON'
 {
   "active_release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
   "rollback_target_release_id": "rel-2026-05-06",
@@ -416,7 +437,7 @@ cat sample-projection/runtime-store/releases/<release_id>/scopes.jsonl
 提交代码前至少执行：
 
 ```bash
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home mvn verify
+JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn verify
 git diff --check
 git status --short
 ```

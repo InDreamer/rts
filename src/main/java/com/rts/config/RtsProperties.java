@@ -12,7 +12,7 @@ public class RtsProperties {
     private String llmApiKey = "";
     private String llmWireApi = "responses";
     private boolean llmStoreResponses = false;
-    private String llmReasoningEffort = "xhigh";
+    private String llmReasoningEffort = "low";
     private int llmMaxTokens = 600;
     private String adminCallerId = "admin";
     private String adminApiKeyHash = "";

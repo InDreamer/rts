@@ -3,8 +3,12 @@ role: entry
 layer: 1
 parent: null
 children:
+  - docs/api-caller-guide-zh.md
+  - docs/java-service-runbook-zh.md
+  - docs/day1-sample-pack-test-commands.md
   - docs/confirmed/README.md
   - docs/reference/README.md
+  - docs/archive/README.md
 summary: primary RTS documentation router
 read_when:
   - 需要选择 RTS 文档阅读路径
@@ -26,6 +30,9 @@ This is the primary documentation router for RTS.
 
 - `docs/confirmed/README.md` — 当前 baseline。做项目对齐、KB/index contract、Day1 实现或 Day2 演进规划时优先打开。
 - `docs/reference/README.md` — 参考材料。需要历史 rationale、OV 背景、检索原则、术语表或早期 Java 参考方案时打开。
+- `docs/java-service-runbook-zh.md` — 本地运行、配置、测试、排障和服务维护。
+- `docs/api-caller-guide-zh.md` — API 调用方如何发起查询、理解响应和处理拒答。
+- `docs/day1-sample-pack-test-commands.md` — 当前 sample runtime projection 的手工 curl 验证命令。
 - `docs/archive/README.md` — 历史材料。只在明确需要追溯旧讨论、旧产物或 archived prototype 时打开。
 
 ## Default Rule

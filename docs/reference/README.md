@@ -9,6 +9,8 @@ children:
   - docs/reference/ov-boundary-and-adoption.md
   - docs/reference/ov-kb-retrieval-design.md
   - docs/reference/project-keywords-glossary-zh.md
+  - docs/reference/external-review-final-2026-04-20.md
+  - docs/reference/proposals/ai-token-review/README.md
   - docs/reference/rts-project-background-and-pack-model.md
   - docs/reference/rts-publication-and-refusal-principles.md
   - docs/reference/rts-retrieval-principles.md
@@ -35,12 +37,12 @@ Use these files when a task needs:
 - RTS publication, refusal, trace, and release safety principles (`rts-publication-and-refusal-principles.md`)
 - RTS retrieval principles distilled from OV/KB history (`rts-retrieval-principles.md`)
 - RTS service interface and output principles (`rts-service-interface-and-output-principles.md`)
-- LLM-enhanced RTS index mediation, controlled harness, context management, and memory boundary design (`llm-enhanced-index-and-harness-design-zh.md`)
+- distilled LLM-mediated query and harness reference for scope mediation, context, memory, and controlled tool use (`llm-enhanced-index-and-harness-design-zh.md`)
 - OV boundary rationale and adoption discussion
-- index/query layer reference plan (`java-index-layer-full-plan-zh.md`)
+- distilled Java index/query layer reference summary (`java-index-layer-full-plan-zh.md`)
 - retrieval semantics and scope-aware loading details
 - external critique or proposal background
-- handoff context from earlier project phases
+- AI token review rationale summary (`proposals/ai-token-review/README.md`)
 - a Chinese glossary of current project terms and examples (`project-keywords-glossary-zh.md`)
 
 Current convention:
@@ -50,7 +52,9 @@ Current convention:
 - Treat `rts-publication-and-refusal-principles.md` as the current RTS-owned publication/refusal/trace safety reference.
 - Treat `rts-retrieval-principles.md` as the current RTS-owned retrieval principle document.
 - Treat `rts-service-interface-and-output-principles.md` as the current RTS-owned API/MCP/output quality reference.
-- Treat `llm-enhanced-index-and-harness-design-zh.md` as a reference draft for LLM mediation and harness enhancement; it does not override confirmed Day1/Day2 baseline.
+- Treat `llm-enhanced-index-and-harness-design-zh.md` as the distilled LLM mediation/harness reference. The full historical discussion lives in archive and does not override confirmed Day1/Day2 or final roadmap baseline.
 - Treat OV-related documents here as historical/reference thinking, not as a final engineering baseline.
-- Treat `java-index-layer-full-plan-zh.md` as an index/query layer reference, not the full RTS system baseline.
+- Treat `java-index-layer-full-plan-zh.md` as the distilled Java index/query layer reference. The full historical plan lives in archive and is not a current infrastructure commitment.
+- Treat `external-review-final-2026-04-20.md` as a historical critique that motivated confirmed contracts.
+- Treat `proposals/ai-token-review/README.md` as a consolidated historical rationale summary; the old long review drafts are archived outside the default reference route after their useful guardrails were extracted.
 - Do not treat older proposals or handoff notes as overriding the confirmed docs.

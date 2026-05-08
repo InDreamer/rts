@@ -68,7 +68,7 @@ class LlmResponsesIntegrationTests {
         registry.add("rts.llm-model", () -> "gpt-5.5");
         registry.add("rts.llm-wire-api", () -> "responses");
         registry.add("rts.llm-store-responses", () -> false);
-        registry.add("rts.llm-reasoning-effort", () -> "xhigh");
+        registry.add("rts.llm-reasoning-effort", () -> "low");
     }
 
     @Autowired
@@ -103,7 +103,7 @@ class LlmResponsesIntegrationTests {
         assertThat(Files.exists(STORE_ROOT.resolve("traces").resolve("llm-run-trace.jsonl"))).isTrue();
         assertThat(RESPONSE_REQUEST.get()).contains("\"model\":\"gpt-5.5\"");
         assertThat(RESPONSE_REQUEST.get()).contains("\"store\":false");
-        assertThat(RESPONSE_REQUEST.get()).contains("\"reasoning\":{\"effort\":\"xhigh\"}");
+        assertThat(RESPONSE_REQUEST.get()).contains("\"reasoning\":{\"effort\":\"low\"}");
         assertThat(RESPONSE_REQUEST.get()).contains("Grounded RTS service result");
     }
 }

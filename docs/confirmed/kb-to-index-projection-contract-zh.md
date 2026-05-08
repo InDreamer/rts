@@ -20,8 +20,8 @@ source_of_truth:
 
 # KB-to-Index Runtime Projection Contract
 
-> 状态：confirmed baseline  
-> 创建日期：2026-05-05  
+> 状态：confirmed baseline
+> 创建日期：2026-05-05
 > 范围：定义 RTS Knowledge Base 与查询/索引层之间的运行时投影契约
 
 ## 1. 命名和定位

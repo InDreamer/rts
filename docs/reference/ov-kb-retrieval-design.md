@@ -3,331 +3,57 @@ role: leaf
 layer: 3
 parent: docs/reference/README.md
 children: []
-summary: knowledge base retrieval architecture using OpenViking — projection model, L0/L1/L2 layering, OV capability selection, and validated query scenarios
+summary: distilled OpenViking-inspired retrieval lessons for RTS without making OV the runtime baseline
 read_when:
-  - the request is about how the knowledge base should be structured for agent retrieval
-  - the request is about L0/L1/L2 layered context loading design
-  - the request is about OV feature selection or what to use vs not use
-  - the request is about token efficiency or anti-hallucination through KB structure
-  - the request is about query scenarios — rule lookup, message generation, transaction diagnosis
+  - 需要理解 OV 对 RTS 检索设计的可借鉴点
+  - 需要快速查看 L0/L1/L2、URI、layered loading 和 anti-hallucination 的历史来源
 skip_when:
-  - the request is about the system constitution or governance principles
-  - the request is about the raw OV/TRS boundary line (see ov-boundary-and-adoption.md)
-  - the request is about the minimal integration engineering plan (see minimal-ov-integration.md)
+  - 需要当前 confirmed baseline
+  - 需要完整 OV retrieval 历史设计原文
 source_of_truth:
-  - docs/reference/ov-kb-retrieval-design.md
+  - docs/reference/rts-retrieval-principles.md
+  - docs/reference/ov-boundary-and-adoption.md
 -->
 
-# OV Knowledge Base Retrieval Design
+# OV Retrieval Lessons Summary
 
-> Date: 2026-04-16
-> Status: Design consensus — pending L0/L1 template specification and projection adapter implementation
+> 状态：distilled reference
+> 原完整原文：`docs/archive/reference-proposals/ov-kb-retrieval-design.md`
 
----
+## What RTS Keeps
 
-## 1. Core Positioning
+OV 讨论中仍适用于 RTS 的思想：
 
-Two systems serve orthogonal roles:
+- Stable URI-like addressing for packs, rules, lookups, helpers.
+- Layered loading: cheap navigation first, precise L2 read later.
+- Scope-first retrieval before content recall.
+- L0/L1/card as navigation and disambiguation views.
+- L2 as final service-readable fact surface.
+- Traceable retrieval path for audit and debugging.
+- Tool-based access instead of model-direct file access.
 
-| System | Responsibility | Analogy |
-|--------|---------------|---------|
-| **Transformation Rule System (TRS)** | Defines what is true — governance, authoring, review, signoff | The law |
-| **OpenViking (OV)** | Stores and retrieves truth projections — URI addressing, layered loading, search | The library |
+## What RTS Rejects Or Downgrades
 
-They are not alternatives. TRS produces governed truth; OV makes that truth discoverable and efficiently loadable for agents.
+- OV is not the RTS runtime dependency baseline.
+- OV memory extraction must not write rule truth.
+- Vector retrieval cannot run before scope/permission/release gates.
+- Resource tree shape is not mandatory; runtime projection may live in filesystem, database, object store, or other controlled store.
+- Old “evidence/review/reports never enter runtime” has been replaced by operational view plus permissioned governance view.
+- Bidirectional sync/write-back to canonical truth is forbidden.
 
----
+## L0/L1/L2 Interpretation
 
-## 2. Projection Model: What Enters the Knowledge Base
+- **L0**: cheap abstract for recall and scope filtering.
+- **L1/card**: structured overview for navigation, rerank, and disambiguation.
+- **L2**: structured runtime object or authorized governed source required for final answer.
 
-### What gets projected
+L0/L1 are not replacements for L2. Final facts must return to L2 or authorized governance view.
 
-After a pack passes signoff, a **read-only, stripped-down projection** enters the OV resource tree:
+## Current Use
 
-| Object type | Projected? | Format |
-|-------------|-----------|--------|
-| **rules** (`rule_*.yaml`) | Yes | Stripped to: `id`, `source`, `logic`, `target`, `dependencies`, `examples` |
-| **lookups** (`lk_*.yaml`) | Yes | Same stripping |
-| **helpers** (`hlp_*.yaml`) | Yes | Same stripping |
-| **evidence** | No | Signoff completed; evidence is an audit artifact, not an operational one |
-| **review** | No | Same reasoning |
-| **reports** | No | Session-level artifacts, not runtime knowledge |
+Read this summary only for historical retrieval rationale. For active implementation, use:
 
-### What gets removed from YAML objects
-
-Fields stripped during projection (they served governance, not runtime):
-
-- `signoff_status`
-- `evidence_refs`
-- `review_status`
-- `ambiguities` (resolved by signoff)
-- Long trace / approval history
-
-### Projection is one-way and read-only
-
-- OV receives generated copies, never the canonical files
-- No OV channel writes back to the pack repository
-- No OV session memory is treated as business truth
-
----
-
-## 3. L0/L1/L2 Layered Context Loading
-
-### Core concept
-
-L0, L1, L2 are **three precision views of the same resource**, not filesystem hierarchy levels. Every directory node can have its own L0/L1 pair.
-
-| Layer | File | Tokens | When agent reads it | Purpose |
-|-------|------|--------|-------------------|---------|
-| **L0** | `.abstract.md` | ~100 | Vector search hit → read L0 to decide "is this relevant?" | Recall filtering |
-| **L1** | `.overview.md` | ~2k | Confirmed relevant → read L1 for structure, objects, dependencies | Rerank + navigation |
-| **L2** | `*.yaml` originals | Unlimited | Precise target identified → load full content | Final answer material |
-
-### Layer assignment by directory depth
-
-| Directory level | L0 | L1 | Rationale |
-|----------------|----|----|-----------|
-| **Channel** (`tradition-stella/`) | Yes | Yes | Agent needs to distinguish which system's rules to query when multiple channels exist |
-| **Product** (`fxd_ndf/`) | Yes | Yes | Distinguishing COMMON vs FXD vs FXO is the most common fork |
-| **Pack** (`rule-pack-cutoff-split/`) | Yes | **Yes — highest quality required** | Pack L0 determines recall quality; pack L1 determines rerank quality |
-| **Individual rule** (`rule_001.yaml`) | Yes (recommended) | No | Pack L1 already contains per-rule summaries; rule L2 is the final answer |
-
-### How retrieval works (Recall → Rerank → Load)
-
-```
-Query arrives
-  │
-  ▼
-Stage 1: Vector search across all L0 abstracts (~100 tok each)
-  → Returns candidates ranked by embedding similarity
-  → Cost: ~100 tokens × N candidates
-  │
-  ▼
-Stage 2: Load L1 overviews of top candidates (~2k tok each)
-  → Rerank model (or LLM) re-scores with richer context
-  → False positives filtered out (e.g., FXO cutoff removed when asking about FXD)
-  → Cost: ~2k tokens × top-K candidates
-  │
-  ▼
-Stage 3: Load L2 for confirmed hits only
-  → Full YAML objects enter agent context
-  → Cost: only the needed rules/lookups/helpers
-```
-
-### L0/L1 generation method
-
-- Generated by LLM from the approved YAML content
-- Human-confirmed before entering the projection
-- Not using OV's automatic L0/L1 generation for governed rule content (too risky for precision-sensitive banking rules)
-
----
-
-## 4. Resource Tree Structure
-
-```
-viking://resources/
-│
-├── {channel}/                                    # e.g. tradition-stella
-│   ├── .abstract.md                              # L0 channel
-│   ├── .overview.md                              # L1 channel: product line list
-│   │
-│   ├── {product}/                                # e.g. fxd_ndf
-│   │   ├── .abstract.md                          # L0 product
-│   │   ├── .overview.md                          # L1 product: pack list
-│   │   │
-│   │   ├── {pack}/                               # e.g. rule-pack-cutoff-split
-│   │   │   ├── .abstract.md                      # L0 pack (critical)
-│   │   │   ├── .overview.md                      # L1 pack (critical — rule list + deps)
-│   │   │   │
-│   │   │   ├── rules/
-│   │   │   │   ├── rule_cutoff_time.yaml         # L2
-│   │   │   │   ├── rule_cutoff_time.abstract.md  # L0 rule (recommended)
-│   │   │   │   └── ...
-│   │   │   ├── lookups/
-│   │   │   │   ├── lk_cutoff_matrix.yaml         # L2
-│   │   │   │   ├── lk_cutoff_matrix.abstract.md  # L0 lookup
-│   │   │   │   └── ...
-│   │   │   └── helpers/
-│   │   │       └── ...
-│   │   └── ...
-│   └── ...
-│
-├── {channel-2}/                                  # second source system
-│   └── ... (isomorphic structure)
-│
-└── _meta/
-    ├── channel-registry.yaml                     # all channels list + status
-    └── governance-protocol.md                    # constitution reference
-```
-
-### Multi-channel design principles
-
-- **Channel is the top-level partition** — rules from different source/target systems never mix in retrieval
-- **Every channel is structurally isomorphic** — agent learns the navigation pattern once, applies everywhere
-- **Governance state is implicit** — everything in the projection is approved; no draft/approved distinction needed at retrieval time
-
----
-
-## 5. OV Capability Selection
-
-### Use (directly solves core needs)
-
-| OV Capability | Value |
-|---------------|-------|
-| **Viking URI addressing** | Every rule, lookup, pack has a stable deterministic address. Agent can cite `viking://resources/tradition-stella/fxd_ndf/rule-pack-cutoff-split/rules/rule_cutoff_time` instead of relying on semantic search alone |
-| **L0/L1/L2 layered loading** | 10-50× token efficiency improvement; reduces hallucination by minimizing irrelevant context |
-| **Directory recursive retrieval** | channel→product→pack→object tree maps naturally to hierarchical navigation |
-| **Resource ingestion pipeline** | Automatic vectorization and indexing of projected files |
-
-### Use with caution
-
-| OV Capability | Risk | Constraint |
-|---------------|------|-----------|
-| **Semantic search (vector retrieval)** | May return similar rules from wrong channel/pack, polluting context | Always constrain with URI scope prefix; use as fallback after deterministic routing |
-| **Automatic L0/L1 generation** | LLM-generated summaries may introduce subtle bias for precision-sensitive banking rules | Only use for auxiliary documents (reports, tech notes); governed rule L0/L1 must be human-confirmed |
-
-### Do not use
-
-| OV Capability | Why not |
-|---------------|---------|
-| **Session automatic memory extraction** | OV auto-extracts memories from conversations into `viking://agent/`. Wrong inferences during rule queries could be saved as "learned cases" and influence future answers. Violates constitution principle 11: runtime learning must not pollute goldensource |
-| **OV Skill system** | TRS skills (authoring, review) are business governance workflows, not MCP tool dispatch |
-| **Bidirectional sync / write-back** | Approved packs are read-only projections. OV must have no write channel back to the canonical repository |
-| **Queue processing pipeline** | Not needed for static projections |
-| **Full relation graph** | Defer in the first phase. If needed later, start with lightweight rule→lookup/helper dependencies rather than evidence/review graphs |
-
----
-
-## 6. Validated Query Scenarios
-
-### Scenario 1: Single Rule Query
-
-**Query**: "How should the initiatedTimestamp field be generated in Tradition→Stella conversion?"
-
-```
-Step 1: Vector search across L0 abstracts
-  → Hit: tradition-stella/common/rule-pack-scbml-header/.abstract.md (score 0.94)
-  → False positive: trade-date-product-summary (score 0.62) — filtered by rerank
-
-Step 2: Load L1 of rule-pack-scbml-header
-  → Confirms: contains rule_initiated_timestamp
-
-Step 3: Load L2: rules/rule_initiated_timestamp.yaml
-  → Agent returns: source→logic→target with examples
-```
-
-**Token cost**: ~2.5k (vs ~18k if loading all 18 packs)
-**Hallucination risk**: Minimal — single rule, clean context
-
-### Scenario 2: Multi-Rule Composition — Full Message Generation
-
-**Query**: "Generate a complete FXD NDF trade message, USD/CNY 1M notional, maturity 2026-05-01"
-
-```
-Step 1: Intent analysis → 5 TypedQueries with scoped URIs
-  → COMMON header rules (scope: .../common/)
-  → Trade identifiers (scope: .../common/)
-  → FXD currency legs (scope: .../fxd_ndf/)
-  → FXD exchange rate (scope: .../fxd_ndf/)
-  → FXD cutoff/settlement (scope: .../fxd_ndf/)
-
-Step 2-3: Each sub-query independently walks L0→L1→L2
-  → ~12 rules + 2 lookups loaded
-
-Step 4: Agent assembles message from target.output_xpath of each rule
-```
-
-**Token cost**: ~14k (vs ~40-50k full load)
-**Key protection**: Scope constraints prevent FXO rules from entering context — no cross-product-line hallucination
-
-### Scenario 3: Transaction Diagnosis — Field Anomaly Tracing
-
-**Query**: "This FXD trade has cutoff time 15:00 UTC but the system says it should be 14:00. Why?"
-
-```
-Step 1: Scoped search in fxd_ndf/
-  → Hit: rule-pack-cutoff-split
-
-Step 2: L1 reveals lookup dependency
-  → rule_cutoff_time depends on lk_cutoff_matrix
-
-Step 3: Load both rule YAML and lookup YAML
-  → lk_cutoff_matrix shows:
-     USD/CNY + 2 participants → 14:00 UTC
-     USD/CNY + 3 participants → 15:00 UTC
-
-Step 4: Agent diagnosis
-  → "The trade was treated as a 3-party transaction (cutoff 15:00).
-     Check if the source message participant count is correct."
-```
-
-**Token cost**: ~2.7k
-**Key value**: Lookup table provides deterministic answer — agent doesn't need to guess
-
-### Scenario comparison
-
-| Dimension | Single rule | Message generation | Diagnosis |
-|-----------|------------|-------------------|-----------|
-| Token cost | ~2.5k | ~14k | ~2.7k |
-| Precision | One-shot | 5 parallel sub-queries | One-shot + lookup chain |
-| Hallucination risk | Very low | Medium (multi-rule assembly) | Low (lookup = deterministic) |
-| L0/L1 critical role | L0 filters false positives | Scope constrains cross-product | L1 exposes dependency chain |
-
----
-
-## 7. Anti-Hallucination Design Summary
-
-The KB structure itself is the primary defense against hallucination, not prompt engineering alone.
-
-| Hallucination source | Structural defense |
-|---------------------|--------------------|
-| Irrelevant context interference | L0/L1/L2 progressive loading → agent sees only precisely relevant rules |
-| Draft vs approved confusion | Only approved content enters projection; no governance status to misread |
-| Hidden dependency chain → fabrication | Pack L1 exposes dependencies early; optional lightweight rule→lookup/helper links may be added later |
-| Cross-domain concept mixing | Channel-level physical isolation + directory-scoped retrieval |
-
----
-
-## 8. Implementation Roadmap
-
-```
-Phase 0: Validate (current stage — paused for design review)
-  └─ Take 1 approved pack (e.g. rule-pack-scbml-header)
-     Manually organize into OV resource tree, ingest, test retrieval
-
-Phase 1: Single channel projection
-  └─ Build lightweight export script: canonical pack → OV resource tree
-  Includes: L0/L1 human-confirmed, stripped YAML projection, URI convention
-
-Phase 2: Multi-channel framework
-  └─ Replicate Tradition-Stella structure to a second channel
-  Verify isomorphism and retrieval isolation; add lightweight dependency metadata only if needed
-
-Phase 3: Agent integration
-  └─ Define query protocol (prompt constraints)
-     Validate scenarios: rule query / trade generation / trade diagnosis
-```
-
----
-
-## 9. Open Items
-
-| Item | Priority | Notes |
-|------|----------|-------|
-| L0/L1 content templates | High | Standardize what each level should contain, how long, what tone |
-| Projection adapter design | High | Pack YAML → OV resource tree conversion logic |
-| OV engineering setup | Medium | ov.conf, ingestion commands, directory initialization |
-| Relations graph | Low (deferred) | rule→lookup/helper dependencies; revisit when needed |
-| Message generation scenario risk | Medium | Multi-rule assembly correctness needs careful prompt design |
-
----
-
-## 10. Risk Matrix
-
-| Risk | Severity | Mitigation |
-|------|----------|-----------|
-| OV auto-L0/L1 summary bias leads agent astray | **High** | Approved rule L0/L1 should be LLM-assisted and human-reviewed; auto-gen only for auxiliary docs |
-| OV session memory silently learns wrong inferences | **High** | Disable or isolate OV memory extraction feature |
-| Semantic search returns cross-channel/pack irrelevant rules | **Medium** | Force URI prefix (scope) at retrieval time; limit search radius |
-| OV version upgrade breaks resource structure conventions | **Medium** | Projection adapter isolates — canonical structure doesn't depend on OV internals |
-| Retrieval quality degrades as rule count grows | **Low** | Layered loading naturally scales; periodically evaluate rerank quality |
+- Day1 query/tool service baseline
+- Day2 controlled agentic retrieval roadmap
+- runtime projection contract
+- RTS retrieval principles

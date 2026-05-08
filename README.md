@@ -30,14 +30,19 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 - `docs/confirmed/kb-to-index-projection-contract-zh.md` — KB 到索引/查询层的运行时投影契约。
 - `docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md` — 第一版 RTS 查询服务、轻量索引和受控 LLM harness 方案。
 - `docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md` — Day1 之后的受控 agentic retrieval 和 LLM/MCP 增强路线。
-- `docs/confirmed/final-llm-agent-service-plan-zh.md` — 最终面向 LLM agent 的 RTS 服务计划，定义 harness、工具、上下文、memory、answer contract 和治理边界。
-- `docs/reference/java-index-layer-full-plan-zh.md` — 索引/查询层参考方案；不代表 RTS 全系统基线或最终技术栈决定。
+- `docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 LLM harness、外部 agent tool mode、runtime projection access boundary 和场景接入的当前对齐结论。
+- `docs/confirmed/final-llm-agent-service-plan-zh.md` — 最终面向 LLM agent 的 RTS 服务路线图摘要；原完整长版已归档。
+- `docs/confirmed/document-decision-register-zh.md` — 文档审核中的关键抉择点、歧义点和下一轮删减规则。
+- `docs/java-service-runbook-zh.md` — 本地运行、配置、测试、排障和服务维护。
+- `docs/api-caller-guide-zh.md` — API 调用方如何发起查询、理解响应和处理拒答。
+- `docs/reference/java-index-layer-full-plan-zh.md` — Java 索引/查询层短参考摘要；原完整历史方案已归档，不代表当前技术栈承诺。
 - `docs/reference/README.md` — 参考材料入口；包含 OV 边界、检索设计、术语表、外部评审和历史交接材料。
 - `docs/archive/README.md` — 历史材料入口；只在需要追溯旧讨论或原型时阅读。
 
 ## 文档分区
 
 - `docs/confirmed/`：当前内部对齐的默认阅读区。
+- `docs/java-service-runbook-zh.md` / `docs/api-caller-guide-zh.md`：运行和调用 RTS service 的操作文档。
 - `docs/reference/`：有价值的参考材料，但不是默认 truth baseline。
 - `docs/archive/`：历史材料，不属于 active baseline。
 
@@ -60,8 +65,8 @@ Java 服务运行手册见 `docs/java-service-runbook-zh.md`。
 最短启动示例：
 
 ```bash
-RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run
 ```
 

@@ -18,6 +18,8 @@ source_of_truth:
 
 # Minimal OV Integration
 
+> Historical reference only. Current active baseline uses RTS runtime projection and Java query/tool service; OV is not the required runtime path.
+
 ## What This Covers
 
 This document defines the smallest acceptable OV integration path: one that improves discoverability and low-noise retrieval while keeping the Transformation Rule System as the sole owner of canonical truth.
@@ -166,19 +168,19 @@ The current narrowed scope should aim for the low end of that range. If evidence
 
 ## Suggested Work Breakdown
 
-### Phase 1: Exporter
+### OV Step 1: Exporter
 
 Build a local exporter that reads approved packs and writes a clean runtime projection tree.
 
-### Phase 2: Metadata And Layering
+### OV Step 2: Metadata And Layering
 
 Generate pack-level and object-level summaries plus optional lightweight dependency manifests.
 
-### Phase 3: OV Ingestion Wrapper
+### OV Step 3: OV Ingestion Wrapper
 
 Push the projection tree into OV resources using a repeatable ingestion command or wrapper.
 
-### Phase 4: Retrieval Evaluation
+### OV Step 4: Retrieval Evaluation
 
 Check whether common questions become easier to answer with less noise:
 

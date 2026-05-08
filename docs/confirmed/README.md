@@ -8,7 +8,9 @@ children:
   - docs/confirmed/kb-to-index-projection-contract-zh.md
   - docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md
   - docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md
+  - docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md
   - docs/confirmed/final-llm-agent-service-plan-zh.md
+  - docs/confirmed/document-decision-register-zh.md
 summary: route confirmed RTS baseline documents
 read_when:
   - 需要选择当前 RTS confirmed baseline 文档
@@ -35,7 +37,9 @@ This directory contains the current internal alignment baseline for RTS.
 3. `kb-to-index-projection-contract-zh.md` — KB 到查询/索引层的运行时投影契约，定义 KB 必须产出什么、索引层只能读取什么、查询层如何解释 projection。
 4. `day1-query-service-and-llm-harness-plan-zh.md` — Day1 查询服务、轻量索引层和受控 LLM harness 落地方案。
 5. `day2-agentic-retrieval-evolution-plan-zh.md` — Day2 受控 agentic retrieval、rerank、MCP 扩展、影响分析和测试规划演进方向。
-6. `final-llm-agent-service-plan-zh.md` — RTS 最终面向 LLM agent 的服务计划，定义 harness、tool surface、context/memory、answer contract、governance、observability 和最终路线图。
+6. `llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 LLM harness、外部 agent tool mode、runtime projection access boundary 和 PR diff / exception 等场景接入的当前对齐结论。
+7. `final-llm-agent-service-plan-zh.md` — RTS 最终面向 LLM agent 的服务路线图摘要，定义 managed/tool mode、能力地图、阶段路线、answer contract 和不可越界边界。
+8. `document-decision-register-zh.md` — 文档审核中的关键抉择点、歧义点和下一轮删减规则。
 
 ## Read triggers
 
@@ -43,21 +47,27 @@ This directory contains the current internal alignment baseline for RTS.
 - 需要开发 KB 和索引层之间的边界：读 1、2、3。
 - 需要落地第一版服务：读 1、2、3、4。
 - 需要规划 Day1 后的检索/LLM/MCP 增强：读 1、2、3、4、5。
-- 需要规划最终 LLM agent 服务形态、harness、MCP/API/Q&A/pipeline 统一入口：读 1、2、3、4、5、6。
+- 需要判断 LLM 放在 RTS service 内部还是外部 agent、如何选择 OpenAI/Claude/LangChain/PageIndex 等框架、如何接 PR diff 或 exception 场景：读 6，再按需读 4、5、7。
+- 需要规划最终 LLM agent 服务形态、harness、MCP/API/Q&A/pipeline 统一入口：读 1、2、3、4、5、6、7。
+- 需要判断历史文档哪些保留、压缩、归档或删除：读 8。
 
 ## Conflict rule
 
-If confirmed documents disagree, use this order:
+Confirmed docs use topic-specific authority. Resolve conflicts with this table before applying any general reading order:
 
-1. `project-alignment-summary-zh.md`
-2. `system-constitution-v1.md`
-3. `kb-to-index-projection-contract-zh.md`
-4. `day1-query-service-and-llm-harness-plan-zh.md`
-5. `day2-agentic-retrieval-evolution-plan-zh.md`
-6. `final-llm-agent-service-plan-zh.md`
-7. `docs/reference/` materials
-8. `docs/archive/` materials
+| Topic | Authority |
+|---|---|
+| RTS identity, truth ownership, source/evidence/review/human adjudication/signoff, and document zone meaning | `project-alignment-summary-zh.md` |
+| Non-negotiable system principles, safety boundaries, permissioned access, AI-first review, and human final decision | `system-constitution-v1.md` |
+| KB/runtime projection/index boundary, release artifact shape, L0/L1/L2 meaning, schema/release/read constraints | `kb-to-index-projection-contract-zh.md` |
+| Current Day1 query/tool service, filesystem store, Lucene, L2 read/hash, REST/MCP skeleton, `/query`, `/ask` Day1 DoD | `day1-query-service-and-llm-harness-plan-zh.md` |
+| LLM placement, managed mode vs tool mode, framework/SDK boundary, and PR diff / exception / failed-message scenario integration | `llm-harness-and-agent-integration-alignment-zh.md` |
+| Day2 retrieval evolution, planner/orchestrator, rerank/vector/confusable active use, expanded MCP, impact/test candidate evolution | `day2-agentic-retrieval-evolution-plan-zh.md` |
+| Final long-range service roadmap, capability map, consumer views, and sequencing after current alignment decisions | `final-llm-agent-service-plan-zh.md` |
+| Documentation cleanup, compression, archive/delete/retain decisions | `document-decision-register-zh.md` |
 
-`docs/reference/java-index-layer-full-plan-zh.md` is an index/query layer reference plan. It is not the full RTS system baseline and does not decide the final technology stack.
+If a topic is not listed, follow the current baseline order above. `docs/reference/` materials may explain rationale but do not override confirmed docs. `docs/archive/` materials never override confirmed docs.
+
+`docs/reference/java-index-layer-full-plan-zh.md` is a distilled index/query layer reference summary. The old full plan is archived and does not decide the current infrastructure stack.
 
 Use `docs/reference/` for supporting rationale, engineering references, external review, OV history, and historical context. Use `docs/archive/` only when tracing older discussions or prototypes before deletion/consolidation.
