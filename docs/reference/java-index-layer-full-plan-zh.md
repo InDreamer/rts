@@ -199,7 +199,7 @@ source_of_truth:
 
 - Java 21
 - Spring Boot 3.x
-- Gradle
+- Maven
 
 ### 7.2 结构化存储
 
@@ -739,14 +739,13 @@ Rerank 的核心目标不是“更聪明”，而是：
 
 ## 21. 项目模块划分
 
-建议采用 Gradle 多模块结构。
+建议采用 Maven 多模块结构。
 
 示例：
 
 ```text
 trs-index/
-  settings.gradle
-  build.gradle
+  pom.xml
   modules/
     index-api/
     projection-engine/
@@ -824,7 +823,7 @@ trs-index/
 
 交付物：
 
-- Gradle multi-module
+- Maven multi-module
 - Spring Boot app
 - Docker compose
 - PostgreSQL schema baseline

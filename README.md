@@ -62,7 +62,7 @@ Java 服务运行手册见 `docs/java-service-runbook-zh.md`。
 ```bash
 RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
 JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
-./gradlew bootRun
+mvn spring-boot:run
 ```
 
 默认端口是 `8080`，启动后验证：

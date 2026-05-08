@@ -7,7 +7,7 @@ Run this from the repository root:
 ```bash
 JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
-./gradlew bootRun
+mvn spring-boot:run
 ```
 
 Keep this terminal running, then open another terminal for the commands below.

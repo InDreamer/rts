@@ -6,7 +6,7 @@
 
 - JDK 17。
 - macOS/Linux shell。
-- Gradle wrapper：使用仓库自带 `./gradlew`，不要求全局安装 Gradle。
+- Maven 3.8+。
 - 可选工具：`curl`、`jq`、`lsof`。
 - 网络：首次构建需要访问 Maven Central 下载依赖。
 
@@ -33,22 +33,22 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
 从仓库根目录执行：
 
 ```bash
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home ./gradlew check
+JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home mvn verify
 ```
 
 更严格的全量重跑：
 
 ```bash
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home ./gradlew clean check
+JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home mvn clean verify
 ```
 
 预期结果：
 
 ```text
-BUILD SUCCESSFUL
+BUILD SUCCESS
 ```
 
-`check` 会执行普通测试和 golden 测试。
+`verify` 会执行普通测试和 golden 测试。
 
 ## 3. Runtime Store
 
@@ -124,7 +124,7 @@ photo pack 是 demo-signoff/photo reconstructed golden release，用于验证多
 ```bash
 RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
 JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
-./gradlew bootRun
+mvn spring-boot:run
 ```
 
 Keep this terminal running, then open another terminal for curl commands.
@@ -134,7 +134,7 @@ Keep this terminal running, then open another terminal for curl commands.
 ```bash
 RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
 JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
-./gradlew bootRun --args='--server.port=19091'
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=19091
 ```
 
 如果不确定哪些端口可用，也可以使用随机空闲端口：
@@ -142,7 +142,7 @@ JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
 ```bash
 RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
 JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
-./gradlew bootRun --args='--server.port=0'
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=0
 ```
 
 此时从启动日志读取实际端口，例如：
@@ -303,7 +303,7 @@ RTS_LLM_MODEL=... \
 RTS_LLM_WIRE_API=responses \
 RTS_STORE_ROOT=/Users/tuziliji/projects/rts/sample-projection/runtime-store \
 JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
-./gradlew bootRun
+mvn spring-boot:run
 ```
 
 LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、permission、release、L2、trace 和 grounding validation。
@@ -379,7 +379,7 @@ lsof -nP -iTCP:8080 -sTCP:LISTEN
 换端口或用随机端口：
 
 ```bash
-./gradlew bootRun --args='--server.port=0'
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=0
 ```
 
 ### 400 Unrecognized field
@@ -416,7 +416,7 @@ cat sample-projection/runtime-store/releases/<release_id>/scopes.jsonl
 提交代码前至少执行：
 
 ```bash
-JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home ./gradlew check
+JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home mvn verify
 git diff --check
 git status --short
 ```

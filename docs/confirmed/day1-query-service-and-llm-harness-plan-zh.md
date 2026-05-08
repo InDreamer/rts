@@ -498,7 +498,7 @@ LLM harness 禁止：
 
 - JDK 17
 - Spring Boot 3.x
-- Gradle
+- Maven
 
 理由：
 
