@@ -36,7 +36,7 @@ RTS 应同时支持两种模式：
 managed mode:
   caller -> RTS scenario endpoint or /ask
   RTS internal LLM harness plans and calls RTS tools
-  RTS returns grounded answer / candidate report / trace
+  RTS returns grounded answer / managed analysis output / trace
 
 tool mode:
   external agent -> RTS REST/MCP tools
@@ -44,7 +44,25 @@ tool mode:
   each RTS tool still enforces scope, permission, release, L2 and trace
 ```
 
-这两个模式共享同一个 RTS core service 和同一套 runtime projection access boundary。
+这两个模式共享同一个 RTS core service 和同一套 runtime projection access boundary。它们共同复用同一组稳定原子能力，而不是各自拥有一套 truth access logic。
+
+## 1.1 Mode Selection Matrix
+
+为了避免实现者各自理解“什么时候该走 managed mode、什么时候只该走 deterministic/tool mode”，当前 active baseline 固定如下：
+
+| Surface | Target normal product mode | Degraded / fallback mode | Forbidden shortcut |
+|---|---|---|---|
+| `/api/v1/query` | deterministic truth/information service | N/A | 不能假装自己提供 managed scenario synthesis |
+| `/api/v1/find` / `objects/*` / `dependencies` / trace | deterministic truth-source atomic capability | N/A | 不能绕过 scope/release/permission/L2 |
+| `/api/v1/ask` | managed analysis service | LLM-unavailable 时降级为 bounded information-service output | 不能把降级输出描述成等价 AI 分析 |
+| `scenario/analyze-pr-diff` | managed analysis normal mode | 降级为 impact/test information or candidate support surface | 不能直接退化成“无语义的 query 包装” |
+| `scenario/investigate-exception` | managed analysis normal mode | 降级为 investigation information surface | 不能把降级输出当 final root cause |
+| `scenario/analyze-failed-message` | managed analysis normal mode | 降级为 grounded target information/candidate surface | 不能把降级输出当生产转换结果 |
+| `scenario/plan-tests` | managed analysis normal mode | 降级为 deterministic template / candidate support surface | 不能把 candidate 自动当 QA signoff |
+| `scenario/governance-review` | managed analysis normal mode | 降级为 governance information/candidate surface | 不能把 AI suggestion 当 human decision |
+| MCP / external tool mode | external agent orchestration over shared atomic capabilities | same atomic capabilities, possibly narrower catalog under flags | 不能拥有比 internal managed agent 更宽松的 truth access |
+
+这张矩阵解决的是产品语义优先级，不是实现完成度声明：只要某个 surface 被归类为 AI-centric scenario，它的目标正常产品模式就是 managed analysis；deterministic 输出只承担当前底座、降级连续性和信息提供职责。当前是否已经达到 managed analysis normal mode，以 internal implementation plan 的 current-state 矩阵为准。
 
 ## 2. 三个容易混淆的概念
 
@@ -73,9 +91,9 @@ RTS service 不拥有 canonical truth，但它拥有 runtime truth access bounda
 
 这些能力不只是普通索引查询；它们决定 runtime projection 如何被安全消费。
 
-### 2.3 LLM / agent framework 是调查和表达层
+### 2.3 LLM / agent framework 是受控分析与表达层
 
-OpenAI Agents SDK、Claude SDK、LangChain、LangGraph、PageIndex 或其他 agent framework 可以帮助理解任务、规划步骤、调用工具和组织报告。
+OpenAI Agents SDK、Claude SDK、LangChain、LangGraph、PageIndex 或其他 agent framework 可以帮助理解任务、规划步骤、调用工具、生成候选分析和组织报告。
 
 它们不应直接读取 projection 文件、PG 表或索引，并自行决定 active release、permission、hash、grounding 或 final truth。
 
@@ -154,13 +172,13 @@ SDK 使用边界：
 
 ## 6. 当前实现阶段定位
 
-截至 2026-05-08，按当前实现和本地验证结果，RTS 主要处在：
+截至 2026-05-10，按当前实现和本地验证结果，RTS 当前更适合这样理解：
 
 ```text
-Day1 RTS Query / Tool Service mostly working
-Controlled LLM Harness partially wired
-Deterministic impact / test / message / governance / pipeline support tools exist
-PR diff / exception / failed-message managed LLM scenario endpoints not yet built
+Dual-core RTS baseline established
+Truth-source atomic capability service mostly working
+Managed LLM harness present, but not yet the stable default surface across every AI-centric scenario
+Some scenario endpoints and support surfaces exist, but many still behave like degraded information-service or deterministic/candidate surfaces rather than stable AI-normal-mode products
 ```
 
 已经相对明确的能力：
@@ -180,14 +198,13 @@ PR diff / exception / failed-message managed LLM scenario endpoints not yet buil
 
 主要缺口：
 
-- `/ask` 的 LLM shaped answer 尚未真正作为 service answer 返回
-- Responses adapter can produce shaped text, but the service answer still needs a stable shaped-answer surface and stronger validation before it is treated as the primary answer view
+- `/ask` 的 managed analysis answer 还没有在所有相关文档里成为稳定的 primary service stance
 - model output claim validation 仍不足
 - scope mediator / planner / orchestrator 仍偏简单
-- impact / test / governance 目前主要是 deterministic candidate，不是 LLM-enhanced candidate
-- PR diff、exception investigation、failed-message analysis 等 managed LLM 场景 endpoint 尚未形成
+- impact / test / governance 目前仍过多被表述为 degraded information-service or deterministic/candidate support surface，而不是 AI-normal-mode managed analysis
+- PR diff、exception investigation、failed-message analysis 等场景虽然已有 endpoint/support surface，但尚未在文档和产品叙事里稳定成 managed AI 正常态
 
-因此当前大量 API 输出是结构化 JSON 是合理状态。它服务的是后续 harness、agent、pipeline 和 integration，而不是最终用户体验本身。
+因此当前大量 API 输出是结构化 JSON 是合理状态。下一步不是弱化 AI，而是让同一组稳定原子能力同时支撑 deterministic truth/information service 和 managed analysis service，并明确后者在场景入口中的正常产品身份。
 
 ## 7. 场景化目标
 
@@ -225,16 +242,16 @@ exception / stack / failed message / log
 business question
   -> RTS /ask managed harness
   -> grounded L2 answer
-  -> human-readable explanation plus citations and trace
+  -> human-readable controlled analysis and expression plus citations and trace
 ```
 
-这要求 `/ask` 不只是返回 raw L2 JSON，而是返回 shaped answer，并保留 facts、citations、warnings 和 trace。
+这要求 `/ask` 不只是返回 raw L2 JSON，而是返回稳定的 managed analysis answer，并保留 facts、citations、warnings 和 trace。
 
 ## 8. 推荐实现顺序
 
 ### Step 1: 完成 managed `/ask`
 
-- 返回 LLM shaped answer。
+- 返回 grounded managed analysis answer。
 - 保留 L2 facts、citations、dependencies、warnings 和 trace。
 - 对 model answer 做 claim grounding validation。
 - 不让模型增加未被 L2 支撑的业务事实。
@@ -253,7 +270,7 @@ business question
 - `investigate_exception`
 - `analyze_failed_message`
 
-现有 `/api/v1/analyze/*`、`/api/v1/message/*`、`/api/v1/governance/*` 和 pipeline/report endpoint 是可复用的 deterministic support surface。这里的场景 endpoint 指由 managed LLM harness 编排这些工具并返回 grounded scenario report 的端到端入口，不要求调用方自己集成 agent framework。
+现有 `/api/v1/analyze/*`、`/api/v1/message/*`、`/api/v1/governance/*` 和 pipeline/report endpoint 是可复用的 truth-source atomic capability substrate。当前 scenario endpoints 已能包装这些能力返回 grounded candidate report；只有当 managed harness 对外部场景输入进行规划、证据选择、候选解释、unknown/next-evidence synthesis，并通过 grounding/evaluation 后，才算达到 AI-normal-mode scenario endpoint。
 
 ### Step 4: 对外开放 tool mode
 
@@ -273,6 +290,7 @@ business question
 - 如果问题是“如何理解一个外部场景输入”，可以交给 LLM harness 或外部 agent。
 - 如果问题是“如何把结果写成报告、PR comment、排查建议”，可以交给 LLM。
 - 如果问题是“这个 claim 是否可以作为事实”，必须回到 RTS L2 / dependency / governance / trace。
+- 如果问题是“该输出能否直接驱动自动化动作”，只有 deterministic contract 或 recorded human decision 可以充当 automation decision input；candidate/inference output 不能直接充当批准、发布门禁、根因关闭或 QA signoff。
 
 一句话：
 

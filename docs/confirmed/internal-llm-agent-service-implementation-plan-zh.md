@@ -29,7 +29,7 @@ source_of_truth:
 
 本文定义 RTS service 内部 LLM agent 接入的完整目标形态和落地工作包。
 
-这里的“完整”不是把 RTS 变成自由 agent 平台，而是在现有 Java truth service 内形成一个可审计、可控、可验证的 managed LLM agent 闭环：LLM 可以理解任务、规划工具调用、读取 RTS truth、组织答案、产出候选分析和驱动场景 adapter；RTS service 继续负责 release、scope、permission、L2 hash、dependency、grounding、refusal、trace 和 evaluation。
+这里的“完整”不是把 RTS 变成自由 agent 平台，而是在现有 Java truth service 内形成一个可审计、可控、可验证的 managed LLM agent 闭环：LLM 可以理解任务、规划工具调用、读取 RTS truth、执行受控分析与表达、产出候选分析和驱动场景 adapter；RTS service 继续负责 release、scope、permission、L2 hash、dependency、grounding、refusal、trace 和 evaluation。
 
 本文不按阶段拆分。所有工作包共同组成目标状态；执行时可以按依赖关系排队，但任何单个工作包都不能绕过 truth boundary 单独上线为默认能力。
 
@@ -56,7 +56,7 @@ caller
   -> schema-constrained planner
   -> guarded tool orchestrator
   -> RTS truth tools
-  -> answer / candidate report / refusal / trace
+  -> managed analysis output / candidate report / refusal / trace
 ```
 
 其中：
@@ -139,16 +139,21 @@ caller
 - REST `/ask`、query tools、agent tools、analysis、message、governance、pipeline、evaluation、metrics、feedback/memory endpoints。
 - MCP tool catalog and wrappers。
 
-当前闭合状态：
+当前实现对齐状态：
 
-- `/ask` 已走 planner -> service-owned orchestrator -> context/model draft -> claim validator -> answer view -> trace。
-- Model shaped text 只能作为表达层；service answer 的 structured facts、grounding map 和 citations 仍由 RTS 校验。
-- Tool registry 已统一 REST、MCP 和 internal harness 的 catalog、permission、refusal 和 schema metadata。
-- Scenario endpoints 已覆盖 PR diff、exception、failed message、test planning、governance review，并统一输出 grounded candidate report。
-- Context/memory 已通过 `truthEligible=false` 和 validator 边界限制为检索/交互辅助，不能支撑 facts。
-- Evaluation/metrics 已覆盖 scope、grounding、refusal、wrong-scope、unsupported-claim、permission leak、memory-as-truth 和 trace completeness 风险。
-- 生产默认保持保守：tool orchestrator、confusable、impact/test candidates 和 expanded MCP 默认关闭；测试和本地验证必须显式开启。orchestrator 关闭时 `/ask` 退化为 deterministic `/query`，不调用模型。
-- Provider timeout、不可用或 malformed output 使用 `model_provider_failure` structured refusal，不再混入 budget exhausted。
+| Surface | 当前已完成 | 当前限制 / 未完成 |
+|---|---|---|
+| `/query`、`find`、object/L2/dependency/trace | deterministic truth/information read 已是稳定原子能力面。 | 不承担 managed scenario synthesis。 |
+| `/ask` | endpoint、planner、service-owned orchestrator、tool execution、context/model draft、claim validator、answer view、trace 和 LLM run trace 已接入。 | 生产默认 `RTS_TOOL_ORCHESTRATOR_ENABLED=false`，此时 `/ask` 降级为 deterministic `/query` 风格信息服务；OpenAI-compatible adapter 当前仍主要把 grounded facts 写成可读 answer，不代表完整场景级 AI 分析已完成。 |
+| Tool registry / REST / MCP | catalog、permission、refusal 和 schema metadata 已统一到同一批 RTS truth tools。 | expanded MCP 默认关闭，外部 tool mode 仍受 feature flag 和 permission 限制。 |
+| Scenario endpoints | PR diff、exception、failed message、test planning、governance review endpoints 和统一 `scenario-report.v1` envelope 已存在；当前能输出 grounded candidate / information-service report、trace 和 warnings。 | 当前实现主要编排 deterministic analysis/message/governance support services；还不能宣称每个 scenario 都已进入 LLM-enhanced managed analysis normal mode。 |
+| Context / memory | `truthEligible=false` 和 validator 边界已限制 memory/external input 不能支撑 facts。 | memory/context 仍是检索和交互辅助，不是 truth source。 |
+| Evaluation / metrics | 已覆盖 scope、grounding、refusal、wrong-scope、unsupported-claim、permission leak、memory-as-truth、trace completeness 等安全风险。 | AI value metrics 已进入目标口径，但 adoption/usefulness/reviewer-time-saved 等正向指标仍需接入真实评估数据和默认开启门槛。 |
+| Runtime defaults | tool orchestrator、confusable、impact/test candidates 和 expanded MCP 生产默认关闭；Provider timeout、不可用或 malformed output 使用 `model_provider_failure` structured refusal。 | 默认关闭是安全门槛，不改变 managed AI 是 AI-centric scenario 目标正常态的产品口径。 |
+
+### Current-state authority
+
+在“当前到底已经存在什么能力、哪些只是目标正常态或默认未开启能力”这个问题上，以上状态矩阵是 active baseline 的权威表述。若其他 confirmed 文档仍残留较早的阶段性描述，以本文的 current baseline、runtime defaults、scenario endpoint availability 和 degraded-mode semantics 为准。后续工作包描述的是目标闭环，不等于全部已经默认启用。
 
 ## Completion Definition
 
@@ -157,7 +162,7 @@ caller
 - `/ask` 能返回 human-readable grounded answer，并保留结构化 facts、inferences、unknowns、candidates、human decisions、citations、warnings、trace。
 - Harness 能根据 intent 选择受控工具序列，而不是只执行单一固定链路。
 - REST、MCP 和内部 harness 使用同一组工具实现和同一组 gates。
-- 第一组 managed scenario endpoints 能把外部输入转换为 grounded candidate report。
+- 第一组 managed scenario endpoints 能把外部输入转换为 grounded managed analysis report。
 - Tool calls、retrieved context、model output、grounding result、refusal reason 和 budget usage 都可追踪。
 - Claim validation 能拒绝 unsupported fact、governance overreach、prompt injection 和未读 L2 claim。
 - Context/memory/feedback 只影响检索辅助和交互体验，不会被当作 truth。
@@ -257,9 +262,9 @@ caller
 - Governance raw text 不进入默认 answer context。
 - Context compaction 后仍能保留 citation object URI 和 content hash。
 
-## Work Package E: Answer Shaping And Claim Validation
+## Work Package E: Controlled Analysis-And-Expression And Claim Validation
 
-目标是让模型负责表达，而不是负责决定事实。
+目标是让模型在 authority boundary 内负责受控分析与表达，而不是负责决定事实。
 
 落地内容：
 
@@ -274,7 +279,7 @@ caller
 
 验收门禁：
 
-- LLM shaped text 不得覆盖 service answer 的 structured facts。
+- LLM controlled analysis text 不得覆盖 service answer 的 structured facts。
 - Unsupported claim count 必须进入 metrics。
 - Grounding check endpoint 可以解释每个 claim 的 grounded/rejected/warning 状态。
 
@@ -317,7 +322,7 @@ caller
 - Scenario 输出默认是 candidate/investigation/test suggestion。
 - 所有 scenario 都必须回到 object URI、L2 hash、dependency path 或 authorized governance summary。
 - 每个 scenario 都要有 trace report 和 grounding check。
-- Scenario reports must still be useful when LLM is disabled.
+- Scenario reports must degrade to useful information-service output when LLM is disabled.
 
 验收门禁：
 
@@ -461,6 +466,10 @@ caller
 - permission leak count
 - draft-as-approved count
 - conflict-hidden count
+- impact/test candidate adoption and usefulness
+- review question usefulness
+- conflict simplification quality
+- evidence review time saved
 
 必须建设的测试集：
 
@@ -486,6 +495,8 @@ caller
 - LLM integration tests 不依赖真实外部 provider；使用 local fake server。
 - Evaluation output 可以被 metrics snapshot 聚合。
 - Evaluation must have explicit pass/fail thresholds for default enablement.
+- 对任何准备默认开启的 feature flag，至少满足：unsupported approved facts = 0、wrong-scope automation-visible outputs = 0、trace completeness = 100%、refusal correctness 达到文档定义阈值。
+- 一旦默认开启后出现阈值回退，必须能够通过 feature flag 回滚到上一安全模式。
 
 ## Work Package O: Observability And Audit
 
@@ -495,7 +506,7 @@ caller
 
 - Query trace 记录 entrypoint、caller、query text hash or redacted text、query plan、resolved scope、candidate URIs、selected URIs、L2 read URIs、tool calls、tool step hashes、grounding map、budget usage、status。
 - LLM run trace 记录 model、prompt version、tool outputs hash、final output hash、validation result、duration。
-- Scenario trace 记录 external input summary/hash、extracted anchors、selected tools、candidate report、grounding/refusal。
+- Scenario trace 记录 external input summary/hash、extracted anchors、selected tools、managed analysis report、grounding/refusal。
 - Trace report 提供 human/audit/pipeline views。
 - Metrics snapshot 汇总 evaluation 和 runtime counters。
 
@@ -598,12 +609,15 @@ Runtime projection 必须继续提供：
 [x] 引入 `AgentPlan` 和 planner validator。
 [x] 将 `ControlledLlmHarness` 改造为 planner -> orchestrator -> context builder -> model -> claim validator 链路。
 [x] 升级 `FinalAnswerValidator` 到 claim-level grounding validation。
-[x] 将 `/ask` 的 shaped answer 作为 validated service answer view 返回。
-[x] 为 PR diff、exception、failed message、test planning、governance review 建立 managed scenario adapters。
+[x] 将 `/ask` 的 grounded managed answer 作为 validated service answer view 返回。
+[x] 为 PR diff、exception、failed message、test planning、governance review 建立 scenario adapters 和统一 candidate report envelope。
 [x] 明确 `ContextItem.truthEligible` enforcement，让 memory/external input 不能支撑 facts。
 [x] 扩展 trace，覆盖 tool step、context hash、grounding map、budget、scenario input summary。
 [x] 补齐 feature flags 和 runtime config 文档。
 [x] 补齐 REST/MCP parity tests。
+[ ] 将第一个 AI-centric scenario 从 deterministic/candidate support surface 升级为真正由 managed harness 进行场景规划、证据选择、候选解释、unknown/next-evidence synthesis 的正常产品模式。
+[ ] 将 OpenAI-compatible adapter 的 prompt strategy 从 answer organizer 升级为受控分析草稿生成，同时继续由 RTS validator 裁决事实。
+[ ] 为正向 AI value metrics 接入评估数据和默认开启阈值。
 [x] 补齐 LLM fake-provider integration tests。
 [x] 补齐 prompt injection、unsupported claim、permission leak、wrong-scope、memory-as-truth golden tests。
 [x] 更新 API caller guide 和 runbook。

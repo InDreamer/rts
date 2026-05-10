@@ -288,19 +288,19 @@ curl -sS -X POST http://localhost:8080/api/v1/scenario/analyze-failed-message \
   }' | jq
 ```
 
-预期：返回 `schema_version=scenario-report.v1`、`status=candidate`、`candidates`、`citations`、`grounding_map`、`trace_id`。scenario 输出不是 release approval、final root cause、QA signoff 或 human decision。
+预期：返回 `schema_version=scenario-report.v1`、`status=candidate`、`candidates`、`citations`、`grounding_map`、`trace_id`。这些字段说明当前 scenario surface 已返回 grounded candidate / information-service result；这不等于该场景已经完成 LLM-enhanced managed analysis normal mode。scenario 输出仍遵守 authority boundary，不是 release approval、final root cause、QA signoff 或 human decision。
 
 ## 6. 常用入口
 
 ### REST
 
-- `POST /api/v1/query`：确定性查询。
-- `POST /api/v1/ask`：受控 LLM harness 入口；默认本地 LLM disabled，仍会走受控工具输出 grounded answer。
-- `POST /api/v1/scenario/analyze-pr-diff`：PR diff impact candidate report。
-- `POST /api/v1/scenario/investigate-exception`：exception investigation candidate report。
-- `POST /api/v1/scenario/analyze-failed-message`：failed/raw message grounded target candidate report。
-- `POST /api/v1/scenario/plan-tests`：test planning candidate report。
-- `POST /api/v1/scenario/governance-review`：governance review candidate report。
+- `POST /api/v1/query`：确定性 truth/information 查询。
+- `POST /api/v1/ask`：受控 managed analysis 入口；默认本地 LLM disabled 时降级为结构化信息提供服务。
+- `POST /api/v1/scenario/analyze-pr-diff`：PR diff scenario surface；当前返回 grounded impact/test candidate support，目标正常态是 managed analysis。
+- `POST /api/v1/scenario/investigate-exception`：exception scenario surface；当前返回 investigation information/candidate support，目标正常态是 managed investigation。
+- `POST /api/v1/scenario/analyze-failed-message`：failed/raw message scenario surface；当前返回 grounded target information/candidate support，目标正常态是 managed analysis。
+- `POST /api/v1/scenario/plan-tests`：test planning scenario surface；当前返回 test planning candidate support，目标正常态是 managed test planning。
+- `POST /api/v1/scenario/governance-review`：governance review scenario surface；当前返回 governance candidate support，目标正常态是 managed governance review。
 - `POST /api/v1/find`：候选搜索。
 - `POST /api/v1/objects/get`：读取 object card 和 dependency summary。
 - `POST /api/v1/objects/content`：读取 L2 content。
@@ -357,7 +357,7 @@ api key: tester-key
 RTS_LLM_ENABLED=false
 ```
 
-此时 `/ask` 不依赖外部 provider。若 `RTS_TOOL_ORCHESTRATOR_ENABLED=false`，`/ask` 直接退化为 deterministic `/query`；若显式开启 orchestrator，则使用 disabled LLM client 通过受控工具链返回 grounded answer。
+此时 `/ask` 不依赖外部 provider。若 `RTS_TOOL_ORCHESTRATOR_ENABLED=false`，`/ask` 直接降级为 deterministic `/query` 风格的信息服务；若显式开启 orchestrator，则使用 disabled LLM client 通过受控工具链返回 grounded answer。
 
 高风险候选能力的生产默认值保持关闭：`RTS_TOOL_ORCHESTRATOR_ENABLED=false`、`RTS_CONFUSABLE_CHECK_ENABLED=false`、`RTS_IMPACT_CANDIDATES_ENABLED=false`、`RTS_TEST_PLAN_CANDIDATES_ENABLED=false`、`RTS_MCP_EXPANDED_TOOLS_ENABLED=false`。只有评估通过后才逐项开启。
 

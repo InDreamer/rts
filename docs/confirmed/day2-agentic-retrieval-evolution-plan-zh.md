@@ -25,14 +25,15 @@ source_of_truth:
 
 ## 1. Day2 Goal
 
-Day2 把 Day1 的受控工具调用扩展成 **controlled agentic retrieval**。
+Day2 把 Day1 的受控工具调用扩展成 **controlled agentic retrieval**，并把双核心栈中的托管分析服务从第一版入口推进到更稳定的场景产品能力。
 
 核心变化：
 
 - LLM/harness 可以规划多步 tool sequence。
 - 检索可以加入 negative/confusable candidates、rerank、alias/entity boost。
 - MCP tool surface 可以更稳定地服务外部 agents。
-- impact/test planning 可以输出 candidate artifacts。
+- impact/test planning 可以输出更高价值的 candidate artifacts。
+- PR diff / exception / failed message / governance review 等场景可以逐步进入 managed AI 正常模式。
 
 核心不变：
 
@@ -123,7 +124,9 @@ Test planning output should distinguish:
 - unsupported/speculative cases
 - reviewer accepted/rejected state where available
 
-Neither output is release approval, final impact conclusion, root cause, or QA signoff.
+这些输出继续遵守 authority boundary：它们不是 release approval、final impact conclusion、root cause 或 QA signoff。
+
+但 candidate 边界不应被误读成能力天花板。Day2 的目标是提高这些场景输出的分析价值、采纳率和审查效率，而不是只生成更漂亮的保守措辞。
 
 ## 7. Evaluation Harness
 
@@ -137,7 +140,11 @@ Track:
 - unsupported assertion rate
 - critical miss rate
 - impact candidate usefulness
+- impact candidate adoption / reviewer acceptance
 - test candidate usefulness
+- test candidate adoption / regression hit quality
+- review question usefulness
+- evidence review time saved or conflict simplification quality
 - tool budget/cost
 - trace completeness
 

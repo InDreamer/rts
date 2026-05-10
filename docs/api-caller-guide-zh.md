@@ -125,7 +125,7 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 
 ### 3.2 LLM 增强查询 `/api/v1/ask`
 
-使用受控 LLM harness 回答，工具链仍受 scope、permission、grounding 和 trace 约束。LLM 未启用时退化为 grounded tool output。
+`/ask` 是 RTS 的 managed analysis service 入口。它使用受控 LLM harness 回答，工具链仍受 scope、permission、grounding 和 trace 约束。LLM 未启用或 provider 不可用时，`/ask` 会降级为结构化信息提供服务，而不是继续假装自己处于同等分析能力状态。
 
 请求 body 与 `/query` 类似，额外支持 `max_tool_calls`。LLM 仍只能通过 allowlisted RTS tools 读取 projection。
 
@@ -140,13 +140,30 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 
 如果模型输出无法通过 claim-level grounding validation，服务会返回 `refusal.reason=unsupported_claim` 或 `hash_mismatch`，不会把自由文本当作事实答案。
 
-`RTS_TOOL_ORCHESTRATOR_ENABLED=false` 时，`/ask` 会退化为 deterministic `/query` 风格答案。显式开启 orchestrator 后，内部 `/ask` 链路会先生成受控 `AgentPlan`，记录 intent、scenario type、scope snapshot、release snapshot、tool plan 和 expected evidence。Planner 只允许决定工具计划或 clarification，不允许直接产出业务事实。
+`RTS_TOOL_ORCHESTRATOR_ENABLED=false` 时，`/ask` 会降级为 deterministic `/query` 风格的信息服务输出。显式开启 orchestrator 后，内部 `/ask` 链路会先生成受控 `AgentPlan`，记录 intent、scenario type、scope snapshot、release snapshot、tool plan 和 expected evidence。Planner 只允许决定工具计划或 clarification，不允许直接产出业务事实。
 
-### 3.3 Managed scenario endpoints
+### 3.3 Scenario endpoints
 
-复杂外部输入可以走 managed scenario endpoint，由 RTS 内部 harness/support tools 生成 grounded candidate report。外部输入只作为线索，不是真相。
+复杂外部输入可以走 scenario endpoint。当前实现已经提供统一 `scenario-report.v1`、grounded candidate / information-service output、citations、grounding map、warnings 和 trace。外部输入只作为线索，不是真相。
 
-PR diff、exception impact 和 test planning 这类 candidate 能力默认通过 feature flag 保守关闭；本地验证或受控环境需要显式开启对应开关。
+对 PR diff、exception impact、failed message 和 test planning 这类 AI-centric 场景，managed AI 仍是目标正常产品模式；但当前 endpoint 多数仍主要编排 deterministic/candidate support services。对应 feature flag 关闭或 LLM 不可用时，服务会降级为结构化信息提供或 candidate support surface。本地验证或受控环境需要显式开启对应开关。
+
+### 3.3.1 Automation boundary
+
+无论是 `/ask` 还是 scenario endpoint，只要输出类型仍属于 `candidate`、`inference`、`unknown` 或 investigation path，它就不能被当作：
+
+- release approval
+- final root cause closure
+- QA signoff
+- pipeline allow/block gate
+- unrecorded human decision
+
+只有两类内容可以直接驱动自动化动作：
+
+1. deterministic contract 已明确允许的 machine-readable result
+2. 已记录的人类裁决 / approved truth / signed release state
+
+这条边界对 managed mode 和 external agent tool mode 同样成立。
 
 当前入口：
 

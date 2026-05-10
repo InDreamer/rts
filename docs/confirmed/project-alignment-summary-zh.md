@@ -20,26 +20,26 @@ source_of_truth:
 
 ## 一句话定义
 
-RTS 是面向银行报文转换场景的 **规则真相服务**。
+RTS 是面向银行报文转换场景的 **双核心规则真相服务**。
 
-它不是静态文档库、普通 RAG、聊天机器人，也不是某个固定 agent SDK 的包装。RTS 的核心职责是从尽可能准确和充分的 source 中整理 transformation rules，经过 AI-first review、人工裁决和 signoff，形成可治理、可追溯、可审查、可查询、可解释的规则真相，并按权限提供给系统、人和 agent 使用。
+它不是静态文档库、普通 RAG、聊天机器人，也不是某个固定 agent SDK 的包装。RTS 的核心职责是从尽可能准确和充分的 source 中整理 transformation rules，经过 AI-first review、人工裁决和 signoff，形成可治理、可追溯、可审查、可查询、可解释的规则真相，并以两种同等核心能力对外提供：一类是受控真相源 / 原子能力服务，另一类是托管 LLM agent 分析服务。
 
-LLM 是 RTS 的核心能力之一，但不是 truth owner。LLM 可以整理、检索、解释、发现冲突、提出候选分析和把输出写得更容易读；真正的 truth 仍来自 source、evidence、review、人工裁决、signoff 和发布版本。
+LLM 是 RTS 的核心能力之一，但不是 truth owner。LLM 不是 answer organizer，而是在 governed truth 上执行受控分析、冲突发现、依赖解释、影响候选、测试候选、unsupported-assertion detection 和 reviewer-friendly 表达；真正的 truth 仍来自 source、evidence、review、人工裁决、signoff 和发布版本。
+
+这并不意味着 RTS 是“truth service 主体 + AI 附件”。双核心意味着：deterministic truth/information service 与 managed analysis service 都是产品主能力，只是它们面向的调用面和完成的工作不同。
 
 ## 最终服务形态
 
-RTS 最终应该是统一 truth service，而不是多个割裂工具。
+RTS 最终应该是统一双核心服务，而不是多个割裂工具。
 
-它要支持：
+它要同时支持：
 
-- 事实查询：某个 target 字段如何生成，依赖哪些 source、lookup、helper 和 rule。
-- 规则解释：规则为什么可信，证据、review、signoff 和风险状态是什么。
-- 影响分析：某个 source、字段、lookup、helper 或规则变化后影响哪些对象、测试或下游流程。
-- 测试规划：基于规则、依赖和条件生成测试点、覆盖建议和风险提示。
-- 流程驱动：被 CI/CD、数据治理、迁移、review、incident 或其他系统 pipeline 调用。
-- Agent 接入：通过 REST/MCP/tool mode，让 AI agent 在权限和 trace 边界内读取 RTS truth。
+- **真相源原子能力服务**：稳定提供事实查询、对象读取、依赖遍历、scope/navigation、trace、grounding 等结构化能力。
+- **托管分析服务**：在同一 truth boundary 内提供规则解释、影响分析、测试规划、冲突简化、evidence review 加速和场景化调查。
+- **流程驱动**：被 CI/CD、数据治理、迁移、review、incident 或其他系统 pipeline 调用。
+- **Agent 接入**：通过 REST/MCP/tool mode，让内部 managed agent 和外部 agent 在权限和 trace 边界内复用同一组稳定原子能力。
 
-不同入口可以有不同体验，但底层必须共享同一个 runtime truth access boundary。
+不同入口可以有不同体验，但底层必须共享同一个 runtime truth access boundary 和同一组稳定原子能力面。
 
 ## 核心对象
 
@@ -90,10 +90,10 @@ KB 和 runtime projection 都是机器优先知识结构，不是“KB 给人读
 当前边界：
 
 - **KB** 是 governed truth 的完整机器知识图，包含 rule / lookup / helper 逻辑，也包含 source、evidence、review、report、ambiguity、adjudication、signoff 和 lineage。
-- **Runtime projection** 是 approved truth 的服务运行视图，面向查询、索引、诊断、影响分析、测试规划和 agent tools。它可以裁剪治理噪声、重排结构和拆分视图，但不能丢失服务回答事实所需的结构化 L2 规则语义。
+- **Runtime projection** 是 approved truth 的服务运行视图，面向查询、索引、诊断、影响分析、测试规划和 agent tools。它可以裁剪治理噪声、重排结构和拆分视图，但不能丢失服务回答事实所需的结构化 L2 规则语义，也必须能够支撑稳定原子能力面。
 - **Index document** 是 projection 派生出的召回和导航视图，例如 object card、L0/L1、alias、confusable、search text。它帮助找到对象，不拥有 truth，也不能替代 L2 runtime object。
 - **Governance view** 是在权限允许时展开 evidence、review、report、conflict、adjudication 的视图。
-- **LLM answer** 是对上述材料的解释、整理或候选分析，不是新的 truth。
+- **LLM analysis output** 是对上述材料的受控分析与表达，不是新的 truth。candidate、inference、unknown 和 human decision 的区分是权威边界，不是 AI 分析深度的上限。
 
 详细字段和索引读取边界以 runtime projection contract 为准。
 
@@ -149,9 +149,10 @@ tool mode:
 一句话：
 
 ```text
-LLM investigates and explains.
+AI performs controlled analysis and expression.
 RTS service gates and proves.
 Runtime projection supplies governed truth material.
+Stable atomic capabilities serve both internal and external agents.
 ```
 
 ## 输出纪律
@@ -168,16 +169,16 @@ RTS/LLM 输出必须明确区分：
 
 ## 当前阶段
 
-截至 2026-05-08，按当前实现和本地验证结果，当前实现阶段可理解为：
+截至 2026-05-10，按当前实现和本地验证结果，当前实现阶段应理解为：
 
 ```text
-Day1 RTS Query / Tool Service mostly working
-Controlled LLM Harness partially wired
-Deterministic impact / test / message / governance / pipeline support tools exist
-PR diff / exception / failed-message managed LLM scenario endpoints not yet built
+Dual-core RTS baseline established
+Truth-source atomic capability service shipped and mostly working
+Managed LLM harness present, but not yet the stable default surface across every AI-centric scenario
+Some scenario endpoints and support surfaces already exist, but many still need clearer AI-normal-mode contracts and degradation rules
 ```
 
-也就是说，结构化 API 输出多是合理的当前状态。下一步的关键不是把 truth core 交给某个 agent framework，而是完成 managed `/ask` 的可读 grounded answer、把现有 deterministic 工具面稳定成统一工具层，然后做 PR diff impact、exception investigation 或 failed-message analysis 这类 managed LLM 端到端场景 endpoint。
+也就是说，结构化 API 输出多是合理的当前状态，但它们不应被误读为最终产品身份。下一步的关键不是把 truth core 交给某个 agent framework，而是把双核心叙事真正落到活跃文档和运行路径上：一方面稳住真相源原子能力面，另一方面让 `/ask`、PR diff impact、exception investigation、failed-message analysis、test planning 等场景形成 managed AI 正常模式；当 LLM 不可用时，再明确降级为信息提供服务。
 
 ## OpenViking / OV 定位
 

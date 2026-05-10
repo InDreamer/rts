@@ -21,13 +21,13 @@ source_of_truth:
 
 ## What This Covers
 
-This document defines the constitutional rules for RTS as a rule truth service.
+This document defines the constitutional rules for RTS as a dual-core rule truth service.
 
-RTS exists to turn multi-source transformation knowledge into governed rule truth that can be safely used through its internal Knowledge Base, retrieval layer, LLM, APIs, MCP tools, Q&A surfaces, and system pipelines.
+RTS exists to turn multi-source transformation knowledge into governed rule truth that can be safely used through its internal Knowledge Base, retrieval layer, truth-source atomic capabilities, managed LLM analysis service, APIs, MCP tools, Q&A surfaces, and system pipelines.
 
-RTS includes LLM as a core internal capability. The LLM may organize, retrieve, explain, analyze, and answer based on governed Knowledge Base content, but an LLM answer is not automatically truth.
+RTS includes LLM as a core internal capability. The LLM may retrieve, explain, analyze, detect conflicts, propose impact/test candidates, surface unsupported assertions, and express results based on governed Knowledge Base content, but an LLM answer is not automatically truth.
 
-The goal is not maximum generative fluency. The goal is controlled truth creation, controlled truth publication, and controlled truth consumption.
+The goal is not maximum generative fluency. The goal is controlled truth creation, controlled truth publication, controlled truth consumption, and high-value AI analysis that remains inside explicit truth and authority boundaries.
 
 ## Constitutional Purpose
 
@@ -35,10 +35,10 @@ RTS protects five things:
 
 - truth must come from traceable sources
 - source conflicts must be exposed, not hidden
-- AI should do as much review work as possible, but must not become the final truth owner
+- AI should do as much governed review and analysis work as possible, but must not become the final truth owner
 - human review is the final裁决 for material ambiguity and conflict
-- LLM answers must be separated from approved truth
-- service outputs must stay permissioned, traceable, and state-aware
+- LLM outputs, candidates, and investigation paths must be separated from approved truth and recorded human decisions
+- service outputs must stay permissioned, traceable, state-aware, and useful enough to create measurable AI value within those boundaries
 
 ## Core Objects
 
@@ -66,7 +66,7 @@ The system of record is governed rule objects, evidence chains, review/adjudicat
 
 Chat logs, prompt outputs, runtime memory, retrieval traces, and agent behavior do not redefine truth.
 
-### 3. AI Is A Governance Accelerator, Not A Final Authority
+### 3. AI Is A Controlled Analysis-And-Expression Layer, Not A Final Authority
 
 AI may:
 
@@ -74,10 +74,12 @@ AI may:
 - assemble draft rule packs
 - check structural completeness
 - cross-validate sources
-- detect missing evidence, inconsistent logic, and ambiguity
-- simplify reviewer questions
-- recommend confidence, risk, impact, and test coverage
+- detect missing evidence, inconsistent logic, unsupported assertions, and ambiguity
+- simplify reviewer questions and conflicts
+- explain dependencies and non-obvious impact paths
+- recommend confidence, risk, impact, test coverage, and next evidence needed
 - explain signed truth under permission and scope constraints
+- turn governed truth material into reviewer-friendly, agent-friendly, and pipeline-friendly analysis outputs
 
 AI may not:
 
@@ -86,6 +88,7 @@ AI may not:
 - override human review裁决
 - publish truth without signoff
 - write runtime learning back into canonical truth
+- use candidate or investigative output as if it were recorded human decision or approved truth
 
 ### 4. Human Review Is The Final裁决 For Material Conflict
 
@@ -185,7 +188,9 @@ When answering a rule or impact question, RTS should prefer outputs that:
 - cite rule IDs or stable object references
 - expose evidence and review state when the caller is allowed to see them
 - separate factual rule statements from AI analysis or recommendations
+- label degraded information-service output explicitly when managed analysis is unavailable
 - refuse or qualify conclusions when truth state is insufficient
+- prevent candidate or inference output from being consumed as approval, release gate, root-cause closure, or human decision without an explicit deterministic or recorded-decision contract
 
 ## Service Non-Goals
 
@@ -196,7 +201,9 @@ RTS is not trying to:
 - treat all documents as equal truth sources
 - collapse source ingestion, governance, publication, retrieval, and runtime memory into one uncontrolled surface
 - let pipeline or agent integrations bypass review/signoff state
+- let degraded continuity behavior redefine RTS product identity as “just retrieval”
+- let candidate or inference outputs silently become automation decisions
 
 ## Decision Rule
 
-When a future design choice is unclear, choose the option that best preserves governed truth, exposes source conflict, minimizes unauthorized AI freedom, records human裁决, and keeps service outputs permissioned, state-aware, and traceable.
+When a future design choice is unclear, choose the option that best preserves governed truth, exposes source conflict, maximizes authorized AI value inside explicit safety boundaries, records human裁决, and keeps service outputs permissioned, state-aware, traceable, and reviewable.

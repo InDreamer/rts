@@ -27,20 +27,24 @@ source_of_truth:
 
 ## 1. Day1 Goal
 
-Day1 交付的是：
+Day1 交付的是 RTS 双核心栈中的第一版可运行 baseline：
 
 ```text
-RTS Query / Tool Service
+RTS Truth-Source Atomic Capability Service
   + lightweight governed index
   + filesystem runtime projection store
   + Lucene scoped BM25
   + L2 read/hash validation
   + trace/refusal contract
-  + controlled LLM harness skeleton
   + REST API and thin MCP surface
+
+RTS Managed LLM Analysis Service
+  + controlled LLM harness skeleton
+  + tool-only truth access
+  + grounded managed /ask entry
 ```
 
-Day1 的目标不是完整 agentic RAG，也不是重型企业搜索平台，而是让 RTS 可以被 API/MCP/LLM 安全读取，并且每个事实答案能回到 released projection 和 L2 object。
+Day1 的目标不是完整 agentic RAG，也不是重型企业搜索平台，而是在同一个 truth boundary 内同时立住两件事：一是稳定的受控真相源原子能力面，二是第一版可审计的 managed LLM 分析入口。Day1 不要求所有场景都成熟，但它不能把 AI 长期写成可有可无的整理层。
 
 ## 2. Hard Boundaries
 
@@ -48,9 +52,10 @@ Day1 的目标不是完整 agentic RAG，也不是重型企业搜索平台，而
 - Query service reads projection; it does not own canonical truth.
 - API/MCP/LLM harness all use the same controlled service tools.
 - Final facts must come from L2 object, dependency edge, manifest, or authorized governance view.
-- Search hit, card, summary, LLM answer, and memory do not own truth.
-- LLM may identify intent, choose tools, ask clarification, and shape answer.
+- Search hit, card, summary, LLM output, and memory do not own truth.
+- LLM may identify intent, choose tools, ask clarification, perform controlled analysis, and express grounded results.
 - LLM may not bypass scope, permission, release, L2 read, grounding, refusal, or trace.
+- deterministic capability is first-class information service, not a lower-grade product path.
 
 ## 3. Day1 Does
 
@@ -74,7 +79,8 @@ Day1 must support:
 - refusal when scope/release/permission/L2/dependency conditions fail
 - REST service surface
 - thin MCP adapter over the same service layer
-- `/ask` controlled LLM harness with tool-only access
+- `/query` as deterministic truth/information service
+- `/ask` as controlled managed analysis entry with tool-only access
 
 ## 4. Day1 Does Not
 
@@ -144,8 +150,8 @@ Names may evolve, but Day1 needs these service meanings:
 | object card read | navigation and disambiguation | not final truth |
 | L2 content read | final fact surface | requires active release and hash validation |
 | dependencies | explain/navigation/impact preview | cannot expand scope automatically |
-| query | deterministic or low-LLM answer package | must cite facts and trace |
-| ask | controlled LLM harness entry | LLM uses tools, not direct store access |
+| query | deterministic truth/information service | must cite facts and trace |
+| ask | controlled managed analysis entry | LLM uses tools, not direct store access |
 | trace read | audit and debugging | shows scope, candidates, tools, L2 reads, refusal |
 
 ## 7. Controlled LLM Harness
@@ -159,8 +165,8 @@ Allowed responsibilities:
 - ask clarification when scope is missing
 - call allowlisted tools
 - choose object cards and L2 reads
-- organize human-readable answer
-- preserve warnings, ambiguity, draft/release state
+- perform controlled analysis over governed truth
+- return human-readable grounded answer with warnings, ambiguity, draft/release state, and trace context preserved
 
 Prohibited:
 
@@ -195,6 +201,8 @@ Day1 must refuse, degrade, or ask clarification when:
 - LLM tool budget is exhausted before grounding
 - only card/search summary exists but no L2 truth exists
 
+When managed analysis is unavailable, `/ask` may degrade to bounded information-service output under the same release/scope/permission/trace contract. That degraded continuity mode exists to preserve access to truth material; it does not redefine RTS product identity or make AI-centric scenario services equivalent to pure deterministic retrieval.
+
 Refusal is product behavior, not an error fallback.
 
 ## 9. Output Contract
@@ -216,6 +224,8 @@ Every answer should include:
 - warnings or governance summary when allowed
 - trace id
 
+candidate / human decision separation is an authority boundary, not a limit on how deeply managed analysis may reason.
+
 ## 10. Day1 Definition Of Done
 
 Day1 is done when:
@@ -230,7 +240,7 @@ Day1 is done when:
 - refusal cases are covered by tests
 - query trace and LLM run trace are written
 - `/ask` uses controlled tools before answering
-- `/ask` shaped answer is exposed through a stable service answer surface, not only as model text beside raw tool output
+- `/ask` returns a stable managed answer surface with grounding validation, not just raw model text beside tool output
 - LLM final answer has citation/trace validation strong enough to reject unsupported claims
 - minimal MCP adapter uses the same service layer
 - a small golden set covers normal, ambiguous, missing-L2, permission, and refusal cases
@@ -243,7 +253,7 @@ Implementation should prioritize:
 2. L2 read and hash validation
 3. scope and permission gates
 4. trace/refusal completeness
-5. `/ask` shaped answer with grounding validation
-6. stable REST/MCP tool surface
+5. grounded managed `/ask` with controlled analysis and claim validation
+6. stable REST/MCP atomic capability surface
 
 Day2 enhancements should wait until Day1 stops failing on scope, L2, refusal, and trace.

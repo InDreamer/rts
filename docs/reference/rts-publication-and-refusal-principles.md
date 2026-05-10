@@ -91,6 +91,8 @@ Examples:
 
 A refusal is better than a confident unsupported answer.
 
+If RTS degrades instead of refusing, the degraded output must be explicitly labeled as bounded information-service continuity behavior. It must not masquerade as scenario judgment, approval, root-cause closure, QA signoff, or truth mutation.
+
 ## 6. L0/L1 Are Governed Navigation Outputs
 
 L0/L1 summaries are not decorative docs.

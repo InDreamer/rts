@@ -37,7 +37,7 @@ user / external agent
   -> LLM mediation
   -> RTS controlled tools
   -> L2 truth read / dependency / authorized governance view
-  -> answer shaping
+  -> controlled analysis and expression
   -> grounding validation and trace
 ```
 
@@ -212,7 +212,7 @@ RTS agent 可以有 memory，但 memory 只能提升体验和检索质量，不�
 2. Controlled query plan
 3. Session/workspace context store
 4. Pack navigation / object graph tools
-5. Human/agent/audit answer shaping
+5. Human/agent/audit controlled analysis and expression
 6. Trace feedback memory
 7. Optional reranker
 8. Optional alias/entity boost

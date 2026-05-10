@@ -29,12 +29,12 @@ source_of_truth:
 
 | 主题 | 当前裁决 | 文档处理 |
 |---|---|---|
-| RTS 定位 | RTS 是 governed rule truth service，不是普通 RAG、聊天机器人或单个 agent app。 | 保留在 confirmed；旧 proposal 只作历史材料。 |
+| RTS 定位 | RTS 是双核心规则真相服务：既是受控真相源 / 原子能力服务，也是托管 LLM agent 分析服务；不是普通 RAG、聊天机器人或单个 agent app。 | 保留在 confirmed；旧 proposal 只作历史材料。 |
 | Truth 权威 | canonical truth 来自 source / evidence / review / human adjudication / signoff；LLM answer、retrieval hit、agent memory 不是 truth。 | 保留在 confirmed 和 distilled reference。 |
 | Runtime projection | projection 是 approved truth 的服务运行视图，不能丢失 L2 结构化规则语义。 | 以 projection contract 为准；旧“摘要式 KB”口径废弃。 |
 | RTS service 边界 | RTS service 拥有 runtime truth access boundary：release、scope、permission、hash、dependency、grounding、refusal、trace。 | 保留在 confirmed。 |
 | Agent/SDK 边界 | OpenAI/Claude/LangChain/PageIndex 等可做 adapter、harness 或 sidecar，不拥有 truth access core。 | 保留在 confirmed alignment note。 |
-| 接入模式 | RTS 同时支持 managed LLM harness 和 external tool mode。 | 保留在 confirmed alignment note。 |
+| 接入模式 | RTS 同时支持 managed LLM harness 和 external tool mode；两者共享同一组稳定原子能力面。 | 保留在 confirmed alignment note。 |
 | 历史 AI token 审核稿 | 长稿已合并为风险原则摘要；不再让 token PoC 口径限制长期服务方向。 | 原始长稿移出默认 reference 路径并归档；保留 consolidated summary。 |
 | Java index/reference 长稿 | 旧全量方案已归档；reference 默认只保留当前适用的短摘要。 | 原文在 archive；短摘要保留旧方案中的安全工程原则。 |
 | Final LLM agent plan 长稿 | 旧全量 final plan 已归档；confirmed 默认只保留最终路线图。 | 细节回收到 Day1、Day2 和 LLM alignment；原文在 archive。 |
@@ -96,15 +96,11 @@ source_of_truth:
 
 ### D5. 第一个场景 endpoint 选择哪个
 
-当前缺口：结构化 API 已有价值，但用户体感需要一个端到端场景展示 LLM 能力。
+状态：已冻结。
 
-候选：
+当前缺口：结构化 API 已有价值，但用户体感需要一个端到端场景展示 managed AI 正常模式。
 
-- **A `/ask` shaped answer**：先把 human-readable grounded answer 做完整。
-- **B `analyze_pr_diff`**：接 PR diff 做影响面候选和测试建议。
-- **C `investigate_exception`**：接 exception/log 做调查路径候选。
-
-推荐：A 作为门槛，然后 B。
+裁决：先把 `/ask` 的 grounded managed analysis answer 做完整，再优先 `analyze_pr_diff`，然后是 `investigate_exception`。这些场景的 authority boundary 仍保留，但不再把 candidate 边界写成能力上限；LLM 不可用时，能力降级为信息提供服务。
 
 ### D6. LLM provider/framework 选择是否进入文档主线
 

@@ -37,7 +37,7 @@ Use these files when a task needs:
 - RTS publication, refusal, trace, and release safety principles (`rts-publication-and-refusal-principles.md`)
 - RTS retrieval principles distilled from OV/KB history (`rts-retrieval-principles.md`)
 - RTS service interface and output principles (`rts-service-interface-and-output-principles.md`)
-- distilled LLM-mediated query and harness reference for scope mediation, context, memory, and controlled tool use (`llm-enhanced-index-and-harness-design-zh.md`)
+- distilled LLM-mediated query and harness reference for scope mediation, context, memory, controlled tool use, and analysis-expression boundaries (`llm-enhanced-index-and-harness-design-zh.md`)
 - OV boundary rationale and adoption discussion
 - distilled Java index/query layer reference summary (`java-index-layer-full-plan-zh.md`)
 - retrieval semantics and scope-aware loading details
@@ -48,13 +48,16 @@ Use these files when a task needs:
 Current convention:
 
 - Treat `docs/confirmed/project-alignment-summary-zh.md` as the first alignment entry.
-- Treat `rts-project-background-and-pack-model.md` as the current reference for historical sample context and pack/object shape.
-- Treat `rts-publication-and-refusal-principles.md` as the current RTS-owned publication/refusal/trace safety reference.
-- Treat `rts-retrieval-principles.md` as the current RTS-owned retrieval principle document.
-- Treat `rts-service-interface-and-output-principles.md` as the current RTS-owned API/MCP/output quality reference.
-- Treat `llm-enhanced-index-and-harness-design-zh.md` as the distilled LLM mediation/harness reference. The full historical discussion lives in archive and does not override confirmed Day1/Day2 or final roadmap baseline.
-- Treat OV-related documents here as historical/reference thinking, not as a final engineering baseline.
-- Treat `java-index-layer-full-plan-zh.md` as the distilled Java index/query layer reference. The full historical plan lives in archive and is not a current infrastructure commitment.
-- Treat `external-review-final-2026-04-20.md` as a historical critique that motivated confirmed contracts.
-- Treat `proposals/ai-token-review/README.md` as a consolidated historical rationale summary; the old long review drafts are archived outside the default reference route after their useful guardrails were extracted.
+- Reference docs are non-normative support material: they may preserve rationale, guardrails, or terminology, but confirmed docs and runtime/API docs own active behavior contracts.
+- Interpret every reference doc under the confirmed dual-core baseline: RTS is both a controlled truth-source atomic capability service and a managed LLM agent analysis service.
+- Reference docs may preserve historical reasoning, but they must not be used to demote AI into mere answer organization or to redefine deterministic capability as the only real product identity.
+- `rts-project-background-and-pack-model.md` is the current reference for historical sample context and pack/object shape.
+- `rts-publication-and-refusal-principles.md` is the current RTS-owned publication/refusal/trace safety reference.
+- `rts-retrieval-principles.md` is the current RTS-owned retrieval principle document.
+- `rts-service-interface-and-output-principles.md` is the current RTS-owned API/MCP/output quality reference, but only as support for the confirmed baseline.
+- `llm-enhanced-index-and-harness-design-zh.md` is the distilled harness/reference doc. It should be read as support for controlled analysis-and-expression over stable truth-source atomic capabilities, not as a competing product stance.
+- OV-related documents here are historical/reference thinking, not a final engineering baseline.
+- `java-index-layer-full-plan-zh.md` is the distilled Java index/query layer reference. The full historical plan lives in archive and is not a current infrastructure commitment.
+- `external-review-final-2026-04-20.md` is a historical critique that motivated confirmed contracts.
+- `proposals/ai-token-review/README.md` is a consolidated historical rationale summary. It preserves guardrails, not the active product thesis.
 - Do not treat older proposals or handoff notes as overriding the confirmed docs.

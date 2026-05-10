@@ -122,11 +122,11 @@ Be especially careful with:
 
 The safest default is to provide structured, sanitized, scoped context unless a caller has explicit permission and the use case requires more.
 
-## 9. Deterministic Capabilities Are First-Class
+## 9. Stable Atomic Capabilities Are First-Class
 
 RTS should not use LLM for work that stable structure can do better.
 
-First-class deterministic capabilities include:
+First-class stable atomic capabilities include:
 
 - scope resolution
 - stable URI lookup
@@ -135,4 +135,8 @@ First-class deterministic capabilities include:
 - fixed output templates
 - trace construction
 
-LLM should add value by organizing, explaining, finding non-obvious candidates, summarizing uncertainty, and turning complex material into reviewer-friendly questions.
+These capabilities are not anti-AI. They are the governed substrate shared by internal managed analysis and external agent orchestration.
+
+For AI-centric scenario services, managed analysis remains the normal product mode. Deterministic/template-only outputs are bounded degraded continuity behavior unless the service contract explicitly defines them as the primary machine-readable result.
+
+LLM should add value by performing controlled analysis and expression: organizing evidence-backed explanations, finding non-obvious candidates, surfacing uncertainty, simplifying conflicts, and turning complex material into reviewer-friendly questions.

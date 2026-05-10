@@ -29,7 +29,7 @@ source_of_truth:
 
 - 为什么 LLM output 不能被当成 truth。
 - 为什么服务化 LLM 必须有 scope、权限、trace、grounding 和人工决策边界。
-- 为什么 impact analysis / test planning 只能先输出 candidate。
+- Why impact analysis / test planning must preserve candidate-only as an authority boundary before recorded review, rather than pretending AI output is final truth.
 - 为什么 deterministic retrieval、dependency graph、template baseline 和 Copilot/Yoda 对照不能被 LLM 叙事跳过。
 
 它不限制 RTS 的长期范围。当前长期方向仍以 confirmed baseline 为准：RTS 是包含 Knowledge Base、retrieval/indexing、LLM、governance workflow、API/MCP/Q&A/pipeline-facing surfaces 的 truth service。
@@ -43,7 +43,7 @@ The useful ideas preserved from the archived long-form review drafts are:
 - Agent/API/MCP callers may read and cite approved truth, and may submit candidates or open questions, but must not directly rewrite approved truth.
 - Deterministic retrieval, URI identity, dependency graph, template baselines, and refusal behavior are first-class service capabilities.
 - LLM value should be evaluated against deterministic baseline, Copilot/Yoda-like workflows, and SME goldensets before being promoted to broad automation.
-- Early impact analysis and test planning outputs should be candidate-only unless backed by governed truth and review state.
+- Early impact analysis and test planning outputs should be candidate-only unless backed by governed truth and review state; that boundary limits authority, not the depth of AI analysis.
 - Sensitive operational data, production messages, monitor alerts, defect attachments, customer identifiers, and release decision records require separate approval before entering model context or logs.
 - Failure types to track include wrong scope, unsupported assertion, hallucinated dependency, critical miss, over-broad noise, authority drift, unsafe data handling, and instruction injection failure.
 
