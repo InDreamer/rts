@@ -193,6 +193,8 @@ class Day1ServiceTests {
     @Test
     void newRuntimePropertiesKeepHighRiskFeaturesDefaultClosed() {
         RtsProperties defaults = new RtsProperties();
+        assertThat(defaults.isClaimValidatorEnabled()).isTrue();
+        assertThat(defaults.isLlmDebugRawOutput()).isFalse();
         assertThat(defaults.isPlannerV2Enabled()).isFalse();
         assertThat(defaults.isToolOrchestratorEnabled()).isFalse();
         assertThat(defaults.isRerankerEnabled()).isFalse();
@@ -645,6 +647,33 @@ class Day1ServiceTests {
         assertThat(answer.answerType()).isEqualTo(AnswerType.refusal);
         assertThat(answer.refusal().reason()).isEqualTo(RefusalReason.unsupported_claim);
         assertThat(answer.refusal().whatIsMissing()).contains("Answer text is not derived");
+    }
+
+    @Test
+    void claimValidatorCanBeDisabledForLocalModelDebuggingOnly() {
+        LlmClient ungroundedText = new LlmClient() {
+            @Override
+            public LlmDraft draftAnswer(AskRequest request, ToolContext toolContext) {
+                var l2 = (com.rts.model.CoreModels.L2Content) toolContext.plannedOutputs().get("read_object_l2");
+                ServiceAnswer structured = new ServiceAnswer(AnswerType.answer, stella, l2.releaseId(),
+                        java.util.List.of(new Fact("Grounded structured fact", TestProjectionFactory.RULE_URI, l2.releaseId(), "l2:" + l2.contentHash())),
+                        java.util.List.of(), java.util.List.of(), java.util.List.of(), java.util.List.of(),
+                        java.util.List.of(TestProjectionFactory.RULE_URI), java.util.List.of(), "trace-forged", null,
+                        java.util.List.of(), "This model text is useful for debugging but not claim-validator clean.");
+                return new LlmDraft("ignored", java.util.List.of(), structured);
+            }
+        };
+        RtsProperties managedProperties = new RtsProperties();
+        managedProperties.setToolOrchestratorEnabled(true);
+        managedProperties.setClaimValidatorEnabled(false);
+        ControlledLlmHarness harness = new ControlledLlmHarness(queryService, ungroundedText,
+                new FinalAnswerValidator(new PromptPolicyGuard()), new PromptPolicyGuard(), noOpTraceStore(), managedProperties);
+
+        var answer = harness.ask(new AskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6));
+
+        assertThat(answer.answerType()).isEqualTo(AnswerType.answer);
+        assertThat(answer.answer()).contains("debugging");
+        assertThat(answer.groundingMap().claims()).isEmpty();
     }
 
     @Test

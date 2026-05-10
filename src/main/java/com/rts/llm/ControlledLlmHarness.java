@@ -136,7 +136,7 @@ public class ControlledLlmHarness {
                     finalAnswerText);
             GroundingMap groundingMap = GroundingMap.empty();
             if (candidate.answerType() == AnswerType.answer) {
-                groundingMap = finalAnswerValidator.validateClaims(candidate, Map.copyOf(tools.l2ReadHashes));
+                groundingMap = validateFinalClaims(candidate, tools);
             } else {
                 promptPolicyGuard.validateGeneratedAnswer(finalAnswerText);
             }
@@ -157,6 +157,16 @@ public class ControlledLlmHarness {
                     new Refusal(ex.reason(), ex.getMessage(), List.of(), false), List.of(), null)
                     .withValidation(GroundingMap.empty(), budgetUsage(start, tools), request.outputMode(), null);
         }
+    }
+
+    private GroundingMap validateFinalClaims(ServiceAnswer candidate, GuardedToolContext tools) {
+        if (properties.isClaimValidatorEnabled()) {
+            return finalAnswerValidator.validateClaims(candidate, Map.copyOf(tools.l2ReadHashes));
+        }
+        // This bypass is intentionally narrow and observable: it helps debug model
+        // shaping without changing the service-owned tool, scope, release, or prompt guards.
+        promptPolicyGuard.validateGeneratedAnswer(candidate.answer());
+        return GroundingMap.empty();
     }
 
     private ServiceAnswer deterministicFallback(AskRequest request) {

@@ -21,18 +21,22 @@ import com.rts.query.QueryRequests.ObjectGetRequest;
 import com.rts.query.QueryRequests.PlanRequest;
 import com.rts.query.QueryRefusalException;
 import com.rts.query.QueryService.ObjectEnvelope;
+import com.rts.store.Hashing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
 @ConditionalOnProperty(prefix = "rts", name = "llm-enabled", havingValue = "true")
 public class OpenAiCompatibleLlmClient implements LlmClient {
+    private static final Logger log = LoggerFactory.getLogger(OpenAiCompatibleLlmClient.class);
     private final RtsProperties properties;
     private final ObjectMapper mapper;
     private final RestClient restClient;
@@ -134,6 +138,7 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
             throw new IllegalStateException("Only the OpenAI Responses wire API is supported for RTS LLM harness");
         }
         Map<String, Object> body = responsesBody(query, context);
+        logRequest(query, context, body);
         String response = restClient.post()
                 .uri("/responses")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -143,7 +148,9 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
                 .body(String.class);
         try {
             JsonNode root = mapper.readTree(response);
-            return extractOutputText(root);
+            String outputText = extractOutputText(root);
+            logResponse(response, outputText);
+            return outputText;
         } catch (Exception ex) {
             throw new IllegalStateException("Invalid OpenAI-compatible Responses API response", ex);
         }
@@ -182,6 +189,28 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
             }
         }
         return String.join("\n", parts).strip();
+    }
+
+    private void logRequest(String query, GroundedContext context, Map<String, Object> body) {
+        String queryHash = Hashing.sha256(query == null ? "" : query);
+        String contextHash = Hashing.sha256(String.valueOf(context.answer()));
+        log.info("RTS LLM request provider=OpenAI-compatible model={} baseUrl={} wireApi={} reasoning={} queryHash={} contextHash={} storeResponses={} maxOutputTokens={}",
+                properties.getLlmModel(), properties.getLlmBaseUrl(), properties.getLlmWireApi(),
+                properties.getLlmReasoningEffort(), queryHash, contextHash, properties.isLlmStoreResponses(),
+                properties.getLlmMaxTokens());
+        if (properties.isLlmDebugRawOutput()) {
+            log.warn("RTS LLM debug raw request body={}", body);
+        }
+    }
+
+    private void logResponse(String rawResponse, String outputText) {
+        log.info("RTS LLM response model={} rawResponseHash={} outputHash={} outputChars={}",
+                properties.getLlmModel(), Hashing.sha256(rawResponse == null ? "" : rawResponse),
+                Hashing.sha256(outputText == null ? "" : outputText), outputText == null ? 0 : outputText.length());
+        if (properties.isLlmDebugRawOutput()) {
+            log.warn("RTS LLM debug raw response body={}", rawResponse);
+            log.warn("RTS LLM debug raw output text={}", outputText);
+        }
     }
 
     private List<String> objectTypesForIntent(String intent) {

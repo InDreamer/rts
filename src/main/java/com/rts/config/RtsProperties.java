@@ -14,6 +14,8 @@ public class RtsProperties {
     private boolean llmStoreResponses = false;
     private String llmReasoningEffort = "low";
     private int llmMaxTokens = 600;
+    private boolean llmDebugRawOutput = false;
+    private boolean claimValidatorEnabled = true;
     private String adminCallerId = "admin";
     private String adminApiKeyHash = "";
     private int maxToolCalls = 8;
@@ -101,6 +103,22 @@ public class RtsProperties {
 
     public void setLlmMaxTokens(int llmMaxTokens) {
         this.llmMaxTokens = llmMaxTokens;
+    }
+
+    public boolean isLlmDebugRawOutput() {
+        return llmDebugRawOutput;
+    }
+
+    public void setLlmDebugRawOutput(boolean llmDebugRawOutput) {
+        this.llmDebugRawOutput = llmDebugRawOutput;
+    }
+
+    public boolean isClaimValidatorEnabled() {
+        return claimValidatorEnabled;
+    }
+
+    public void setClaimValidatorEnabled(boolean claimValidatorEnabled) {
+        this.claimValidatorEnabled = claimValidatorEnabled;
     }
 
     public String getAdminCallerId() {

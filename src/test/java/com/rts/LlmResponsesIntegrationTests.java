@@ -72,6 +72,7 @@ class LlmResponsesIntegrationTests {
         registry.add("rts.llm-wire-api", () -> "responses");
         registry.add("rts.llm-store-responses", () -> false);
         registry.add("rts.llm-reasoning-effort", () -> "low");
+        registry.add("rts.llm-debug-raw-output", () -> true);
     }
 
     @Autowired

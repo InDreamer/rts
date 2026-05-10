@@ -377,6 +377,22 @@ mvn spring-boot:run
 
 LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、permission、release、L2、trace 和 grounding validation。
 
+调试 LLM provider 时可以开启：
+
+```bash
+RTS_LLM_DEBUG_RAW_OUTPUT=true
+```
+
+开启后服务日志会写入 raw model response 和 extracted output text，只适合本地调试；不要在包含敏感业务规则或生产消息的环境开启。
+
+claim validator 默认开启：
+
+```bash
+RTS_CLAIM_VALIDATOR_ENABLED=true
+```
+
+如需临时排查模型输出和 validator 的差异，可以在本地设置 `RTS_CLAIM_VALIDATOR_ENABLED=false`。这只绕过 final claim validation，不会绕过 scope、permission、release、tool orchestration、prompt guard 或 trace。
+
 启用 LLM 时，请先确认数据外发边界。RTS 只发送受控工具上下文和必要 L2 片段给配置的模型端点，但这些内容仍可能包含业务规则语义；生产或敏感环境需要使用获批 endpoint、密钥和日志策略。
 
 ## 9. 切换 sample active release
