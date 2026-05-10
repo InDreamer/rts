@@ -229,41 +229,41 @@ AgentSession
 - REST `/ask`、query tools、agent tools、analysis、message、governance、pipeline、evaluation、metrics、feedback/memory endpoints。
 - MCP tool catalog and wrappers。
 
-这些底座说明 RTS 已经不是从零开始；truth read、tool surface、基础 harness、validator、scenario/report surface 和 trace 骨架都已经存在。
+这些底座说明 RTS 已经不是从零开始；truth read、tool surface、managed harness、validator、scenario/report surface 和 trace 骨架都已经存在。
 
-但这不等于“强 managed AI normal mode 已经成形”。当前实现更多说明 RTS 已经具备了进入 internal agent 闭环的骨架，而不是说明完整 AI 价值已经兑现。
+当前实现已经把 internal agent 闭环接成 service-owned managed AI normal mode：planner、recipe/composition executor、observe/revise/hard-stop、context snapshot、structured model draft、claim validation、scenario compiler、evaluation gate 和 trace replay 都在同一条受控链路内。这里的“normal mode”指实现路径已经成形；生产默认开启仍必须按 feature flag、evaluation threshold、受控评审和运行证据逐项放开。
 
 当前实现对齐状态：
 
-| Surface | 当前已完成 | 当前限制 / 未完成 |
+| Surface | 当前已完成 | 当前边界 / 后续增强 |
 |---|---|---|
 | `/query`、`find`、object/L2/dependency/trace | deterministic truth/information read 已是稳定原子能力面。 | 不承担 managed scenario synthesis。 |
-| `/ask` | endpoint、planner、service-owned orchestrator、tool execution、context/model draft、claim validator、answer view、trace 和 LLM run trace 已接入。 | 生产默认 `RTS_TOOL_ORCHESTRATOR_ENABLED=false`，此时 `/ask` 降级为 deterministic `/query` 风格信息服务；OpenAI-compatible adapter 当前仍主要把 grounded facts 写成可读 answer，不代表完整场景级 AI 分析已完成。 |
+| `/ask` | endpoint、planner、service-owned multi-step loop executor、tool execution、observe/revise/hard-stop trace、context/model draft、claim validator、answer view、trace 和 LLM run trace 已接入；OpenAI-compatible adapter 已要求结构化 schema draft，包含 claims、inferences、unknowns、candidates、warnings、citation intents 和 tool needs。 | 生产默认 `RTS_TOOL_ORCHESTRATOR_ENABLED=false`，此时 `/ask` 降级为 deterministic `/query` 风格信息服务；动态 revise 只由 service policy 追加 allowlisted RTS tool 证据，模型仍不能自由发起工具调用。 |
 | Tool registry / REST / MCP | catalog、permission、refusal 和 schema metadata 已统一到同一批 RTS truth tools。 | expanded MCP 默认关闭，外部 tool mode 仍受 feature flag 和 permission 限制。 |
-| Scenario endpoints | PR diff、exception、failed message、test planning、governance review endpoints 和统一 `scenario-report.v1` envelope 已存在；当前能输出 grounded candidate / information-service report、trace 和 warnings。 | 当前实现主要编排 deterministic analysis/message/governance support services；还不能宣称每个 scenario 都已进入 LLM-enhanced managed analysis normal mode。 |
-| Context / memory | `truthEligible=false` 和 validator 边界已限制 memory/external input 不能支撑 facts。 | memory/context 仍是检索和交互辅助，不是 truth source。 |
-| Evaluation / metrics | 已覆盖 scope、grounding、refusal、wrong-scope、unsupported-claim、permission leak、memory-as-truth、trace completeness 等安全风险。 | AI value metrics 已进入目标口径，但 adoption/usefulness/reviewer-time-saved 等正向指标仍需接入真实评估数据和默认开启门槛。 |
+| Scenario endpoints | PR diff、exception、failed message、test planning、governance review endpoints 和统一 `scenario-report.v1` envelope 已存在；当前核心 scenario 都已先接入 managed harness loop，形成 service-owned `AgentRun`，再编译 grounded candidate report。 | scenario 输出仍是 candidate/report surface，不是 release approval、final root cause、QA signoff 或 human decision；默认开启仍受 feature flag、permission 和 evaluation gate 控制。 |
+| Context / memory | `ContextBuilder` 已为 `AgentRun` 输出 `ContextSnapshot`，只保留 truth-eligible L2 URI/hash 指针、context hash、truthEligible count、token estimate 和 redaction state；memory/session context 仍标记 `truthEligible=false`。 | memory/context 仍是检索和交互辅助，不是 truth source；更复杂的 context compaction/retrieval ranking 还未完成。 |
+| Evaluation / metrics | 已覆盖 scope、grounding、refusal、wrong-scope、unsupported-claim、permission leak、memory-as-truth、trace completeness、first-pass usefulness 和 AI value score gates。 | 本地 golden evaluation 已具备默认开启阈值口径；真实生产默认开启仍需要受控评审接受这些指标，并继续积累 adoption/usefulness/reviewer-time-saved 等运行数据。 |
 | Runtime defaults | tool orchestrator、confusable、impact/test candidates 和 expanded MCP 生产默认关闭；Provider timeout、不可用或 malformed output 使用 `model_provider_failure` structured refusal。 | 默认关闭是安全门槛，不改变 managed AI 是 AI-centric scenario 目标正常态的产品口径。 |
 
-### What exists now vs. what is still missing
+### What Exists Now Vs. Operational Boundaries
 
 为了避免“已有骨架”和“完整目标态”被混读，这里明确区分：
 
-- **已经存在的** 是：truth read surface、统一 tool surface、基础 harness、claim validation、trace 骨架、scenario/report envelope，以及在保守默认下可运行的 `/ask` 和 scenario support 能力。
-- **尚未真正成形的** 是：更强的多步 managed analysis normal mode，也就是能稳定执行 service-owned plan/observe/revise、多步取证、context-preserving synthesis、claim-by-claim裁决，并在核心场景里明显提升 AI 首轮分析价值的那一层能力。
-- **因此当前最大缺口** 不是“再接一个模型能力”或“再补几个 endpoint”，而是把这些已有骨架真正闭合成一条更强的 managed AI capability loop。
+- **已经存在的** 是：truth read surface、统一 tool surface、managed harness、service-owned plan/observe/revise loop、claim validation、trace replay、scenario/report envelope，以及在保守默认下可运行的 `/ask` 和 scenario support 能力。
+- **当前仍需守住的边界** 是：service 可以根据 observation 动态补证据，但模型不能自由调工具；scenario 输出仍是 grounded candidate/report surface；memory/context 仍不能支撑 facts；生产默认开启需要明确评审和运行证据。
+- **因此当前主要风险** 不再是“没有 managed loop”，而是把默认开启、运行指标和人工决策边界持续管住，避免把 candidate analysis 误升级成 truth 或 signoff。
 
-### Why prior RTS LLM agent attempts often feel weak
+### Why RTS LLM agent attempts would feel weak without this closure
 
-如果只停留在当前形态，RTS 很容易看起来已经“有 LLM 了”，但实际体验仍然偏弱，原因通常不是 prompt 不够花，而是以下几类骨架没完全闭合：
+如果没有当前这次闭环，RTS 很容易看起来已经“有 LLM 了”，但实际体验仍然偏弱，原因通常不是 prompt 不够花，而是以下几类骨架没完全闭合：
 
-- AI 只能整理已有 deterministic read，不能稳定地自己在受控范围内决定下一步证据。
-- tool orchestration 还不够像真正的多步 loop，observe/revise 能力有限。
-- context compaction、citation preservation 和 claim validation 还不足以支撑更强的分析草稿。
-- scenario surface 仍偏 support/report，而不是 AI-first managed analysis normal mode。
-- 正向 AI value metrics 还没有形成默认开启依据，所以系统更容易长期停留在“安全但保守”的状态。
+- AI 如果只整理 deterministic read，会退化成 answer organizer；当前实现通过 service-owned observation policy 在依赖证据缺口出现时追加 allowlisted L2 read，并把 revise 写入 trace。
+- tool orchestration 必须继续保持 service-owned：`AgentRecipe` 定义目标证据、stop condition、compiler 和 validation rule；`ControlledLlmHarness` 执行 plan/observe/revise/hard-stop；模型提出的越界工具调用会被拒绝。
+- context compaction、citation preservation 和 claim validation 仍要作为运行门槛持续检查，尤其不能让 memory、raw diff/log 或模型草稿支撑 facts。
+- scenario surface 已接入 managed harness loop + scenario compiler，能输出 grounded candidate report；但 candidate/report surface 仍不得被解释为 release approval、root cause closure、QA signoff 或 human decision。
+- 正向 AI value metrics 已有本地 golden threshold，生产默认开启仍需要评审和运行数据闭环。
 
-这也是本文后续工作包的真正指向：不是把现有 LLM 接入再抛光，而是把 RTS internal agent 补齐成一个 AI 价值更强、但依然严格受管的正常模式。
+这也是本文工作包的真正指向：不是把现有 LLM 接入再抛光，而是把 RTS internal agent 补齐成一个 AI 价值更强、但依然严格受管的正常模式。
 
 ### Current-state authority
 
@@ -1098,27 +1098,28 @@ Runtime projection 必须继续提供：
 
 ### P0 — 先把 managed AI capability loop 立住
 
-[ ] 增加显式 `AgentSession`、`AgentRun`、`AgentStep`、`ToolInvocation`、`ToolObservation`、`ContextSnapshot`、`ValidatedClaim` runtime records。
-[ ] 将 `ControlledLlmHarness` 从固定核心工具链升级为 service-owned multi-step loop executor，支持 plan/observe/revise 和 hard stop。
-[ ] 将 `RtsToolRegistry` 升级为完整 tool contract registry，包含 side effect class、truth output type、budget cost、max result size、idempotency、feature flag、schema version。
-[ ] 增加 tool argument normalization/binding 层，统一处理 `scope`、`release_id`、`uri`、`purpose`、`dependency_depth`、`trace_id` 的权威解释和校验。
-[ ] 将 trace 升级为完整 agent step replay log，能证明每个参数如何绑定、每步为什么 allowed/refused、每条 claim 为什么 grounded/rejected。
+[x] 增加显式 `AgentSession`、`AgentRun`、`AgentStep`、`ToolInvocation`、`ToolObservation`、`ContextSnapshot`、`ValidatedClaim` runtime records。
+[x] 将 `ControlledLlmHarness` 从 bounded recipe executor 继续升级为 service-owned multi-step loop executor，支持 plan/observe/revise 和 hard stop。
+[x] 将 `RtsToolRegistry` 升级为完整 tool contract registry，包含 side effect class、truth output type、budget cost、max result size、idempotency、feature flag、schema version。
+[x] 增加 tool argument normalization/binding 层，统一处理 `scope`、`release_id`、`uri`、`purpose`、`dependency_depth`、`trace_id` 的权威解释和校验。
+[x] 将 trace 升级为完整 agent step replay log，能证明每个参数如何绑定、每步为什么 allowed/refused、每条 claim 为什么 grounded/rejected。
 
 ### P1 — 让 AI 分析质量真正上去
 
-[ ] 增加 recipe/composition executor，让 `/ask` 和 scenario endpoints 通过原子工具 recipe 组合能力，而不是各自手写第二套编排。
-[ ] 增加专门 `ContextBuilder`，输出 `ContextSnapshot`，统一管理 truthEligible、token budget、redaction、URI/hash preservation 和 prompt-injection neutralization。
-[ ] 将 OpenAI-compatible adapter 的 prompt strategy 从 answer organizer 升级为受控分析草稿生成，同时继续由 RTS validator 裁决事实。
-[ ] 将 LLM draft 改为结构化 schema output：claims、tool_needs、inferences、unknowns、candidates、warnings、citation intents。
-[ ] 增加 multi-turn clarification/session flow，让上一轮澄清和 selected object 只能作为 hint，本轮事实必须重新读取 L2/dependency/governance evidence。
+[x] 增加 recipe/composition executor，让 `/ask` 和 scenario endpoints 通过原子工具 recipe 组合能力，而不是各自手写第二套编排。
+[x] 增加专门 `ContextBuilder`，输出 `ContextSnapshot`，统一管理 truthEligible、token budget、redaction、URI/hash preservation 和 prompt-injection neutralization。
+[x] 将 OpenAI-compatible adapter 的 prompt strategy 从 answer organizer 升级为受控分析草稿生成，同时继续由 RTS validator 裁决事实。
+[x] 将 LLM draft 改为结构化 schema output：claims、tool_needs、inferences、unknowns、candidates、warnings、citation intents。
+[x] 增加 multi-turn clarification/session flow，让上一轮澄清和 selected object 只能作为 hint，本轮事实必须重新读取 L2/dependency/governance evidence。
 
 ### P2 — 让第一批 AI-centric scenario 真进入 normal mode
 
-[ ] 将第一个 AI-centric scenario 从 deterministic/candidate support surface 升级为真正由 managed harness 进行场景规划、证据选择、候选解释、unknown/next-evidence synthesis 的正常产品模式。
-[ ] 为正向 AI value metrics 接入评估数据和默认开启阈值。
-[ ] 为新增 runtime records、tool contracts、recipe executor、multi-turn clarification、context snapshot 和 agent step trace 补齐 golden tests。
-[ ] 更新 API caller guide、runbook、MCP catalog docs 和 evaluation thresholds。
-[ ] 运行 Java tests、LLM fake-provider integration tests、documentation contract validator 和 `git diff --check`。
+[x] 将第一个 AI-centric scenario 从 deterministic/candidate support surface 升级为真正由 managed harness 进行场景规划、证据选择、候选解释、unknown/next-evidence synthesis 的正常产品模式。
+[x] 将 PR diff、exception、failed message、test planning、governance review 全部接入 managed harness loop + scenario compiler，并保留 candidate/human-decision boundary。
+[x] 为正向 AI value metrics 接入评估数据和默认开启阈值。
+[x] 为新增 runtime records、tool contracts、recipe executor、multi-turn clarification、context snapshot 和 agent step trace 补齐 golden tests。
+[x] 更新 API caller guide、runbook、MCP catalog docs 和 evaluation thresholds。
+[x] 运行 Java tests、LLM fake-provider integration tests、documentation contract validator 和 `git diff --check`。
 
 这里的 `P0/P1/P2` 不是重新回到“长期阶段性 roadmap”，而是执行优先顺序：先把闭环立住，再把 AI 质量做强，最后把场景价值和默认开启门槛固定下来。
 

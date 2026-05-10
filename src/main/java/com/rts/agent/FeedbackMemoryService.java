@@ -2,6 +2,7 @@ package com.rts.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rts.config.RtsProperties;
+import com.rts.model.AgentServiceModels.AgentSession;
 import com.rts.model.AgentServiceModels.ContextItem;
 import com.rts.model.AgentServiceModels.ContextKind;
 import com.rts.model.AgentServiceModels.ContextSnapshot;
@@ -15,6 +16,7 @@ import com.rts.model.CoreModels.RefusalReason;
 import com.rts.model.CoreModels.ScopeKey;
 import com.rts.query.PermissionService;
 import com.rts.query.QueryRefusalException;
+import com.rts.store.Hashing;
 import com.rts.store.StoreContracts.ProjectionStore;
 import com.rts.store.StoreContracts.ScopeRegistry;
 import java.io.IOException;
@@ -33,6 +35,8 @@ public class FeedbackMemoryService {
     private static final List<String> ALLOWED_MEMORY_TYPES = List.of(
             "session_scope_memory",
             "workspace_default_memory",
+            "selected_object_hint",
+            "selected_object_memory",
             "user_preference_memory",
             "tool_feedback_memory",
             "retrieval_failure_memory",
@@ -127,8 +131,32 @@ public class FeedbackMemoryService {
                 .map(memory -> new ContextItem(ContextKind.memory, memory.memoryType(), false, null, null,
                         memory.key() + "=" + memory.value()))
                 .toList();
-        return new ContextSnapshot(request.sessionId(), request.callerId(), memories, items,
-                List.of("Runtime context memory is not truth-eligible and only provides scope/preference/tool feedback hints."));
+        AgentSession session = new AgentSession(request.sessionId(), request.callerId(), recentScope(memories), selectedObjectUri(memories), null, false);
+        return new ContextSnapshot(request.sessionId(), request.callerId(), session, memories, items,
+                List.of("Runtime context memory is not truth-eligible and only provides scope/preference/tool feedback hints."),
+                Hashing.sha256(String.valueOf(items)), items.size(), 0, estimateTokens(items), "memory_text_available_as_hint_not_fact");
+    }
+
+    private int estimateTokens(List<ContextItem> items) {
+        int chars = items.stream().mapToInt(item -> String.valueOf(item.text()).length()).sum();
+        return items.isEmpty() ? 0 : Math.max(1, chars / 4);
+    }
+
+    private ScopeKey recentScope(List<MemoryRecord> memories) {
+        return memories.stream()
+                .filter(memory -> memory.scope() != null)
+                .map(MemoryRecord::scope)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String selectedObjectUri(List<MemoryRecord> memories) {
+        return memories.stream()
+                .filter(memory -> "selected_object_hint".equals(memory.memoryType()) || "selected_object_memory".equals(memory.memoryType()))
+                .map(MemoryRecord::value)
+                .filter(value -> value != null && value.startsWith("rts://"))
+                .findFirst()
+                .orElse(null);
     }
 
     private boolean canReadMemory(String releaseId, MemoryRecord memory, String callerId, String apiKey) {

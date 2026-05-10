@@ -193,9 +193,15 @@ curl -s http://localhost:8080/mcp/tools | jq
 
 - 默认 `RTS_MCP_EXPANDED_TOOLS_ENABLED=false` 时，`tools` 只包含 minimal tool mode：`rts_find_objects`、`rts_read_object`、`rts_get_dependencies`、`rts_ask`、`rts_get_trace`。
 - 显式设置 `RTS_MCP_EXPANDED_TOOLS_ENABLED=true` 后，expanded catalog 才会包含并允许执行 `rts_read_object_l2`、`rts_trace_report`、`rts_analyze_pr_diff` 等扩展工具；关闭时直接调用这些 expanded endpoints 也会被拒绝。
-- `catalog`：每个工具的 purpose、required permission、required fields、possible refusal reasons。
+- `catalog`：每个工具的 purpose、required permission、required fields、possible refusal reasons、side effect class、truth output type、budget cost、max result size、idempotency、feature flag、redaction rule。
 
-MCP catalog 是 tool mode 入口说明；每个工具仍共享 REST service 的 scope、permission、release、L2 hash、trace 和 refusal gate。Catalog 元数据来自同一套 RTS tool registry，因此 MCP、REST agent tools 和内部 harness 的 tool name、purpose、permission 和 refusal 语义保持一致。
+MCP catalog 是 tool mode 入口说明；每个工具仍共享 REST service 的 scope、permission、release、L2 hash、trace 和 refusal gate。Catalog 元数据来自同一套 RTS tool registry，因此 MCP、REST agent tools 和内部 harness 的 tool name、purpose、permission、truth output type 和 refusal 语义保持一致。
+
+`truth_output_type` 是工具输出能否支撑事实 claim 的权威元数据：
+
+- `l2_fact`、`dependency`、`authorized_governance_summary` 可以作为 fact grounding 的候选证据，但仍必须通过当前 run 的 scope、release、permission、hash 和 claim validation。
+- `navigation_only`、`candidate`、`trace_metadata`、`none` 不能直接支撑 facts，只能用于导航、候选分析、审计说明或非真相上下文。
+- `validated_answer_envelope` 表示 MCP managed `/ask` 包装器返回的是 RTS service 已校验的 answer envelope；外部 agent 不能把自己的中间 tool output 升格为 RTS fact。
 
 ### 查询 photo pack
 
@@ -257,7 +263,11 @@ curl -sS http://localhost:8080/api/v1/traces/<TRACE_ID> \
   -H 'X-RTS-API-Key: tester-key' | jq
 ```
 
-预期：返回 `l2_read_uris`、`grounding_map`、`budget_usage`、`status`。
+预期：返回 `l2_read_uris`、`grounding_map`、`budget_usage`、`status`。Managed `/ask` 或 scenario trace 还应包含 `run_id` 和 `agent_run`；`agent_run` 内的 argument binding、tool invocation、observation、context snapshot、validated claim 是 replay/audit 依据。`context_snapshot` 只保留 truth-eligible L2 URI/hash 指针、context hash、truthEligible count、token estimate 和 redaction state；不要期待在 trace 里看到原始 diff/log/message 或 memory 文本作为 fact context。
+
+`agent_run.loop_transitions` 应显示 service-owned observe/revise/hard-stop 状态，例如 `l2_observed -> continue -> validate_claims` 和 `grounding_observed -> answer -> hard_stop`。这用于审计 service loop，不表示模型可以自由发起 recipe 外工具调用。
+
+`/api/v1/ask/contextual` 和 MCP `rts_contextual_ask` 允许 session scope 或 selected object 作为 hint。selected object hint 必须重新绑定 active release 和 caller permission，最终 facts 仍来自本轮 L2/dependency/governance read。
 
 ### Managed scenario smoke test
 
@@ -288,7 +298,7 @@ curl -sS -X POST http://localhost:8080/api/v1/scenario/analyze-failed-message \
   }' | jq
 ```
 
-预期：返回 `schema_version=scenario-report.v1`、`status=candidate`、`candidates`、`citations`、`grounding_map`、`trace_id`。这些字段说明当前 scenario surface 已返回 grounded candidate / information-service result；这不等于该场景已经完成 LLM-enhanced managed analysis normal mode。scenario 输出仍遵守 authority boundary，不是 release approval、final root cause、QA signoff 或 human decision。
+预期：返回 `schema_version=scenario-report.v1`、`status=candidate`、`candidates`、`citations`、`grounding_map`、`trace_id`、`run_id`。这些字段说明当前 scenario surface 已返回 grounded candidate / information-service result，并能定位到 service-owned `AgentRun`；trace 中应能看到 managed harness loop 的 tool steps、context snapshot、validated claims，以及必要时的 `decision=revise` 证据补读。scenario 输出仍遵守 authority boundary，不是 release approval、final root cause、QA signoff 或 human decision。
 
 ## 6. 常用入口
 
@@ -296,11 +306,11 @@ curl -sS -X POST http://localhost:8080/api/v1/scenario/analyze-failed-message \
 
 - `POST /api/v1/query`：确定性 truth/information 查询。
 - `POST /api/v1/ask`：受控 managed analysis 入口；默认本地 LLM disabled 时降级为结构化信息提供服务。
-- `POST /api/v1/scenario/analyze-pr-diff`：PR diff scenario surface；当前返回 grounded impact/test candidate support，目标正常态是 managed analysis。
-- `POST /api/v1/scenario/investigate-exception`：exception scenario surface；当前返回 investigation information/candidate support，目标正常态是 managed investigation。
-- `POST /api/v1/scenario/analyze-failed-message`：failed/raw message scenario surface；当前返回 grounded target information/candidate support，目标正常态是 managed analysis。
-- `POST /api/v1/scenario/plan-tests`：test planning scenario surface；当前返回 test planning candidate support，目标正常态是 managed test planning。
-- `POST /api/v1/scenario/governance-review`：governance review scenario surface；当前返回 governance candidate support，目标正常态是 managed governance review。
+- `POST /api/v1/scenario/analyze-pr-diff`：PR diff scenario surface；当前先接入 managed harness impact recipe，再编译 grounded impact/test candidate report。
+- `POST /api/v1/scenario/investigate-exception`：exception scenario surface；当前先接入 managed harness impact recipe，再编译 grounded investigation candidate report。
+- `POST /api/v1/scenario/analyze-failed-message`：failed/raw message scenario surface；当前先接入 managed harness target-message recipe，再编译 grounded target candidate report。
+- `POST /api/v1/scenario/plan-tests`：test planning scenario surface；当前先接入 managed harness test-planning recipe，再编译 grounded test candidate report。
+- `POST /api/v1/scenario/governance-review`：governance review scenario surface；当前先接入 managed harness governance/review recipe，再编译 governed review candidate report。
 - `POST /api/v1/find`：候选搜索。
 - `POST /api/v1/objects/get`：读取 object card 和 dependency summary。
 - `POST /api/v1/objects/content`：读取 L2 content。
@@ -361,6 +371,11 @@ RTS_LLM_ENABLED=false
 
 高风险候选能力的生产默认值保持关闭：`RTS_TOOL_ORCHESTRATOR_ENABLED=false`、`RTS_CONFUSABLE_CHECK_ENABLED=false`、`RTS_IMPACT_CANDIDATES_ENABLED=false`、`RTS_TEST_PLAN_CANDIDATES_ENABLED=false`、`RTS_MCP_EXPANDED_TOOLS_ENABLED=false`。只有评估通过后才逐项开启。
 
+默认开启 managed/scenario/LLM 模式前，evaluation 必须同时通过两类 gate：
+
+- safety gates：scope resolution、refusal correctness、trace completeness、top-k recall、unsupported claim count、wrong scope count。
+- AI value gates：`first_pass_usefulness` 和 `ai_value_score_min`，来源必须是 grounded facts、inferences、unknowns、candidate suggestions、next evidence 等结构化输出信号，不能用自由文本流畅度充数。
+
 如需启用 OpenAI-compatible endpoint：
 
 ```bash
@@ -375,7 +390,9 @@ JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run
 ```
 
-LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、permission、release、L2、trace 和 grounding validation。
+LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、permission、release、L2、trace 和 grounding validation。`ControlledLlmHarness` 的 plan/observe/revise/hard-stop loop 由 RTS service 拥有；模型可以产出结构化分析草稿和 tool needs，但不能直接授权新工具调用。若 service policy 判断依赖证据不足，会追加受控 L2 read 并把 revise 决策写入 `AgentRun.loop_transitions`。
+
+Responses provider 必须返回受控 JSON schema draft，字段包括 `analysis_text`、`claims`、`inferences`、`unknowns`、`candidates`、`warnings`、`citation_intents`、`tool_needs`。RTS 只把它作为分析草稿；最终 facts 仍由本次 service-owned L2/dependency/governance evidence 和 validator 裁决。
 
 调试 LLM provider 时可以开启：
 

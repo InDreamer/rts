@@ -17,6 +17,8 @@ public class MetricsService {
         long refusalCorrect = results.stream().filter(EvaluationResult::refusalCorrect).count();
         long traceComplete = results.stream().filter(result -> result.traceId() != null && !result.traceId().isBlank()).count();
         long objectFound = results.stream().filter(EvaluationResult::correctObjectFound).count();
+        long firstPassUseful = results.stream().filter(EvaluationResult::firstPassUseful).count();
+        long aiValueScore = results.stream().mapToLong(EvaluationResult::aiValueScore).sum();
         return new MetricsSnapshot(
                 correctScope,
                 total,
@@ -35,6 +37,10 @@ public class MetricsService {
                 grounded,
                 Math.max(1, objectFound),
                 traceComplete,
+                total,
+                firstPassUseful,
+                total,
+                aiValueScore,
                 total,
                 0,
                 total,

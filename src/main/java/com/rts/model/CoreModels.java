@@ -2,6 +2,7 @@ package com.rts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.rts.model.AgentServiceModels.AgentRun;
 import com.rts.model.AgentServiceModels.BudgetUsage;
 import com.rts.model.AgentServiceModels.GroundingMap;
 import com.rts.model.AgentServiceModels.ToolStepTrace;
@@ -314,6 +315,7 @@ public final class CoreModels {
             List<String> anchors,
             String requiredState,
             List<String> toolPlan,
+            String recipeVersion,
             BudgetUsage budgets,
             List<String> expectedEvidence,
             String clarificationQuestion,
@@ -334,6 +336,7 @@ public final class CoreModels {
                     plan == null || plan.anchors() == null ? List.of() : plan.anchors(),
                     plan == null ? "released" : plan.requiredState(),
                     plan == null || plan.toolPlan() == null ? List.of() : plan.toolPlan(),
+                    "managed_ask.v1",
                     budgets,
                     List.of("L2 runtime object", "content hash", "trace"),
                     plan == null ? null : plan.clarificationQuestion(),
@@ -341,6 +344,7 @@ public final class CoreModels {
                     releaseId,
                     resolvedScope == null ? null : resolvedScope.value());
         }
+
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -395,6 +399,7 @@ public final class CoreModels {
             List<String> citedObjects,
             List<DependencyEdge> dependencies,
             String traceId,
+            String runId,
             Refusal refusal,
             List<String> warnings,
             String answer,
@@ -421,7 +426,7 @@ public final class CoreModels {
                 String answer
         ) {
             this(answerType, scope, releaseId, facts, inferences, unknowns, candidateSuggestions, humanDecisions, citedObjects,
-                    dependencies, traceId, refusal, warnings, answer, "service-answer.v2",
+                    dependencies, traceId, null, refusal, warnings, answer, "service-answer.v2",
                     "Additive schema; facts remain grounded only by L2, dependency, or authorized governance evidence.",
                     "human", GroundingMap.empty(), null);
         }
@@ -444,9 +449,15 @@ public final class CoreModels {
                     null);
         }
 
+        public ServiceAnswer withRunId(String runId) {
+            return new ServiceAnswer(answerType, scope, releaseId, facts, inferences, unknowns, candidateSuggestions, humanDecisions,
+                    citedObjects, dependencies, traceId, runId, refusal, warnings, answer, schemaVersion, compatibilityNote,
+                    answerView, groundingMap, budgetUsage);
+        }
+
         public ServiceAnswer withValidation(GroundingMap groundingMap, BudgetUsage budgetUsage, String answerView, String answerText) {
             return new ServiceAnswer(answerType, scope, releaseId, facts, inferences, unknowns, candidateSuggestions, humanDecisions,
-                    citedObjects, dependencies, traceId, refusal, warnings, answerText, schemaVersion, compatibilityNote,
+                    citedObjects, dependencies, traceId, runId, refusal, warnings, answerText, schemaVersion, compatibilityNote,
                     answerView == null || answerView.isBlank() ? this.answerView : answerView,
                     groundingMap == null ? GroundingMap.empty() : groundingMap, budgetUsage);
         }
@@ -475,6 +486,8 @@ public final class CoreModels {
             List<String> l2ReadUris,
             RefusalReason refusalReason,
             String releaseId,
+            String runId,
+            AgentRun agentRun,
             long durationMs,
             Instant createdAt,
             List<String> toolCalls,
@@ -505,6 +518,8 @@ public final class CoreModels {
             private List<String> l2ReadUris = new ArrayList<>();
             private RefusalReason refusalReason = RefusalReason.none;
             private String releaseId;
+            private String runId;
+            private AgentRun agentRun;
             private long durationMs;
             private Instant createdAt = Instant.now();
             private List<String> toolCalls = new ArrayList<>();
@@ -533,6 +548,8 @@ public final class CoreModels {
             public Builder l2ReadUris(List<String> l2ReadUris) { this.l2ReadUris = safe(l2ReadUris); return this; }
             public Builder refusalReason(RefusalReason refusalReason) { this.refusalReason = refusalReason; return this; }
             public Builder releaseId(String releaseId) { this.releaseId = releaseId; return this; }
+            public Builder runId(String runId) { this.runId = runId; return this; }
+            public Builder agentRun(AgentRun agentRun) { this.agentRun = agentRun; return this; }
             public Builder durationMs(long durationMs) { this.durationMs = durationMs; return this; }
             public Builder toolCalls(List<String> toolCalls) { this.toolCalls = safe(toolCalls); return this; }
             public Builder toolSteps(List<ToolStepTrace> toolSteps) { this.toolSteps = toolSteps == null ? new ArrayList<>() : new ArrayList<>(toolSteps); return this; }
@@ -546,7 +563,7 @@ public final class CoreModels {
 
             public TraceRecord build() {
                 return new TraceRecord(traceId, callerId, entrypoint, queryText, queryTextHash, queryPlan, agentPlan, resolvedScope,
-                        candidateUris, selectedUris, l2ReadUris, refusalReason, releaseId, durationMs, createdAt, toolCalls,
+                        candidateUris, selectedUris, l2ReadUris, refusalReason, releaseId, runId, agentRun, durationMs, createdAt, toolCalls,
                         toolSteps, groundingMap, answerView, budgetUsage, scenarioInputSummary, scenarioInputHash, contextHash, status);
             }
 

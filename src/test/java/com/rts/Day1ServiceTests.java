@@ -24,6 +24,7 @@ import com.rts.agent.MessageSupportService;
 import com.rts.agent.PipelineReportService;
 import com.rts.agent.ManagedScenarioService;
 import com.rts.agent.AgentPlannerService;
+import com.rts.agent.AgentRecipeService;
 import com.rts.model.AgentServiceModels.AnswerViewRequest;
 import com.rts.llm.LlmContracts.LlmClient;
 import com.rts.llm.LlmContracts.LlmDraft;
@@ -435,6 +436,60 @@ class Day1ServiceTests {
         assertThat(answer.answerView()).isEqualTo("default");
         assertThat(Files.exists(STORE_ROOT.resolve("traces").resolve("llm-run-trace.jsonl"))).isTrue();
         assertThat(queryService.trace(answer.traceId())).isPresent();
+        var trace = queryService.trace(answer.traceId()).orElseThrow();
+        assertThat(answer.runId()).startsWith("run-");
+        assertThat(trace.runId()).isEqualTo(answer.runId());
+        assertThat(trace.agentRun()).isNotNull();
+        assertThat(trace.agentRun().runId()).isEqualTo(answer.runId());
+        assertThat(trace.agentRun().traceId()).isEqualTo(answer.traceId());
+        assertThat(trace.agentRun().recipeVersion()).isEqualTo("managed_ask.v1");
+        assertThat(trace.agentRun().featureFlagSnapshot().toolOrchestratorEnabled()).isTrue();
+        assertThat(trace.agentRun().steps()).anySatisfy(step -> {
+            assertThat(step.stepType()).isEqualTo("tool_call");
+            assertThat(step.toolName()).isEqualTo("read_object_l2");
+            assertThat(step.policyResult()).isEqualTo("allowed");
+        });
+        assertThat(trace.agentRun().loopTransitions()).anySatisfy(transition -> {
+            assertThat(transition.observeState()).isEqualTo("l2_observed");
+            assertThat(transition.decision()).isEqualTo("continue");
+            assertThat(transition.nextAction()).isEqualTo("validate_claims");
+        });
+        assertThat(trace.agentRun().loopTransitions()).anySatisfy(transition -> {
+            assertThat(transition.observeState()).isEqualTo("grounding_observed");
+            assertThat(transition.decision()).isEqualTo("answer");
+            assertThat(transition.nextAction()).isEqualTo("hard_stop");
+        });
+        assertThat(trace.agentRun().stopReason()).isEqualTo("answer_ready_grounded");
+        assertThat(trace.agentRun().toolInvocations()).anySatisfy(invocation -> {
+            assertThat(invocation.toolName()).isEqualTo("read_object_l2");
+            assertThat(invocation.inputSchema()).isEqualTo("rts.tool.read_object_l2.v1.input");
+        });
+        assertThat(trace.agentRun().toolObservations()).anySatisfy(observation -> {
+            assertThat(observation.toolName()).isEqualTo("read_object_l2");
+            assertThat(observation.outputSchema()).isEqualTo("rts.tool.read_object_l2.v1.output");
+            assertThat(observation.redactionState()).contains("hash_inputs");
+        });
+        assertThat(trace.agentRun().contextSnapshot()).isNotNull();
+        assertThat(trace.agentRun().contextSnapshot().warnings())
+                .contains("AgentRun context snapshot preserves truth-eligible L2 URI/hash pointers only; memory and external inputs remain truth-ineligible.");
+        assertThat(trace.agentRun().contextSnapshot().contextHash()).startsWith("sha256:");
+        assertThat(trace.agentRun().contextSnapshot().truthEligibleCount()).isGreaterThanOrEqualTo(1);
+        assertThat(trace.agentRun().contextSnapshot().redactionState()).isEqualTo("hash_inputs_keep_uri_and_content_hash_only");
+        assertThat(trace.agentRun().contextSnapshot().contextItems()).anySatisfy(item -> {
+            assertThat(item.kind()).isEqualTo(ContextKind.l2_fact);
+            assertThat(item.truthEligible()).isTrue();
+            assertThat(item.objectUri()).isEqualTo(TestProjectionFactory.RULE_URI);
+            assertThat(item.hash()).isEqualTo(Hashing.sha256(TestProjectionFactory.ruleContent()));
+            assertThat(item.text()).isNull();
+        });
+        assertThat(trace.agentRun().argumentBindings()).anySatisfy(binding -> {
+            assertThat(binding.toolName()).isEqualTo("read_object_l2");
+            assertThat(binding.boundReleaseId()).isEqualTo(TestProjectionFactory.RELEASE);
+            assertThat(binding.boundScope()).isEqualTo(stella);
+            assertThat(binding.callerId()).isEqualTo("tester");
+            assertThat(binding.policyResult()).isEqualTo("allowed");
+        });
+        assertThat(trace.agentRun().validatedClaims()).isNotEmpty();
         assertThat(queryService.trace(answer.traceId()).orElseThrow().toolSteps()).isNotEmpty();
         assertThat(queryService.trace(answer.traceId()).orElseThrow().toolSteps()).anySatisfy(step -> {
             assertThat(step.toolName()).isEqualTo("read_object_l2");
@@ -448,6 +503,37 @@ class Day1ServiceTests {
         assertThat(queryService.trace(answer.traceId()).orElseThrow().agentPlan()).isNotNull();
         assertThat(queryService.trace(answer.traceId()).orElseThrow().queryTextHash()).isNotBlank();
         assertThat(queryService.trace(answer.traceId()).orElseThrow().contextHash()).isNotBlank();
+        assertThat(queryService.trace(answer.traceId()).orElseThrow().groundingMap().claims())
+                .containsExactlyElementsOf(answer.groundingMap().claims());
+    }
+
+    @Test
+    void controlledLlmHarnessUsesRecipeIntentForReverseImpactDependencies(@Autowired com.rts.llm.ControlledLlmHarness harness) {
+        var answer = harness.ask(new AskRequest("impact lookup_currency", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6));
+
+        assertThat(answer.answerType()).isEqualTo(AnswerType.answer);
+        var trace = queryService.trace(answer.traceId()).orElseThrow();
+        assertThat(trace.agentPlan().recipeVersion()).isEqualTo("managed_ask.impact_preview.v1");
+        assertThat(trace.agentRun().recipeVersion()).isEqualTo("managed_ask.impact_preview.v1");
+        assertThat(trace.toolSteps()).anySatisfy(step -> {
+            assertThat(step.toolName()).isEqualTo("get_dependencies");
+            assertThat(step.selectedUris()).contains(TestProjectionFactory.RULE_URI);
+        });
+        assertThat(trace.toolSteps()).anySatisfy(step -> {
+            assertThat(step.toolName()).isEqualTo("read_object_l2");
+            assertThat(step.selectedUris()).contains(TestProjectionFactory.RULE_URI);
+            assertThat(step.policyResult()).isEqualTo("allowed:revise_dependency_l2");
+        });
+        assertThat(trace.l2ReadUris()).contains(TestProjectionFactory.LOOKUP_URI, TestProjectionFactory.RULE_URI);
+        assertThat(trace.agentRun().loopTransitions()).anySatisfy(transition -> {
+            assertThat(transition.observeState()).isEqualTo("dependency_gap_observed");
+            assertThat(transition.decision()).isEqualTo("revise");
+            assertThat(transition.nextAction()).isEqualTo("read_object_l2");
+        });
+        assertThat(trace.agentRun().contextSnapshot().contextItems()).anySatisfy(item -> {
+            assertThat(item.objectUri()).isEqualTo(TestProjectionFactory.RULE_URI);
+            assertThat(item.truthEligible()).isTrue();
+        });
     }
 
     @Test
@@ -478,13 +564,26 @@ class Day1ServiceTests {
     }
 
     @Test
-    void agentPlannerRecordsReleaseAndScopeSnapshotsWithoutBusinessFacts() {
+    void agentPlannerRecordsReleaseScopeAndRecipeSnapshotsWithoutBusinessFacts(@Autowired AgentRecipeService recipeService) {
         var plan = agentPlannerService.plan("payment amount target field", "tester", stella, "default", "ask");
         assertThat(plan.intent()).isEqualTo("rule_lookup");
         assertThat(plan.releaseId()).isEqualTo(TestProjectionFactory.RELEASE);
         assertThat(plan.scopeSnapshot()).isEqualTo(stella.value());
+        assertThat(plan.recipeVersion()).isEqualTo("managed_ask.v1");
         assertThat(plan.toolPlan()).contains("resolve_scope", "find_objects", "read_object_l2");
         assertThat(plan.expectedEvidence()).contains("L2 runtime object", "content hash", "trace");
+
+        var impact = agentPlannerService.plan("impact payment amount", "tester", stella, "default", "ask");
+        assertThat(impact.recipeVersion()).isEqualTo("managed_ask.impact_preview.v1");
+        var recipe = recipeService.recipeFor(impact);
+        assertThat(recipe.toolSequence()).containsExactly("resolve_scope", "find_objects", "get_object_card", "read_object_l2", "get_dependencies");
+        assertThat(recipe.stopCondition()).isEqualTo("service_owned_observe_revise_until_required_evidence_or_budget");
+        assertThat(recipe.requiredEvidence()).contains("dependency L2 runtime object");
+        assertThat(recipe.validationRule()).isEqualTo("claim_level_l2_hash_grounding");
+        assertThat(recipeService.scenarioManagedQuery("failed_message_analysis", "src.amount=1", null))
+                .startsWith("target message ");
+        assertThat(recipeService.scenarioManagedQuery("governance_review", "ignored", TestProjectionFactory.RULE_URI))
+                .isEqualTo("review " + TestProjectionFactory.RULE_URI);
 
         var unclear = agentPlannerService.plan("payment amount target field", "tester", null, "default", "ask");
         assertThat(unclear.clarificationQuestion()).isNotBlank();
@@ -528,7 +627,7 @@ class Day1ServiceTests {
         var answer = harness.ask(new AskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6));
         assertThat(answer.answerType()).isEqualTo(AnswerType.refusal);
         assertThat(answer.refusal().reason()).isEqualTo(RefusalReason.unsupported_claim);
-        assertThat(answer.refusal().whatIsMissing()).contains("service orchestrator executes the plan");
+        assertThat(answer.refusal().whatIsMissing()).contains("service recipe executor executes the plan");
     }
 
     @Test
@@ -549,7 +648,8 @@ class Day1ServiceTests {
         RtsProperties managedProperties = new RtsProperties();
         managedProperties.setToolOrchestratorEnabled(true);
         ControlledLlmHarness harness = new ControlledLlmHarness(queryService, scopeDrift, new FinalAnswerValidator(new PromptPolicyGuard()),
-                new PromptPolicyGuard(), noOpTraceStore(), managedProperties, new com.rts.agent.RtsToolRegistry(), planner, store);
+                new PromptPolicyGuard(), noOpTraceStore(), managedProperties, new com.rts.agent.RtsToolRegistry(), planner, store,
+                new AgentRecipeService());
         var answer = harness.ask(new AskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6));
         assertThat(answer.answerType()).isEqualTo(AnswerType.refusal);
         assertThat(answer.refusal().reason()).isEqualTo(RefusalReason.unauthorized_scope);
@@ -800,6 +900,19 @@ class Day1ServiceTests {
     }
 
     @Test
+    void runtimeToolArgumentsCannotSelfAuthorizeReleaseOrDependencyDepth() {
+        assertThatThrownBy(() -> queryService.readContent(new ObjectContentRequest(TestProjectionFactory.RULE_URI, "answer",
+                "rel-not-active", null, "tester", TestProjectionFactory.TESTER_KEY)))
+                .isInstanceOf(QueryRefusalException.class)
+                .hasMessageContaining("active release");
+
+        assertThatThrownBy(() -> queryService.dependencies(new DependenciesRequest(TestProjectionFactory.RULE_URI, Direction.forward,
+                null, properties.getMaxDependencyDepth() + 1, "answer", null, "tester", TestProjectionFactory.TESTER_KEY)))
+                .isInstanceOf(QueryRefusalException.class)
+                .hasMessageContaining("Dependency depth exceeds RTS tool budget");
+    }
+
+    @Test
     void apiExceptionHandlerReturnsStructuredRefusal() {
         var response = new ApiExceptionHandler().queryRefusal(new QueryRefusalException(RefusalReason.unauthorized_scope, "blocked"));
         assertThat(response.getStatusCode().value()).isEqualTo(403);
@@ -816,11 +929,22 @@ class Day1ServiceTests {
             throw new RuntimeException(ex);
         }
         AtomicReference<String> requestBody = new AtomicReference<>();
-        server.createContext("/responses", exchange -> {
+        server.createContext("/", exchange -> {
+            assertThat(exchange.getRequestURI().getPath()).isEqualTo("/responses");
             requestBody.set(new String(exchange.getRequestBody().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8));
-            byte[] body = ("{\"id\":\"resp_test\",\"object\":\"response\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\""
-                    + TestProjectionFactory.ruleContent().replace("\"", "\\\"")
-                    + " rts://tradition/stella/payments/day1/rules/rule_amount trace-llm-grounded. Unsupported new business claim.\"}]}]}").getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            ObjectMapper mapper = new ObjectMapper();
+            String draftJson = mapper.writeValueAsString(java.util.Map.of(
+                    "analysis_text", TestProjectionFactory.ruleContent() + " rts://tradition/stella/payments/day1/rules/rule_amount trace-llm-grounded. Unsupported new business claim.",
+                    "claims", java.util.List.of("Unsupported new business claim."),
+                    "inferences", java.util.List.of("Draft inference remains candidate material."),
+                    "unknowns", java.util.List.of(),
+                    "candidates", java.util.List.of(),
+                    "warnings", java.util.List.of("Draft claims are not final truth authority."),
+                    "citation_intents", java.util.List.of(TestProjectionFactory.RULE_URI),
+                    "tool_needs", java.util.List.of()));
+            byte[] body = ("{\"id\":\"resp_test\",\"object\":\"response\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":"
+                    + mapper.writeValueAsString(draftJson)
+                    + "}]}]}").getBytes(java.nio.charset.StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(200, body.length);
             exchange.getResponseBody().write(body);
             exchange.close();
@@ -849,12 +973,15 @@ class Day1ServiceTests {
             });
             assertThat(draft.groundedAnswer().answer()).contains(TestProjectionFactory.RULE_URI);
             assertThat(draft.groundedAnswer().answer()).contains("Unsupported new business claim");
+            assertThat(draft.groundedAnswer().facts()).noneMatch(fact -> fact.text().contains("Unsupported new business claim"));
             assertThat(draft.toolCalls()).contains("responses");
             assertThat(requestBody.get()).contains("\"model\":\"dummy\"");
             assertThat(requestBody.get()).contains("\"store\":false");
             assertThat(requestBody.get()).contains("\"max_output_tokens\":600");
             assertThat(requestBody.get()).contains("\"reasoning\":{\"effort\":\"xhigh\"}");
             assertThat(requestBody.get()).contains("Grounded RTS service result");
+            assertThat(requestBody.get()).contains("\"type\":\"json_schema\"");
+            assertThat(requestBody.get()).contains("analysis_text");
         } finally {
             server.stop(0);
         }
@@ -972,11 +1099,24 @@ class Day1ServiceTests {
         assertThat(pr.citations()).extracting("objectUri").contains(TestProjectionFactory.RULE_URI);
         assertThat(pr.citations()).extracting("contentHash").contains(Hashing.sha256(TestProjectionFactory.ruleContent()));
         assertThat(pr.traceId()).startsWith("trace-");
+        assertThat(pr.runId()).startsWith("run-");
         assertThat(queryService.trace(pr.traceId())).isPresent();
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().runId()).isEqualTo(pr.runId());
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().agentRun()).isNotNull();
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().entrypoint()).isEqualTo("pr_diff_impact");
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().agentRun().entrypoint()).isEqualTo("ask");
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().agentRun().recipeVersion()).isEqualTo("managed_ask.impact_preview.v1");
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().agentRun().steps()).anySatisfy(step -> {
+            assertThat(step.stepType()).isEqualTo("tool_call");
+            assertThat(step.toolName()).isEqualTo("read_object_l2");
+        });
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().agentRun().validatedClaims()).isNotEmpty();
         assertThat(queryService.trace(pr.traceId()).orElseThrow().queryText()).isEqualTo("[redacted external input]");
         assertThat(queryService.trace(pr.traceId()).orElseThrow().scenarioInputSummary()).contains("diff changes");
         assertThat(queryService.trace(pr.traceId()).orElseThrow().scenarioInputHash()).isNotBlank();
-        assertThat(queryService.trace(pr.traceId()).orElseThrow().toolCalls()).contains("find_seed", "get_reverse_dependencies", "extract_diff_anchors", "analyze_impact");
+        assertThat(queryService.trace(pr.traceId()).orElseThrow().toolCalls())
+                .contains("resolve_scope", "find_objects", "read_object_l2", "get_dependencies",
+                        "extract_diff_anchors", "analyze_impact", "check_grounding");
         assertThat(queryService.trace(pr.traceId()).orElseThrow().l2ReadUris()).contains(TestProjectionFactory.RULE_URI);
         assertThat(agentAnalysisService.checkGrounding(pr.traceId(), "tester", TestProjectionFactory.TESTER_KEY, "default")
                 .groundingMap().claims()).isNotEmpty();
@@ -987,6 +1127,8 @@ class Day1ServiceTests {
         assertThat(exception.scenarioType()).isEqualTo("exception_investigation");
         assertThat(exception.unknowns()).contains("External stack trace, log text, and failure location are not truth sources.");
         assertThat(exception.citations()).extracting("objectUri").contains(TestProjectionFactory.RULE_URI);
+        assertThat(exception.runId()).startsWith("run-");
+        assertThat(queryService.trace(exception.traceId()).orElseThrow().agentRun()).isNotNull();
 
         ScenarioReport failed = managedScenarioService.analyzeFailedMessage(new ManagedScenarioRequest("failed_message_analysis",
                 "src.amount=123.45\nsrc.currency=USD", stella, "tester", TestProjectionFactory.TESTER_KEY, "default", 5));
@@ -994,18 +1136,24 @@ class Day1ServiceTests {
         assertThat(failed.candidates()).anyMatch(value -> value.contains("payment.amount"));
         assertThat(failed.facts()).allMatch(fact -> fact.source().startsWith("l2:"));
         assertThat(failed.groundingMap().claims()).isNotEmpty();
+        assertThat(failed.runId()).startsWith("run-");
+        assertThat(queryService.trace(failed.traceId()).orElseThrow().agentRun()).isNotNull();
 
         ScenarioReport tests = managedScenarioService.planTests(new ManagedScenarioRequest("test_planning",
                 TestProjectionFactory.RULE_URI, stella, "tester", TestProjectionFactory.TESTER_KEY, "default", 5));
         assertThat(tests.scenarioType()).isEqualTo("test_planning");
         assertThat(tests.candidates()).anyMatch(value -> value.contains("Positive candidate"));
         assertThat(tests.warnings()).contains("Scenario output is a grounded candidate report, not release approval, final root cause, QA signoff, or human decision.");
+        assertThat(tests.runId()).startsWith("run-");
+        assertThat(queryService.trace(tests.traceId()).orElseThrow().agentRun()).isNotNull();
 
         ScenarioReport governance = managedScenarioService.reviewGovernance(new ManagedScenarioRequest("governance_review",
                 TestProjectionFactory.RULE_URI, stella, "tester", TestProjectionFactory.TESTER_KEY, "default", 5));
         assertThat(governance.scenarioType()).isEqualTo("governance_review");
         assertThat(governance.candidates()).anyMatch(value -> value.contains("options="));
         assertThat(governance.inferences()).contains("Governance review output is candidate material and cannot mutate runtime truth.");
+        assertThat(governance.runId()).startsWith("run-");
+        assertThat(queryService.trace(governance.traceId()).orElseThrow().agentRun()).isNotNull();
     }
 
     @Test
@@ -1096,15 +1244,44 @@ class Day1ServiceTests {
     void contextualAskCanUseSessionScopeMemoryWithoutMakingMemoryTruth() {
         feedbackMemoryService.writeMemory(new MemoryWriteRequest("session-ctx", "session_scope_memory", "last_scope",
                 stella.value(), stella, "tester", TestProjectionFactory.TESTER_KEY));
+        feedbackMemoryService.writeMemory(new MemoryWriteRequest("session-ctx", "selected_object_hint", "last_object",
+                TestProjectionFactory.RULE_URI, stella, "tester", TestProjectionFactory.TESTER_KEY));
         var context = feedbackMemoryService.loadContext(new ContextSnapshotRequest("session-ctx", stella, "tester", TestProjectionFactory.TESTER_KEY));
+        assertThat(context.agentSession()).isNotNull();
+        assertThat(context.agentSession().truthEligible()).isFalse();
+        assertThat(context.agentSession().recentScope()).isEqualTo(stella);
+        assertThat(context.agentSession().selectedObjectUri()).isEqualTo(TestProjectionFactory.RULE_URI);
         assertThat(context.contextItems()).allMatch(item -> !item.truthEligible());
         assertThat(context.warnings()).contains("Runtime context memory is not truth-eligible and only provides scope/preference/tool feedback hints.");
+        assertThat(context.truthEligibleCount()).isZero();
+        assertThat(context.redactionState()).isEqualTo("memory_text_available_as_hint_not_fact");
 
         var answer = contextualAskService.ask(new ContextualAskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY,
                 null, "default", 6, "session-ctx", null));
         assertThat(answer.answerType()).isEqualTo(AnswerType.answer);
         assertThat(answer.citedObjects()).contains(TestProjectionFactory.RULE_URI);
         assertThat(answer.facts()).allMatch(fact -> fact.source().startsWith("l2:"));
+        assertThat(queryService.trace(answer.traceId()).orElseThrow().l2ReadUris()).contains(TestProjectionFactory.RULE_URI);
+        assertThat(queryService.trace(answer.traceId()).orElseThrow().agentRun().runId()).isEqualTo(answer.runId());
+    }
+
+    @Test
+    void contextualAskCanUseSelectedObjectHintForScopeButRereadsCurrentL2() {
+        feedbackMemoryService.writeMemory(new MemoryWriteRequest("session-selected", "selected_object_hint", "last_object",
+                TestProjectionFactory.RULE_URI, stella, "tester", TestProjectionFactory.TESTER_KEY));
+
+        var answer = contextualAskService.ask(new ContextualAskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY,
+                null, "default", 6, "session-selected", null));
+
+        assertThat(answer.answerType()).isEqualTo(AnswerType.answer);
+        assertThat(answer.scope()).isEqualTo(stella);
+        assertThat(answer.facts()).allMatch(fact -> fact.source().startsWith("l2:"));
+        assertThat(queryService.trace(answer.traceId()).orElseThrow().l2ReadUris()).contains(TestProjectionFactory.RULE_URI);
+        assertThat(queryService.trace(answer.traceId()).orElseThrow().agentRun().contextSnapshot().contextItems()).anySatisfy(item -> {
+            assertThat(item.objectUri()).isEqualTo(TestProjectionFactory.RULE_URI);
+            assertThat(item.truthEligible()).isTrue();
+            assertThat(item.text()).isNull();
+        });
     }
 
     @Test
@@ -1161,7 +1338,12 @@ class Day1ServiceTests {
             assertThat(entry.possibleRefusalReasons()).contains(RefusalReason.unauthorized_scope, RefusalReason.unsupported_claim);
             assertThat(entry.inputSchema()).isEqualTo("rts.mcp.rts_analyze_pr_diff.v1.input");
             assertThat(entry.outputSchema()).isEqualTo("rts.mcp.rts_analyze_pr_diff.v1.output");
+            assertThat(entry.sideEffectClass()).isEqualTo("read_only");
+            assertThat(entry.truthOutputType()).isEqualTo("candidate");
             assertThat(entry.budgetCost()).isGreaterThan(0);
+            assertThat(entry.maxResultSize()).isGreaterThan(0);
+            assertThat(entry.idempotency()).isEqualTo("idempotent_read");
+            assertThat(entry.featureFlag()).isEqualTo("mcp_expanded_tools_enabled");
             assertThat(entry.allowedIntents()).contains("pr_diff_impact");
             assertThat(entry.traceRedactionRule()).contains("hash_inputs");
         });
@@ -1170,10 +1352,13 @@ class Day1ServiceTests {
             assertThat(entry.requiredPermission()).isEqualTo("query");
             assertThat(entry.purpose()).contains("Managed RTS /ask wrapper");
             assertThat(entry.inputSchema()).isEqualTo("rts.mcp.rts_ask.v1.input");
+            assertThat(entry.truthOutputType()).isEqualTo("validated_answer_envelope");
         });
         assertThat(catalog).anySatisfy(entry -> {
             assertThat(entry.name()).isEqualTo("rts_write_context_memory");
             assertThat(entry.requiredPermission()).isEqualTo("feedback_tools");
+            assertThat(entry.sideEffectClass()).isEqualTo("candidate_write");
+            assertThat(entry.truthOutputType()).isEqualTo("none");
             assertThat(entry.allowedIntents()).contains("context_memory");
             assertThat(entry.traceRedactionRule()).contains("memory");
         });
@@ -1218,6 +1403,23 @@ class Day1ServiceTests {
         assertThat(catalog).anySatisfy(entry -> {
             assertThat(entry.name()).isEqualTo("read_object_l2");
             assertThat(entry.requiredPermission()).isEqualTo("objects_content");
+            assertThat(entry.sideEffectClass()).isEqualTo("read_only");
+            assertThat(entry.truthOutputType()).isEqualTo("l2_fact");
+            assertThat(entry.maxResultSize()).isEqualTo(1);
+            assertThat(entry.idempotency()).isEqualTo("idempotent_read");
+            assertThat(entry.featureFlag()).isEqualTo("always_available");
+        });
+        assertThat(catalog).anySatisfy(entry -> {
+            assertThat(entry.name()).isEqualTo("find_objects");
+            assertThat(entry.truthOutputType()).isEqualTo("navigation_only");
+        });
+        assertThat(catalog).anySatisfy(entry -> {
+            assertThat(entry.name()).isEqualTo("get_dependencies");
+            assertThat(entry.truthOutputType()).isEqualTo("dependency");
+        });
+        assertThat(catalog).anySatisfy(entry -> {
+            assertThat(entry.name()).isEqualTo("read_evidence_summary");
+            assertThat(entry.truthOutputType()).isEqualTo("authorized_governance_summary");
         });
     }
 
@@ -1232,6 +1434,7 @@ class Day1ServiceTests {
         assertThat(run.correctObjectFoundCount()).isGreaterThanOrEqualTo(1);
         assertThat(run.refusalCorrectCount()).isEqualTo(2);
         assertThat(run.unsupportedClaimCount()).isZero();
+        assertThat(run.thresholds()).containsEntry("ai_value_score_min", 1.0);
         assertThat(run.passed()).isTrue();
         assertThat(run.thresholds()).containsEntry("scope_resolution_accuracy", 1.0);
         assertThat(run.gateFailures()).isEmpty();
@@ -1242,6 +1445,7 @@ class Day1ServiceTests {
         assertThat(metrics.traceCompletenessNumerator()).isEqualTo(run.totalCases());
         assertThat(metrics.topKRecallNumerator()).isGreaterThanOrEqualTo(1);
         assertThat(metrics.unsupportedClaimRateNumerator()).isZero();
+        assertThat(metrics.aiValueScoreDenominator()).isEqualTo(run.totalCases());
         assertThat(metrics.memoryAsTruthCount()).isZero();
         assertThat(metrics.permissionLeakCount()).isZero();
     }
@@ -1254,6 +1458,8 @@ class Day1ServiceTests {
                 new EvaluationCase("managed-2", "payment amount", null, java.util.List.of(), RefusalReason.scope_unclear,
                         "managed ask refusal", "tester", TestProjectionFactory.TESTER_KEY)));
         assertThat(managedRun.passed()).isTrue();
+        assertThat(managedRun.aiValueScoreTotal()).isGreaterThanOrEqualTo(managedRun.totalCases());
+        assertThat(managedRun.firstPassUsefulCount()).isEqualTo(managedRun.totalCases());
         assertThat(managedRun.results()).allSatisfy(result -> assertThat(result.mode()).isEqualTo("managed_ask"));
         assertThat(managedRun.results()).allSatisfy(result -> assertThat(result.traceId()).startsWith("trace-"));
 
@@ -1262,12 +1468,14 @@ class Day1ServiceTests {
                         java.util.List.of(TestProjectionFactory.RULE_URI), null,
                         "scenario grounded candidate", "tester", TestProjectionFactory.TESTER_KEY)));
         assertThat(scenarioRun.passed()).isTrue();
+        assertThat(scenarioRun.aiValueScoreTotal()).isGreaterThan(0);
+        assertThat(scenarioRun.firstPassUsefulCount()).isEqualTo(1);
         assertThat(scenarioRun.correctObjectFoundCount()).isEqualTo(1);
         assertThat(scenarioRun.results()).allSatisfy(result -> assertThat(result.mode()).isEqualTo("scenario_pr_diff"));
     }
 
     @Test
-    void pipelineAndTraceReportsAreMachineReadableButNotReleaseGates() {
+    void pipelineAndTraceReportsAreMachineReadableButNotReleaseGates(@Autowired com.rts.llm.ControlledLlmHarness harness) {
         var readiness = pipelineReportService.releaseReadiness(new ReleaseReadinessRequest(stella, "tester", TestProjectionFactory.TESTER_KEY, "pipeline"));
         assertThat(readiness.machineResult()).containsEntry("blocking_issues_count", 0);
         assertThat(readiness.status()).isEqualTo("ready_for_runtime_projection");
@@ -1279,6 +1487,13 @@ class Day1ServiceTests {
         assertThat(report.budgetUsage().maxModelCalls()).isGreaterThan(0);
         assertThat(report.budgetUsage().maxLatencyMs()).isGreaterThan(0);
         assertThat(report.warnings()).contains("Trace report is audit/reporting output, not a release gate.");
+
+        var managed = harness.ask(new AskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6));
+        var managedReport = pipelineReportService.traceReport(managed.traceId(), "tester", TestProjectionFactory.TESTER_KEY);
+        assertThat(managedReport.runId()).isEqualTo(managed.runId());
+        assertThat(managedReport.agentRun()).isNotNull();
+        assertThat(managedReport.agentRun().toolInvocations()).isNotEmpty();
+        assertThat(managedReport.agentRun().validatedClaims()).isNotEmpty();
     }
 
     @Test

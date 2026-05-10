@@ -2,6 +2,8 @@ package com.rts.llm;
 
 import com.rts.config.RtsProperties;
 import com.rts.agent.AgentPlannerService;
+import com.rts.agent.AgentRecipeService.AgentRecipe;
+import com.rts.agent.AgentRecipeService;
 import com.rts.agent.RtsToolRegistry;
 import com.rts.llm.LlmContracts.LlmClient;
 import com.rts.llm.LlmContracts.LlmDraft;
@@ -39,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,16 +57,17 @@ public class ControlledLlmHarness {
     private final RtsToolRegistry toolRegistry;
     private final AgentPlannerService agentPlannerService;
     private final ProjectionStore projectionStore;
+    private final AgentRecipeService agentRecipeService;
 
     public ControlledLlmHarness(QueryService queryService, LlmClient llmClient, FinalAnswerValidator finalAnswerValidator,
             PromptPolicyGuard promptPolicyGuard, TraceStore traceStore, RtsProperties properties) {
-        this(queryService, llmClient, finalAnswerValidator, promptPolicyGuard, traceStore, properties, new RtsToolRegistry(), null, null);
+        this(queryService, llmClient, finalAnswerValidator, promptPolicyGuard, traceStore, properties, new RtsToolRegistry(), null, null, new AgentRecipeService());
     }
 
     @Autowired
     public ControlledLlmHarness(QueryService queryService, LlmClient llmClient, FinalAnswerValidator finalAnswerValidator,
             PromptPolicyGuard promptPolicyGuard, TraceStore traceStore, RtsProperties properties, RtsToolRegistry toolRegistry,
-            AgentPlannerService agentPlannerService, ProjectionStore projectionStore) {
+            AgentPlannerService agentPlannerService, ProjectionStore projectionStore, AgentRecipeService agentRecipeService) {
         this.queryService = queryService;
         this.llmClient = llmClient;
         this.finalAnswerValidator = finalAnswerValidator;
@@ -73,6 +77,7 @@ public class ControlledLlmHarness {
         this.toolRegistry = toolRegistry;
         this.agentPlannerService = agentPlannerService;
         this.projectionStore = projectionStore;
+        this.agentRecipeService = agentRecipeService;
     }
 
     public ServiceAnswer ask(AskRequest request) {
@@ -82,6 +87,7 @@ public class ControlledLlmHarness {
         Instant start = Instant.now();
         GuardedToolContext tools = new GuardedToolContext(request.maxToolCalls() == null ? properties.getMaxToolCalls() : request.maxToolCalls());
         String traceId = queryService.newTraceId();
+        String runId = newRunId();
         LlmDraft draft;
         AgentPlan agentPlan = null;
         try {
@@ -94,17 +100,17 @@ public class ControlledLlmHarness {
                 throw new QueryRefusalException(RefusalReason.scope_unclear, agentPlan.clarificationQuestion());
             }
             tools.bindPlan(agentPlan);
-            tools.executePlanned(request);
+            tools.executeRecipe(request, agentRecipeService.recipeFor(agentPlan));
             try {
                 draft = llmClient.draftAnswer(request, tools);
             } catch (QueryRefusalException ex) {
                 throw ex;
             } catch (RuntimeException ex) {
-                return providerFailure(start, traceId, request, agentPlan, tools, ex);
+                return providerFailure(start, traceId, runId, request, agentPlan, tools, ex);
             }
             enforceLatencyBudget(start);
         } catch (QueryRefusalException ex) {
-            queryService.appendTrace(start, traceId, "ask", request.callerId(), request.query(), null,
+            queryService.appendTrace(start, traceId, runId, "ask", request.callerId(), request.query(), null,
                     agentPlan, request.scopeHint(), null, List.of(), List.copyOf(tools.l2ReadUris), List.copyOf(tools.l2ReadUris),
                     ex.reason(), tools.calls, tools.toolSteps(), request.outputMode(), null, null);
             BudgetUsage budgetUsage = budgetUsage(start, tools);
@@ -113,7 +119,7 @@ public class ControlledLlmHarness {
             traceStore.appendLlmRunTrace(new LlmRunTrace("llm-" + UUID.randomUUID(), traceId, properties.getLlmModel(), "day1-controlled-v1",
                     List.copyOf(tools.calls), Hashing.sha256("refusal"), Hashing.sha256(ex.getMessage()), "invalid:" + ex.reason(),
                     Duration.between(start, Instant.now()).toMillis(), Instant.now()));
-            return refusal.withValidation(GroundingMap.empty(), budgetUsage, request.outputMode(), null);
+            return refusal.withRunId(runId).withValidation(GroundingMap.empty(), budgetUsage, request.outputMode(), null);
         }
         ServiceAnswer grounded = withTraceId(draft.groundedAnswer(), traceId);
         try {
@@ -141,20 +147,21 @@ public class ControlledLlmHarness {
                 promptPolicyGuard.validateGeneratedAnswer(finalAnswerText);
             }
             enforceLatencyBudget(start);
-            queryService.appendTrace(start, traceId, "ask", request.callerId(), request.query(), null,
+            queryService.appendTrace(start, traceId, runId, "ask", request.callerId(), request.query(), null,
                     agentPlan, grounded.scope(), grounded.releaseId(), grounded.citedObjects(), grounded.citedObjects(), tools.l2ReadUris,
                     grounded.refusal() == null ? RefusalReason.none : grounded.refusal().reason(), draft.toolCalls(), tools.toolSteps(),
-                    request.outputMode(), null, null);
+                    request.outputMode(), null, null, groundingMap);
             appendLlmTrace(start, grounded.traceId(), draft, "valid");
-            return candidate.withValidation(groundingMap, budgetUsage(start, tools), request.outputMode(), finalAnswerText);
+            return candidate.withRunId(runId).withValidation(groundingMap, budgetUsage(start, tools), request.outputMode(), finalAnswerText);
         } catch (QueryRefusalException ex) {
-            queryService.appendTrace(start, traceId, "ask", request.callerId(), request.query(), null,
+            queryService.appendTrace(start, traceId, runId, "ask", request.callerId(), request.query(), null,
                     agentPlan, grounded.scope(), grounded.releaseId(), List.of(), List.of(), List.of(), ex.reason(), draft.toolCalls(),
                     tools.toolSteps(), request.outputMode(), null, null);
             appendLlmTrace(start, grounded.traceId(), draft, "invalid:" + ex.reason());
             return new ServiceAnswer(AnswerType.refusal, grounded.scope(), grounded.releaseId(), List.of(), List.of(),
                     List.of(ex.getMessage()), List.of(), List.of(), List.of(), List.of(), grounded.traceId(),
                     new Refusal(ex.reason(), ex.getMessage(), List.of(), false), List.of(), null)
+                    .withRunId(runId)
                     .withValidation(GroundingMap.empty(), budgetUsage(start, tools), request.outputMode(), null);
         }
     }
@@ -176,14 +183,14 @@ public class ControlledLlmHarness {
         warnings.add("Managed tool orchestrator is disabled; returned deterministic query fallback.");
         return new ServiceAnswer(answer.answerType(), answer.scope(), answer.releaseId(), answer.facts(), answer.inferences(),
                 answer.unknowns(), answer.candidateSuggestions(), answer.humanDecisions(), answer.citedObjects(),
-                answer.dependencies(), answer.traceId(), answer.refusal(), List.copyOf(warnings), answer.answer(),
+                answer.dependencies(), answer.traceId(), answer.runId(), answer.refusal(), List.copyOf(warnings), answer.answer(),
                 answer.schemaVersion(), answer.compatibilityNote(), answer.answerView(), answer.groundingMap(), answer.budgetUsage());
     }
 
-    private ServiceAnswer providerFailure(Instant start, String traceId, AskRequest request, AgentPlan agentPlan,
+    private ServiceAnswer providerFailure(Instant start, String traceId, String runId, AskRequest request, AgentPlan agentPlan,
             GuardedToolContext tools, RuntimeException ex) {
         RefusalReason reason = RefusalReason.model_provider_failure;
-        queryService.appendTrace(start, traceId, "ask", request.callerId(), request.query(), null,
+        queryService.appendTrace(start, traceId, runId, "ask", request.callerId(), request.query(), null,
                 agentPlan, request.scopeHint(), null, List.of(), List.copyOf(tools.l2ReadUris), List.copyOf(tools.l2ReadUris),
                 reason, tools.calls, tools.toolSteps(), request.outputMode(), null, null);
         BudgetUsage budgetUsage = budgetUsage(start, tools);
@@ -195,6 +202,7 @@ public class ControlledLlmHarness {
                 List.of(), List.of(), List.of(), List.of(), traceId,
                 new Refusal(reason, message, List.of("retry later", "use /api/v1/query for deterministic truth read"), false),
                 List.of("Provider error was converted to structured refusal."), null)
+                .withRunId(runId)
                 .withValidation(GroundingMap.empty(), budgetUsage, request.outputMode(), null);
     }
 
@@ -202,7 +210,12 @@ public class ControlledLlmHarness {
         return new ServiceAnswer(answer.answerType(), answer.scope(), answer.releaseId(), safeFacts(answer.facts()), safeStrings(answer.inferences()),
                 safeStrings(answer.unknowns()), safeStrings(answer.candidateSuggestions()), safeStrings(answer.humanDecisions()),
                 safeStrings(answer.citedObjects()), safeEdges(answer.dependencies()), traceId, answer.refusal(), safeStrings(answer.warnings()),
-                replaceTraceId(answer.answer(), answer.traceId(), traceId));
+                replaceTraceId(answer.answer(), answer.traceId(), traceId))
+                .withRunId(answer.runId());
+    }
+
+    private String newRunId() {
+        return "run-" + UUID.randomUUID();
     }
 
     private String answerText(ServiceAnswer grounded, LlmDraft draft) {
@@ -259,7 +272,7 @@ public class ControlledLlmHarness {
             return agentPlannerService.plan(request.query(), request.callerId(), request.scopeHint(), request.outputMode(), "ask");
         }
         var queryPlan = queryService.plan(new PlanRequest(request.query(), request.callerId(), request.scopeHint(), request.outputMode(), true));
-        return AgentPlan.fromQueryPlan(queryPlan, "ask", null);
+        return agentRecipeService.applyRecipe(AgentPlan.fromQueryPlan(queryPlan, "ask", null));
     }
 
     private void recheckFinalEmit(AskRequest request, AgentPlan plan, ServiceAnswer answer) {
@@ -312,7 +325,9 @@ public class ControlledLlmHarness {
         private final Map<String, String> l2ReadHashes = new LinkedHashMap<>();
         private final List<ToolStepTrace> toolSteps = new ArrayList<>();
         private final Map<String, Object> plannedOutputs = new LinkedHashMap<>();
-        private List<String> plannedTools = List.of();
+        private AgentPlan activePlan;
+        private AgentRecipe activeRecipe;
+        private List<String> plannedTools = new ArrayList<>();
         private int replayCursor;
         private boolean replayingPlan;
         private boolean planExecuted;
@@ -323,10 +338,15 @@ public class ControlledLlmHarness {
         }
 
         private void bindPlan(AgentPlan plan) {
-            this.plannedTools = plan == null || plan.toolPlan() == null ? List.of() : List.copyOf(plan.toolPlan());
+            this.activePlan = plan;
+            this.plannedTools = plan == null || plan.toolPlan() == null ? new ArrayList<>() : new ArrayList<>(plan.toolPlan());
         }
 
-        private void executePlanned(AskRequest request) {
+        private void executeRecipe(AskRequest request, AgentRecipe recipe) {
+            this.activeRecipe = recipe;
+            if (recipe != null) {
+                this.plannedTools = recipe.toolSequence() == null ? new ArrayList<>() : new ArrayList<>(recipe.toolSequence());
+            }
             if (plannedTools.isEmpty()) {
                 return;
             }
@@ -335,7 +355,9 @@ public class ControlledLlmHarness {
                 com.rts.model.CoreModels.QueryPlan queryPlan = null;
                 List<com.rts.model.CoreModels.CandidateObject> candidates = List.of();
                 String selectedUri = null;
-                for (String toolName : plannedTools) {
+                int planIndex = 0;
+                while (planIndex < plannedTools.size()) {
+                    String toolName = plannedTools.get(planIndex++);
                     if ("resolve_scope".equals(toolName)) {
                         queryPlan = (com.rts.model.CoreModels.QueryPlan) call(toolName,
                                 new PlanRequest(request.query(), request.callerId(), request.scopeHint(), request.outputMode(), true)).output();
@@ -359,8 +381,10 @@ public class ControlledLlmHarness {
                         call(toolName, new ObjectContentRequest(selectedUri, "answer", null, null, request.callerId(), request.apiKey()));
                     } else if ("get_dependencies".equals(toolName)) {
                         selectedUri = requireSelectedUri(selectedUri, candidates);
-                        call(toolName, new DependenciesRequest(selectedUri, com.rts.model.CoreModels.Direction.forward, null,
-                                1, "answer", null, request.callerId(), request.apiKey()));
+                        ToolResult dependencies = call(toolName, new DependenciesRequest(selectedUri, dependencyDirection(), null,
+                                1, toolPurpose(), null, request.callerId(), request.apiKey()));
+                        reviseFromObservation(request, selectedUri, dependencies);
+                        planIndex = Math.max(planIndex, replayCursor);
                     } else {
                         throw new QueryRefusalException(RefusalReason.unsupported_claim,
                                 "Tool is registered but not enabled for managed harness: " + toolName);
@@ -370,7 +394,37 @@ public class ControlledLlmHarness {
             } finally {
                 replayingPlan = false;
                 replayCursor = 0;
+                activeRecipe = null;
             }
+        }
+
+        private void reviseFromObservation(AskRequest request, String selectedUri, ToolResult observation) {
+            if (!requiresDependencyL2Evidence() || observation == null
+                    || !(observation.output() instanceof com.rts.model.CoreModels.DependencyResult dependencies)) {
+                return;
+            }
+            List<String> dependencyUris = dependencies.objects().stream()
+                    .map(com.rts.model.CoreModels.ObjectManifestEntry::uri)
+                    .filter(uri -> uri != null && !uri.isBlank())
+                    .filter(uri -> !Objects.equals(uri, selectedUri))
+                    .filter(uri -> !l2ReadUris.contains(uri))
+                    .distinct()
+                    .limit(Math.max(0, properties.getMaxL2Objects() - l2ReadUris.size()))
+                    .toList();
+            if (dependencyUris.isEmpty()) {
+                return;
+            }
+            for (String dependencyUri : dependencyUris) {
+                plannedTools.add(replayCursor, "read_object_l2");
+                call("read_object_l2", new ObjectContentRequest(dependencyUri, toolPurpose(), null, null, request.callerId(), request.apiKey()));
+                markLastStepAsServiceRevise("revise_dependency_l2");
+            }
+        }
+
+        private boolean requiresDependencyL2Evidence() {
+            return activeRecipe != null
+                    && activeRecipe.requiredEvidence() != null
+                    && activeRecipe.requiredEvidence().stream().anyMatch("dependency L2 runtime object"::equals);
         }
 
         @Override
@@ -378,7 +432,7 @@ public class ControlledLlmHarness {
             if (planExecuted && !replayingPlan) {
                 recordRefusedStep(toolName, input, selectedUrisFor(toolName, input), RefusalReason.unsupported_claim);
                 throw new QueryRefusalException(RefusalReason.unsupported_claim,
-                        "Model clients cannot initiate RTS tool calls after the service orchestrator executes the plan; use plannedOutputs");
+                        "Model clients cannot initiate RTS tool calls after the service recipe executor executes the plan; use plannedOutputs");
             }
             if (calls.size() >= maxCalls) {
                 recordRefusedStep(toolName, input, selectedUrisFor(toolName, input), RefusalReason.tool_budget_exhausted);
@@ -424,7 +478,16 @@ public class ControlledLlmHarness {
                 l2ReadUris.add(l2Content.uri());
                 l2ReadHashes.put(l2Content.uri(), l2Content.contentHash());
             }
-            plannedOutputs.put(toolName, output);
+            plannedOutputs.put(toolName + "#" + stepNo, output);
+            plannedOutputs.putIfAbsent(toolName, output);
+            if ("read_object_l2".equals(toolName) && output instanceof com.rts.model.CoreModels.L2Content l2Content) {
+                @SuppressWarnings("unchecked")
+                List<com.rts.model.CoreModels.L2Content> existing =
+                        (List<com.rts.model.CoreModels.L2Content>) plannedOutputs.getOrDefault("read_object_l2:all", List.of());
+                List<com.rts.model.CoreModels.L2Content> all = new ArrayList<>(existing);
+                all.add(l2Content);
+                plannedOutputs.put("read_object_l2:all", List.copyOf(all));
+            }
             int outputTokens = estimateRetrievedTokens(output);
             if (retrievedTokensUsed + outputTokens >= properties.getMaxRetrievedTokens()) {
                 toolSteps.add(new ToolStepTrace(stepNo, toolName, inputHash, Hashing.sha256(String.valueOf(output)), selectedUris,
@@ -434,6 +497,15 @@ public class ControlledLlmHarness {
             retrievedTokensUsed += outputTokens;
             toolSteps.add(new ToolStepTrace(stepNo, toolName, inputHash, Hashing.sha256(String.valueOf(output)), selectedUris, policyResult));
             return new ToolResult(toolName, output);
+        }
+
+        private void markLastStepAsServiceRevise(String reason) {
+            if (toolSteps.isEmpty()) {
+                return;
+            }
+            ToolStepTrace last = toolSteps.remove(toolSteps.size() - 1);
+            toolSteps.add(new ToolStepTrace(last.stepNo(), last.toolName(), last.toolInputHash(), last.toolOutputHash(),
+                    last.selectedUris(), "allowed:" + reason));
         }
 
         @Override
@@ -465,8 +537,9 @@ public class ControlledLlmHarness {
             }
             String expected = plannedTools.get(step);
             if (!"*".equals(expected) && !expected.equals(toolName)) {
+                String recipe = activeRecipe == null ? "unknown" : activeRecipe.recipeVersion();
                 throw new QueryRefusalException(RefusalReason.unsupported_claim,
-                        "Tool call does not match the planned RTS tool sequence; expected " + expected + " but got " + toolName);
+                        "Tool call does not match RTS recipe " + recipe + "; expected " + expected + " but got " + toolName);
             }
         }
 
@@ -531,6 +604,23 @@ public class ControlledLlmHarness {
                 return List.of("rule");
             }
             return List.of();
+        }
+
+        private com.rts.model.CoreModels.Direction dependencyDirection() {
+            if (activePlan != null && "impact_preview".equals(activePlan.intent())) {
+                return com.rts.model.CoreModels.Direction.reverse;
+            }
+            if (activePlan != null && "dependency_lookup".equals(activePlan.intent())) {
+                return com.rts.model.CoreModels.Direction.both;
+            }
+            return com.rts.model.CoreModels.Direction.forward;
+        }
+
+        private String toolPurpose() {
+            if (activePlan == null || activePlan.intent() == null || activePlan.intent().isBlank()) {
+                return "answer";
+            }
+            return activePlan.intent();
         }
     }
 }

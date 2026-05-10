@@ -13,9 +13,13 @@ import com.rts.model.AgentServiceModels.RawMessageCandidateRequest;
 import com.rts.model.AgentServiceModels.ScenarioReport;
 import com.rts.model.AgentServiceModels.TestPlanRequest;
 import com.rts.model.AgentServiceModels.ValidationStatus;
+import com.rts.model.CoreModels.AnswerType;
 import com.rts.model.CoreModels.Fact;
 import com.rts.model.CoreModels.Refusal;
 import com.rts.model.CoreModels.RefusalReason;
+import com.rts.model.CoreModels.ServiceAnswer;
+import com.rts.llm.ControlledLlmHarness;
+import com.rts.query.QueryRequests.AskRequest;
 import com.rts.model.CoreModels.TraceRecord;
 import com.rts.query.PromptPolicyGuard;
 import com.rts.query.QueryRefusalException;
@@ -38,14 +42,19 @@ public class ManagedScenarioService {
     private final ProjectionStore projectionStore;
     private final QueryService queryService;
     private final PromptPolicyGuard promptPolicyGuard;
+    private final ControlledLlmHarness controlledLlmHarness;
+    private final AgentRecipeService agentRecipeService;
 
     public ManagedScenarioService(AgentAnalysisService analysisService, GovernanceAssistantService governanceAssistantService,
-            ProjectionStore projectionStore, QueryService queryService, PromptPolicyGuard promptPolicyGuard) {
+            ProjectionStore projectionStore, QueryService queryService, PromptPolicyGuard promptPolicyGuard,
+            ControlledLlmHarness controlledLlmHarness, AgentRecipeService agentRecipeService) {
         this.analysisService = analysisService;
         this.governanceAssistantService = governanceAssistantService;
         this.projectionStore = projectionStore;
         this.queryService = queryService;
         this.promptPolicyGuard = promptPolicyGuard;
+        this.controlledLlmHarness = controlledLlmHarness;
+        this.agentRecipeService = agentRecipeService;
     }
 
     public ScenarioReport analyzePrDiff(ManagedScenarioRequest request) {
@@ -76,9 +85,27 @@ public class ManagedScenarioService {
             if (impact.candidates().isEmpty()) {
                 nextEvidence.add("Provide a stronger governed anchor from the diff.");
             }
+            ServiceAnswer managed = managedScenarioAsk(request, "pr_diff_impact", input, anchor);
+            List<String> inferences = new ArrayList<>(impact.inferences());
+            List<String> warnings = new ArrayList<>(impact.warnings());
+            String traceId = impact.traceId();
+            String runId = null;
+            if (managed != null) {
+                traceId = managed.traceId();
+                runId = managed.runId();
+                inferences.addAll(managed.inferences());
+                if (managed.answerType() == AnswerType.answer) {
+                    inferences.add("Managed harness recipe " + queryService.trace(managed.traceId())
+                            .map(trace -> trace.agentRun() == null ? "unknown" : trace.agentRun().recipeVersion())
+                            .orElse("unknown") + " executed before scenario report compilation.");
+                } else if (managed.refusal() != null) {
+                    warnings.add("Managed harness returned refusal before scenario compilation: " + managed.refusal().reason());
+                }
+                nextEvidence.addAll(managed.unknowns());
+            }
             ScenarioReport report = report("pr_diff_impact", summarize(input), impact.status(), impact.scope(), impact.releaseId(), impact.facts(),
-                    impact.inferences(), candidates, impact.unknowns(), nextEvidence, impact.groundingMap(), impact.traceId(),
-                    citations(impact.releaseId(), impact.facts()), null, impact.warnings());
+                    inferences, candidates, impact.unknowns(), nextEvidence, impact.groundingMap(), traceId, runId,
+                    citations(impact.releaseId(), impact.facts()), null, warnings);
             appendScenarioTrace(request, input, report, List.of("extract_diff_anchors", "analyze_impact", "check_grounding"));
             return report;
         });
@@ -109,9 +136,14 @@ public class ManagedScenarioService {
             List<String> unknowns = new ArrayList<>(impact.unknowns());
             unknowns.add("External stack trace, log text, and failure location are not truth sources.");
             List<String> nextEvidence = List.of("Provide failed message fields, exact target path, rule/helper/lookup id, and runtime trace id when available.");
+            ServiceAnswer managed = managedScenarioAsk(request, "exception_investigation", input, anchor);
+            List<String> inferences = new ArrayList<>(impact.inferences());
+            List<String> warnings = new ArrayList<>(impact.warnings());
+            List<String> mutableNextEvidence = new ArrayList<>(nextEvidence);
+            mergeManaged(managed, inferences, mutableNextEvidence, warnings);
             ScenarioReport report = report("exception_investigation", summarize(input), impact.status(), impact.scope(), impact.releaseId(), impact.facts(),
-                    impact.inferences(), candidates, unknowns, nextEvidence, impact.groundingMap(), impact.traceId(),
-                    citations(impact.releaseId(), impact.facts()), null, impact.warnings());
+                    inferences, candidates, unknowns, mutableNextEvidence, impact.groundingMap(), traceId(managed, impact.traceId()), runId(managed),
+                    citations(impact.releaseId(), impact.facts()), null, warnings);
             appendScenarioTrace(request, input, report, List.of("extract_exception_anchors", "analyze_impact", "check_grounding"));
             return report;
         });
@@ -137,10 +169,15 @@ public class ManagedScenarioService {
             List<String> nextEvidence = result.targetCandidates().isEmpty()
                     ? List.of("Provide parseable source fields that map to released source anchors.")
                     : List.of("Provide production execution context if final transformation behavior is required.");
+            ServiceAnswer managed = managedScenarioAsk(request, "failed_message_analysis", input, null);
+            List<String> inferences = new ArrayList<>();
+            inferences.add("Parsed message fields are clues only; grounded candidates come from released RTS rules.");
+            List<String> warnings = new ArrayList<>(result.warnings());
+            List<String> mutableNextEvidence = new ArrayList<>(nextEvidence);
+            mergeManaged(managed, inferences, mutableNextEvidence, warnings);
             ScenarioReport report = report("failed_message_analysis", summarize(input), result.status(), result.scope(), result.releaseId(), facts,
-                    List.of("Parsed message fields are clues only; grounded candidates come from released RTS rules."),
-                    candidates, result.unknowns(), nextEvidence, result.groundingMap(), result.traceId(),
-                    citations(result.releaseId(), facts), null, result.warnings());
+                    inferences, candidates, result.unknowns(), mutableNextEvidence, result.groundingMap(), traceId(managed, result.traceId()), runId(managed),
+                    citations(result.releaseId(), facts), null, warnings);
             appendScenarioTrace(request, input, report, List.of("parse_raw_message_candidate", "map_source_fields_to_rules", "validate_target_message_grounding"));
             return report;
         });
@@ -161,17 +198,24 @@ public class ManagedScenarioService {
             candidates.addAll(result.negativeTestCandidates());
             candidates.addAll(result.boundaryCases());
             candidates.addAll(result.regressionFocus());
+            ServiceAnswer managed = managedScenarioAsk(request, "test_planning", input, extractFirstAnchor(input));
+            List<String> inferences = new ArrayList<>();
+            inferences.add("Test planning candidates are derived from released RTS objects and dependency traversal.");
+            List<String> warnings = new ArrayList<>(result.warnings());
+            List<String> nextEvidence = new ArrayList<>(result.dependencyCoverageSuggestions());
+            mergeManaged(managed, inferences, nextEvidence, warnings);
             ScenarioReport report = report("test_planning", summarize(input), result.status(), result.scope(), result.releaseId(),
                     result.facts(),
-                    List.of("Test planning candidates are derived from released RTS objects and dependency traversal."),
+                    inferences,
                     candidates,
                     result.unknowns(),
-                    result.dependencyCoverageSuggestions(),
+                    nextEvidence,
                     groundingFromFacts(result.facts()),
-                    result.traceId(),
+                    traceId(managed, result.traceId()),
+                    runId(managed),
                     citations(result.releaseId(), result.facts()),
                     null,
-                    result.warnings());
+                    warnings);
             appendScenarioTrace(request, input, report, List.of("plan_tests", "check_grounding"));
             return report;
         });
@@ -190,17 +234,25 @@ public class ManagedScenarioService {
             candidates.addAll(review.conflictCandidates());
             candidates.addAll(review.ambiguityCandidates());
             candidates.addAll(review.reviewerQuestions().stream().map(question -> question.question() + " options=" + question.options()).toList());
+            ServiceAnswer managed = managedScenarioAsk(request, "governance_review", input, extractFirstAnchor(input));
+            List<String> inferences = new ArrayList<>();
+            inferences.add("Governance review output is candidate material and cannot mutate runtime truth.");
+            List<String> warnings = new ArrayList<>(review.warnings());
+            List<String> nextEvidence = new ArrayList<>();
+            nextEvidence.add("Read authorized governance summaries or provide recorded human decision references when needed.");
+            mergeManaged(managed, inferences, nextEvidence, warnings);
             ScenarioReport report = report("governance_review", summarize(input), review.status(), review.scope(), review.releaseId(),
                     review.facts(),
-                    List.of("Governance review output is candidate material and cannot mutate runtime truth."),
+                    inferences,
                     candidates,
                     List.of("Human adjudication is required for material governance decisions."),
-                    List.of("Read authorized governance summaries or provide recorded human decision references when needed."),
+                    nextEvidence,
                     groundingFromFacts(review.facts()),
-                    review.traceId(),
+                    traceId(managed, review.traceId()),
+                    runId(managed),
                     citations(review.releaseId(), review.facts()),
                     null,
-                    review.warnings());
+                    warnings);
             appendScenarioTrace(request, input, report, List.of("governance_review", "check_grounding"));
             return report;
         });
@@ -209,6 +261,13 @@ public class ManagedScenarioService {
     private ScenarioReport report(String type, String summary, String status, com.rts.model.CoreModels.ScopeKey scope, String releaseId,
             List<Fact> facts, List<String> inferences, List<String> candidates, List<String> unknowns, List<String> nextEvidenceNeeded,
             GroundingMap groundingMap, String traceId, List<Citation> citations, Refusal refusal, List<String> warnings) {
+        return report(type, summary, status, scope, releaseId, facts, inferences, candidates, unknowns, nextEvidenceNeeded, groundingMap,
+                traceId, newRunId(), citations, refusal, warnings);
+    }
+
+    private ScenarioReport report(String type, String summary, String status, com.rts.model.CoreModels.ScopeKey scope, String releaseId,
+            List<Fact> facts, List<String> inferences, List<String> candidates, List<String> unknowns, List<String> nextEvidenceNeeded,
+            GroundingMap groundingMap, String traceId, String runId, List<Citation> citations, Refusal refusal, List<String> warnings) {
         List<String> safeWarnings = new ArrayList<>(warnings == null ? List.of() : warnings);
         safeWarnings.add("Scenario output is a grounded candidate report, not release approval, final root cause, QA signoff, or human decision.");
         return new ScenarioReport("scenario-report.v1", status == null ? "candidate" : status, type, summary, scope, releaseId,
@@ -220,9 +279,45 @@ public class ManagedScenarioService {
                 citations == null ? List.of() : citations,
                 groundingMap == null ? GroundingMap.empty() : groundingMap,
                 traceId,
+                runId == null || runId.isBlank() ? newRunId() : runId,
                 budgetFrom(groundingMap, candidates),
                 refusal,
                 List.copyOf(safeWarnings));
+    }
+
+    private ServiceAnswer managedScenarioAsk(ManagedScenarioRequest request, String scenarioType, String input, String anchor) {
+        String query = agentRecipeService.scenarioManagedQuery(scenarioType, input, anchor);
+        if (query == null || query.isBlank() || query.endsWith(" null")) {
+            return null;
+        }
+        return controlledLlmHarness.ask(new AskRequest(query, request.callerId(), request.apiKey(), request.scope(), request.outputMode(), 6));
+    }
+
+    private void mergeManaged(ServiceAnswer managed, List<String> inferences, List<String> nextEvidence, List<String> warnings) {
+        if (managed == null) {
+            return;
+        }
+        if (managed.inferences() != null) {
+            inferences.addAll(managed.inferences());
+        }
+        if (managed.unknowns() != null) {
+            nextEvidence.addAll(managed.unknowns());
+        }
+        if (managed.answerType() == AnswerType.answer) {
+            inferences.add("Managed harness recipe " + queryService.trace(managed.traceId())
+                    .map(trace -> trace.agentRun() == null ? "unknown" : trace.agentRun().recipeVersion())
+                    .orElse("unknown") + " executed before scenario report compilation.");
+        } else if (managed.refusal() != null) {
+            warnings.add("Managed harness returned refusal before scenario compilation: " + managed.refusal().reason());
+        }
+    }
+
+    private String traceId(ServiceAnswer managed, String fallbackTraceId) {
+        return managed != null && managed.traceId() != null && !managed.traceId().isBlank() ? managed.traceId() : fallbackTraceId;
+    }
+
+    private String runId(ServiceAnswer managed) {
+        return managed == null ? null : managed.runId();
     }
 
     private ScenarioReport refusalReport(ManagedScenarioRequest request, String type, String input, RefusalReason reason, String message) {
@@ -256,15 +351,21 @@ public class ManagedScenarioService {
         List<String> factUris = report.facts().stream().map(Fact::uri).distinct().toList();
         RefusalReason refusalReason = report.refusal() == null ? RefusalReason.none : report.refusal().reason();
         Optional<TraceRecord> existing = queryService.trace(report.traceId());
-        queryService.appendTrace(Instant.now(), report.traceId(), report.scenarioType(), request.callerId(), report.inputSummary(), null, null,
+        queryService.appendTrace(Instant.now(), report.traceId(), report.runId(), report.scenarioType(), request.callerId(), report.inputSummary(), null, null,
                 report.scope(), report.releaseId(),
                 merge(existing.map(TraceRecord::candidateUris).orElse(List.of()), factUris),
                 merge(existing.map(TraceRecord::selectedUris).orElse(List.of()), factUris),
                 merge(existing.map(TraceRecord::l2ReadUris).orElse(List.of()), factUris),
                 refusalReason,
                 merge(existing.map(TraceRecord::toolCalls).orElse(List.of()), toolCalls),
+                null,
                 request.outputMode(),
-                report.inputSummary(), Hashing.sha256(rawInput == null ? "" : rawInput));
+                report.inputSummary(), Hashing.sha256(rawInput == null ? "" : rawInput),
+                existing.map(TraceRecord::agentRun).orElse(null));
+    }
+
+    private String newRunId() {
+        return "run-" + java.util.UUID.randomUUID();
     }
 
     private List<String> merge(Collection<String> first, Collection<String> second) {

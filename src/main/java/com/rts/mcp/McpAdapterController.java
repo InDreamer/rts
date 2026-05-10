@@ -488,7 +488,9 @@ public class McpAdapterController {
     private ToolCatalogEntry catalogEntry(String name) {
         ToolCatalogEntry source = toolRegistry.catalogEntry(registryName(name));
         return new ToolCatalogEntry(name, purpose(name, source), permission(name, source), requiredFields(name, source), source.possibleRefusalReasons(),
-                schema(name, "input"), schema(name, "output"), source.budgetCost(), allowedIntents(name, source), redactionRule(name, source));
+                schema(name, "input"), schema(name, "output"), sideEffectClass(name, source), truthOutputType(name, source),
+                source.budgetCost(), source.maxResultSize(), idempotency(name, source), featureFlag(name, source),
+                allowedIntents(name, source), redactionRule(name, source));
     }
 
     private String purpose(String name, ToolCatalogEntry source) {
@@ -536,6 +538,36 @@ public class McpAdapterController {
             case "rts_record_feedback", "rts_write_context_memory", "rts_get_context_memory" -> List.of("feedback", "context_memory");
             default -> source.allowedIntents();
         };
+    }
+
+    private String sideEffectClass(String name, ToolCatalogEntry source) {
+        return switch (name) {
+            case "rts_record_human_decision" -> "human_decision_draft";
+            case "rts_record_feedback", "rts_write_context_memory" -> "candidate_write";
+            default -> source.sideEffectClass();
+        };
+    }
+
+    private String truthOutputType(String name, ToolCatalogEntry source) {
+        return switch (name) {
+            case "rts_ask", "rts_contextual_ask" -> "validated_answer_envelope";
+            case "rts_record_feedback", "rts_write_context_memory", "rts_get_context_memory" -> "none";
+            default -> source.truthOutputType();
+        };
+    }
+
+    private String idempotency(String name, ToolCatalogEntry source) {
+        return switch (name) {
+            case "rts_record_feedback", "rts_write_context_memory" -> "idempotent_by_trace_session_and_key";
+            default -> source.idempotency();
+        };
+    }
+
+    private String featureFlag(String name, ToolCatalogEntry source) {
+        if (name.startsWith("rts_") && !List.of("rts_find_objects", "rts_read_object", "rts_get_dependencies", "rts_ask", "rts_get_trace").contains(name)) {
+            return "mcp_expanded_tools_enabled";
+        }
+        return source.featureFlag();
     }
 
     private String redactionRule(String name, ToolCatalogEntry source) {

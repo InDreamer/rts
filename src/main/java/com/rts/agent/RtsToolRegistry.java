@@ -85,7 +85,12 @@ public class RtsToolRegistry {
                         RefusalReason.model_provider_failure, RefusalReason.unsupported_claim),
                 definition.inputSchema(),
                 definition.outputSchema(),
+                definition.sideEffectClass(),
+                definition.truthOutputType(),
                 definition.budgetCost(),
+                definition.maxResultSize(),
+                definition.idempotency(),
+                definition.featureFlag(),
                 definition.allowedIntents(),
                 definition.traceRedactionRule());
     }
@@ -155,7 +160,8 @@ public class RtsToolRegistry {
     private static Map.Entry<String, ToolDefinition> tool(String name, String purpose, String permission, List<String> requiredFields) {
         String schemaBase = "rts.tool." + name + ".v1";
         return Map.entry(name, new ToolDefinition(name, purpose, permission, requiredFields,
-                schemaBase + ".input", schemaBase + ".output", budgetCost(name), allowedIntents(name), redactionRule(name)));
+                schemaBase + ".input", schemaBase + ".output", sideEffectClass(name), truthOutputType(name), budgetCost(name),
+                maxResultSize(name), idempotency(name), featureFlag(name), allowedIntents(name), redactionRule(name)));
     }
 
     private static int budgetCost(String name) {
@@ -184,6 +190,66 @@ public class RtsToolRegistry {
         return List.of("*");
     }
 
+    private static String sideEffectClass(String name) {
+        if ("record_human_decision".equals(name)) {
+            return "human_decision_draft";
+        }
+        return "read_only";
+    }
+
+    private static String truthOutputType(String name) {
+        if ("read_object_l2".equals(name)) {
+            return "l2_fact";
+        }
+        if ("get_dependencies".equals(name) || "find_reverse_dependencies".equals(name) || "get_dependency_subgraph".equals(name)) {
+            return "dependency";
+        }
+        if ("read_evidence_summary".equals(name)) {
+            return "authorized_governance_summary";
+        }
+        if ("governance_review".equals(name) || "record_human_decision".equals(name) || name.contains("candidate")
+                || name.startsWith("analyze_") || name.startsWith("plan_") || "compare_rules".equals(name)
+                || "explain_conflict".equals(name) || "simulate_rule_application".equals(name)
+                || "assemble_target_message_candidate".equals(name)) {
+            return "candidate";
+        }
+        if ("check_grounding".equals(name) || "get_trace".equals(name) || "trace_report".equals(name)
+                || "metrics_snapshot".equals(name) || "run_evaluation".equals(name) || "feature_flags".equals(name)) {
+            return "trace_metadata";
+        }
+        return "navigation_only";
+    }
+
+    private static int maxResultSize(String name) {
+        if ("read_object_l2".equals(name) || "read_evidence_summary".equals(name)) {
+            return 1;
+        }
+        if (name.contains("dependencies") || name.contains("subgraph")) {
+            return 50;
+        }
+        if (name.startsWith("find_") || name.startsWith("search_") || name.startsWith("list_")) {
+            return 25;
+        }
+        return 10;
+    }
+
+    private static String idempotency(String name) {
+        return "record_human_decision".equals(name) ? "idempotent_by_trace_and_object" : "idempotent_read";
+    }
+
+    private static String featureFlag(String name) {
+        if ("find_confusable_objects".equals(name) || "find_confusable_scopes".equals(name)) {
+            return "confusable_check_enabled";
+        }
+        if ("analyze_impact".equals(name)) {
+            return "impact_candidates_enabled";
+        }
+        if ("plan_tests".equals(name)) {
+            return "test_plan_candidates_enabled";
+        }
+        return "always_available";
+    }
+
     private static String redactionRule(String name) {
         if (name.contains("raw_message") || name.contains("message")) {
             return "hash_raw_external_payload_keep_field_names";
@@ -201,7 +267,12 @@ public class RtsToolRegistry {
             List<String> requiredFields,
             String inputSchema,
             String outputSchema,
+            String sideEffectClass,
+            String truthOutputType,
             int budgetCost,
+            int maxResultSize,
+            String idempotency,
+            String featureFlag,
             List<String> allowedIntents,
             String traceRedactionRule
     ) {}

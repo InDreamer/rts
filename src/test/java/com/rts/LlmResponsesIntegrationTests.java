@@ -44,8 +44,14 @@ class LlmResponsesIntegrationTests {
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/responses", exchange -> {
             RESPONSE_REQUEST.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
-            String text = "Grounded rewrite for payment.amount from "
-                    + TestProjectionFactory.RULE_URI;
+            String text = "{\"analysis_text\":\"payment.amount is generated from src.amount, rounded with helper_rounding, and currency-normalized using lookup_currency.\","
+                    + "\"claims\":[\"payment.amount is generated from src.amount\"],"
+                    + "\"inferences\":[\"Use dependency evidence to review lookup/helper impact.\"],"
+                    + "\"unknowns\":[\"No runtime transaction sample was provided.\"],"
+                    + "\"candidates\":[\"Review tests covering lookup_currency and helper_rounding.\"],"
+                    + "\"warnings\":[\"Draft claims are not final truth authority.\"],"
+                    + "\"citation_intents\":[\"" + TestProjectionFactory.RULE_URI + "\"],"
+                    + "\"tool_needs\":[]}";
             byte[] body = ("""
                     {"id":"resp_test","object":"response","status":"completed","output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":%s}]}]}
                     """.formatted(jsonString(text))).getBytes(StandardCharsets.UTF_8);
@@ -102,13 +108,19 @@ class LlmResponsesIntegrationTests {
         var answer = harness.ask(new AskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6));
 
         assertThat(answer.answerType()).isEqualTo(AnswerType.answer);
-        assertThat(answer.answer()).isEqualTo("Grounded rewrite for payment.amount from " + TestProjectionFactory.RULE_URI);
+        assertThat(answer.answer()).isEqualTo("payment.amount is generated from src.amount, rounded with helper_rounding, and currency-normalized using lookup_currency.");
         assertThat(answer.facts()).extracting("uri").contains(TestProjectionFactory.RULE_URI);
+        assertThat(answer.inferences()).contains("Use dependency evidence to review lookup/helper impact.");
+        assertThat(answer.unknowns()).contains("No runtime transaction sample was provided.");
+        assertThat(answer.candidateSuggestions()).contains("Review tests covering lookup_currency and helper_rounding.");
         assertThat(Files.exists(STORE_ROOT.resolve("traces").resolve("llm-run-trace.jsonl"))).isTrue();
         assertThat(RESPONSE_REQUEST.get()).contains("\"model\":\"gpt-5.5\"");
         assertThat(RESPONSE_REQUEST.get()).contains("\"store\":false");
         assertThat(RESPONSE_REQUEST.get()).contains("\"reasoning\":{\"effort\":\"low\"}");
         assertThat(RESPONSE_REQUEST.get()).contains("Grounded RTS service result");
+        assertThat(RESPONSE_REQUEST.get()).contains("controlled analysis draft generator");
+        assertThat(RESPONSE_REQUEST.get()).contains("\"type\":\"json_schema\"");
+        assertThat(RESPONSE_REQUEST.get()).contains("analysis_text");
     }
 
     private static String jsonString(String value) {

@@ -34,7 +34,7 @@ public class PipelineReportService {
     public TraceReport traceReport(String traceId, String callerId, String apiKey) {
         var trace = queryService.trace(traceId, callerId, apiKey)
                 .orElseThrow(() -> new QueryRefusalException(RefusalReason.object_not_found, "Trace not found"));
-        return new TraceReport(trace.traceId(), trace.status(), trace.releaseId(), trace.resolvedScope(), trace.toolCalls(),
+        return new TraceReport(trace.traceId(), trace.status(), trace.releaseId(), trace.resolvedScope(), trace.runId(), trace.agentRun(), trace.toolCalls(),
                 trace.groundingMap(), trace.budgetUsage(), List.of("Trace report is audit/reporting output, not a release gate."));
     }
 }

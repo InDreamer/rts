@@ -137,16 +137,25 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 - `grounding_map`：claim 到 L2 URI/content hash 的映射。
 - `budget_usage`：tool/L2/model/latency budget 使用情况。
 - `trace_id`：可用于审计工具序列、L2 reads 和 grounding。
+- `run_id`：managed `/ask` 开启 orchestrator 时返回的 RTS-owned `AgentRun` 标识；可通过 trace report 找到完整 run record、tool invocation、observation 和 validated claim。
 
 如果模型输出无法通过 claim-level grounding validation，服务会返回 `refusal.reason=unsupported_claim` 或 `hash_mismatch`，不会把自由文本当作事实答案。
 
-`RTS_TOOL_ORCHESTRATOR_ENABLED=false` 时，`/ask` 会降级为 deterministic `/query` 风格的信息服务输出。显式开启 orchestrator 后，内部 `/ask` 链路会先生成受控 `AgentPlan`，记录 intent、scenario type、scope snapshot、release snapshot、tool plan 和 expected evidence。Planner 只允许决定工具计划或 clarification，不允许直接产出业务事实。
+OpenAI-compatible Responses adapter 当前要求 provider 返回结构化 JSON schema draft：`analysis_text`、`claims`、`inferences`、`unknowns`、`candidates`、`warnings`、`citation_intents`、`tool_needs`。这些字段是受控分析草稿；最终 `facts` 仍只能来自本次 RTS 读取并通过 validator 的 L2/dependency/governance evidence。
+
+`RTS_TOOL_ORCHESTRATOR_ENABLED=false` 时，`/ask` 会降级为 deterministic `/query` 风格的信息服务输出。显式开启 orchestrator 后，内部 `/ask` 链路会先生成受控 `AgentPlan`，记录 intent、scenario type、scope snapshot、release snapshot、tool plan 和 expected evidence。Planner 只允许决定工具计划或 clarification，不允许直接产出业务事实。执行时由 RTS service 拥有 plan/observe/revise/hard-stop loop：例如 dependency observation 发现目标场景还需要依赖对象 L2 evidence 时，service policy 可以追加 allowlisted `read_object_l2` 补证据，并在 trace 中记录 `decision=revise`；模型仍不能绕过 service recipe 自行发起工具调用。
 
 ### 3.3 Scenario endpoints
 
 复杂外部输入可以走 scenario endpoint。当前实现已经提供统一 `scenario-report.v1`、grounded candidate / information-service output、citations、grounding map、warnings 和 trace。外部输入只作为线索，不是真相。
 
-对 PR diff、exception impact、failed message 和 test planning 这类 AI-centric 场景，managed AI 仍是目标正常产品模式；但当前 endpoint 多数仍主要编排 deterministic/candidate support services。对应 feature flag 关闭或 LLM 不可用时，服务会降级为结构化信息提供或 candidate support surface。本地验证或受控环境需要显式开启对应开关。
+对 PR diff、exception impact、failed message、test planning 和 governance review 这类 AI-centric 场景，managed AI 是目标正常产品模式。当前核心 scenario endpoint 都会先进入 managed harness loop，形成 service-owned `AgentRun`，再由 scenario compiler 合并 grounded facts、inferences、unknowns、candidate suggestions、warnings、citations 和 grounding map。这个实现已经避免 scenario 直接把外部输入或 memory 当 truth，也能记录 service-owned observe/revise/hard-stop 决策；但 scenario 输出仍是 grounded candidate report，不是 human decision 或 signoff。对应 feature flag 关闭或 LLM 不可用时，服务会降级为结构化信息提供或 candidate support surface。本地验证或受控环境需要显式开启对应开关。
+
+`AgentRun.context_snapshot` 由 service-side `ContextBuilder` 生成。当前 trace 只把 truth-eligible L2 URI/hash 指针、`context_hash`、`truth_eligible_count`、token estimate 和 redaction state 写入 run record；session memory、workspace hint、diff/log/raw message 等上下文不能支撑 facts。
+
+`AgentRun.loop_transitions` 记录 service-owned observe/revise/hard-stop 判断，例如 L2 observed 后继续 claim validation、dependency gap observed 后 revise 读取依赖对象 L2、grounding observed 后 hard stop answer。模型不能绕过 recipe 自行发起新工具；与 recipe 不一致的 tool proposal 会被拒绝。
+
+`/ask/contextual` 和 MCP `rts_contextual_ask` 可以使用 session scope 或 selected object 作为检索 hint；selected object hint 会先被重新绑定到 active release 和 caller permission，再只用于解析本轮 scope。事实输出仍必须由本轮 `/ask` 重新读取 L2/dependency/governance evidence。
 
 ### 3.3.1 Automation boundary
 
@@ -192,7 +201,7 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 }
 ```
 
-统一 report 字段包括 `schema_version`、`status`、`scenario_type`、`input_summary`、`facts`、`inferences`、`candidates`、`unknowns`、`next_evidence_needed`、`citations`、`grounding_map`、`trace_id`、`budget_usage`、`warnings`。
+统一 report 字段包括 `schema_version`、`status`、`scenario_type`、`input_summary`、`facts`、`inferences`、`candidates`、`unknowns`、`next_evidence_needed`、`citations`、`grounding_map`、`trace_id`、`run_id`、`budget_usage`、`warnings`。`run_id` 只标识 RTS service 内部执行单元；scenario 输出仍是 candidate/report surface，不是 human decision。
 
 ### 3.4 候选搜索 `/api/v1/find`
 
@@ -210,7 +219,7 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 
 查询某个 object 的依赖关系。
 
-常用请求字段：`uri`、`direction`、`depth`、`purpose`、`caller_id`。`direction` 可选值：`forward`、`reverse`、`both`。
+常用请求字段：`uri`、`direction`、`depth`、`purpose`、`caller_id`。`direction` 可选值：`forward`、`reverse`、`both`。`depth` 受 RTS tool budget 控制，请求参数不能自授权扩大依赖遍历。
 
 ### 3.7 读取 Trace `/api/v1/traces/{traceId}`
 
@@ -219,6 +228,14 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 `trace_id` 从 `/query` 或 `/ask` 的响应中获取。
 
 完整可复制 curl 命令见 sample runtime projection smoke test 文档。
+
+### 3.8 Evaluation / metrics gates
+
+`POST /api/v1/evaluation/run` 返回 scope、grounding、refusal、trace completeness 等安全门禁。对 `managed_ask`、`scenario_*`、`llm` 等 managed/AI 模式，还会返回 `ai_value_score_total` 和 `first_pass_useful_count`；这些是默认开启 managed normal mode 前的正向价值门禁，避免只用流畅度或“能回答”作为通过标准。
+
+- safety gates：scope resolution、refusal correctness、trace completeness、top-k recall、unsupported claim count、wrong scope count。
+- AI value gates：`first_pass_usefulness` 和 `ai_value_score_min`。只有 managed/scenario/LLM 模式需要满足，deterministic 基线不需要伪造 AI value。
+- `ai_value_score` 来自 grounded facts、inferences、unknowns、candidate suggestions、next evidence 等结构化输出信号；不能由未 grounded 的自由文本充数。
 
 ## 4. 响应结构
 
@@ -261,6 +278,7 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 | `cited_objects` | 本次答案引用的 object URI 列表 |
 | `dependencies` | 关联依赖边 |
 | `trace_id` | 可用于追踪本次查询执行详情 |
+| `run_id` | managed `/ask` 或 scenario report 对应的 AgentRun；deterministic `/query` 可为空 |
 | `grounding_map` | claim 到 L2 object/hash 的映射；search hit 或 memory 不能成为 fact source |
 | `budget_usage` | 本次请求的工具、L2、模型、延迟预算使用 |
 | `warnings` | 非阻塞警告，如 demo-signoff/photo-reconstructed 标注 |

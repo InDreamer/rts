@@ -1,12 +1,21 @@
 package com.rts.query;
 
 import com.rts.config.RtsProperties;
+import com.rts.agent.ContextBuilder;
 import com.rts.index.LuceneIndexService;
 import com.rts.model.AgentServiceModels.BudgetUsage;
+import com.rts.model.AgentServiceModels.AgentRun;
+import com.rts.model.AgentServiceModels.AgentStep;
+import com.rts.model.AgentServiceModels.ArgumentBinding;
+import com.rts.model.AgentServiceModels.FeatureFlags;
 import com.rts.model.AgentServiceModels.GroundedClaim;
 import com.rts.model.AgentServiceModels.GroundingEvidence;
 import com.rts.model.AgentServiceModels.GroundingMap;
+import com.rts.model.AgentServiceModels.LoopTransition;
+import com.rts.model.AgentServiceModels.ToolInvocation;
+import com.rts.model.AgentServiceModels.ToolObservation;
 import com.rts.model.AgentServiceModels.ToolStepTrace;
+import com.rts.model.AgentServiceModels.ValidatedClaim;
 import com.rts.model.AgentServiceModels.ValidationStatus;
 import com.rts.model.CoreModels.AnswerType;
 import com.rts.model.CoreModels.AgentPlan;
@@ -64,12 +73,13 @@ public class QueryService {
     private final PromptPolicyGuard promptPolicyGuard;
     private final AliasEntityService aliasEntityService;
     private final RtsProperties properties;
+    private final ContextBuilder contextBuilder;
 
     public QueryService(ProjectionStore projectionStore, ScopeRegistry scopeRegistry, TraceStore traceStore,
             ContentStore contentStore, LuceneIndexService luceneIndexService, QueryResolver queryResolver,
             DependencyService dependencyService, PermissionService permissionService, AnswerAssembler answerAssembler,
             FinalAnswerValidator finalAnswerValidator, PromptPolicyGuard promptPolicyGuard, AliasEntityService aliasEntityService,
-            RtsProperties properties) {
+            RtsProperties properties, ContextBuilder contextBuilder) {
         this.projectionStore = projectionStore;
         this.scopeRegistry = scopeRegistry;
         this.traceStore = traceStore;
@@ -83,6 +93,7 @@ public class QueryService {
         this.promptPolicyGuard = promptPolicyGuard;
         this.aliasEntityService = aliasEntityService;
         this.properties = properties;
+        this.contextBuilder = contextBuilder;
     }
 
     public QueryPlan plan(PlanRequest request) {
@@ -131,7 +142,7 @@ public class QueryService {
                 .orElseThrow(() -> new QueryRefusalException(RefusalReason.object_not_found, "Object not found"));
         requireScope(snapshot.manifest().releaseId(), entry.scope());
         permissionService.requireAllowed(snapshot.manifest().releaseId(), request.callerId(), request.apiKey(), entry.scope(), "objects_dependencies", "default");
-        int depth = request.depth() == null ? 1 : request.depth();
+        int depth = boundedDependencyDepth(request.depth());
         DependencyResult result = dependencyService.traverse(snapshot.manifest().releaseId(), request.uri(), request.direction(), request.edgeType(), depth, 50);
         requireDependencyResultAllowed(snapshot.manifest().releaseId(), request.callerId(), request.apiKey(), result);
         return result;
@@ -390,10 +401,42 @@ public class QueryService {
     public void appendTrace(Instant start, String traceId, String entrypoint, String callerId, String queryText, QueryPlan plan, AgentPlan agentPlan,
             ScopeKey scope, String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris, RefusalReason refusal,
             List<String> toolCalls, List<ToolStepTrace> suppliedToolSteps, String answerView, String scenarioInputSummary, String scenarioInputHash) {
+        appendTrace(start, traceId, null, entrypoint, callerId, queryText, plan, agentPlan, scope, releaseId, candidateUris, selectedUris,
+                l2ReadUris, refusal, toolCalls, suppliedToolSteps, answerView, scenarioInputSummary, scenarioInputHash);
+    }
+
+    public void appendTrace(Instant start, String traceId, String runId, String entrypoint, String callerId, String queryText, QueryPlan plan,
+            AgentPlan agentPlan, ScopeKey scope, String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris,
+            RefusalReason refusal, List<String> toolCalls, List<ToolStepTrace> suppliedToolSteps, String answerView, String scenarioInputSummary,
+            String scenarioInputHash) {
+        appendTrace(start, traceId, runId, entrypoint, callerId, queryText, plan, agentPlan, scope, releaseId, candidateUris, selectedUris,
+                l2ReadUris, refusal, toolCalls, suppliedToolSteps, answerView, scenarioInputSummary, scenarioInputHash, (AgentRun) null);
+    }
+
+    public void appendTrace(Instant start, String traceId, String runId, String entrypoint, String callerId, String queryText, QueryPlan plan,
+            AgentPlan agentPlan, ScopeKey scope, String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris,
+            RefusalReason refusal, List<String> toolCalls, List<ToolStepTrace> suppliedToolSteps, String answerView, String scenarioInputSummary,
+            String scenarioInputHash, GroundingMap suppliedGroundingMap) {
+        appendTrace(start, traceId, runId, entrypoint, callerId, queryText, plan, agentPlan, scope, releaseId, candidateUris, selectedUris,
+                l2ReadUris, refusal, toolCalls, suppliedToolSteps, answerView, scenarioInputSummary, scenarioInputHash, null, suppliedGroundingMap);
+    }
+
+    public void appendTrace(Instant start, String traceId, String runId, String entrypoint, String callerId, String queryText, QueryPlan plan,
+            AgentPlan agentPlan, ScopeKey scope, String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris,
+            RefusalReason refusal, List<String> toolCalls, List<ToolStepTrace> suppliedToolSteps, String answerView, String scenarioInputSummary,
+            String scenarioInputHash, AgentRun preservedAgentRun) {
+        appendTrace(start, traceId, runId, entrypoint, callerId, queryText, plan, agentPlan, scope, releaseId, candidateUris, selectedUris,
+                l2ReadUris, refusal, toolCalls, suppliedToolSteps, answerView, scenarioInputSummary, scenarioInputHash, preservedAgentRun, null);
+    }
+
+    public void appendTrace(Instant start, String traceId, String runId, String entrypoint, String callerId, String queryText, QueryPlan plan,
+            AgentPlan agentPlan, ScopeKey scope, String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris,
+            RefusalReason refusal, List<String> toolCalls, List<ToolStepTrace> suppliedToolSteps, String answerView, String scenarioInputSummary,
+            String scenarioInputHash, AgentRun preservedAgentRun, GroundingMap suppliedGroundingMap) {
         List<ToolStepTrace> toolSteps = suppliedToolSteps == null || suppliedToolSteps.isEmpty()
                 ? toolSteps(toolCalls, candidateUris, selectedUris, l2ReadUris)
                 : List.copyOf(suppliedToolSteps);
-        GroundingMap groundingMap = groundingMap(releaseId, l2ReadUris);
+        GroundingMap groundingMap = suppliedGroundingMap == null ? groundingMap(releaseId, l2ReadUris) : suppliedGroundingMap;
         BudgetUsage budgetUsage = new BudgetUsage(
                 toolCalls == null ? 0 : toolCalls.size(),
                 properties.getMaxToolCalls(),
@@ -419,6 +462,10 @@ public class QueryService {
                 .l2ReadUris(l2ReadUris)
                 .refusalReason(refusal)
                 .releaseId(releaseId)
+                .runId(runId)
+                .agentRun(preservedAgentRun == null
+                        ? agentRun(runId, traceId, entrypoint, callerId, answerView, releaseId, scope, agentPlan, budgetUsage, toolSteps, groundingMap)
+                        : preservedAgentRun)
                 .durationMs(Duration.between(start, Instant.now()).toMillis())
                 .toolCalls(toolCalls)
                 .toolSteps(toolSteps)
@@ -430,6 +477,138 @@ public class QueryService {
                 .contextHash(Hashing.sha256(String.valueOf(candidateUris) + String.valueOf(selectedUris) + String.valueOf(l2ReadUris)))
                 .status(status(refusal))
                 .build());
+    }
+
+    private AgentRun agentRun(String runId, String traceId, String entrypoint, String callerId, String answerView, String releaseId,
+            ScopeKey scope, AgentPlan agentPlan, BudgetUsage budgetUsage, List<ToolStepTrace> toolSteps, GroundingMap groundingMap) {
+        if (runId == null || runId.isBlank()) {
+            return null;
+        }
+        List<AgentStep> steps = new ArrayList<>();
+        steps.add(new AgentStep(1, "run_start", "allowed", null, null, null, List.of(), "release_scope_caller_bound"));
+        int nextStep = 2;
+        if (toolSteps != null) {
+            for (ToolStepTrace toolStep : toolSteps) {
+                steps.add(new AgentStep(nextStep++, "tool_call", toolStep.policyResult() != null && toolStep.policyResult().startsWith("refused")
+                        ? "refused" : "allowed", toolStep.toolName(), toolStep.toolInputHash(), toolStep.toolOutputHash(),
+                        toolStep.selectedUris(), toolStep.policyResult()));
+            }
+        }
+        steps.add(new AgentStep(nextStep, "answer_compile", "completed", null, null, null, List.of(), "service_validated"));
+        return new AgentRun(runId, traceId, entrypoint, callerId, answerView == null || answerView.isBlank() ? outputModeFromEntrypoint(entrypoint) : answerView,
+                releaseId, scope, agentPlan == null ? null : agentPlan.recipeVersion(), budgetUsage, featureFlags(),
+                contextBuilder.agentRunSnapshot(callerId, scope, groundingMap), List.copyOf(steps), loopTransitions(toolSteps, groundingMap),
+                stopReason(groundingMap, toolSteps),
+                argumentBindings(toolSteps, releaseId, scope, callerId),
+                toolInvocations(toolSteps), toolObservations(toolSteps), validatedClaims(groundingMap));
+    }
+
+    private List<LoopTransition> loopTransitions(List<ToolStepTrace> toolSteps, GroundingMap groundingMap) {
+        if (toolSteps == null || toolSteps.isEmpty()) {
+            return groundingMap == null || groundingMap.claims() == null || groundingMap.claims().isEmpty()
+                    ? List.of(new LoopTransition(1, "no_tool_observation", "clarify_or_refuse", "no truth-eligible observation was produced", "hard_stop"))
+                    : List.of();
+        }
+        List<LoopTransition> transitions = new ArrayList<>();
+        for (int i = 0; i < toolSteps.size(); i++) {
+            ToolStepTrace step = toolSteps.get(i);
+            if (step.policyResult() != null && step.policyResult().startsWith("refused")) {
+                transitions.add(new LoopTransition(i + 1, step.toolName(), "refuse", step.policyResult(), "hard_stop"));
+            } else if (step.policyResult() != null && step.policyResult().contains("revise_dependency_l2")) {
+                transitions.add(new LoopTransition(i + 1, "dependency_gap_observed", "revise",
+                        "service policy required dependency L2 evidence after dependency observation", "read_object_l2"));
+            } else if ("read_object_l2".equals(step.toolName())) {
+                transitions.add(new LoopTransition(i + 1, "l2_observed", "continue", "truth-eligible L2 evidence observed", "validate_claims"));
+            } else if ("get_dependencies".equals(step.toolName())) {
+                transitions.add(new LoopTransition(i + 1, "dependency_observed", "continue", "dependency evidence observed", "compile_or_validate"));
+            } else {
+                transitions.add(new LoopTransition(i + 1, step.toolName() + "_observed", "continue", "recipe tool completed", "next_recipe_tool"));
+            }
+        }
+        if (groundingMap != null && groundingMap.claims() != null && !groundingMap.claims().isEmpty()) {
+            transitions.add(new LoopTransition(toolSteps.size() + 1, "grounding_observed", "answer", "grounded claims available", "hard_stop"));
+        } else {
+            transitions.add(new LoopTransition(toolSteps.size() + 1, "no_grounded_claim", "clarify_or_refuse", "no validated claim available", "hard_stop"));
+        }
+        return List.copyOf(transitions);
+    }
+
+    private String stopReason(GroundingMap groundingMap, List<ToolStepTrace> toolSteps) {
+        if (toolSteps != null && toolSteps.stream().anyMatch(step -> step.policyResult() != null && step.policyResult().startsWith("refused"))) {
+            return "tool_refusal";
+        }
+        if (groundingMap != null && groundingMap.claims() != null && !groundingMap.claims().isEmpty()) {
+            return "answer_ready_grounded";
+        }
+        return "clarify_or_refuse_no_grounded_claim";
+    }
+
+    private List<ToolInvocation> toolInvocations(List<ToolStepTrace> toolSteps) {
+        if (toolSteps == null || toolSteps.isEmpty()) {
+            return List.of();
+        }
+        return toolSteps.stream()
+                .map(step -> new ToolInvocation(step.toolName(), toolSchema(step.toolName(), "input"), step.toolInputHash(),
+                        step.selectedUris(), step.policyResult()))
+                .toList();
+    }
+
+    private List<ArgumentBinding> argumentBindings(List<ToolStepTrace> toolSteps, String releaseId, ScopeKey scope, String callerId) {
+        if (toolSteps == null || toolSteps.isEmpty()) {
+            return List.of();
+        }
+        return toolSteps.stream()
+                .map(step -> new ArgumentBinding(step.toolName(), step.toolInputHash(), releaseId, scope, callerId, purposeFor(step.toolName()),
+                        step.policyResult()))
+                .toList();
+    }
+
+    private String purposeFor(String toolName) {
+        if ("read_object_l2".equals(toolName) || "get_dependencies".equals(toolName)) {
+            return "answer";
+        }
+        if ("resolve_scope".equals(toolName)) {
+            return "scope_resolution";
+        }
+        if ("find_objects".equals(toolName)) {
+            return "navigation";
+        }
+        return "managed_analysis";
+    }
+
+    private List<ToolObservation> toolObservations(List<ToolStepTrace> toolSteps) {
+        if (toolSteps == null || toolSteps.isEmpty()) {
+            return List.of();
+        }
+        return toolSteps.stream()
+                .map(step -> new ToolObservation(step.toolName(), toolSchema(step.toolName(), "output"), step.toolOutputHash(),
+                        step.selectedUris(), "hash_inputs_keep_release_scope_uri_and_content_hash"))
+                .toList();
+    }
+
+    private List<ValidatedClaim> validatedClaims(GroundingMap groundingMap) {
+        if (groundingMap == null || groundingMap.claims() == null || groundingMap.claims().isEmpty()) {
+            return List.of();
+        }
+        return groundingMap.claims().stream()
+                .map(claim -> new ValidatedClaim(claim.claim(), "fact", claim.groundedBy(), claim.validation(), claim.reason()))
+                .toList();
+    }
+
+    private String toolSchema(String toolName, String direction) {
+        return "rts.tool." + toolName + ".v1." + direction;
+    }
+
+    private FeatureFlags featureFlags() {
+        return new FeatureFlags(
+                properties.isPlannerV2Enabled(),
+                properties.isToolOrchestratorEnabled(),
+                properties.isRerankerEnabled(),
+                properties.isConfusableCheckEnabled(),
+                properties.isVectorRecallEnabled(),
+                properties.isImpactCandidatesEnabled(),
+                properties.isTestPlanCandidatesEnabled(),
+                properties.isMcpExpandedToolsEnabled());
     }
 
     public String newTraceId() {
@@ -510,6 +689,14 @@ public class QueryService {
             return 0;
         }
         return 1;
+    }
+
+    private int boundedDependencyDepth(Integer requestedDepth) {
+        int depth = requestedDepth == null ? 1 : requestedDepth;
+        if (depth < 0 || depth > properties.getMaxDependencyDepth()) {
+            throw new QueryRefusalException(RefusalReason.tool_budget_exhausted, "Dependency depth exceeds RTS tool budget");
+        }
+        return depth;
     }
 
     private int estimateRetrievedTokens(List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris) {

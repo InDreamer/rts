@@ -49,11 +49,14 @@ public class EvaluationService {
         long refusalCorrect = results.stream().filter(EvaluationResult::refusalCorrect).count();
         long unsupported = results.stream().mapToLong(EvaluationResult::unsupportedClaimCount).sum();
         long traceComplete = results.stream().filter(result -> result.traceId() != null && !result.traceId().isBlank()).count();
+        long aiValueScore = results.stream().mapToLong(EvaluationResult::aiValueScore).sum();
+        long firstPassUseful = results.stream().filter(EvaluationResult::firstPassUseful).count();
         long expectedObjectCases = cases.stream()
                 .filter(testCase -> testCase.expectedObjects() != null && !testCase.expectedObjects().isEmpty())
                 .count();
         Map<String, Double> thresholds = thresholds();
-        List<String> failures = gateFailures(results.size(), correctScope, correctObject, expectedObjectCases, refusalCorrect, unsupported, traceComplete, thresholds);
+        List<String> failures = gateFailures(safeMode, results.size(), correctScope, correctObject, expectedObjectCases, refusalCorrect,
+                unsupported, traceComplete, aiValueScore, firstPassUseful, thresholds);
         return new EvaluationRunResult(
                 runId,
                 safeMode,
@@ -62,6 +65,8 @@ public class EvaluationService {
                 correctObject,
                 refusalCorrect,
                 unsupported,
+                aiValueScore,
+                firstPassUseful,
                 results,
                 thresholds,
                 failures.isEmpty(),
@@ -91,6 +96,8 @@ public class EvaluationService {
                 correctObject,
                 refusalCorrect,
                 unsupported,
+                output.aiValueSignals(),
+                output.aiValueSignals() > 0 && correctScope && correctObject && unsupported == 0,
                 Duration.between(start, Instant.now()).toMillis(),
                 answer.traceId(),
                 output.warnings());
@@ -117,8 +124,13 @@ public class EvaluationService {
     }
 
     private EvaluatedOutput fromAnswer(ServiceAnswer answer) {
+        int aiSignals = size(answer.inferences()) + size(answer.unknowns()) + size(answer.candidateSuggestions());
+        if (answer.answerType() == AnswerType.answer && answer.groundingMap() != null && answer.groundingMap().claims() != null
+                && !answer.groundingMap().claims().isEmpty()) {
+            aiSignals += 1;
+        }
         return new EvaluatedOutput(answer, answer.citedObjects() == null ? List.of() : answer.citedObjects(),
-                answer.warnings() == null ? List.of() : answer.warnings());
+                answer.warnings() == null ? List.of() : answer.warnings(), aiSignals);
     }
 
     private EvaluatedOutput fromScenario(ScenarioReport report) {
@@ -137,10 +149,12 @@ public class EvaluationService {
                 report.refusal(),
                 report.warnings(),
                 null);
-        return fromAnswer(answer);
+        int aiSignals = size(report.inferences()) + size(report.candidates()) + size(report.unknowns()) + size(report.nextEvidenceNeeded());
+        return new EvaluatedOutput(answer, answer.citedObjects() == null ? List.of() : answer.citedObjects(),
+                answer.warnings() == null ? List.of() : answer.warnings(), aiSignals);
     }
 
-    private record EvaluatedOutput(ServiceAnswer answer, List<String> citedObjects, List<String> warnings) {}
+    private record EvaluatedOutput(ServiceAnswer answer, List<String> citedObjects, List<String> warnings, int aiValueSignals) {}
 
     private Map<String, Double> thresholds() {
         Map<String, Double> values = new LinkedHashMap<>();
@@ -150,11 +164,13 @@ public class EvaluationService {
         values.put("top_k_recall", 1.0);
         values.put("unsupported_claim_count_max", 0.0);
         values.put("wrong_scope_count_max", 0.0);
+        values.put("first_pass_usefulness", 1.0);
+        values.put("ai_value_score_min", 1.0);
         return values;
     }
 
-    private List<String> gateFailures(int total, long correctScope, long correctObject, long expectedObjectCases, long refusalCorrect, long unsupported,
-            long traceComplete, Map<String, Double> thresholds) {
+    private List<String> gateFailures(String mode, int total, long correctScope, long correctObject, long expectedObjectCases,
+            long refusalCorrect, long unsupported, long traceComplete, long aiValueScore, long firstPassUseful, Map<String, Double> thresholds) {
         if (total == 0) {
             return List.of("no evaluation cases supplied");
         }
@@ -178,11 +194,28 @@ public class EvaluationService {
         if (wrongScope > thresholds.get("wrong_scope_count_max")) {
             failures.add("wrong_scope_count above threshold");
         }
+        if (requiresAiValueGate(mode)) {
+            if (ratio(firstPassUseful, total) < thresholds.get("first_pass_usefulness")) {
+                failures.add("first_pass_usefulness below threshold");
+            }
+            if (ratio(aiValueScore, total) < thresholds.get("ai_value_score_min")) {
+                failures.add("ai_value_score below threshold");
+            }
+        }
         return failures;
+    }
+
+    private boolean requiresAiValueGate(String mode) {
+        String normalized = mode == null ? "" : mode.toLowerCase(java.util.Locale.ROOT);
+        return normalized.contains("managed") || normalized.contains("llm") || normalized.contains("scenario") || normalized.contains("ask");
     }
 
     private double ratio(long numerator, int denominator) {
         return denominator == 0 ? 0.0 : (double) numerator / (double) denominator;
+    }
+
+    private int size(List<?> values) {
+        return values == null ? 0 : values.size();
     }
 
 }

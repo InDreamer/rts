@@ -50,6 +50,97 @@ public final class AgentServiceModels {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    public record AgentSession(
+            String sessionId,
+            String callerId,
+            ScopeKey recentScope,
+            String selectedObjectUri,
+            String lastTraceId,
+            boolean truthEligible
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record AgentStep(
+            int stepNo,
+            String stepType,
+            String status,
+            String toolName,
+            String inputHash,
+            String outputHash,
+            List<String> selectedUris,
+            String policyResult
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ToolInvocation(
+            String toolName,
+            String inputSchema,
+            String inputHash,
+            List<String> selectedUris,
+            String policyResult
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ToolObservation(
+            String toolName,
+            String outputSchema,
+            String outputHash,
+            List<String> selectedUris,
+            String redactionState
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ArgumentBinding(
+            String toolName,
+            String normalizedArgumentHash,
+            String boundReleaseId,
+            ScopeKey boundScope,
+            String callerId,
+            String purpose,
+            String policyResult
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ValidatedClaim(
+            String claimText,
+            String claimType,
+            List<GroundingEvidence> groundingEvidence,
+            ValidationStatus validationStatus,
+            String rejectionReason
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record LoopTransition(
+            int stepNo,
+            String observeState,
+            String decision,
+            String reason,
+            String nextAction
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record AgentRun(
+            String runId,
+            String traceId,
+            String entrypoint,
+            String callerId,
+            String outputMode,
+            String releaseId,
+            ScopeKey resolvedScope,
+            String recipeVersion,
+            BudgetUsage budgetEnvelope,
+            FeatureFlags featureFlagSnapshot,
+            ContextSnapshot contextSnapshot,
+            List<AgentStep> steps,
+            List<LoopTransition> loopTransitions,
+            String stopReason,
+            List<ArgumentBinding> argumentBindings,
+            List<ToolInvocation> toolInvocations,
+            List<ToolObservation> toolObservations,
+            List<ValidatedClaim> validatedClaims
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record ContextItem(
             ContextKind kind,
             String source,
@@ -133,6 +224,7 @@ public final class AgentServiceModels {
             List<Citation> citations,
             GroundingMap groundingMap,
             String traceId,
+            String runId,
             BudgetUsage budgetUsage,
             Refusal refusal,
             List<String> warnings
@@ -160,7 +252,12 @@ public final class AgentServiceModels {
             List<RefusalReason> possibleRefusalReasons,
             String inputSchema,
             String outputSchema,
+            String sideEffectClass,
+            String truthOutputType,
             int budgetCost,
+            int maxResultSize,
+            String idempotency,
+            String featureFlag,
             List<String> allowedIntents,
             String traceRedactionRule
     ) {}
@@ -550,10 +647,42 @@ public final class AgentServiceModels {
     public record ContextSnapshot(
             String sessionId,
             String callerId,
+            AgentSession agentSession,
             List<MemoryRecord> memories,
             List<ContextItem> contextItems,
-            List<String> warnings
-    ) {}
+            List<String> warnings,
+            String contextHash,
+            int itemCount,
+            int truthEligibleCount,
+            int estimatedTokens,
+            String redactionState
+    ) {
+        public ContextSnapshot(String sessionId, String callerId, AgentSession agentSession, List<MemoryRecord> memories,
+                List<ContextItem> contextItems, List<String> warnings) {
+            this(sessionId, callerId, agentSession, memories, contextItems, warnings, null,
+                    count(contextItems), truthEligibleCount(contextItems), estimatedTokens(contextItems), "not_specified");
+        }
+
+        private static int count(List<ContextItem> items) {
+            return items == null ? 0 : items.size();
+        }
+
+        private static int truthEligibleCount(List<ContextItem> items) {
+            return items == null ? 0 : (int) items.stream().filter(ContextItem::truthEligible).count();
+        }
+
+        private static int estimatedTokens(List<ContextItem> items) {
+            if (items == null || items.isEmpty()) {
+                return 0;
+            }
+            int chars = items.stream()
+                    .mapToInt(item -> String.valueOf(item.objectUri()).length()
+                            + String.valueOf(item.hash()).length()
+                            + String.valueOf(item.text()).length())
+                    .sum();
+            return Math.max(1, chars / 4);
+        }
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record ContextualAskRequest(
@@ -601,6 +730,8 @@ public final class AgentServiceModels {
             boolean correctObjectFound,
             boolean refusalCorrect,
             int unsupportedClaimCount,
+            int aiValueScore,
+            boolean firstPassUseful,
             long latencyMs,
             String traceId,
             List<String> warnings
@@ -616,6 +747,8 @@ public final class AgentServiceModels {
             long correctObjectFoundCount,
             long refusalCorrectCount,
             long unsupportedClaimCount,
+            long aiValueScoreTotal,
+            long firstPassUsefulCount,
             List<EvaluationResult> results,
             Map<String, Double> thresholds,
             boolean passed,
@@ -624,7 +757,7 @@ public final class AgentServiceModels {
         public EvaluationRunResult(String runId, String mode, int totalCases, long correctScopeCount, long correctObjectFoundCount,
                 long refusalCorrectCount, long unsupportedClaimCount, List<EvaluationResult> results) {
             this(runId, mode, totalCases, correctScopeCount, correctObjectFoundCount, refusalCorrectCount, unsupportedClaimCount,
-                    results, Map.of(), false, List.of("evaluation thresholds were not supplied"));
+                    0, 0, results, Map.of(), false, List.of("evaluation thresholds were not supplied"));
         }
     }
 
@@ -714,6 +847,10 @@ public final class AgentServiceModels {
             long l2ReadEfficiencyDenominator,
             long traceCompletenessNumerator,
             long traceCompletenessDenominator,
+            long firstPassUsefulnessNumerator,
+            long firstPassUsefulnessDenominator,
+            long aiValueScoreNumerator,
+            long aiValueScoreDenominator,
             long userCorrectionRateNumerator,
             long userCorrectionRateDenominator,
             long cardImprovementYieldNumerator,
@@ -751,6 +888,8 @@ public final class AgentServiceModels {
             String status,
             String releaseId,
             ScopeKey scope,
+            String runId,
+            AgentRun agentRun,
             List<String> toolCalls,
             GroundingMap groundingMap,
             BudgetUsage budgetUsage,

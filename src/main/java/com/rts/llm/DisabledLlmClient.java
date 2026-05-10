@@ -63,16 +63,19 @@ public class DisabledLlmClient implements LlmClient {
             l2 = (L2Content) toolContext.call("read_object_l2",
                     new ObjectContentRequest(selected.uri(), "answer", null, null, request.callerId(), request.apiKey())).output();
         }
+        List<L2Content> l2Contents = plannedL2Contents(toolContext, l2);
         DependencyResult dependencies = planned(toolContext, "get_dependencies", DependencyResult.class);
         if (dependencies == null) {
             dependencies = (DependencyResult) toolContext.call("get_dependencies",
                     new DependenciesRequest(selected.uri(), Direction.forward, null, 1, "answer", null, request.callerId(), request.apiKey())).output();
         }
-        String factText = l2.content();
-        Fact fact = new Fact(factText, selected.uri(), l2.releaseId(), "l2:" + l2.contentHash());
-        ServiceAnswer answer = new ServiceAnswer(AnswerType.answer, plan.scope(), l2.releaseId(), List.of(fact),
+        List<Fact> facts = l2Contents.stream()
+                .map(content -> new Fact(content.content(), content.uri(), content.releaseId(), "l2:" + content.contentHash()))
+                .toList();
+        String factText = facts.stream().map(Fact::text).collect(java.util.stream.Collectors.joining("\n"));
+        ServiceAnswer answer = new ServiceAnswer(AnswerType.answer, plan.scope(), l2.releaseId(), facts,
                 List.of("Object card loaded for " + object.objectManifest().objectId()), List.of(), List.of(), List.of(),
-                List.of(selected.uri()), dependencies.edges(), "trace-llm-grounded", null, warningsFor(object),
+                facts.stream().map(Fact::uri).distinct().toList(), dependencies.edges(), "trace-llm-grounded", null, warningsFor(object),
                 factText + " (trace: trace-llm-grounded)");
         return new LlmDraft("LLM disabled; controlled tools produced grounded answer.",
                 List.of("resolve_scope", "find_objects", "get_object_card", "read_object_l2", "get_dependencies"), answer);
@@ -105,5 +108,19 @@ public class DisabledLlmClient implements LlmClient {
     private <T> T planned(ToolContext toolContext, String toolName, Class<T> type) {
         Object value = toolContext.plannedOutputs().get(toolName);
         return type.isInstance(value) ? type.cast(value) : null;
+    }
+
+    private List<L2Content> plannedL2Contents(ToolContext toolContext, L2Content fallback) {
+        Object value = toolContext.plannedOutputs().get("read_object_l2:all");
+        if (value instanceof List<?> values) {
+            List<L2Content> contents = values.stream()
+                    .filter(L2Content.class::isInstance)
+                    .map(L2Content.class::cast)
+                    .toList();
+            if (!contents.isEmpty()) {
+                return contents;
+            }
+        }
+        return fallback == null ? List.of() : List.of(fallback);
     }
 }

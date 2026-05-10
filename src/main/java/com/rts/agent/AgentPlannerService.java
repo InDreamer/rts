@@ -18,24 +18,26 @@ public class AgentPlannerService {
     private final ProjectionStore projectionStore;
     private final RtsToolRegistry toolRegistry;
     private final RtsProperties properties;
+    private final AgentRecipeService agentRecipeService;
 
     public AgentPlannerService(QueryService queryService, ProjectionStore projectionStore, RtsToolRegistry toolRegistry,
-            RtsProperties properties) {
+            RtsProperties properties, AgentRecipeService agentRecipeService) {
         this.queryService = queryService;
         this.projectionStore = projectionStore;
         this.toolRegistry = toolRegistry;
         this.properties = properties;
+        this.agentRecipeService = agentRecipeService;
     }
 
     public AgentPlan plan(String query, String callerId, ScopeKey scopeHint, String outputMode, String scenarioType) {
         QueryPlan queryPlan = queryService.plan(new PlanRequest(query, callerId, scopeHint, outputMode, true));
         if (queryPlan.needsClarification()) {
-            return AgentPlan.fromQueryPlan(queryPlan, scenarioType, activeReleaseId(), budgetEnvelope());
+            return agentRecipeService.applyRecipe(AgentPlan.fromQueryPlan(queryPlan, scenarioType, activeReleaseId(), budgetEnvelope()));
         }
         if (queryPlan.scope() == null) {
             throw new QueryRefusalException(RefusalReason.scope_unclear, "Agent planner requires resolved scope before tool execution");
         }
-        AgentPlan agentPlan = AgentPlan.fromQueryPlan(queryPlan, scenarioType, activeReleaseId(), budgetEnvelope());
+        AgentPlan agentPlan = agentRecipeService.applyRecipe(AgentPlan.fromQueryPlan(queryPlan, scenarioType, activeReleaseId(), budgetEnvelope()));
         validate(agentPlan);
         return agentPlan;
     }
