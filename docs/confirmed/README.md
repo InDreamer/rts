@@ -38,7 +38,7 @@ This directory contains the current internal alignment baseline for RTS.
 2. `system-constitution-v1.md` — RTS Constitution v2，定义多源真相治理、受控分析与表达、人工最终裁决、权限化服务访问和运行时边界。
 3. `kb-to-index-projection-contract-zh.md` — KB 到查询/索引层的运行时投影契约，定义 KB 必须产出什么、索引层只能读取什么、稳定原子能力面如何解释 projection。
 4. `llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 managed mode、外部 tool mode、runtime projection access boundary 和 PR diff / exception 等场景接入的当前对齐结论。
-5. `internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划，覆盖 managed harness、tool orchestration、scenario endpoints、MCP/tool mode、memory、grounding、evaluation 和运维控制。
+5. `internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划，覆盖 agent runtime、多轮工具调用、工具参数权威、managed harness、tool orchestration、scenario endpoints、MCP/tool mode、memory/context、grounding、evaluation 和运维控制。
 6. `day1-query-service-and-llm-harness-plan-zh.md` — Day1：建立受控真相源原子能力面和第一版 managed LLM harness 的 confirmed baseline。
 7. `day2-agentic-retrieval-evolution-plan-zh.md` — Day2：在同一边界内扩展 controlled agentic retrieval、rerank、MCP、影响分析和测试规划演进方向。
 8. `final-llm-agent-service-plan-zh.md` — RTS 最终面向 LLM agent 的服务路线图摘要，定义双核心栈、消费模式、能力地图、阶段路线和不可越界边界。
@@ -65,7 +65,7 @@ Confirmed docs use topic-specific authority. Resolve conflicts with this table b
 | Non-negotiable system principles, safety boundaries, permissioned access, controlled analysis-and-expression, AI-first review, human final decision, and AI value guardrails | `system-constitution-v1.md` |
 | KB/runtime projection/index boundary, release artifact shape, L0/L1/L2 meaning, schema/release/read constraints, and stable truth-source atomic capability surface | `kb-to-index-projection-contract-zh.md` |
 | LLM placement, managed mode vs tool mode, framework/SDK boundary, shared atomic capability reuse, and PR diff / exception / failed-message scenario integration | `llm-harness-and-agent-integration-alignment-zh.md` |
-| Complete internal LLM agent implementation work packages, current shipped state, runtime defaults, scenario endpoint availability, service contracts, validation gates, memory/context, evaluation, rollout controls, and degraded-mode semantics | `internal-llm-agent-service-implementation-plan-zh.md` |
+| Complete internal LLM agent implementation work packages, current shipped state, runtime defaults, agent runtime, multi-step tool loop, tool parameter authority, scenario endpoint availability, service contracts, validation gates, memory/context, evaluation, rollout controls, and degraded-mode semantics | `internal-llm-agent-service-implementation-plan-zh.md` |
 | Current Day1 query/tool service, filesystem store, Lucene, L2 read/hash, REST/MCP skeleton, `/query`, `/ask`, and Day1 DoD | `day1-query-service-and-llm-harness-plan-zh.md` |
 | Day2 retrieval evolution, planner/orchestrator, rerank/vector/confusable active use, expanded MCP, impact/test candidate evolution, and evaluation metrics | `day2-agentic-retrieval-evolution-plan-zh.md` |
 | Final long-range service roadmap, capability map, consumer views, and sequencing after current alignment decisions | `final-llm-agent-service-plan-zh.md` |

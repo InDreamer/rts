@@ -79,7 +79,8 @@ documents:
   layer: 3
   parent: docs/confirmed/README.md
   summary: complete non-phased implementation plan for RTS service internal LLM
-    agent integration
+    agent runtime, tool orchestration, context management, grounding, and service
+    authority boundaries
 - path: docs/confirmed/document-decision-register-zh.md
   role: leaf
   layer: 3
