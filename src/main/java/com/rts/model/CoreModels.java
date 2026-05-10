@@ -40,6 +40,7 @@ public final class CoreModels {
         only_similarity_no_structured_match,
         governance_unauthorized,
         tool_budget_exhausted,
+        model_provider_failure,
         unsupported_claim
     }
 
@@ -306,6 +307,43 @@ public final class CoreModels {
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    public record AgentPlan(
+            @NotBlank String intent,
+            String scenarioType,
+            ScopeKey scope,
+            List<String> anchors,
+            String requiredState,
+            List<String> toolPlan,
+            BudgetUsage budgets,
+            List<String> expectedEvidence,
+            String clarificationQuestion,
+            RefusalReason refusalIfMissing,
+            String releaseId,
+            String scopeSnapshot
+    ) {
+        public static AgentPlan fromQueryPlan(QueryPlan plan, String scenarioType, String releaseId) {
+            return fromQueryPlan(plan, scenarioType, releaseId, new BudgetUsage(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        }
+
+        public static AgentPlan fromQueryPlan(QueryPlan plan, String scenarioType, String releaseId, BudgetUsage budgets) {
+            ScopeKey resolvedScope = plan == null ? null : plan.scope();
+            return new AgentPlan(
+                    plan == null ? "unknown" : plan.intent(),
+                    scenarioType,
+                    resolvedScope,
+                    plan == null || plan.anchors() == null ? List.of() : plan.anchors(),
+                    plan == null ? "released" : plan.requiredState(),
+                    plan == null || plan.toolPlan() == null ? List.of() : plan.toolPlan(),
+                    budgets,
+                    List.of("L2 runtime object", "content hash", "trace"),
+                    plan == null ? null : plan.clarificationQuestion(),
+                    plan == null ? RefusalReason.object_not_found : plan.refusalIfMissing(),
+                    releaseId,
+                    resolvedScope == null ? null : resolvedScope.value());
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record CandidateObject(
             @NotBlank String uri,
             @NotNull ObjectType objectType,
@@ -359,8 +397,35 @@ public final class CoreModels {
             String traceId,
             Refusal refusal,
             List<String> warnings,
-            String answer
+            String answer,
+            String schemaVersion,
+            String compatibilityNote,
+            String answerView,
+            GroundingMap groundingMap,
+            BudgetUsage budgetUsage
     ) {
+        public ServiceAnswer(
+                AnswerType answerType,
+                ScopeKey scope,
+                String releaseId,
+                List<Fact> facts,
+                List<String> inferences,
+                List<String> unknowns,
+                List<String> candidateSuggestions,
+                List<String> humanDecisions,
+                List<String> citedObjects,
+                List<DependencyEdge> dependencies,
+                String traceId,
+                Refusal refusal,
+                List<String> warnings,
+                String answer
+        ) {
+            this(answerType, scope, releaseId, facts, inferences, unknowns, candidateSuggestions, humanDecisions, citedObjects,
+                    dependencies, traceId, refusal, warnings, answer, "service-answer.v2",
+                    "Additive schema; facts remain grounded only by L2, dependency, or authorized governance evidence.",
+                    "human", GroundingMap.empty(), null);
+        }
+
         public static ServiceAnswer refusal(RefusalReason reason, String message, String traceId, ScopeKey scope, String releaseId) {
             return new ServiceAnswer(
                     AnswerType.refusal,
@@ -378,6 +443,13 @@ public final class CoreModels {
                     List.of(),
                     null);
         }
+
+        public ServiceAnswer withValidation(GroundingMap groundingMap, BudgetUsage budgetUsage, String answerView, String answerText) {
+            return new ServiceAnswer(answerType, scope, releaseId, facts, inferences, unknowns, candidateSuggestions, humanDecisions,
+                    citedObjects, dependencies, traceId, refusal, warnings, answerText, schemaVersion, compatibilityNote,
+                    answerView == null || answerView.isBlank() ? this.answerView : answerView,
+                    groundingMap == null ? GroundingMap.empty() : groundingMap, budgetUsage);
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -394,7 +466,9 @@ public final class CoreModels {
             String callerId,
             @NotBlank String entrypoint,
             String queryText,
+            String queryTextHash,
             QueryPlan queryPlan,
+            AgentPlan agentPlan,
             ScopeKey resolvedScope,
             List<String> candidateUris,
             List<String> selectedUris,
@@ -408,6 +482,9 @@ public final class CoreModels {
             GroundingMap groundingMap,
             String answerView,
             BudgetUsage budgetUsage,
+            String scenarioInputSummary,
+            String scenarioInputHash,
+            String contextHash,
             String status
     ) {
         public static Builder builder(String traceId, String entrypoint) {
@@ -419,7 +496,9 @@ public final class CoreModels {
             private final String entrypoint;
             private String callerId;
             private String queryText;
+            private String queryTextHash;
             private QueryPlan queryPlan;
+            private AgentPlan agentPlan;
             private ScopeKey resolvedScope;
             private List<String> candidateUris = new ArrayList<>();
             private List<String> selectedUris = new ArrayList<>();
@@ -433,6 +512,9 @@ public final class CoreModels {
             private GroundingMap groundingMap = GroundingMap.empty();
             private String answerView;
             private BudgetUsage budgetUsage;
+            private String scenarioInputSummary;
+            private String scenarioInputHash;
+            private String contextHash;
             private String status;
 
             private Builder(String traceId, String entrypoint) {
@@ -442,7 +524,9 @@ public final class CoreModels {
 
             public Builder callerId(String callerId) { this.callerId = callerId; return this; }
             public Builder queryText(String queryText) { this.queryText = queryText; return this; }
+            public Builder queryTextHash(String queryTextHash) { this.queryTextHash = queryTextHash; return this; }
             public Builder queryPlan(QueryPlan queryPlan) { this.queryPlan = queryPlan; return this; }
+            public Builder agentPlan(AgentPlan agentPlan) { this.agentPlan = agentPlan; return this; }
             public Builder resolvedScope(ScopeKey resolvedScope) { this.resolvedScope = resolvedScope; return this; }
             public Builder candidateUris(List<String> candidateUris) { this.candidateUris = safe(candidateUris); return this; }
             public Builder selectedUris(List<String> selectedUris) { this.selectedUris = safe(selectedUris); return this; }
@@ -455,12 +539,15 @@ public final class CoreModels {
             public Builder groundingMap(GroundingMap groundingMap) { this.groundingMap = groundingMap == null ? GroundingMap.empty() : groundingMap; return this; }
             public Builder answerView(String answerView) { this.answerView = answerView; return this; }
             public Builder budgetUsage(BudgetUsage budgetUsage) { this.budgetUsage = budgetUsage; return this; }
+            public Builder scenarioInputSummary(String scenarioInputSummary) { this.scenarioInputSummary = scenarioInputSummary; return this; }
+            public Builder scenarioInputHash(String scenarioInputHash) { this.scenarioInputHash = scenarioInputHash; return this; }
+            public Builder contextHash(String contextHash) { this.contextHash = contextHash; return this; }
             public Builder status(String status) { this.status = status; return this; }
 
             public TraceRecord build() {
-                return new TraceRecord(traceId, callerId, entrypoint, queryText, queryPlan, resolvedScope,
+                return new TraceRecord(traceId, callerId, entrypoint, queryText, queryTextHash, queryPlan, agentPlan, resolvedScope,
                         candidateUris, selectedUris, l2ReadUris, refusalReason, releaseId, durationMs, createdAt, toolCalls,
-                        toolSteps, groundingMap, answerView, budgetUsage, status);
+                        toolSteps, groundingMap, answerView, budgetUsage, scenarioInputSummary, scenarioInputHash, contextHash, status);
             }
 
             private static List<String> safe(List<String> values) {

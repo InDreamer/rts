@@ -77,6 +77,11 @@ RTS 运行时读取 runtime projection store，不直接读取 KB/candidate pack
 
 ```bash
 RTS_STORE_ROOT=runtime-store
+RTS_TOOL_ORCHESTRATOR_ENABLED=false
+RTS_CONFUSABLE_CHECK_ENABLED=false
+RTS_IMPACT_CANDIDATES_ENABLED=false
+RTS_TEST_PLAN_CANDIDATES_ENABLED=false
+RTS_MCP_EXPANDED_TOOLS_ENABLED=false
 ```
 
 仓库提供 sample store：
@@ -184,7 +189,13 @@ lsof -nP -iTCP:8080 -sTCP:LISTEN
 curl -s http://localhost:8080/mcp/tools | jq
 ```
 
-预期：返回 JSON，包含 `rts_ask`、`rts_find_objects`、`rts_read_object_l2`、`rts_trace_report` 等工具。
+预期：返回 JSON，包含：
+
+- 默认 `RTS_MCP_EXPANDED_TOOLS_ENABLED=false` 时，`tools` 只包含 minimal tool mode：`rts_find_objects`、`rts_read_object`、`rts_get_dependencies`、`rts_ask`、`rts_get_trace`。
+- 显式设置 `RTS_MCP_EXPANDED_TOOLS_ENABLED=true` 后，expanded catalog 才会包含并允许执行 `rts_read_object_l2`、`rts_trace_report`、`rts_analyze_pr_diff` 等扩展工具；关闭时直接调用这些 expanded endpoints 也会被拒绝。
+- `catalog`：每个工具的 purpose、required permission、required fields、possible refusal reasons。
+
+MCP catalog 是 tool mode 入口说明；每个工具仍共享 REST service 的 scope、permission、release、L2 hash、trace 和 refusal gate。Catalog 元数据来自同一套 RTS tool registry，因此 MCP、REST agent tools 和内部 harness 的 tool name、purpose、permission 和 refusal 语义保持一致。
 
 ### 查询 photo pack
 
@@ -248,12 +259,48 @@ curl -sS http://localhost:8080/api/v1/traces/<TRACE_ID> \
 
 预期：返回 `l2_read_uris`、`grounding_map`、`budget_usage`、`status`。
 
+### Managed scenario smoke test
+
+如果 active release 切到回滚 sample `rel-2026-05-06`，可以验证 scenario report：
+
+scenario candidate 能力默认关闭。先在本地显式开启需要的 feature flag：
+
+```bash
+RTS_IMPACT_CANDIDATES_ENABLED=true
+RTS_TEST_PLAN_CANDIDATES_ENABLED=true
+```
+
+```bash
+curl -sS -X POST http://localhost:8080/api/v1/scenario/analyze-failed-message \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{
+    "input": "src.amount=123.45\nsrc.currency=USD",
+    "caller_id": "tester",
+    "scope": {
+      "channel": "tradition",
+      "product": "stella",
+      "pack": "payments",
+      "domain": "core"
+    },
+    "output_mode": "default",
+    "max_objects": 5
+  }' | jq
+```
+
+预期：返回 `schema_version=scenario-report.v1`、`status=candidate`、`candidates`、`citations`、`grounding_map`、`trace_id`。scenario 输出不是 release approval、final root cause、QA signoff 或 human decision。
+
 ## 6. 常用入口
 
 ### REST
 
 - `POST /api/v1/query`：确定性查询。
 - `POST /api/v1/ask`：受控 LLM harness 入口；默认本地 LLM disabled，仍会走受控工具输出 grounded answer。
+- `POST /api/v1/scenario/analyze-pr-diff`：PR diff impact candidate report。
+- `POST /api/v1/scenario/investigate-exception`：exception investigation candidate report。
+- `POST /api/v1/scenario/analyze-failed-message`：failed/raw message grounded target candidate report。
+- `POST /api/v1/scenario/plan-tests`：test planning candidate report。
+- `POST /api/v1/scenario/governance-review`：governance review candidate report。
 - `POST /api/v1/find`：候选搜索。
 - `POST /api/v1/objects/get`：读取 object card 和 dependency summary。
 - `POST /api/v1/objects/content`：读取 L2 content。
@@ -310,12 +357,15 @@ api key: tester-key
 RTS_LLM_ENABLED=false
 ```
 
-此时 `/ask` 使用 disabled LLM client，通过受控工具链返回 grounded answer，适合本地验证。
+此时 `/ask` 不依赖外部 provider。若 `RTS_TOOL_ORCHESTRATOR_ENABLED=false`，`/ask` 直接退化为 deterministic `/query`；若显式开启 orchestrator，则使用 disabled LLM client 通过受控工具链返回 grounded answer。
+
+高风险候选能力的生产默认值保持关闭：`RTS_TOOL_ORCHESTRATOR_ENABLED=false`、`RTS_CONFUSABLE_CHECK_ENABLED=false`、`RTS_IMPACT_CANDIDATES_ENABLED=false`、`RTS_TEST_PLAN_CANDIDATES_ENABLED=false`、`RTS_MCP_EXPANDED_TOOLS_ENABLED=false`。只有评估通过后才逐项开启。
 
 如需启用 OpenAI-compatible endpoint：
 
 ```bash
 RTS_LLM_ENABLED=true \
+RTS_TOOL_ORCHESTRATOR_ENABLED=true \
 RTS_LLM_BASE_URL=https://example.com \
 RTS_LLM_API_KEY=... \
 RTS_LLM_MODEL=... \

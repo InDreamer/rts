@@ -62,31 +62,46 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
                 base.traceId(),
                 base.refusal(),
                 base.warnings(),
-                base.answer());
-        return new LlmDraft(shapedText.isBlank() ? "Responses adapter returned no text; grounded answer retained." : shapedText,
+                shapedAnswerText(base, shapedText));
+        return new LlmDraft(shapedText,
                 List.of("resolve_scope", "find_objects", "get_object_card", "read_object_l2", "get_dependencies", "responses"),
                 shaped);
     }
 
     private GroundedContext loadGroundedContext(AskRequest request, ToolContext toolContext) {
-        QueryPlan plan = (QueryPlan) toolContext.call("resolve_scope",
-                new PlanRequest(request.query(), request.callerId(), request.scopeHint(), request.outputMode(), true)).output();
+        QueryPlan plan = planned(toolContext, "resolve_scope", QueryPlan.class);
+        if (plan == null) {
+            plan = (QueryPlan) toolContext.call("resolve_scope",
+                    new PlanRequest(request.query(), request.callerId(), request.scopeHint(), request.outputMode(), true)).output();
+        }
         if (plan.needsClarification()) {
             throw new QueryRefusalException(com.rts.model.CoreModels.RefusalReason.scope_unclear, plan.clarificationQuestion());
         }
         @SuppressWarnings("unchecked")
-        List<CandidateObject> candidates = (List<CandidateObject>) toolContext.call("find_objects",
-                new FindRequest(request.query(), plan.scope(), objectTypesForIntent(plan.intent()), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
+        List<CandidateObject> candidates = (List<CandidateObject>) toolContext.plannedOutputs().get("find_objects");
+        if (candidates == null) {
+            candidates = (List<CandidateObject>) toolContext.call("find_objects",
+                    new FindRequest(request.query(), plan.scope(), objectTypesForIntent(plan.intent()), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
+        }
         if (candidates.isEmpty()) {
             throw new QueryRefusalException(com.rts.model.CoreModels.RefusalReason.object_not_found, "No released structured object matched the query");
         }
         CandidateObject selected = candidates.get(0);
-        ObjectEnvelope object = (ObjectEnvelope) toolContext.call("get_object_card",
-                new ObjectGetRequest(selected.uri(), null, null, request.callerId(), request.apiKey())).output();
-        L2Content l2 = (L2Content) toolContext.call("read_object_l2",
-                new ObjectContentRequest(selected.uri(), "answer", null, null, request.callerId(), request.apiKey())).output();
-        DependencyResult dependencies = (DependencyResult) toolContext.call("get_dependencies",
-                new DependenciesRequest(selected.uri(), Direction.forward, null, 1, "answer", null, request.callerId(), request.apiKey())).output();
+        ObjectEnvelope object = planned(toolContext, "get_object_card", ObjectEnvelope.class);
+        if (object == null) {
+            object = (ObjectEnvelope) toolContext.call("get_object_card",
+                    new ObjectGetRequest(selected.uri(), null, null, request.callerId(), request.apiKey())).output();
+        }
+        L2Content l2 = planned(toolContext, "read_object_l2", L2Content.class);
+        if (l2 == null) {
+            l2 = (L2Content) toolContext.call("read_object_l2",
+                    new ObjectContentRequest(selected.uri(), "answer", null, null, request.callerId(), request.apiKey())).output();
+        }
+        DependencyResult dependencies = planned(toolContext, "get_dependencies", DependencyResult.class);
+        if (dependencies == null) {
+            dependencies = (DependencyResult) toolContext.call("get_dependencies",
+                    new DependenciesRequest(selected.uri(), Direction.forward, null, 1, "answer", null, request.callerId(), request.apiKey())).output();
+        }
         Fact fact = new Fact(l2.content(), selected.uri(), l2.releaseId(), "l2:" + l2.contentHash());
         ServiceAnswer answer = new ServiceAnswer(
                 com.rts.model.CoreModels.AnswerType.answer,
@@ -104,6 +119,11 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
                 warningsFor(object),
                 l2.content());
         return new GroundedContext(answer, l2);
+    }
+
+    private <T> T planned(ToolContext toolContext, String toolName, Class<T> type) {
+        Object value = toolContext.plannedOutputs().get(toolName);
+        return type.isInstance(value) ? type.cast(value) : null;
     }
 
     private String callResponses(String query, GroundedContext context) {
@@ -186,6 +206,13 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
             warnings.add("Object governance status: " + object.objectCard().cardJson().get("status"));
         }
         return List.copyOf(warnings);
+    }
+
+    private String shapedAnswerText(ServiceAnswer base, String shapedText) {
+        if (shapedText == null || shapedText.isBlank()) {
+            return base.answer();
+        }
+        return shapedText;
     }
 
     private record GroundedContext(ServiceAnswer answer, L2Content l2) {}

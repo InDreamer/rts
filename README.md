@@ -32,6 +32,7 @@ RTS 的核心职责是从尽可能准确和充分的 source 中整理 transforma
 - `docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md` — Day1 之后的受控 agentic retrieval 和 LLM/MCP 增强路线。
 - `docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 LLM harness、外部 agent tool mode、runtime projection access boundary 和场景接入的当前对齐结论。
 - `docs/confirmed/final-llm-agent-service-plan-zh.md` — 最终面向 LLM agent 的 RTS 服务路线图摘要；原完整长版已归档。
+- `docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划。
 - `docs/confirmed/document-decision-register-zh.md` — 文档审核中的关键抉择点、歧义点和下一轮删减规则。
 - `docs/java-service-runbook-zh.md` — 本地运行、配置、测试、排障和服务维护。
 - `docs/api-caller-guide-zh.md` — API 调用方如何发起查询、理解响应和处理拒答。

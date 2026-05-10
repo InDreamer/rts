@@ -87,11 +87,23 @@ public class AgentAnalysisService {
                 .map(object -> impactCandidate(seedUri, object, reverse.edges()))
                 .toList();
         List<Fact> facts = new ArrayList<>();
+        List<GroundedClaim> claims = new ArrayList<>();
         if (request.readL2()) {
             for (ImpactCandidate candidate : candidates) {
                 L2Content l2 = queryService.readContent(new ObjectContentRequest(candidate.impactedObjectUri(), "impact", null, traceId,
                         request.callerId(), request.apiKey()));
                 facts.add(new Fact("Impacted object L2 read for candidate " + candidate.impactedObjectUri(), candidate.impactedObjectUri(), l2.releaseId(), "l2:" + l2.contentHash()));
+                claims.add(new GroundedClaim("Impact candidate grounded by L2 " + candidate.impactedObjectUri(),
+                        List.of(new GroundingEvidence(candidate.impactedObjectUri(), l2.contentHash(), "$")),
+                        ValidationStatus.grounded, null));
+            }
+            if (candidates.isEmpty()) {
+                L2Content l2 = queryService.readContent(new ObjectContentRequest(seedUri, "impact_seed", null, traceId,
+                        request.callerId(), request.apiKey()));
+                facts.add(new Fact("Changed seed object L2 read for candidate analysis " + seedUri, seedUri, l2.releaseId(), "l2:" + l2.contentHash()));
+                claims.add(new GroundedClaim("Changed seed object grounded by L2 " + seedUri,
+                        List.of(new GroundingEvidence(seedUri, l2.contentHash(), "$")),
+                        ValidationStatus.grounded, null));
             }
         }
         List<String> unknowns = candidates.isEmpty() ? List.of("No reverse dependency candidates were found in the selected scope.") : List.of();
@@ -101,7 +113,7 @@ public class AgentAnalysisService {
                 facts.stream().map(Fact::uri).toList(), RefusalReason.none, List.of("find_seed", "get_reverse_dependencies", request.readL2() ? "read_object_l2" : "cards_only"));
         return new ImpactAnalysisResult("candidate", releaseId, scope, facts,
                 List.of("Reverse released dependency traversal produced " + candidates.size() + " impact candidate(s)."),
-                candidates, unknowns, warnings, traceId);
+                candidates, unknowns, warnings, traceId, new GroundingMap(claims));
     }
 
     public TestPlanResult planTests(TestPlanRequest request) {

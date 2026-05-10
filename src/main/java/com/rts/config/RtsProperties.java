@@ -8,7 +8,7 @@ public class RtsProperties {
     private Path storeRoot = Path.of("runtime-store");
     private boolean llmEnabled = false;
     private String llmModel = "gpt-5.5";
-    private String llmBaseUrl = "https://api.jankan.com";
+    private String llmBaseUrl = "https://pixel.try-chatapi.com";
     private String llmApiKey = "";
     private String llmWireApi = "responses";
     private boolean llmStoreResponses = false;
@@ -23,13 +23,13 @@ public class RtsProperties {
     private int maxModelCalls = 1;
     private long maxLatencyMs = 30000;
     private boolean plannerV2Enabled = false;
-    private boolean toolOrchestratorEnabled = true;
+    private boolean toolOrchestratorEnabled = false;
     private boolean rerankerEnabled = false;
-    private boolean confusableCheckEnabled = true;
+    private boolean confusableCheckEnabled = false;
     private boolean vectorRecallEnabled = false;
-    private boolean impactCandidatesEnabled = true;
-    private boolean testPlanCandidatesEnabled = true;
-    private boolean mcpExpandedToolsEnabled = true;
+    private boolean impactCandidatesEnabled = false;
+    private boolean testPlanCandidatesEnabled = false;
+    private boolean mcpExpandedToolsEnabled = false;
 
     public Path getStoreRoot() {
         return storeRoot;

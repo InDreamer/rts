@@ -10,12 +10,14 @@ children:
   - docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md
   - docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md
   - docs/confirmed/final-llm-agent-service-plan-zh.md
+  - docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md
   - docs/confirmed/document-decision-register-zh.md
 summary: route confirmed RTS baseline documents
 read_when:
   - 需要选择当前 RTS confirmed baseline 文档
   - 需要判断 Day1 或 Day2 服务方案该读哪一篇
   - 需要理解 RTS 最终如何服务 LLM agent
+  - 需要完整落地 RTS service 内部 LLM agent 接入
   - 第一次进入 confirmed 文档区
 skip_when:
   - 已经明确要读取某一篇 confirmed leaf
@@ -39,7 +41,8 @@ This directory contains the current internal alignment baseline for RTS.
 5. `day2-agentic-retrieval-evolution-plan-zh.md` — Day2 受控 agentic retrieval、rerank、MCP 扩展、影响分析和测试规划演进方向。
 6. `llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 LLM harness、外部 agent tool mode、runtime projection access boundary 和 PR diff / exception 等场景接入的当前对齐结论。
 7. `final-llm-agent-service-plan-zh.md` — RTS 最终面向 LLM agent 的服务路线图摘要，定义 managed/tool mode、能力地图、阶段路线、answer contract 和不可越界边界。
-8. `document-decision-register-zh.md` — 文档审核中的关键抉择点、歧义点和下一轮删减规则。
+8. `internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划，覆盖 managed harness、tool orchestration、scenario endpoints、MCP/tool mode、memory、grounding、evaluation 和运维控制。
+9. `document-decision-register-zh.md` — 文档审核中的关键抉择点、歧义点和下一轮删减规则。
 
 ## Read triggers
 
@@ -49,7 +52,8 @@ This directory contains the current internal alignment baseline for RTS.
 - 需要规划 Day1 后的检索/LLM/MCP 增强：读 1、2、3、4、5。
 - 需要判断 LLM 放在 RTS service 内部还是外部 agent、如何选择 OpenAI/Claude/LangChain/PageIndex 等框架、如何接 PR diff 或 exception 场景：读 6，再按需读 4、5、7。
 - 需要规划最终 LLM agent 服务形态、harness、MCP/API/Q&A/pipeline 统一入口：读 1、2、3、4、5、6、7。
-- 需要判断历史文档哪些保留、压缩、归档或删除：读 8。
+- 需要把 RTS service 内部 LLM agent 接入落到完整功能、接口、控制点、测试和运维计划：读 8。
+- 需要判断历史文档哪些保留、压缩、归档或删除：读 9。
 
 ## Conflict rule
 
@@ -64,6 +68,7 @@ Confirmed docs use topic-specific authority. Resolve conflicts with this table b
 | LLM placement, managed mode vs tool mode, framework/SDK boundary, and PR diff / exception / failed-message scenario integration | `llm-harness-and-agent-integration-alignment-zh.md` |
 | Day2 retrieval evolution, planner/orchestrator, rerank/vector/confusable active use, expanded MCP, impact/test candidate evolution | `day2-agentic-retrieval-evolution-plan-zh.md` |
 | Final long-range service roadmap, capability map, consumer views, and sequencing after current alignment decisions | `final-llm-agent-service-plan-zh.md` |
+| Complete internal LLM agent implementation work packages, service contracts, validation gates, scenario endpoints, memory/context, evaluation, and rollout controls | `internal-llm-agent-service-implementation-plan-zh.md` |
 | Documentation cleanup, compression, archive/delete/retain decisions | `document-decision-register-zh.md` |
 
 If a topic is not listed, follow the current baseline order above. `docs/reference/` materials may explain rationale but do not override confirmed docs. `docs/archive/` materials never override confirmed docs.

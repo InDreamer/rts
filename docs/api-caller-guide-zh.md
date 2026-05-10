@@ -129,25 +129,73 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 
 请求 body 与 `/query` 类似，额外支持 `max_tool_calls`。LLM 仍只能通过 allowlisted RTS tools 读取 projection。
 
-### 3.3 候选搜索 `/api/v1/find`
+`/ask` 返回统一 answer envelope。成功答案除了 `answer` 文本外，仍必须包含：
+
+- `schema_version`：当前为 `service-answer.v2`。
+- `facts`：每条事实都必须来自本次读取过的 L2 object。
+- `cited_objects`：被引用的 object URI。
+- `grounding_map`：claim 到 L2 URI/content hash 的映射。
+- `budget_usage`：tool/L2/model/latency budget 使用情况。
+- `trace_id`：可用于审计工具序列、L2 reads 和 grounding。
+
+如果模型输出无法通过 claim-level grounding validation，服务会返回 `refusal.reason=unsupported_claim` 或 `hash_mismatch`，不会把自由文本当作事实答案。
+
+`RTS_TOOL_ORCHESTRATOR_ENABLED=false` 时，`/ask` 会退化为 deterministic `/query` 风格答案。显式开启 orchestrator 后，内部 `/ask` 链路会先生成受控 `AgentPlan`，记录 intent、scenario type、scope snapshot、release snapshot、tool plan 和 expected evidence。Planner 只允许决定工具计划或 clarification，不允许直接产出业务事实。
+
+### 3.3 Managed scenario endpoints
+
+复杂外部输入可以走 managed scenario endpoint，由 RTS 内部 harness/support tools 生成 grounded candidate report。外部输入只作为线索，不是真相。
+
+PR diff、exception impact 和 test planning 这类 candidate 能力默认通过 feature flag 保守关闭；本地验证或受控环境需要显式开启对应开关。
+
+当前入口：
+
+| Endpoint | 场景 | 输出边界 |
+|---|---|---|
+| `POST /api/v1/scenario/analyze-pr-diff` | PR diff impact analysis | impact/test candidate，不是 release approval |
+| `POST /api/v1/scenario/investigate-exception` | exception/log investigation | investigation path，不是 final root cause |
+| `POST /api/v1/scenario/analyze-failed-message` | failed/raw message analysis | target candidate，不是生产转换结果 |
+| `POST /api/v1/scenario/plan-tests` | test planning | test suggestions，不是 QA signoff |
+| `POST /api/v1/scenario/governance-review` | governance review assistant | reviewer questions / conflict candidates，不是 human decision |
+
+请求字段：
+
+```json
+{
+  "input": "diff/log/raw message text",
+  "caller_id": "tester",
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "output_mode": "default",
+  "max_objects": 5
+}
+```
+
+统一 report 字段包括 `schema_version`、`status`、`scenario_type`、`input_summary`、`facts`、`inferences`、`candidates`、`unknowns`、`next_evidence_needed`、`citations`、`grounding_map`、`trace_id`、`budget_usage`、`warnings`。
+
+### 3.4 候选搜索 `/api/v1/find`
 
 按关键词搜索对象，返回候选列表。适合在发起精确查询前探索哪些对象存在。
 
 常用请求字段：`query`、`caller_id`、`scope`、`object_types`、`anchors`、`limit`、`output_mode`。
 
-### 3.4 读取对象 L2 内容 `/api/v1/objects/content`
+### 3.5 读取对象 L2 内容 `/api/v1/objects/content`
 
 直接读取某个 object 的 L2 内容。
 
 常用请求字段：`uri`、`purpose`、`caller_id`。示例 URI：`rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_time`。
 
-### 3.5 依赖遍历 `/api/v1/objects/dependencies`
+### 3.6 依赖遍历 `/api/v1/objects/dependencies`
 
 查询某个 object 的依赖关系。
 
 常用请求字段：`uri`、`direction`、`depth`、`purpose`、`caller_id`。`direction` 可选值：`forward`、`reverse`、`both`。
 
-### 3.6 读取 Trace `/api/v1/traces/{traceId}`
+### 3.7 读取 Trace `/api/v1/traces/{traceId}`
 
 查看某次查询的执行详情，包括用了哪些 L2 对象、grounding 情况、耗时。
 
@@ -180,6 +228,11 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
   "cited_objects": ["rts://..."],
   "dependencies": [],
   "trace_id": "...",
+  "schema_version": "service-answer.v2",
+  "grounding_map": {
+    "claims": []
+  },
+  "budget_usage": {},
   "warnings": []
 }
 ```
@@ -191,6 +244,8 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 | `cited_objects` | 本次答案引用的 object URI 列表 |
 | `dependencies` | 关联依赖边 |
 | `trace_id` | 可用于追踪本次查询执行详情 |
+| `grounding_map` | claim 到 L2 object/hash 的映射；search hit 或 memory 不能成为 fact source |
+| `budget_usage` | 本次请求的工具、L2、模型、延迟预算使用 |
 | `warnings` | 非阻塞警告，如 demo-signoff/photo-reconstructed 标注 |
 
 ### 拒答
@@ -216,6 +271,10 @@ scope 不属于当前 active release 时，服务会返回 `scope_unclear`。
 | `unauthorized_scope` | caller 无权访问该 scope | 确认 caller_id 和 api_key 正确，联系管理员确认权限 |
 | `object_not_found` | 在该 scope 下未找到匹配对象 | 用 `/find` 先搜索确认对象存在 |
 | `only_similarity_no_structured_match` | 只有相似候选，无精确匹配 | 换用更精确的查询词或用 `/find` 查候选 |
+| `tool_budget_exhausted` | tool、L2、依赖深度、上下文或延迟预算耗尽 | 缩小问题范围或降低读取深度；不要使用半截结果作为事实 |
+| `model_provider_failure` | LLM provider timeout、不可用或返回格式非法 | 稍后重试，或改用 `/query` / tool mode 获取 deterministic truth |
+| `unsupported_claim` | 模型或调用方请求的事实 claim 无法被本次 L2/依赖/governance evidence 支撑 | 改用更明确的 object URI、target path 或读取 grounding report |
+| `hash_mismatch` | claim 引用的 L2 hash 与本次读取结果不一致 | 重新读取 active release；检查调用方是否混用了旧 trace 或旧 release |
 | `active_release_missing` | 服务未加载任何 release | 联系运维，检查 store 是否配置 |
 
 ## 5. 旧 sample release

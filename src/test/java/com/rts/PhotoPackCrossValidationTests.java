@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.rts.index.LuceneIndexService;
 import com.rts.agent.AgentAnalysisService;
 import com.rts.agent.AgentToolService;
+import com.rts.config.RtsProperties;
 import com.rts.model.AgentServiceModels.ImpactAnalysisRequest;
 import com.rts.model.AgentServiceModels.TestPlanRequest;
 import com.rts.model.CoreModels.AnswerType;
@@ -87,9 +88,14 @@ class PhotoPackCrossValidationTests {
     @Autowired
     AgentAnalysisService agentAnalysisService;
 
+    @Autowired
+    RtsProperties properties;
+
     @BeforeEach
     void setup() throws Exception {
         store.clearForTests();
+        properties.setImpactCandidatesEnabled(true);
+        properties.setTestPlanCandidatesEnabled(true);
         copyDirectory(FIXTURE_RELEASE_ROOT, store.releaseRoot(RELEASE));
         Files.writeString(STORE_ROOT.resolve("active-release.json"), """
                 {

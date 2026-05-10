@@ -44,9 +44,11 @@ class LlmResponsesIntegrationTests {
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/responses", exchange -> {
             RESPONSE_REQUEST.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
-            byte[] body = """
-                    {"id":"resp_test","object":"response","status":"completed","output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Grounded rewrite only."}]}]}
-                    """.getBytes(StandardCharsets.UTF_8);
+            String text = "Grounded rewrite for payment.amount from "
+                    + TestProjectionFactory.RULE_URI;
+            byte[] body = ("""
+                    {"id":"resp_test","object":"response","status":"completed","output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":%s}]}]}
+                    """.formatted(jsonString(text))).getBytes(StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(200, body.length);
             exchange.getResponseBody().write(body);
             exchange.close();
@@ -63,6 +65,7 @@ class LlmResponsesIntegrationTests {
     static void properties(DynamicPropertyRegistry registry) {
         registry.add("rts.store-root", STORE_ROOT::toString);
         registry.add("rts.llm-enabled", () -> true);
+        registry.add("rts.tool-orchestrator-enabled", () -> true);
         registry.add("rts.llm-api-key", () -> "dummy");
         registry.add("rts.llm-base-url", () -> "http://localhost:" + server.getAddress().getPort());
         registry.add("rts.llm-model", () -> "gpt-5.5");
@@ -98,12 +101,16 @@ class LlmResponsesIntegrationTests {
         var answer = harness.ask(new AskRequest("payment amount target field", "tester", TestProjectionFactory.TESTER_KEY, stella, "default", 6));
 
         assertThat(answer.answerType()).isEqualTo(AnswerType.answer);
-        assertThat(answer.answer()).isEqualTo(TestProjectionFactory.ruleContent());
+        assertThat(answer.answer()).isEqualTo("Grounded rewrite for payment.amount from " + TestProjectionFactory.RULE_URI);
         assertThat(answer.facts()).extracting("uri").contains(TestProjectionFactory.RULE_URI);
         assertThat(Files.exists(STORE_ROOT.resolve("traces").resolve("llm-run-trace.jsonl"))).isTrue();
         assertThat(RESPONSE_REQUEST.get()).contains("\"model\":\"gpt-5.5\"");
         assertThat(RESPONSE_REQUEST.get()).contains("\"store\":false");
         assertThat(RESPONSE_REQUEST.get()).contains("\"reasoning\":{\"effort\":\"low\"}");
         assertThat(RESPONSE_REQUEST.get()).contains("Grounded RTS service result");
+    }
+
+    private static String jsonString(String value) {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 }

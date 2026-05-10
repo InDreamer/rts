@@ -29,8 +29,11 @@ import org.springframework.stereotype.Component;
 public class DisabledLlmClient implements LlmClient {
     @Override
     public LlmDraft draftAnswer(AskRequest request, ToolContext toolContext) {
-        QueryPlan plan = (QueryPlan) toolContext.call("resolve_scope",
-                new PlanRequest(request.query(), request.callerId(), request.scopeHint(), request.outputMode(), true)).output();
+        QueryPlan plan = planned(toolContext, "resolve_scope", QueryPlan.class);
+        if (plan == null) {
+            plan = (QueryPlan) toolContext.call("resolve_scope",
+                    new PlanRequest(request.query(), request.callerId(), request.scopeHint(), request.outputMode(), true)).output();
+        }
         if (plan.needsClarification()) {
             ServiceAnswer refusal = new ServiceAnswer(AnswerType.refusal, request.scopeHint(), null, List.of(), List.of(),
                     List.of(plan.clarificationQuestion()), List.of(), List.of(), List.of(), List.of(), "trace-llm-refusal",
@@ -38,8 +41,11 @@ public class DisabledLlmClient implements LlmClient {
             return new LlmDraft("Scope clarification required.", List.of("resolve_scope"), refusal);
         }
         @SuppressWarnings("unchecked")
-        List<CandidateObject> candidates = (List<CandidateObject>) toolContext.call("find_objects",
-                new FindRequest(request.query(), plan.scope(), objectTypesForIntent(plan.intent()), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
+        List<CandidateObject> candidates = (List<CandidateObject>) toolContext.plannedOutputs().get("find_objects");
+        if (candidates == null) {
+            candidates = (List<CandidateObject>) toolContext.call("find_objects",
+                    new FindRequest(request.query(), plan.scope(), objectTypesForIntent(plan.intent()), plan.anchors(), 5, request.callerId(), request.apiKey(), request.outputMode())).output();
+        }
         if (candidates.isEmpty()) {
             ServiceAnswer refusal = new ServiceAnswer(AnswerType.refusal, plan.scope(), null, List.of(), List.of(),
                     List.of("No released structured object matched the query"), List.of(), List.of(), List.of(), List.of(), "trace-llm-refusal",
@@ -47,12 +53,21 @@ public class DisabledLlmClient implements LlmClient {
             return new LlmDraft("No grounded object found.", List.of("resolve_scope", "find_objects"), refusal);
         }
         CandidateObject selected = candidates.get(0);
-        ObjectEnvelope object = (ObjectEnvelope) toolContext.call("get_object_card",
-                new ObjectGetRequest(selected.uri(), null, null, request.callerId(), request.apiKey())).output();
-        L2Content l2 = (L2Content) toolContext.call("read_object_l2",
-                new ObjectContentRequest(selected.uri(), "answer", null, null, request.callerId(), request.apiKey())).output();
-        DependencyResult dependencies = (DependencyResult) toolContext.call("get_dependencies",
-                new DependenciesRequest(selected.uri(), Direction.forward, null, 1, "answer", null, request.callerId(), request.apiKey())).output();
+        ObjectEnvelope object = planned(toolContext, "get_object_card", ObjectEnvelope.class);
+        if (object == null) {
+            object = (ObjectEnvelope) toolContext.call("get_object_card",
+                    new ObjectGetRequest(selected.uri(), null, null, request.callerId(), request.apiKey())).output();
+        }
+        L2Content l2 = planned(toolContext, "read_object_l2", L2Content.class);
+        if (l2 == null) {
+            l2 = (L2Content) toolContext.call("read_object_l2",
+                    new ObjectContentRequest(selected.uri(), "answer", null, null, request.callerId(), request.apiKey())).output();
+        }
+        DependencyResult dependencies = planned(toolContext, "get_dependencies", DependencyResult.class);
+        if (dependencies == null) {
+            dependencies = (DependencyResult) toolContext.call("get_dependencies",
+                    new DependenciesRequest(selected.uri(), Direction.forward, null, 1, "answer", null, request.callerId(), request.apiKey())).output();
+        }
         String factText = l2.content();
         Fact fact = new Fact(factText, selected.uri(), l2.releaseId(), "l2:" + l2.contentHash());
         ServiceAnswer answer = new ServiceAnswer(AnswerType.answer, plan.scope(), l2.releaseId(), List.of(fact),
@@ -85,5 +100,10 @@ public class DisabledLlmClient implements LlmClient {
             warnings.add("Object governance status: " + object.objectCard().cardJson().get("status"));
         }
         return List.copyOf(warnings);
+    }
+
+    private <T> T planned(ToolContext toolContext, String toolName, Class<T> type) {
+        Object value = toolContext.plannedOutputs().get(toolName);
+        return type.isInstance(value) ? type.cast(value) : null;
     }
 }

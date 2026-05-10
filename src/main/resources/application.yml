@@ -2,7 +2,7 @@ rts:
   store-root: ${RTS_STORE_ROOT:runtime-store}
   llm-enabled: ${RTS_LLM_ENABLED:false}
   llm-model: ${RTS_LLM_MODEL:gpt-5.5}
-  llm-base-url: ${RTS_LLM_BASE_URL:https://api.jankan.com}
+  llm-base-url: ${RTS_LLM_BASE_URL:https://pixel.try-chatapi.com}
   llm-api-key: ${RTS_LLM_API_KEY:}
   llm-wire-api: ${RTS_LLM_WIRE_API:responses}
   llm-store-responses: ${RTS_LLM_STORE_RESPONSES:false}
@@ -17,10 +17,10 @@ rts:
   max-model-calls: ${RTS_MAX_MODEL_CALLS:1}
   max-latency-ms: ${RTS_MAX_LATENCY_MS:30000}
   planner-v2-enabled: ${RTS_PLANNER_V2_ENABLED:false}
-  tool-orchestrator-enabled: ${RTS_TOOL_ORCHESTRATOR_ENABLED:true}
+  tool-orchestrator-enabled: ${RTS_TOOL_ORCHESTRATOR_ENABLED:false}
   reranker-enabled: ${RTS_RERANKER_ENABLED:false}
-  confusable-check-enabled: ${RTS_CONFUSABLE_CHECK_ENABLED:true}
+  confusable-check-enabled: ${RTS_CONFUSABLE_CHECK_ENABLED:false}
   vector-recall-enabled: ${RTS_VECTOR_RECALL_ENABLED:false}
-  impact-candidates-enabled: ${RTS_IMPACT_CANDIDATES_ENABLED:true}
-  test-plan-candidates-enabled: ${RTS_TEST_PLAN_CANDIDATES_ENABLED:true}
-  mcp-expanded-tools-enabled: ${RTS_MCP_EXPANDED_TOOLS_ENABLED:true}
+  impact-candidates-enabled: ${RTS_IMPACT_CANDIDATES_ENABLED:false}
+  test-plan-candidates-enabled: ${RTS_TEST_PLAN_CANDIDATES_ENABLED:false}
+  mcp-expanded-tools-enabled: ${RTS_MCP_EXPANDED_TOOLS_ENABLED:false}

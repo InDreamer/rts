@@ -8,6 +8,7 @@ import com.rts.model.CoreModels.Fact;
 import com.rts.model.CoreModels.L2Content;
 import com.rts.model.CoreModels.ObjectCard;
 import com.rts.model.CoreModels.ObjectManifestEntry;
+import com.rts.model.CoreModels.Refusal;
 import com.rts.model.CoreModels.RefusalReason;
 import com.rts.model.CoreModels.ScopeKey;
 import com.rts.model.CoreModels.ScopeRecord;
@@ -65,6 +66,15 @@ public final class AgentServiceModels {
             String fieldPath
     ) {}
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record Citation(
+            String releaseId,
+            String objectUri,
+            String contentHash,
+            String evidenceType
+    ) {}
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record GroundedClaim(
             String claim,
@@ -104,6 +114,55 @@ public final class AgentServiceModels {
             int maxModelCalls,
             long latencyMs,
             long maxLatencyMs
+    ) {}
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ScenarioReport(
+            String schemaVersion,
+            String status,
+            String scenarioType,
+            String inputSummary,
+            ScopeKey scope,
+            String releaseId,
+            List<Fact> facts,
+            List<String> inferences,
+            List<String> candidates,
+            List<String> unknowns,
+            List<String> nextEvidenceNeeded,
+            List<Citation> citations,
+            GroundingMap groundingMap,
+            String traceId,
+            BudgetUsage budgetUsage,
+            Refusal refusal,
+            List<String> warnings
+    ) {}
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ManagedScenarioRequest(
+            String scenarioType,
+            String input,
+            ScopeKey scope,
+            String callerId,
+            String apiKey,
+            String outputMode,
+            Integer maxObjects
+    ) {}
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ToolCatalogEntry(
+            String name,
+            String purpose,
+            String requiredPermission,
+            List<String> requiredFields,
+            List<RefusalReason> possibleRefusalReasons,
+            String inputSchema,
+            String outputSchema,
+            int budgetCost,
+            List<String> allowedIntents,
+            String traceRedactionRule
     ) {}
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -186,8 +245,14 @@ public final class AgentServiceModels {
             List<ImpactCandidate> candidates,
             List<String> unknowns,
             List<String> warnings,
-            String traceId
-    ) {}
+            String traceId,
+            GroundingMap groundingMap
+    ) {
+        public ImpactAnalysisResult(String status, String releaseId, ScopeKey scope, List<Fact> facts, List<String> inferences,
+                List<ImpactCandidate> candidates, List<String> unknowns, List<String> warnings, String traceId) {
+            this(status, releaseId, scope, facts, inferences, candidates, unknowns, warnings, traceId, GroundingMap.empty());
+        }
+    }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -551,8 +616,17 @@ public final class AgentServiceModels {
             long correctObjectFoundCount,
             long refusalCorrectCount,
             long unsupportedClaimCount,
-            List<EvaluationResult> results
-    ) {}
+            List<EvaluationResult> results,
+            Map<String, Double> thresholds,
+            boolean passed,
+            List<String> gateFailures
+    ) {
+        public EvaluationRunResult(String runId, String mode, int totalCases, long correctScopeCount, long correctObjectFoundCount,
+                long refusalCorrectCount, long unsupportedClaimCount, List<EvaluationResult> results) {
+            this(runId, mode, totalCases, correctScopeCount, correctObjectFoundCount, refusalCorrectCount, unsupportedClaimCount,
+                    results, Map.of(), false, List.of("evaluation thresholds were not supplied"));
+        }
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record EvaluationRunRequest(

@@ -10,7 +10,9 @@ import com.rts.agent.FeedbackMemoryService;
 import com.rts.agent.GovernanceAssistantService;
 import com.rts.agent.MessageSupportService;
 import com.rts.agent.MetricsService;
+import com.rts.agent.ManagedScenarioService;
 import com.rts.agent.PipelineReportService;
+import com.rts.agent.RtsToolRegistry;
 import com.rts.model.AgentServiceModels.AnswerViewRequest;
 import com.rts.model.AgentServiceModels.ConfusableObjectsRequest;
 import com.rts.model.AgentServiceModels.ConflictExplainRequest;
@@ -26,6 +28,7 @@ import com.rts.model.AgentServiceModels.ImpactAnalysisRequest;
 import com.rts.model.AgentServiceModels.MemoryRecord;
 import com.rts.model.AgentServiceModels.MemoryWriteRequest;
 import com.rts.model.AgentServiceModels.MetricsSnapshotRequest;
+import com.rts.model.AgentServiceModels.ManagedScenarioRequest;
 import com.rts.model.AgentServiceModels.ObjectCardsRequest;
 import com.rts.model.AgentServiceModels.RawMessageCandidateRequest;
 import com.rts.model.AgentServiceModels.ReleaseReadinessRequest;
@@ -58,11 +61,14 @@ public class AgentServiceController {
     private final MessageSupportService messageSupportService;
     private final PipelineReportService pipelineReportService;
     private final FeedbackMemoryService feedbackMemoryService;
+    private final ManagedScenarioService managedScenarioService;
+    private final RtsToolRegistry toolRegistry;
 
     public AgentServiceController(AgentToolService toolService, AgentAnalysisService analysisService,
             AnswerViewService answerViewService, ContextualAskService contextualAskService, FeatureFlagService featureFlagService,
             EvaluationService evaluationService, GovernanceAssistantService governanceAssistantService, MetricsService metricsService,
-            MessageSupportService messageSupportService, PipelineReportService pipelineReportService, FeedbackMemoryService feedbackMemoryService) {
+            MessageSupportService messageSupportService, PipelineReportService pipelineReportService, FeedbackMemoryService feedbackMemoryService,
+            ManagedScenarioService managedScenarioService, RtsToolRegistry toolRegistry) {
         this.toolService = toolService;
         this.analysisService = analysisService;
         this.answerViewService = answerViewService;
@@ -74,11 +80,18 @@ public class AgentServiceController {
         this.messageSupportService = messageSupportService;
         this.pipelineReportService = pipelineReportService;
         this.feedbackMemoryService = feedbackMemoryService;
+        this.managedScenarioService = managedScenarioService;
+        this.toolRegistry = toolRegistry;
     }
 
     @PostMapping("/tools/feature_flags")
     public Object featureFlags(@RequestBody(required = false) Map<String, Object> request) {
         return featureFlagService.current();
+    }
+
+    @PostMapping("/tools/catalog")
+    public Object toolCatalog(@RequestBody(required = false) Map<String, Object> request) {
+        return toolRegistry.catalog();
     }
 
     @PostMapping("/tools/list_scopes")
@@ -214,6 +227,36 @@ public class AgentServiceController {
     public Object analyzeImpact(@RequestBody ImpactAnalysisRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
         return analysisService.analyzeImpact(new ImpactAnalysisRequest(request.changedUri(), request.changedTargetPath(), request.changedSourceAnchor(),
                 request.scope(), request.callerId(), apiKey, request.outputMode(), request.readL2(), request.maxObjects()));
+    }
+
+    @PostMapping("/scenario/analyze-pr-diff")
+    public Object analyzePrDiff(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.analyzePrDiff(new ManagedScenarioRequest("pr_diff_impact", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/scenario/investigate-exception")
+    public Object investigateException(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.investigateException(new ManagedScenarioRequest("exception_investigation", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/scenario/analyze-failed-message")
+    public Object analyzeFailedMessage(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.analyzeFailedMessage(new ManagedScenarioRequest("failed_message_analysis", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/scenario/plan-tests")
+    public Object scenarioPlanTests(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.planTests(new ManagedScenarioRequest("test_planning", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/scenario/governance-review")
+    public Object scenarioGovernanceReview(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.reviewGovernance(new ManagedScenarioRequest("governance_review", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
     }
 
     @PostMapping("/analyze/test-plan")

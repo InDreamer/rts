@@ -9,6 +9,7 @@ import com.rts.model.AgentServiceModels.GroundingMap;
 import com.rts.model.AgentServiceModels.ToolStepTrace;
 import com.rts.model.AgentServiceModels.ValidationStatus;
 import com.rts.model.CoreModels.AnswerType;
+import com.rts.model.CoreModels.AgentPlan;
 import com.rts.model.CoreModels.CandidateObject;
 import com.rts.model.CoreModels.DependencyResult;
 import com.rts.model.CoreModels.Direction;
@@ -39,6 +40,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -171,7 +173,7 @@ public class QueryService {
             DependencyResult dependencies = dependencyService.traverse(releaseId, selected.uri(), dependencyDirection(plan.intent()), null, 1, 20);
             requireDependencyResultAllowed(releaseId, request.callerId(), request.apiKey(), dependencies);
             ServiceAnswer answer = answerAssembler.answer(scope, releaseId, entry, content, dependencies.edges(), traceId, warningsFor(releaseId, entry));
-            finalAnswerValidator.validate(answer, Set.copyOf(l2ReadUris));
+            finalAnswerValidator.validate(answer, Map.of(content.uri(), content.contentHash()));
             appendTrace(start, traceId, "query", request.callerId(), request.query(), plan, scope, releaseId, candidateUris, selectedUris, l2ReadUris, RefusalReason.none, List.of());
             return answer;
         } catch (ProjectionValidationException ex) {
@@ -374,7 +376,23 @@ public class QueryService {
     public void appendTrace(Instant start, String traceId, String entrypoint, String callerId, String queryText, QueryPlan plan, ScopeKey scope,
             String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris, RefusalReason refusal, List<String> toolCalls,
             String answerView) {
-        List<ToolStepTrace> toolSteps = toolSteps(toolCalls, candidateUris, selectedUris, l2ReadUris);
+        appendTrace(start, traceId, entrypoint, callerId, queryText, plan, null, scope, releaseId, candidateUris, selectedUris, l2ReadUris,
+                refusal, toolCalls, answerView, null, null);
+    }
+
+    public void appendTrace(Instant start, String traceId, String entrypoint, String callerId, String queryText, QueryPlan plan, AgentPlan agentPlan,
+            ScopeKey scope, String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris, RefusalReason refusal,
+            List<String> toolCalls, String answerView, String scenarioInputSummary, String scenarioInputHash) {
+        appendTrace(start, traceId, entrypoint, callerId, queryText, plan, agentPlan, scope, releaseId, candidateUris, selectedUris, l2ReadUris,
+                refusal, toolCalls, null, answerView, scenarioInputSummary, scenarioInputHash);
+    }
+
+    public void appendTrace(Instant start, String traceId, String entrypoint, String callerId, String queryText, QueryPlan plan, AgentPlan agentPlan,
+            ScopeKey scope, String releaseId, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris, RefusalReason refusal,
+            List<String> toolCalls, List<ToolStepTrace> suppliedToolSteps, String answerView, String scenarioInputSummary, String scenarioInputHash) {
+        List<ToolStepTrace> toolSteps = suppliedToolSteps == null || suppliedToolSteps.isEmpty()
+                ? toolSteps(toolCalls, candidateUris, selectedUris, l2ReadUris)
+                : List.copyOf(suppliedToolSteps);
         GroundingMap groundingMap = groundingMap(releaseId, l2ReadUris);
         BudgetUsage budgetUsage = new BudgetUsage(
                 toolCalls == null ? 0 : toolCalls.size(),
@@ -391,8 +409,10 @@ public class QueryService {
                 properties.getMaxLatencyMs());
         traceStore.appendQueryTrace(TraceRecord.builder(traceId, entrypoint)
                 .callerId(callerId)
-                .queryText(queryText)
+                .queryText(redactedQueryText(entrypoint, queryText))
+                .queryTextHash(queryText == null ? null : Hashing.sha256(queryText))
                 .queryPlan(plan)
+                .agentPlan(agentPlan)
                 .resolvedScope(scope)
                 .candidateUris(candidateUris)
                 .selectedUris(selectedUris)
@@ -405,6 +425,9 @@ public class QueryService {
                 .groundingMap(groundingMap)
                 .answerView(answerView == null || answerView.isBlank() ? outputModeFromEntrypoint(entrypoint) : answerView)
                 .budgetUsage(budgetUsage)
+                .scenarioInputSummary(scenarioInputSummary)
+                .scenarioInputHash(scenarioInputHash)
+                .contextHash(Hashing.sha256(String.valueOf(candidateUris) + String.valueOf(selectedUris) + String.valueOf(l2ReadUris)))
                 .status(status(refusal))
                 .build());
     }
@@ -423,6 +446,18 @@ public class QueryService {
 
     private String outputMode(String value) {
         return value == null || value.isBlank() ? "default" : value;
+    }
+
+    private String redactedQueryText(String entrypoint, String queryText) {
+        if (queryText == null || queryText.isBlank()) {
+            return null;
+        }
+        if (entrypoint != null && (entrypoint.contains("scenario") || entrypoint.contains("message") || entrypoint.contains("exception")
+                || entrypoint.contains("pr_diff") || entrypoint.contains("failed"))) {
+            return "[redacted external input]";
+        }
+        String normalized = queryText.replaceAll("\\s+", " ").strip();
+        return normalized.length() > 160 ? normalized.substring(0, 160) + "..." : normalized;
     }
 
     private List<ToolStepTrace> toolSteps(List<String> toolCalls, List<String> candidateUris, List<String> selectedUris, List<String> l2ReadUris) {

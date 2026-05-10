@@ -10,7 +10,9 @@ import com.rts.agent.FeedbackMemoryService;
 import com.rts.agent.GovernanceAssistantService;
 import com.rts.agent.MessageSupportService;
 import com.rts.agent.MetricsService;
+import com.rts.agent.ManagedScenarioService;
 import com.rts.agent.PipelineReportService;
+import com.rts.agent.RtsToolRegistry;
 import com.rts.llm.ControlledLlmHarness;
 import com.rts.model.AgentServiceModels.AnswerViewRequest;
 import com.rts.model.AgentServiceModels.ConfusableObjectsRequest;
@@ -25,6 +27,7 @@ import com.rts.model.AgentServiceModels.HumanDecisionRecordRequest;
 import com.rts.model.AgentServiceModels.ImpactAnalysisRequest;
 import com.rts.model.AgentServiceModels.MemoryWriteRequest;
 import com.rts.model.AgentServiceModels.MetricsSnapshotRequest;
+import com.rts.model.AgentServiceModels.ManagedScenarioRequest;
 import com.rts.model.AgentServiceModels.ObjectCardsRequest;
 import com.rts.model.AgentServiceModels.RawMessageCandidateRequest;
 import com.rts.model.AgentServiceModels.ReleaseReadinessRequest;
@@ -33,6 +36,7 @@ import com.rts.model.AgentServiceModels.ScopeListRequest;
 import com.rts.model.AgentServiceModels.ScopeSearchRequest;
 import com.rts.model.AgentServiceModels.ScopedToolRequest;
 import com.rts.model.AgentServiceModels.TestPlanRequest;
+import com.rts.model.AgentServiceModels.ToolCatalogEntry;
 import com.rts.model.AgentServiceModels.TraceReportRequest;
 import com.rts.model.CoreModels.Direction;
 import com.rts.query.QueryRequests.AskRequest;
@@ -65,12 +69,14 @@ public class McpAdapterController {
     private final MessageSupportService messageSupportService;
     private final PipelineReportService pipelineReportService;
     private final FeedbackMemoryService feedbackMemoryService;
+    private final ManagedScenarioService managedScenarioService;
+    private final RtsToolRegistry toolRegistry;
 
     public McpAdapterController(QueryService queryService, ControlledLlmHarness harness, AgentToolService toolService,
             AgentAnalysisService analysisService, AnswerViewService answerViewService, ContextualAskService contextualAskService,
             EvaluationService evaluationService, FeatureFlagService featureFlagService, GovernanceAssistantService governanceAssistantService,
             MetricsService metricsService, MessageSupportService messageSupportService, PipelineReportService pipelineReportService,
-            FeedbackMemoryService feedbackMemoryService) {
+            FeedbackMemoryService feedbackMemoryService, ManagedScenarioService managedScenarioService, RtsToolRegistry toolRegistry) {
         this.queryService = queryService;
         this.harness = harness;
         this.toolService = toolService;
@@ -84,14 +90,17 @@ public class McpAdapterController {
         this.messageSupportService = messageSupportService;
         this.pipelineReportService = pipelineReportService;
         this.feedbackMemoryService = feedbackMemoryService;
+        this.managedScenarioService = managedScenarioService;
+        this.toolRegistry = toolRegistry;
     }
 
     @GetMapping("/tools")
     public Map<String, Object> tools() {
         if (!featureFlagService.current().mcpExpandedToolsEnabled()) {
-            return Map.of("tools", List.of("rts_find_objects", "rts_read_object", "rts_get_dependencies", "rts_ask", "rts_get_trace"));
+            List<String> minimal = List.of("rts_find_objects", "rts_read_object", "rts_get_dependencies", "rts_ask", "rts_get_trace");
+            return Map.of("tools", minimal, "catalog", minimal.stream().map(this::catalogEntry).toList());
         }
-        return Map.of("tools", List.of(
+        List<String> tools = List.of(
                 "rts_feature_flags",
                 "rts_list_scopes",
                 "rts_search_scopes",
@@ -118,6 +127,11 @@ public class McpAdapterController {
                 "rts_read_helper_contract",
                 "rts_read_evidence_summary",
                 "rts_analyze_impact",
+                "rts_analyze_pr_diff",
+                "rts_investigate_exception",
+                "rts_analyze_failed_message",
+                "rts_scenario_plan_tests",
+                "rts_scenario_governance_review",
                 "rts_plan_tests",
                 "rts_generate_target_message_candidate",
                 "rts_parse_raw_message_candidate",
@@ -143,7 +157,8 @@ public class McpAdapterController {
                 "rts_trace_report",
                 "rts_record_feedback",
                 "rts_write_context_memory",
-                "rts_get_context_memory"));
+                "rts_get_context_memory");
+        return Map.of("tools", tools, "catalog", tools.stream().map(this::catalogEntry).toList());
     }
 
     @PostMapping("/tools/rts_feature_flags")
@@ -281,6 +296,36 @@ public class McpAdapterController {
     public Object impact(@RequestBody ImpactAnalysisRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
         return analysisService.analyzeImpact(new ImpactAnalysisRequest(request.changedUri(), request.changedTargetPath(), request.changedSourceAnchor(),
                 request.scope(), request.callerId(), apiKey, request.outputMode(), request.readL2(), request.maxObjects()));
+    }
+
+    @PostMapping("/tools/rts_analyze_pr_diff")
+    public Object prDiff(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.analyzePrDiff(new ManagedScenarioRequest("pr_diff_impact", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/tools/rts_investigate_exception")
+    public Object exceptionInvestigation(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.investigateException(new ManagedScenarioRequest("exception_investigation", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/tools/rts_analyze_failed_message")
+    public Object failedMessage(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.analyzeFailedMessage(new ManagedScenarioRequest("failed_message_analysis", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/tools/rts_scenario_plan_tests")
+    public Object scenarioPlanTests(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.planTests(new ManagedScenarioRequest("test_planning", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
+    }
+
+    @PostMapping("/tools/rts_scenario_governance_review")
+    public Object scenarioGovernanceReview(@RequestBody ManagedScenarioRequest request, @RequestHeader(name = "X-RTS-API-Key", required = false) String apiKey) {
+        return managedScenarioService.reviewGovernance(new ManagedScenarioRequest("governance_review", request.input(), request.scope(),
+                request.callerId(), apiKey, request.outputMode(), request.maxObjects()));
     }
 
     @PostMapping("/tools/rts_plan_tests")
@@ -438,5 +483,118 @@ public class McpAdapterController {
 
     private String string(Object value) {
         return value == null ? null : String.valueOf(value);
+    }
+
+    private ToolCatalogEntry catalogEntry(String name) {
+        ToolCatalogEntry source = toolRegistry.catalogEntry(registryName(name));
+        return new ToolCatalogEntry(name, purpose(name, source), permission(name, source), requiredFields(name, source), source.possibleRefusalReasons(),
+                schema(name, "input"), schema(name, "output"), source.budgetCost(), allowedIntents(name, source), redactionRule(name, source));
+    }
+
+    private String purpose(String name, ToolCatalogEntry source) {
+        return switch (name) {
+            case "rts_ask" -> "Managed RTS /ask wrapper: RTS plans, reads truth tools, validates claims, and returns grounded answer/refusal.";
+            case "rts_contextual_ask" -> "Managed contextual ask wrapper; session/workspace memory is hint-only and never truth.";
+            case "rts_record_feedback" -> "Record feedback as non-truth workflow input.";
+            case "rts_write_context_memory" -> "Write non-truth context memory; forbidden truth/signoff memory is refused.";
+            case "rts_get_context_memory" -> "Read permission-gated, truth-ineligible context memory.";
+            default -> source.purpose();
+        };
+    }
+
+    private String permission(String name, ToolCatalogEntry source) {
+        return switch (name) {
+            case "rts_ask", "rts_contextual_ask" -> "query";
+            case "rts_record_feedback", "rts_write_context_memory", "rts_get_context_memory" -> "feedback_tools";
+            case "rts_search_objects" -> "find";
+            case "rts_read_object" -> "objects_content";
+            case "rts_get_object_card", "rts_get_object_cards" -> "objects_get";
+            case "rts_check_release_readiness", "rts_pipeline_release_readiness" -> "analysis_tools";
+            case "rts_shape_answer_view", "rts_check_grounding", "rts_get_trace", "rts_trace_report" -> "trace";
+            default -> source.requiredPermission();
+        };
+    }
+
+    private List<String> requiredFields(String name, ToolCatalogEntry source) {
+        return switch (name) {
+            case "rts_ask" -> List.of("query", "caller_id", "scope_hint");
+            case "rts_contextual_ask" -> List.of("query", "caller_id", "scope_hint or session_id/workspace_scope");
+            case "rts_record_feedback" -> List.of("trace_id", "feedback_type", "caller_id");
+            case "rts_write_context_memory" -> List.of("session_id", "memory_type", "key", "value", "caller_id");
+            case "rts_get_context_memory" -> List.of("session_id", "caller_id");
+            default -> source.requiredFields();
+        };
+    }
+
+    private String schema(String name, String direction) {
+        return "rts.mcp." + name + ".v1." + direction;
+    }
+
+    private List<String> allowedIntents(String name, ToolCatalogEntry source) {
+        return switch (name) {
+            case "rts_ask", "rts_contextual_ask" -> List.of("managed_answer");
+            case "rts_record_feedback", "rts_write_context_memory", "rts_get_context_memory" -> List.of("feedback", "context_memory");
+            default -> source.allowedIntents();
+        };
+    }
+
+    private String redactionRule(String name, ToolCatalogEntry source) {
+        if ("rts_record_feedback".equals(name) || "rts_write_context_memory".equals(name) || "rts_get_context_memory".equals(name)) {
+            return "hash_feedback_or_memory_payload_keep_scope_and_trace";
+        }
+        if ("rts_ask".equals(name) || "rts_contextual_ask".equals(name)) {
+            return "hash_query_keep_release_scope_trace_uri_and_content_hash";
+        }
+        return source.traceRedactionRule();
+    }
+
+    private String registryName(String mcpName) {
+        return switch (mcpName) {
+            case "rts_find_objects", "rts_search_objects" -> "find_objects";
+            case "rts_read_object", "rts_read_object_l2" -> "read_object_l2";
+            case "rts_get_dependencies", "rts_read_rule_dependencies" -> "get_dependencies";
+            case "rts_ask", "rts_contextual_ask" -> "resolve_scope";
+            case "rts_get_trace" -> "get_trace";
+            case "rts_feature_flags" -> "feature_flags";
+            case "rts_list_scopes", "rts_get_scope_tree" -> "list_scopes";
+            case "rts_search_scopes" -> "search_scopes";
+            case "rts_get_scope_summary", "rts_get_pack_status" -> "get_scope_summary";
+            case "rts_get_pack_navigation" -> "get_pack_navigation";
+            case "rts_get_object_card", "rts_get_object_cards" -> "get_object_card";
+            case "rts_get_dependency_subgraph" -> "get_dependency_subgraph";
+            case "rts_find_confusable_objects" -> "find_confusable_objects";
+            case "rts_find_confusable_scopes" -> "find_confusable_scopes";
+            case "rts_find_by_target_path" -> "find_by_target_path";
+            case "rts_find_by_source_anchor" -> "find_by_source_anchor";
+            case "rts_find_by_lookup_key" -> "find_by_lookup_key";
+            case "rts_find_reverse_dependencies" -> "find_reverse_dependencies";
+            case "rts_read_agent_object" -> "read_object_l2";
+            case "rts_read_lookup_sample" -> "read_object_l2";
+            case "rts_read_helper_contract" -> "read_object_l2";
+            case "rts_read_evidence_summary" -> "read_evidence_summary";
+            case "rts_analyze_impact", "rts_analyze_pr_diff", "rts_investigate_exception" -> "analyze_impact";
+            case "rts_analyze_failed_message", "rts_generate_target_message_candidate" -> "parse_raw_message_candidate";
+            case "rts_plan_tests", "rts_scenario_plan_tests" -> "plan_tests";
+            case "rts_scenario_governance_review" -> "governance_review";
+            case "rts_parse_raw_message_candidate" -> "parse_raw_message_candidate";
+            case "rts_map_source_fields_to_rules" -> "map_source_fields_to_rules";
+            case "rts_resolve_required_lookups" -> "resolve_required_lookups";
+            case "rts_simulate_rule_application" -> "simulate_rule_application";
+            case "rts_assemble_target_message_candidate" -> "assemble_target_message_candidate";
+            case "rts_validate_target_message_grounding" -> "validate_target_message_grounding";
+            case "rts_compare_rules" -> "compare_rules";
+            case "rts_explain_conflict" -> "explain_conflict";
+            case "rts_check_release_readiness" -> "analyze_impact";
+            case "rts_check_grounding" -> "check_grounding";
+            case "rts_shape_answer_view" -> "check_grounding";
+            case "rts_run_evaluation" -> "run_evaluation";
+            case "rts_governance_review" -> "governance_review";
+            case "rts_record_human_decision" -> "record_human_decision";
+            case "rts_metrics_snapshot" -> "metrics_snapshot";
+            case "rts_pipeline_release_readiness" -> "analyze_impact";
+            case "rts_trace_report" -> "trace_report";
+            case "rts_record_feedback", "rts_write_context_memory", "rts_get_context_memory" -> "feature_flags";
+            default -> mcpName.startsWith("rts_") ? mcpName.substring(4) : mcpName;
+        };
     }
 }

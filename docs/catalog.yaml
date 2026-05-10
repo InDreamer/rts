@@ -74,6 +74,12 @@ documents:
   layer: 3
   parent: docs/confirmed/README.md
   summary: compact final RTS LLM-agent service roadmap and current capability boundaries
+- path: docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md
+  role: leaf
+  layer: 3
+  parent: docs/confirmed/README.md
+  summary: complete non-phased implementation plan for RTS service internal LLM
+    agent integration
 - path: docs/confirmed/document-decision-register-zh.md
   role: leaf
   layer: 3
