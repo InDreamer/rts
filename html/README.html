@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS | RTS 来源解读</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="architecture.html">架构边界</a>
+      <a class="nav-link" href="library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Entry · README.md</p>
+      <h1>RTS</h1>
+      <p>repository entry for RTS dual-core baseline, operational docs, and supporting references</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../README.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>first entering this repository</li>
+<li>deciding which RTS document to read first</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>the exact design leaf document is already known</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="README.html">RTS</a><a href="docs/confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>repository entry for RTS dual-core baseline, operational docs, and supporting references</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>RTS（Rule Truth Source / Transformation Rule System）是面向银行报文转换场景的双核心服务： 它不是静态文档库、普通 RAG 问答机器人，也不是某个固定 agent SDK 的包装。RTS 的核心职责是从尽可能准确和充分的 source 中整理 transformation rules，通过 AI-first review、人工最终裁决和 signoff 形成可信规则真相，并按权限把这些真相能力和受控分析能力提供给系统、人和 agent 使用。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Entry / role: entry / layer: 1</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>先读什么</h3>
+          <p>docs/INDEX.md — 文档主入口；用于在 confirmed、reference、archive、operational 之间选择路径。 docs/confirmed/project-alignment-summary-zh.md — 当前双核心总纲；先读它来统一 RTS 最终服务愿景、多源真相治理、AI-first review、人工裁决和服务边界。</p>
+        </article>
+<article class="chapter-card">
+          <h3>文档分区</h3>
+          <p>docs/confirmed/：当前内部对齐的默认阅读区，定义双核心产品定位和活跃 baseline。 docs/java-service-runbook-zh.md / docs/api-caller-guide-zh.md：运行和调用 RTS service 的操作文档。 docs/reference/：有价值的支撑材料，但不覆盖 confirmed baseline。</p>
+        </article>
+<article class="chapter-card">
+          <h3>当前约定</h3>
+          <p>主名称统一使用 RTS；TRS 只作为历史名称或别名出现。 RTS 的核心叙事是“双核心规则真相服务”。 核心对象必须一起理解：规则、规则包、证据链。 AI 应尽可能完成受控分析、结构校验、跨 source 验证、歧义发现、冲突简化、依赖解释、影响候选、测试候选和 reviewer-friendly 表达。 人工 review 结论是冲突和歧义的最终裁决。</p>
+        </article>
+<article class="chapter-card">
+          <h3>本地运行</h3>
+          <p>Java 服务运行手册见 docs/java-service-runbook-zh.md。 最短启动示例： 默认端口是 8080，启动后验证：</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts">RTS<a class="headerlink" href="#rts" title="Permanent link">#</a></h1>
+<p>RTS（Rule Truth Source / Transformation Rule System）是面向银行报文转换场景的<strong>双核心服务</strong>：</p>
+<ul>
+<li><strong>受控真相源 / 原子能力服务</strong></li>
+<li><strong>托管 LLM agent 分析服务</strong></li>
+</ul>
+<p>它不是静态文档库、普通 RAG 问答机器人，也不是某个固定 agent SDK 的包装。RTS 的核心职责是从尽可能准确和充分的 source 中整理 transformation rules，通过 AI-first review、人工最终裁决和 signoff 形成可信规则真相，并按权限把这些真相能力和受控分析能力提供给系统、人和 agent 使用。</p>
+<p>这两个核心能力是并列的一等公民：托管分析服务不是可选 UI 糖衣，真相源原子能力服务也不是只在 AI 不可用时才存在的 fallback substrate。</p>
+<p>AI 在 RTS 中不是 answer organizer，而是建立在 governed truth 之上的<strong>受控分析与表达层</strong>。deterministic 能力不是低级 fallback；它是 RTS 的第一等公民信息服务能力。对 PR diff、exception、failed message、test planning 等场景，托管 AI 分析是目标正常产品形态；当 LLM 不可用时，RTS 会降级为结构化信息提供服务，继续为调用方或外部 agent 提供真相材料。</p>
+<h2 id="_1">先读什么<a class="headerlink" href="#_1" title="Permanent link">#</a></h2>
+<ul>
+<li><code>docs/INDEX.md</code> — 文档主入口；用于在 confirmed、reference、archive、operational 之间选择路径。</li>
+<li><code>docs/confirmed/project-alignment-summary-zh.md</code> — 当前双核心总纲；先读它来统一 RTS 最终服务愿景、多源真相治理、AI-first review、人工裁决和服务边界。</li>
+<li><code>docs/confirmed/system-constitution-v1.md</code> — 系统底线；定义 truth-first、受控分析与表达、证据优先和不确定性处理原则。</li>
+<li><code>docs/confirmed/kb-to-index-projection-contract-zh.md</code> — KB 到索引/查询层的运行时投影契约，以及稳定原子能力面的边界。</li>
+<li><code>docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md</code> — RTS 内置 managed mode、外部 tool mode、runtime projection access boundary 和场景接入的当前对齐结论。</li>
+<li><code>docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md</code> — RTS service 内部 LLM agent 接入的完整非阶段性落地计划。</li>
+<li><code>docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md</code> — Day1：建立受控真相源原子能力面和第一版 managed LLM harness。</li>
+<li><code>docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md</code> — Day2：在同一边界内扩展 controlled agentic retrieval、场景 AI 能力和外部 agent 复用面。</li>
+<li><code>docs/confirmed/final-llm-agent-service-plan-zh.md</code> — 最终面向 LLM agent 的 RTS 服务路线图摘要。</li>
+<li><code>docs/confirmed/document-decision-register-zh.md</code> — 文档审核中的关键抉择点、冻结口径和下一轮删减规则。</li>
+<li><code>docs/java-service-runbook-zh.md</code> — 本地运行、配置、测试、排障和服务维护。</li>
+<li><code>docs/api-caller-guide-zh.md</code> — API 调用方如何发起 deterministic truth/information 查询、managed analysis 请求和场景分析请求。</li>
+<li><code>docs/reference/README.md</code> — 参考材料入口；包含 OV 边界、检索设计、术语表、外部评审和历史 rationale。</li>
+<li><code>docs/archive/README.md</code> — 历史材料入口；只在需要追溯旧讨论或原型时阅读。</li>
+</ul>
+<h2 id="_2">文档分区<a class="headerlink" href="#_2" title="Permanent link">#</a></h2>
+<ul>
+<li><code>docs/confirmed/</code>：当前内部对齐的默认阅读区，定义双核心产品定位和活跃 baseline。</li>
+<li><code>docs/java-service-runbook-zh.md</code> / <code>docs/api-caller-guide-zh.md</code>：运行和调用 RTS service 的操作文档。</li>
+<li><code>docs/reference/</code>：有价值的支撑材料，但不覆盖 confirmed baseline。</li>
+<li><code>docs/archive/</code>：历史材料，不属于 active baseline。</li>
+</ul>
+<h2 id="_3">当前约定<a class="headerlink" href="#_3" title="Permanent link">#</a></h2>
+<ul>
+<li>主名称统一使用 RTS；TRS 只作为历史名称或别名出现。</li>
+<li>RTS 的核心叙事是“双核心规则真相服务”。</li>
+<li>核心对象必须一起理解：规则、规则包、证据链。</li>
+<li>AI 应尽可能完成受控分析、结构校验、跨 source 验证、歧义发现、冲突简化、依赖解释、影响候选、测试候选和 reviewer-friendly 表达。</li>
+<li>人工 review 结论是冲突和歧义的最终裁决。</li>
+<li>candidate-only / human decision 是权威边界，不是 AI 能力上限。</li>
+<li>API 与 MCP/tool mode 共享同一个真相源原子能力面；managed mode 与外部 agent tool mode 共享同一 truth access boundary。</li>
+<li>Day1 工程方向是 JDK 17 Java 查询/索引服务 + filesystem projection store + Lucene + local L2 store + controlled LLM harness。</li>
+<li>最终服务方向是：受控真相源原子能力服务 + 托管 LLM agent 分析服务；两者都是第一等公民。</li>
+<li>文档可以讨论候选工程方案，但不要把 OV、OpenSearch、向量库等技术写成 Day1 必选。</li>
+</ul>
+<h2 id="_4">本地运行<a class="headerlink" href="#_4" title="Permanent link">#</a></h2>
+<p>Java 服务运行手册见 <code>docs/java-service-runbook-zh.md</code>。</p>
+<p>最短启动示例：</p>
+<pre><code class="language-bash">RTS_STORE_ROOT=&quot;$PWD/sample-projection/runtime-store&quot; \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
+mvn spring-boot:run
+</code></pre>
+<p>默认端口是 <code>8080</code>，启动后验证：</p>
+<pre><code class="language-bash">curl -s http://localhost:8080/mcp/tools | jq
+</code></pre>
+      </div>
+    </details>
+  </main>
+  <script src="assets/app.js"></script>
+</body>
+</html>

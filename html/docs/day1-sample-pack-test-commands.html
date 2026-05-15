@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample Runtime Projection Test Commands | RTS 来源解读</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../index.html">首页</a>
+      <a class="nav-link" href="../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../architecture.html">架构边界</a>
+      <a class="nav-link" href="../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Operational · docs/day1-sample-pack-test-commands.md</p>
+      <h1>Sample Runtime Projection Test Commands</h1>
+      <p>manual curl commands for current sample runtime projection smoke testing</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../docs/day1-sample-pack-test-commands.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要快速手工验证当前 sample release 查询、依赖、L2 和 LLM harness</li>
+<li>需要复制 sample curl 命令进行本地 smoke test</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要完整运行手册或配置说明</li>
+<li>需要面向业务集成方的 API 字段解释</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="java-service-runbook-zh.html">RTS Java Service Runbook</a><a href="api-caller-guide-zh.html">RTS API 调用方指南</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>manual curl commands for current sample runtime projection smoke testing</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>These commands assume the current default active release: The default query scope is: Payments/fees/accounts/fx/compliance commands only work after switching the active release to rel-2026-05-06. Run this from the repository root:</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Operational / role: leaf / layer: 2</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Start Service</h3>
+          <p>Run this from the repository root: Keep this terminal running, then open another terminal for the commands below.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Query Default Photo Pack</h3>
+          <p>Expected: answer_type is answer, with facts, cited_objects, dependencies, trace_id, and photo/demo warnings.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Dependency Test</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Direct L2 Read Test</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Find Test</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Refusal Test: Inactive Scope</h3>
+          <p>This should return answer_type: refusal with scope_unclear while the default photo release is active.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Refusal Test: Unauthorized Product</h3>
+          <p>This should return answer_type: refusal with unauthorized_scope.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Refusal Test: Missing Scope</h3>
+          <p>This should return answer_type: refusal with scope_unclear.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Ask Harness Test</h3>
+          <p>This uses the controlled LLM harness. With default local config, LLM is disabled and the harness still returns grounded tool output.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Trace Read Test</h3>
+          <p>Replace &lt;trace_id&gt; with a trace id returned by a previous query.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Optional: Switch To Legacy Day1 Sample</h3>
+          <p>Stop the service, then write the rollback active release pointer from the repository root. This is sample-only local validation; do not use direct active pointer edits as a shared or production release procedure:</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="sample-runtime-projection-test-commands">Sample Runtime Projection Test Commands<a class="headerlink" href="#sample-runtime-projection-test-commands" title="Permanent link">#</a></h1>
+<p>These commands assume the current default active release:</p>
+<pre><code class="language-text">rel-2026-05-06-photo-fxd-ndf-cutoff
+</code></pre>
+<p>The default query scope is:</p>
+<pre><code class="language-text">tradition / stella / fxd-ndf-cutoff-fixing / cutoff-fixing
+</code></pre>
+<p>Payments/fees/accounts/fx/compliance commands only work after switching the active release to <code>rel-2026-05-06</code>.</p>
+<h2 id="start-service">Start Service<a class="headerlink" href="#start-service" title="Permanent link">#</a></h2>
+<p>Run this from the repository root:</p>
+<pre><code class="language-bash">JAVA_HOME=$(/usr/libexec/java_home -v 17) \
+RTS_STORE_ROOT=&quot;$PWD/sample-projection/runtime-store&quot; \
+mvn spring-boot:run
+</code></pre>
+<p>Keep this terminal running, then open another terminal for the commands below.</p>
+<h2 id="query-default-photo-pack">Query Default Photo Pack<a class="headerlink" href="#query-default-photo-pack" title="Permanent link">#</a></h2>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;query&quot;:&quot;fixing time 怎么生成&quot;,&quot;caller_id&quot;:&quot;tester&quot;,&quot;scope_hint&quot;:{&quot;channel&quot;:&quot;tradition&quot;,&quot;product&quot;:&quot;stella&quot;,&quot;pack&quot;:&quot;fxd-ndf-cutoff-fixing&quot;,&quot;domain&quot;:&quot;cutoff-fixing&quot;},&quot;output_mode&quot;:&quot;default&quot;,&quot;use_llm&quot;:false}'
+</code></pre>
+<p>Expected: <code>answer_type</code> is <code>answer</code>, with <code>facts</code>, <code>cited_objects</code>, <code>dependencies</code>, <code>trace_id</code>, and photo/demo warnings.</p>
+<h2 id="dependency-test">Dependency Test<a class="headerlink" href="#dependency-test" title="Permanent link">#</a></h2>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/objects/dependencies \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;uri&quot;:&quot;rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_time&quot;,&quot;direction&quot;:&quot;forward&quot;,&quot;depth&quot;:1,&quot;purpose&quot;:&quot;explain&quot;,&quot;caller_id&quot;:&quot;tester&quot;}'
+</code></pre>
+<h2 id="direct-l2-read-test">Direct L2 Read Test<a class="headerlink" href="#direct-l2-read-test" title="Permanent link">#</a></h2>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/objects/content \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;uri&quot;:&quot;rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_time&quot;,&quot;purpose&quot;:&quot;answer&quot;,&quot;caller_id&quot;:&quot;tester&quot;}'
+</code></pre>
+<h2 id="find-test">Find Test<a class="headerlink" href="#find-test" title="Permanent link">#</a></h2>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/find \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;query&quot;:&quot;cutoff lookup fixing time&quot;,&quot;caller_id&quot;:&quot;tester&quot;,&quot;scope&quot;:{&quot;channel&quot;:&quot;tradition&quot;,&quot;product&quot;:&quot;stella&quot;,&quot;pack&quot;:&quot;fxd-ndf-cutoff-fixing&quot;,&quot;domain&quot;:&quot;cutoff-fixing&quot;},&quot;object_types&quot;:[&quot;rule&quot;,&quot;lookup&quot;,&quot;helper&quot;],&quot;anchors&quot;:[],&quot;limit&quot;:5,&quot;output_mode&quot;:&quot;default&quot;}'
+</code></pre>
+<h2 id="refusal-test-inactive-scope">Refusal Test: Inactive Scope<a class="headerlink" href="#refusal-test-inactive-scope" title="Permanent link">#</a></h2>
+<p>This should return <code>answer_type: refusal</code> with <code>scope_unclear</code> while the default photo release is active.</p>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;query&quot;:&quot;payment.amount 怎么生成&quot;,&quot;caller_id&quot;:&quot;tester&quot;,&quot;scope_hint&quot;:{&quot;channel&quot;:&quot;tradition&quot;,&quot;product&quot;:&quot;stella&quot;,&quot;pack&quot;:&quot;payments&quot;,&quot;domain&quot;:&quot;core&quot;},&quot;output_mode&quot;:&quot;default&quot;,&quot;use_llm&quot;:false}'
+</code></pre>
+<h2 id="refusal-test-unauthorized-product">Refusal Test: Unauthorized Product<a class="headerlink" href="#refusal-test-unauthorized-product" title="Permanent link">#</a></h2>
+<p>This should return <code>answer_type: refusal</code> with <code>unauthorized_scope</code>.</p>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;query&quot;:&quot;fixing time 怎么生成&quot;,&quot;caller_id&quot;:&quot;tester&quot;,&quot;scope_hint&quot;:{&quot;channel&quot;:&quot;tradition&quot;,&quot;product&quot;:&quot;aurora&quot;,&quot;pack&quot;:&quot;fxd-ndf-cutoff-fixing&quot;,&quot;domain&quot;:&quot;cutoff-fixing&quot;},&quot;output_mode&quot;:&quot;default&quot;,&quot;use_llm&quot;:false}'
+</code></pre>
+<h2 id="refusal-test-missing-scope">Refusal Test: Missing Scope<a class="headerlink" href="#refusal-test-missing-scope" title="Permanent link">#</a></h2>
+<p>This should return <code>answer_type: refusal</code> with <code>scope_unclear</code>.</p>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;query&quot;:&quot;fixing time 怎么生成&quot;,&quot;caller_id&quot;:&quot;tester&quot;,&quot;scope_hint&quot;:null,&quot;output_mode&quot;:&quot;default&quot;,&quot;use_llm&quot;:false}'
+</code></pre>
+<h2 id="ask-harness-test">Ask Harness Test<a class="headerlink" href="#ask-harness-test" title="Permanent link">#</a></h2>
+<p>This uses the controlled LLM harness. With default local config, LLM is disabled and the harness still returns grounded tool output.</p>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/ask \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;query&quot;:&quot;fixing time 怎么生成&quot;,&quot;caller_id&quot;:&quot;tester&quot;,&quot;scope_hint&quot;:{&quot;channel&quot;:&quot;tradition&quot;,&quot;product&quot;:&quot;stella&quot;,&quot;pack&quot;:&quot;fxd-ndf-cutoff-fixing&quot;,&quot;domain&quot;:&quot;cutoff-fixing&quot;},&quot;output_mode&quot;:&quot;default&quot;,&quot;max_tool_calls&quot;:8}'
+</code></pre>
+<h2 id="trace-read-test">Trace Read Test<a class="headerlink" href="#trace-read-test" title="Permanent link">#</a></h2>
+<p>Replace <code>&lt;trace_id&gt;</code> with a trace id returned by a previous query.</p>
+<pre><code class="language-bash">curl -sS -X GET http://localhost:8080/api/v1/traces/&lt;trace_id&gt; \
+  -H 'X-RTS-Caller-Id: tester' \
+  -H 'X-RTS-API-Key: tester-key'
+</code></pre>
+<h2 id="optional-switch-to-legacy-day1-sample">Optional: Switch To Legacy Day1 Sample<a class="headerlink" href="#optional-switch-to-legacy-day1-sample" title="Permanent link">#</a></h2>
+<p>Stop the service, then write the rollback active release pointer from the repository root. This is sample-only local validation; do not use direct active pointer edits as a shared or production release procedure:</p>
+<pre><code class="language-bash">cat &gt; &quot;$PWD/sample-projection/runtime-store/active-release.json&quot; &lt;&lt;'JSON'
+{
+  &quot;active_release_id&quot;: &quot;rel-2026-05-06&quot;,
+  &quot;rollback_target_release_id&quot;: null,
+  &quot;updated_at&quot;: &quot;2026-05-06T00:00:00Z&quot;,
+  &quot;updated_by&quot;: &quot;manual-validation&quot;
+}
+JSON
+</code></pre>
+<p>Restart the service. Then payments/fees/accounts/fx/compliance scopes are active, for example:</p>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{&quot;query&quot;:&quot;payment.amount 怎么生成&quot;,&quot;caller_id&quot;:&quot;tester&quot;,&quot;scope_hint&quot;:{&quot;channel&quot;:&quot;tradition&quot;,&quot;product&quot;:&quot;stella&quot;,&quot;pack&quot;:&quot;payments&quot;,&quot;domain&quot;:&quot;core&quot;},&quot;output_mode&quot;:&quot;default&quot;,&quot;use_llm&quot;:false}'
+</code></pre>
+<p>To restore the default photo pack, stop the service and write:</p>
+<pre><code class="language-bash">cat &gt; &quot;$PWD/sample-projection/runtime-store/active-release.json&quot; &lt;&lt;'JSON'
+{
+  &quot;active_release_id&quot;: &quot;rel-2026-05-06-photo-fxd-ndf-cutoff&quot;,
+  &quot;rollback_target_release_id&quot;: &quot;rel-2026-05-06&quot;,
+  &quot;updated_at&quot;: &quot;2026-05-07T00:00:00Z&quot;,
+  &quot;updated_by&quot;: &quot;sample&quot;
+}
+JSON
+</code></pre>
+      </div>
+    </details>
+  </main>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

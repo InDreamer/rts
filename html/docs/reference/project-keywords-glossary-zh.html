@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Project Glossary | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/project-keywords-glossary-zh.md</p>
+      <h1>RTS Project Glossary</h1>
+      <p>compact Chinese glossary for current RTS project terms and boundary concepts</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/project-keywords-glossary-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要快速理解当前项目高频术语</li>
+<li>需要区分 canonical truth、runtime projection、index、query、LLM answer 和 candidate</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要正式架构决策</li>
+<li>需要完整历史术语长表</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="../confirmed/system-constitution-v1.html">RTS Constitution v2</a><a href="../confirmed/kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>compact Chinese glossary for current RTS project terms and boundary concepts</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：compact glossary &gt; 原完整长表：docs/archive/reference-proposals/project-keywords-glossary-zh.md</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Core Terms</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Layer Terms</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Object Terms</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Projection And Retrieval Terms</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Output Terms</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Common Confusions</h3>
+          <p>Runtime projection is not canonical source; it is a released service view. L0/L1/card helps find truth; L2 supports final facts. Search result is not truth. LLM answer is not truth.</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-project-glossary">RTS Project Glossary<a class="headerlink" href="#rts-project-glossary" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：compact glossary
+原完整长表：<code>docs/archive/reference-proposals/project-keywords-glossary-zh.md</code></p>
+</blockquote>
+<h2 id="core-terms">Core Terms<a class="headerlink" href="#core-terms" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTS service</td>
+<td>面向规则真相读取、解释、影响分析、测试规划和流程接入的服务边界。</td>
+</tr>
+<tr>
+<td>Knowledge Base</td>
+<td>RTS 内部治理知识和已发布 truth material 的统称，不等于普通文档库。</td>
+</tr>
+<tr>
+<td>canonical truth</td>
+<td>source/evidence/review/human adjudication/signoff 后成立的规则真相。</td>
+</tr>
+<tr>
+<td>candidate</td>
+<td>候选规则、候选解释、候选影响面或候选测试点，等待 review。</td>
+</tr>
+<tr>
+<td>open question / ambiguity</td>
+<td>尚未裁决的问题或歧义，不能被模型硬答成事实。</td>
+</tr>
+<tr>
+<td>LLM answer</td>
+<td>模型组织出的回答，不自动等于 truth。</td>
+</tr>
+<tr>
+<td>approved truth</td>
+<td>已经过治理流程批准，可以进入 runtime projection 的 truth。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="layer-terms">Layer Terms<a class="headerlink" href="#layer-terms" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Truth Layer</td>
+<td>管理 source、candidate、review、signoff、canonical pack。</td>
+</tr>
+<tr>
+<td>Projection Layer</td>
+<td>把 approved truth 发布成服务运行视图。</td>
+</tr>
+<tr>
+<td>Retrieval/Index Layer</td>
+<td>帮助定位、导航、搜索、读取 truth；不决定 truth。</td>
+</tr>
+<tr>
+<td>Application Layer</td>
+<td>API、MCP、Q&amp;A、pipeline、workbench、agent tools 等消费入口。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="object-terms">Object Terms<a class="headerlink" href="#object-terms" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pack</td>
+<td>一组可 review/signoff/release 的 rule/lookup/helper 集合。</td>
+</tr>
+<tr>
+<td>rule</td>
+<td>source-to-target transformation rule。</td>
+</tr>
+<tr>
+<td>lookup</td>
+<td>查表定义或 lookup behavior。</td>
+</tr>
+<tr>
+<td>helper</td>
+<td>可复用辅助逻辑。</td>
+</tr>
+<tr>
+<td>evidence</td>
+<td>支撑候选或规则判断的来源材料。</td>
+</tr>
+<tr>
+<td>review</td>
+<td>对 candidate/rule/evidence 的人工或流程审核记录。</td>
+</tr>
+<tr>
+<td>signoff</td>
+<td>使 truth 可以发布的最终治理动作。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="projection-and-retrieval-terms">Projection And Retrieval Terms<a class="headerlink" href="#projection-and-retrieval-terms" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>runtime projection</td>
+<td>approved truth 的服务运行视图，面向 API/MCP/LLM/index。</td>
+</tr>
+<tr>
+<td>release manifest</td>
+<td>projection release 的身份、来源、schema、状态和激活信息。</td>
+</tr>
+<tr>
+<td>object manifest</td>
+<td>可查询对象清单。</td>
+</tr>
+<tr>
+<td>object card / L1</td>
+<td>导航和消歧视图，不是最终事实。</td>
+</tr>
+<tr>
+<td>L2 runtime object</td>
+<td>服务可读事实对象，最终回答必须回到它或授权 governance view。</td>
+</tr>
+<tr>
+<td>dependency edge</td>
+<td>rule/lookup/helper/source/target 之间的依赖关系。</td>
+</tr>
+<tr>
+<td>stable URI</td>
+<td>可追踪、可审计、可被 API/MCP/agent 引用的对象地址。</td>
+</tr>
+<tr>
+<td>retrieval trace</td>
+<td>记录 scope、候选、工具调用、L2 read、refusal 的查询轨迹。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="output-terms">Output Terms<a class="headerlink" href="#output-terms" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fact</td>
+<td>被 L2/dependency/evidence/review/release 支撑的事实。</td>
+</tr>
+<tr>
+<td>inference</td>
+<td>基于事实做出的分析，需要标注来源和不确定性。</td>
+</tr>
+<tr>
+<td>unknown</td>
+<td>缺证据、scope 不清、冲突未裁决或权限不足。</td>
+</tr>
+<tr>
+<td>candidate suggestion</td>
+<td>候选影响面、测试点、问题、解释或规则修改。</td>
+</tr>
+<tr>
+<td>human decision</td>
+<td>人工 adjudication、review 或 signoff 结论。</td>
+</tr>
+<tr>
+<td>refusal contract</td>
+<td>不满足 scope/release/permission/L2/grounding 时拒答或要求澄清。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="common-confusions">Common Confusions<a class="headerlink" href="#common-confusions" title="Permanent link">#</a></h2>
+<ul>
+<li>Runtime projection is not canonical source; it is a released service view.</li>
+<li>L0/L1/card helps find truth; L2 supports final facts.</li>
+<li>Search result is not truth.</li>
+<li>LLM answer is not truth.</li>
+<li>Memory can improve convenience, not authority.</li>
+<li>MCP/API/tool mode changes access style, not truth ownership.</li>
+<li>Vector/rerank can reorder candidates only after gates.</li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

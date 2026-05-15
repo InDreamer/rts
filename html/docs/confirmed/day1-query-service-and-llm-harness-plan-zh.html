@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Day1 Query Service And Controlled LLM Harness | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md</p>
+      <h1>RTS Day1 Query Service And Controlled LLM Harness</h1>
+      <p>compact Day1 RTS query/tool service and controlled LLM harness baseline</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要落地或核对当前 Day1 RTS 查询/工具/LLM harness 边界</li>
+<li>需要判断 Day1 做什么、不做什么、完成标准是什么</li>
+<li>需要确认 filesystem projection store、Lucene、L2 read、trace、MCP 和 /ask 的第一版职责</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要最终 LLM agent service 路线图</li>
+<li>只需要 Day2 检索增强或 agentic retrieval</li>
+<li>需要完整历史长版 Day1 计划</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a><a href="system-constitution-v1.html">RTS Constitution v2</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>compact Day1 RTS query/tool service and controlled LLM harness baseline</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：confirmed compact baseline &gt; 压缩日期：2026-05-08 &gt; 原完整长版：docs/archive/reference-proposals/day1-query-service-and-llm-harness-plan-zh.md Day1 交付的是 RTS 双核心栈中的第一版可运行 baseline： Day1 的目标不是完整 agentic RAG，也不是重型企业搜索平台，而是在同一个 truth boundary 内同时立住两件事：一是稳定的受控真相源原子能力面，二是第一版可审计的 managed LLM 分析入口。Day1 不要求所有场景都成熟，但它不能把 AI 长期写成可有可无的整理层。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. Day1 Goal</h3>
+          <p>Day1 交付的是 RTS 双核心栈中的第一版可运行 baseline： Day1 的目标不是完整 agentic RAG，也不是重型企业搜索平台，而是在同一个 truth boundary 内同时立住两件事：一是稳定的受控真相源原子能力面，二是第一版可审计的 managed LLM 分析入口。Day1 不要求所有场景都成熟，但它不能把 AI 长期写成可有可无的整理层。</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Hard Boundaries</h3>
+          <p>KB publishes approved runtime projection. Query service reads projection; it does not own canonical truth. API/MCP/LLM harness all use the same controlled service tools.</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Day1 Does</h3>
+          <p>Day1 must support: active release pointer projection manifest validation scope registry object manifest object cards dependency edges content refs structured rule/lookup/helper L2 runtime objects</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Day1 Does Not</h3>
+          <p>Day1 should not include: OpenSearch as required infrastructure vector database or primary vector recall PostgreSQL/Flyway as required first storage full graph database</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. Minimal Store Shape</h3>
+          <p>The filesystem store is an implementation of the projection store interface, not the conceptual truth model. Minimum runtime store: Current filesystem implementation does not require a standalone content-refs.jsonl file.</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Core API Semantics</h3>
+          <p>Names may evolve, but Day1 needs these service meanings:</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Controlled LLM Harness</h3>
+          <p>Day1 /ask is allowed, but constrained. Allowed responsibilities: parse user intent extract anchors and possible scope ask clarification when scope is missing call allowlisted tools</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. Refusal Contract</h3>
+          <p>Day1 must refuse, degrade, or ask clarification when: scope is unresolved caller lacks permission active release is missing or not unique projection manifest/schema validation fails</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. Output Contract</h3>
+          <p>Service output should separate: facts inferences unknowns candidates human decisions Every answer should include: answer type: answer / clarification / refusal / partial</p>
+        </article>
+<article class="chapter-card">
+          <h3>10. Day1 Definition Of Done</h3>
+          <p>Day1 is done when: approved runtime projection can be ingested manifest/schema/hash/L2 refs are validated release/scope/object/card/dependency/content refs are queryable</p>
+        </article>
+<article class="chapter-card">
+          <h3>11. Current Priority</h3>
+          <p>Implementation should prioritize: 1. projection/store contract correctness 2. L2 read and hash validation 3. scope and permission gates 4. trace/refusal completeness</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-day1-query-service-and-controlled-llm-harness">RTS Day1 Query Service And Controlled LLM Harness<a class="headerlink" href="#rts-day1-query-service-and-controlled-llm-harness" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：confirmed compact baseline
+压缩日期：2026-05-08
+原完整长版：<code>docs/archive/reference-proposals/day1-query-service-and-llm-harness-plan-zh.md</code></p>
+</blockquote>
+<h2 id="1-day1-goal">1. Day1 Goal<a class="headerlink" href="#1-day1-goal" title="Permanent link">#</a></h2>
+<p>Day1 交付的是 RTS 双核心栈中的第一版可运行 baseline：</p>
+<pre><code class="language-text">RTS Truth-Source Atomic Capability Service
+  + lightweight governed index
+  + filesystem runtime projection store
+  + Lucene scoped BM25
+  + L2 read/hash validation
+  + trace/refusal contract
+  + REST API and thin MCP surface
+
+RTS Managed LLM Analysis Service
+  + controlled LLM harness skeleton
+  + tool-only truth access
+  + grounded managed /ask entry
+</code></pre>
+<p>Day1 的目标不是完整 agentic RAG，也不是重型企业搜索平台，而是在同一个 truth boundary 内同时立住两件事：一是稳定的受控真相源原子能力面，二是第一版可审计的 managed LLM 分析入口。Day1 不要求所有场景都成熟，但它不能把 AI 长期写成可有可无的整理层。</p>
+<h2 id="2-hard-boundaries">2. Hard Boundaries<a class="headerlink" href="#2-hard-boundaries" title="Permanent link">#</a></h2>
+<ul>
+<li>KB publishes approved runtime projection.</li>
+<li>Query service reads projection; it does not own canonical truth.</li>
+<li>API/MCP/LLM harness all use the same controlled service tools.</li>
+<li>Final facts must come from L2 object, dependency edge, manifest, or authorized governance view.</li>
+<li>Search hit, card, summary, LLM output, and memory do not own truth.</li>
+<li>LLM may identify intent, choose tools, ask clarification, perform controlled analysis, and express grounded results.</li>
+<li>LLM may not bypass scope, permission, release, L2 read, grounding, refusal, or trace.</li>
+<li>deterministic capability is first-class information service, not a lower-grade product path.</li>
+</ul>
+<h2 id="3-day1-does">3. Day1 Does<a class="headerlink" href="#3-day1-does" title="Permanent link">#</a></h2>
+<p>Day1 must support:</p>
+<ul>
+<li>active release pointer</li>
+<li>projection manifest validation</li>
+<li>scope registry</li>
+<li>object manifest</li>
+<li>object cards</li>
+<li>dependency edges</li>
+<li>content refs</li>
+<li>structured rule/lookup/helper L2 runtime objects</li>
+<li>filesystem-backed store behind interfaces</li>
+<li>local Lucene index over card/search text within scope</li>
+<li>deterministic lookup by URI/id/target/source anchor where available</li>
+<li>scoped BM25 candidate search</li>
+<li>L2 content read with hash validation</li>
+<li>dependency traversal with depth and purpose limits</li>
+<li>query trace and LLM run trace</li>
+<li>refusal when scope/release/permission/L2/dependency conditions fail</li>
+<li>REST service surface</li>
+<li>thin MCP adapter over the same service layer</li>
+<li><code>/query</code> as deterministic truth/information service</li>
+<li><code>/ask</code> as controlled managed analysis entry with tool-only access</li>
+</ul>
+<h2 id="4-day1-does-not">4. Day1 Does Not<a class="headerlink" href="#4-day1-does-not" title="Permanent link">#</a></h2>
+<p>Day1 should not include:</p>
+<ul>
+<li>OpenSearch as required infrastructure</li>
+<li>vector database or primary vector recall</li>
+<li>PostgreSQL/Flyway as required first storage</li>
+<li>full graph database</li>
+<li>free multi-agent workflow</li>
+<li>autonomous truth mutation</li>
+<li>pipeline release gate</li>
+<li>source ingestion / authoring / review workflow</li>
+<li>raw production data access</li>
+<li>memory writing into rule truth</li>
+</ul>
+<h2 id="5-minimal-store-shape">5. Minimal Store Shape<a class="headerlink" href="#5-minimal-store-shape" title="Permanent link">#</a></h2>
+<p>The filesystem store is an implementation of the projection store interface, not the conceptual truth model.</p>
+<p>Minimum runtime store:</p>
+<pre><code class="language-text">active-release.json
+releases/{release_id}/
+  release-manifest.json
+  scopes.jsonl
+  object-manifest.jsonl
+  caller-profiles.jsonl
+  l2/{rules,lookups,helpers}/...
+  navigation/
+    object-cards.jsonl
+    l0-l1-views.jsonl
+    aliases.jsonl
+    confusables.jsonl
+  governance/
+    governance-access-refs.jsonl
+    evidence-summaries/
+    review-summaries/
+    report-summaries/
+  dependencies/
+    dependency-edges.jsonl
+    field-bindings.jsonl
+  index-artifacts/
+    opensearch-docs.jsonl
+traces/
+  query-trace.jsonl
+  llm-run-trace.jsonl
+</code></pre>
+<p>Current filesystem implementation does not require a standalone <code>content-refs.jsonl</code> file. L2 content references are derived from <code>object-manifest.jsonl</code> fields such as <code>content_ref</code>, <code>l2_storage_ref</code>, and <code>content_hash</code>, then verified against files under <code>l2/</code>.</p>
+<p><code>caller-profiles.jsonl</code> is release-scoped runtime access metadata. It is part of the runtime store boundary for permission checks, not part of the rule content truth surface.</p>
+<p>Future PostgreSQL/object-store migration must preserve query semantics by keeping callers behind store interfaces.</p>
+<p><code>confusables.jsonl</code> may exist in Day1 as released navigation data. Day1 may expose or display those relations for disambiguation, but it should not treat negative/confusable retrieval as an autonomous planner or ranking authority. Active multi-step use of confusable/negative evidence belongs to Day2.</p>
+<h2 id="6-core-api-semantics">6. Core API Semantics<a class="headerlink" href="#6-core-api-semantics" title="Permanent link">#</a></h2>
+<p>Names may evolve, but Day1 needs these service meanings:</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Purpose</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>plan/query plan</td>
+<td>resolve intent/scope/anchors</td>
+<td>may use deterministic parser or controlled LLM extractor</td>
+</tr>
+<tr>
+<td>find</td>
+<td>find candidate objects within resolved scope</td>
+<td>candidates only</td>
+</tr>
+<tr>
+<td>object card read</td>
+<td>navigation and disambiguation</td>
+<td>not final truth</td>
+</tr>
+<tr>
+<td>L2 content read</td>
+<td>final fact surface</td>
+<td>requires active release and hash validation</td>
+</tr>
+<tr>
+<td>dependencies</td>
+<td>explain/navigation/impact preview</td>
+<td>cannot expand scope automatically</td>
+</tr>
+<tr>
+<td>query</td>
+<td>deterministic truth/information service</td>
+<td>must cite facts and trace</td>
+</tr>
+<tr>
+<td>ask</td>
+<td>controlled managed analysis entry</td>
+<td>LLM uses tools, not direct store access</td>
+</tr>
+<tr>
+<td>trace read</td>
+<td>audit and debugging</td>
+<td>shows scope, candidates, tools, L2 reads, refusal</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-controlled-llm-harness">7. Controlled LLM Harness<a class="headerlink" href="#7-controlled-llm-harness" title="Permanent link">#</a></h2>
+<p>Day1 <code>/ask</code> is allowed, but constrained.</p>
+<p>Allowed responsibilities:</p>
+<ul>
+<li>parse user intent</li>
+<li>extract anchors and possible scope</li>
+<li>ask clarification when scope is missing</li>
+<li>call allowlisted tools</li>
+<li>choose object cards and L2 reads</li>
+<li>perform controlled analysis over governed truth</li>
+<li>return human-readable grounded answer with warnings, ambiguity, draft/release state, and trace context preserved</li>
+</ul>
+<p>Prohibited:</p>
+<ul>
+<li>direct file/DB access</li>
+<li>modifying projection</li>
+<li>inventing facts</li>
+<li>using unscoped search hit as final answer</li>
+<li>hiding refusal reason</li>
+<li>presenting candidate impact/test suggestions as final decisions</li>
+</ul>
+<p>Minimum tools:</p>
+<ul>
+<li><code>resolve_scope</code></li>
+<li><code>find_objects</code></li>
+<li><code>get_object_card</code></li>
+<li><code>read_object_l2</code></li>
+<li><code>get_dependencies</code></li>
+<li><code>explain_trace</code></li>
+</ul>
+<h2 id="8-refusal-contract">8. Refusal Contract<a class="headerlink" href="#8-refusal-contract" title="Permanent link">#</a></h2>
+<p>Day1 must refuse, degrade, or ask clarification when:</p>
+<ul>
+<li>scope is unresolved</li>
+<li>caller lacks permission</li>
+<li>active release is missing or not unique</li>
+<li>projection manifest/schema validation fails</li>
+<li>object hit exists but L2 is unreadable</li>
+<li>dependency required for answer is not released</li>
+<li>object state is not answerable for caller profile</li>
+<li>query asks for governance details without authorization</li>
+<li>LLM tool budget is exhausted before grounding</li>
+<li>only card/search summary exists but no L2 truth exists</li>
+</ul>
+<p>When managed analysis is unavailable, <code>/ask</code> may degrade to bounded information-service output under the same release/scope/permission/trace contract. That degraded continuity mode exists to preserve access to truth material; it does not redefine RTS product identity or make AI-centric scenario services equivalent to pure deterministic retrieval.</p>
+<p>Refusal is product behavior, not an error fallback.</p>
+<h2 id="9-output-contract">9. Output Contract<a class="headerlink" href="#9-output-contract" title="Permanent link">#</a></h2>
+<p>Service output should separate:</p>
+<ul>
+<li>facts</li>
+<li>inferences</li>
+<li>unknowns</li>
+<li>candidates</li>
+<li>human decisions</li>
+</ul>
+<p>Every answer should include:</p>
+<ul>
+<li>answer type: answer / clarification / refusal / partial</li>
+<li>resolved scope or missing scope reason</li>
+<li>cited object URIs</li>
+<li>L2/hash grounding where applicable</li>
+<li>warnings or governance summary when allowed</li>
+<li>trace id</li>
+</ul>
+<p>candidate / human decision separation is an authority boundary, not a limit on how deeply managed analysis may reason.</p>
+<h2 id="10-day1-definition-of-done">10. Day1 Definition Of Done<a class="headerlink" href="#10-day1-definition-of-done" title="Permanent link">#</a></h2>
+<p>Day1 is done when:</p>
+<ul>
+<li>approved runtime projection can be ingested</li>
+<li>manifest/schema/hash/L2 refs are validated</li>
+<li>release/scope/object/card/dependency/content refs are queryable</li>
+<li>scoped deterministic lookup works</li>
+<li>scoped Lucene BM25 find works</li>
+<li>L2 read verifies hash</li>
+<li>dependency traversal respects scope/release/permission/depth</li>
+<li>refusal cases are covered by tests</li>
+<li>query trace and LLM run trace are written</li>
+<li><code>/ask</code> uses controlled tools before answering</li>
+<li><code>/ask</code> returns a stable managed answer surface with grounding validation, not just raw model text beside tool output</li>
+<li>LLM final answer has citation/trace validation strong enough to reject unsupported claims</li>
+<li>minimal MCP adapter uses the same service layer</li>
+<li>a small golden set covers normal, ambiguous, missing-L2, permission, and refusal cases</li>
+</ul>
+<h2 id="11-current-priority">11. Current Priority<a class="headerlink" href="#11-current-priority" title="Permanent link">#</a></h2>
+<p>Implementation should prioritize:</p>
+<ol>
+<li>projection/store contract correctness</li>
+<li>L2 read and hash validation</li>
+<li>scope and permission gates</li>
+<li>trace/refusal completeness</li>
+<li>grounded managed <code>/ask</code> with controlled analysis and claim validation</li>
+<li>stable REST/MCP atomic capability surface</li>
+</ol>
+<p>Day2 enhancements should wait until Day1 stops failing on scope, L2, refusal, and trace.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

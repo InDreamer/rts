@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Day2 Controlled Agentic Retrieval Roadmap | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md</p>
+      <h1>RTS Day2 Controlled Agentic Retrieval Roadmap</h1>
+      <p>compact Day2 controlled agentic retrieval, MCP, rerank, impact, and test-planning evolution roadmap</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要规划 Day1 后的检索、MCP、impact/test planning 或受控 agentic retrieval</li>
+<li>需要判断哪些能力可以 Day2 做、哪些仍不能做</li>
+<li>需要评估 rerank、negative retrieval、optional vector 和 scenario candidates</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要当前 Day1 query/tool service baseline</li>
+<li>需要完整历史长版 Day2 计划</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="day1-query-service-and-llm-harness-plan-zh.html">RTS Day1 Query Service And Controlled LLM Harness</a><a href="final-llm-agent-service-plan-zh.html">RTS Final LLM Agent Service Roadmap</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>compact Day2 controlled agentic retrieval, MCP, rerank, impact, and test-planning evolution roadmap</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：confirmed compact roadmap &gt; 压缩日期：2026-05-08 &gt; 原完整长版：docs/archive/reference-proposals/day2-agentic-retrieval-evolution-plan-zh.md Day2 把 Day1 的受控工具调用扩展成 controlled agentic retrieval，并把双核心栈中的托管分析服务从第一版入口推进到更稳定的场景产品能力。 核心变化：</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. Day2 Goal</h3>
+          <p>Day2 把 Day1 的受控工具调用扩展成 controlled agentic retrieval，并把双核心栈中的托管分析服务从第一版入口推进到更稳定的场景产品能力。 核心变化： LLM/harness 可以规划多步 tool sequence。 检索可以加入 negative/confusable candidates、rerank、alias/entity boost。</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Start Conditions</h3>
+          <p>Day2 不应在 Day1 基础不稳时启动。 前提： active release / scope / permission gates stable object manifest and cards stable enough for navigation L2 read and hash validation reliable</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Day2 Capabilities</h3>
+          <p>Day2 可以逐步加入：</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Technical Direction</h3>
+          <p>Day2 can stay on JDK 17. Suggested progression: 1. Keep filesystem/Lucene baseline stable. 2. Add alias/entity boost and better object cards. 3. Add negative/confusable relation data.</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. MCP And Tool Surface</h3>
+          <p>Day2 MCP should become a formal agent-facing tool surface. Candidate tools: rts_resolve_scope rts_list_scopes rts_find_objects rts_get_object_card rts_read_object_l2</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Scenario Outputs</h3>
+          <p>Impact analysis output should be candidate language: affected object candidate dependency path candidate possible target/source impact unknowns and required evidence</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Evaluation Harness</h3>
+          <p>Every Day2 feature must be evaluated before default enablement. Track: correct scope rate wrong-scope/confusable errors grounded answer rate unsupported assertion rate</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. Guardrails</h3>
+          <p>Hard gates never become ranking features. Scope/permission/release/object state/L2 availability must pass before ranking. Tool calls are policy-checked. Agentic retrieval has max steps, max L2 reads, max dependency depth</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. Day2 Still Does Not Do</h3>
+          <p>autonomous rule creation/update automatic approval/signoff pipeline release gate unrestricted raw production data analysis generic agent orchestration platform memory-as-truth</p>
+        </article>
+<article class="chapter-card">
+          <h3>10. Exit Criteria</h3>
+          <p>Day2 is mature when: multi-step retrieval beats Day1 on golden set without increasing wrong-scope errors impact/test candidates have reviewer-visible incremental value</p>
+        </article>
+<article class="chapter-card">
+          <h3>11. Current Priority</h3>
+          <p>Do Day2 in this order: 1. scope/navigation tools 2. planner V2 and controlled orchestrator 3. negative/confusable retrieval 4. expanded MCP tool surface 5. impact/test candidate endpoints</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-day2-controlled-agentic-retrieval-roadmap">RTS Day2 Controlled Agentic Retrieval Roadmap<a class="headerlink" href="#rts-day2-controlled-agentic-retrieval-roadmap" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：confirmed compact roadmap
+压缩日期：2026-05-08
+原完整长版：<code>docs/archive/reference-proposals/day2-agentic-retrieval-evolution-plan-zh.md</code></p>
+</blockquote>
+<h2 id="1-day2-goal">1. Day2 Goal<a class="headerlink" href="#1-day2-goal" title="Permanent link">#</a></h2>
+<p>Day2 把 Day1 的受控工具调用扩展成 <strong>controlled agentic retrieval</strong>，并把双核心栈中的托管分析服务从第一版入口推进到更稳定的场景产品能力。</p>
+<p>核心变化：</p>
+<ul>
+<li>LLM/harness 可以规划多步 tool sequence。</li>
+<li>检索可以加入 negative/confusable candidates、rerank、alias/entity boost。</li>
+<li>MCP tool surface 可以更稳定地服务外部 agents。</li>
+<li>impact/test planning 可以输出更高价值的 candidate artifacts。</li>
+<li>PR diff / exception / failed message / governance review 等场景可以逐步进入 managed AI 正常模式。</li>
+</ul>
+<p>核心不变：</p>
+<pre><code class="language-text">agentic is retrieval behavior, not truth authority.
+</code></pre>
+<h2 id="2-start-conditions">2. Start Conditions<a class="headerlink" href="#2-start-conditions" title="Permanent link">#</a></h2>
+<p>Day2 不应在 Day1 基础不稳时启动。</p>
+<p>前提：</p>
+<ul>
+<li>active release / scope / permission gates stable</li>
+<li>object manifest and cards stable enough for navigation</li>
+<li>L2 read and hash validation reliable</li>
+<li>dependency graph usable</li>
+<li>refusal contract tested</li>
+<li>trace complete enough to debug</li>
+<li><code>/ask</code> already uses controlled tools</li>
+</ul>
+<p>如果 Day1 仍经常拿错 scope、缺 L2、trace 不完整，Day2 只会放大风险。</p>
+<h2 id="3-day2-capabilities">3. Day2 Capabilities<a class="headerlink" href="#3-day2-capabilities" title="Permanent link">#</a></h2>
+<p>Day2 可以逐步加入：</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Purpose</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query Planner V2</td>
+<td>generate multi-step retrieval plan</td>
+<td>schema constrained; not free agent</td>
+</tr>
+<tr>
+<td>Tool Orchestrator</td>
+<td>execute limited plan with budgets</td>
+<td>every tool call policy checked</td>
+</tr>
+<tr>
+<td>Negative/confusable retrieval</td>
+<td>surface easy-to-confuse scopes/objects</td>
+<td>never expands truth scope automatically</td>
+</tr>
+<tr>
+<td>Rerank / score fusion</td>
+<td>improve candidate ordering</td>
+<td>after hard gates only</td>
+</tr>
+<tr>
+<td>Optional vector</td>
+<td>semantic candidate discovery</td>
+<td>only after scope gate and evaluation proof</td>
+</tr>
+<tr>
+<td>Expanded MCP tools</td>
+<td>stable external agent tool mode</td>
+<td>same service gates as REST</td>
+</tr>
+<tr>
+<td>Impact candidates</td>
+<td>affected object/dependency candidates</td>
+<td>not final impact approval</td>
+</tr>
+<tr>
+<td>Test planning candidates</td>
+<td>regression/boundary candidates</td>
+<td>not final QA authority</td>
+</tr>
+<tr>
+<td>Governance-authorized view</td>
+<td>evidence/review/report summary or pointer</td>
+<td>permissioned and traced</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-technical-direction">4. Technical Direction<a class="headerlink" href="#4-technical-direction" title="Permanent link">#</a></h2>
+<p>Day2 can stay on JDK 17.</p>
+<p>Suggested progression:</p>
+<ol>
+<li>Keep filesystem/Lucene baseline stable.</li>
+<li>Add alias/entity boost and better object cards.</li>
+<li>Add negative/confusable relation data.</li>
+<li>Add reranker before vector.</li>
+<li>Evaluate vector only after BM25/alias/card/rerank are insufficient.</li>
+<li>Consider OpenSearch only when scale, ops support, or unified BM25/vector/aggregation need justifies it.</li>
+</ol>
+<p>No scoring layer may override scope, permission, release, or L2 grounding.</p>
+<h2 id="5-mcp-and-tool-surface">5. MCP And Tool Surface<a class="headerlink" href="#5-mcp-and-tool-surface" title="Permanent link">#</a></h2>
+<p>Day2 MCP should become a formal agent-facing tool surface.</p>
+<p>Candidate tools:</p>
+<ul>
+<li><code>rts_resolve_scope</code></li>
+<li><code>rts_list_scopes</code></li>
+<li><code>rts_find_objects</code></li>
+<li><code>rts_get_object_card</code></li>
+<li><code>rts_read_object_l2</code></li>
+<li><code>rts_get_dependencies</code></li>
+<li><code>rts_impact_preview</code></li>
+<li><code>rts_test_plan_candidates</code></li>
+<li><code>rts_get_trace</code></li>
+</ul>
+<p>MCP remains a wrapper over the same truth service. It must not own separate query logic.</p>
+<h2 id="6-scenario-outputs">6. Scenario Outputs<a class="headerlink" href="#6-scenario-outputs" title="Permanent link">#</a></h2>
+<p>Impact analysis output should be candidate language:</p>
+<ul>
+<li>affected object candidate</li>
+<li>dependency path candidate</li>
+<li>possible target/source impact</li>
+<li>unknowns and required evidence</li>
+<li>cited URI and trace</li>
+</ul>
+<p>Test planning output should distinguish:</p>
+<ul>
+<li>deterministic template tests</li>
+<li>rule-condition-derived tests</li>
+<li>LLM-suggested additional candidates</li>
+<li>unsupported/speculative cases</li>
+<li>reviewer accepted/rejected state where available</li>
+</ul>
+<p>这些输出继续遵守 authority boundary：它们不是 release approval、final impact conclusion、root cause 或 QA signoff。</p>
+<p>但 candidate 边界不应被误读成能力天花板。Day2 的目标是提高这些场景输出的分析价值、采纳率和审查效率，而不是只生成更漂亮的保守措辞。</p>
+<h2 id="7-evaluation-harness">7. Evaluation Harness<a class="headerlink" href="#7-evaluation-harness" title="Permanent link">#</a></h2>
+<p>Every Day2 feature must be evaluated before default enablement.</p>
+<p>Track:</p>
+<ul>
+<li>correct scope rate</li>
+<li>wrong-scope/confusable errors</li>
+<li>grounded answer rate</li>
+<li>unsupported assertion rate</li>
+<li>critical miss rate</li>
+<li>impact candidate usefulness</li>
+<li>impact candidate adoption / reviewer acceptance</li>
+<li>test candidate usefulness</li>
+<li>test candidate adoption / regression hit quality</li>
+<li>review question usefulness</li>
+<li>evidence review time saved or conflict simplification quality</li>
+<li>tool budget/cost</li>
+<li>trace completeness</li>
+</ul>
+<p>Feature flags:</p>
+<ul>
+<li><code>planner_v2_enabled</code></li>
+<li><code>tool_orchestrator_enabled</code></li>
+<li><code>reranker_enabled</code></li>
+<li><code>confusable_check_enabled</code></li>
+<li><code>vector_recall_enabled</code></li>
+<li><code>impact_candidates_enabled</code></li>
+<li><code>test_plan_candidates_enabled</code></li>
+<li><code>mcp_expanded_tools_enabled</code></li>
+</ul>
+<p>Negative/confusable retrieval maps to <code>confusable_check_enabled</code> in the current service configuration. If a separate negative-retrieval feature is added later, document it as a planned flag with its runtime property name.</p>
+<p>Current code may expose some candidate-producing or support surfaces behind these flags before the full Day2 planner/orchestrator is mature. Treat those as deterministic support tools unless a feature is explicitly evaluated and documented as default Day2 agentic behavior.</p>
+<p>All Day2 features must be disable-able and fallback to Day1 behavior.</p>
+<h2 id="8-guardrails">8. Guardrails<a class="headerlink" href="#8-guardrails" title="Permanent link">#</a></h2>
+<ul>
+<li>Hard gates never become ranking features.</li>
+<li>Scope/permission/release/object state/L2 availability must pass before ranking.</li>
+<li>Tool calls are policy-checked.</li>
+<li>Agentic retrieval has max steps, max L2 reads, max dependency depth, and cost limits.</li>
+<li>Final answer remains grounded in L2/dependency/authorized governance view.</li>
+<li>Runtime learning does not mutate truth.</li>
+<li>Memory and trace feedback can improve retrieval quality, not rule facts.</li>
+</ul>
+<h2 id="9-day2-still-does-not-do">9. Day2 Still Does Not Do<a class="headerlink" href="#9-day2-still-does-not-do" title="Permanent link">#</a></h2>
+<ul>
+<li>autonomous rule creation/update</li>
+<li>automatic approval/signoff</li>
+<li>pipeline release gate</li>
+<li>unrestricted raw production data analysis</li>
+<li>generic agent orchestration platform</li>
+<li>memory-as-truth</li>
+<li>vector as primary entry</li>
+<li>cross-scope recall before scope resolution</li>
+</ul>
+<h2 id="10-exit-criteria">10. Exit Criteria<a class="headerlink" href="#10-exit-criteria" title="Permanent link">#</a></h2>
+<p>Day2 is mature when:</p>
+<ul>
+<li>multi-step retrieval beats Day1 on golden set without increasing wrong-scope errors</li>
+<li>impact/test candidates have reviewer-visible incremental value</li>
+<li>MCP external agents cannot bypass gates</li>
+<li>trace can replay agentic steps</li>
+<li>refusal behavior remains correct under planner/rerank/vector modes</li>
+<li>all new capabilities can be disabled to recover Day1 behavior</li>
+</ul>
+<h2 id="11-current-priority">11. Current Priority<a class="headerlink" href="#11-current-priority" title="Permanent link">#</a></h2>
+<p>Do Day2 in this order:</p>
+<ol>
+<li>scope/navigation tools</li>
+<li>planner V2 and controlled orchestrator</li>
+<li>negative/confusable retrieval</li>
+<li>expanded MCP tool surface</li>
+<li>impact/test candidate endpoints</li>
+<li>rerank</li>
+<li>optional vector</li>
+<li>governance-authorized evidence/review summaries</li>
+</ol>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

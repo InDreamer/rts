@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Documentation Decision Register | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/document-decision-register-zh.md</p>
+      <h1>RTS Documentation Decision Register</h1>
+      <p>active decision register for resolving outdated, ambiguous, or conflicting RTS documentation directions</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/document-decision-register-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要决定哪些历史文档思想继续保留、降级或删除</li>
+<li>需要审核 RTS 文档中跨时期产生的关键抉择点</li>
+<li>需要整理 confirmed/reference/archive 的下一轮删减计划</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要运行服务或调用 API</li>
+<li>只需要某个具体接口或字段说明</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="README.html">Confirmed Docs</a><a href="../reference/README.html">Reference Docs</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>active decision register for resolving outdated, ambiguous, or conflicting RTS documentation directions</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：active review register &gt; 日期：2026-05-08 &gt; 目的：把长期讨论中留下的关键抉择点集中登记，防止旧 proposal、旧 token 审核和新 confirmed baseline 同时指导实现。 这些点不再作为开放问题处理。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. 已固定的文档裁决</h3>
+          <p>这些点不再作为开放问题处理。</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 需要 owner 决定的抉择点</h3>
+          <p>这些点会影响后续删文档、拆文档和实现优先级。 状态：已执行。 裁决：Day1 = 当前 Java query/tool service + controlled LLM harness 的落地阶段；Day2 = Day1 后的 controlled agentic retrieval / MCP / impact / test planning 演进阶段。历史材料里的 Phase 1/Stage 1/token PoC 不再作为当前阶段</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. 下一轮整理规则</h3>
+          <p>之后删除或合并文档时使用以下规则： 1. confirmed 中的当前事实优先；reference 不覆盖 confirmed；archive 只作历史。 2. 如果一篇历史文档的有用内容已经被 distilled reference 或 confirmed 吸收，删除原长稿或移动到 archive。 3. 如果一个文档主要贡献是决策背景，而不是当前事实，保留为短 rationale，不保留完整讨论流。</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-documentation-decision-register">RTS Documentation Decision Register<a class="headerlink" href="#rts-documentation-decision-register" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：active review register
+日期：2026-05-08
+目的：把长期讨论中留下的关键抉择点集中登记，防止旧 proposal、旧 token 审核和新 confirmed baseline 同时指导实现。</p>
+</blockquote>
+<h2 id="1">1. 已固定的文档裁决<a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>这些点不再作为开放问题处理。</p>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>当前裁决</th>
+<th>文档处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTS 定位</td>
+<td>RTS 是双核心规则真相服务：既是受控真相源 / 原子能力服务，也是托管 LLM agent 分析服务；不是普通 RAG、聊天机器人或单个 agent app。</td>
+<td>保留在 confirmed；旧 proposal 只作历史材料。</td>
+</tr>
+<tr>
+<td>Truth 权威</td>
+<td>canonical truth 来自 source / evidence / review / human adjudication / signoff；LLM answer、retrieval hit、agent memory 不是 truth。</td>
+<td>保留在 confirmed 和 distilled reference。</td>
+</tr>
+<tr>
+<td>Runtime projection</td>
+<td>projection 是 approved truth 的服务运行视图，不能丢失 L2 结构化规则语义。</td>
+<td>以 projection contract 为准；旧“摘要式 KB”口径废弃。</td>
+</tr>
+<tr>
+<td>RTS service 边界</td>
+<td>RTS service 拥有 runtime truth access boundary：release、scope、permission、hash、dependency、grounding、refusal、trace。</td>
+<td>保留在 confirmed。</td>
+</tr>
+<tr>
+<td>Agent/SDK 边界</td>
+<td>OpenAI/Claude/LangChain/PageIndex 等可做 adapter、harness 或 sidecar，不拥有 truth access core。</td>
+<td>保留在 confirmed alignment note。</td>
+</tr>
+<tr>
+<td>接入模式</td>
+<td>RTS 同时支持 managed LLM harness 和 external tool mode；两者共享同一组稳定原子能力面。</td>
+<td>保留在 confirmed alignment note。</td>
+</tr>
+<tr>
+<td>历史 AI token 审核稿</td>
+<td>长稿已合并为风险原则摘要；不再让 token PoC 口径限制长期服务方向。</td>
+<td>原始长稿移出默认 reference 路径并归档；保留 consolidated summary。</td>
+</tr>
+<tr>
+<td>Java index/reference 长稿</td>
+<td>旧全量方案已归档；reference 默认只保留当前适用的短摘要。</td>
+<td>原文在 archive；短摘要保留旧方案中的安全工程原则。</td>
+</tr>
+<tr>
+<td>Final LLM agent plan 长稿</td>
+<td>旧全量 final plan 已归档；confirmed 默认只保留最终路线图。</td>
+<td>细节回收到 Day1、Day2 和 LLM alignment；原文在 archive。</td>
+</tr>
+<tr>
+<td>LLM enhanced reference 长稿</td>
+<td>旧 LLM/index/harness 长讨论已归档；reference 默认只保留 scope、context、memory 和 controlled tools 摘要。</td>
+<td>原文在 archive；当前优先级回到 confirmed Day1/Day2/final roadmap/alignment。</td>
+</tr>
+<tr>
+<td>Day1/Day2 长稿</td>
+<td>旧全量 Day1/Day2 计划已归档；confirmed 默认保留 compact baseline/roadmap。</td>
+<td>Day1 保留实现边界和 DoD；Day2 保留演进能力和 guardrails。</td>
+</tr>
+<tr>
+<td>External/OV/glossary 长 reference</td>
+<td>旧长 reference 已归档；reference 默认保留约束摘要、OV lessons 和短词表。</td>
+<td>用于 rationale，不覆盖 confirmed baseline。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-owner">2. 需要 owner 决定的抉择点<a class="headerlink" href="#2-owner" title="Permanent link">#</a></h2>
+<p>这些点会影响后续删文档、拆文档和实现优先级。</p>
+<h3 id="d1-day1-phase-1">D1. Day1 是否代表当前实现阶段，而不是历史 Phase 1<a class="headerlink" href="#d1-day1-phase-1" title="Permanent link">#</a></h3>
+<p>状态：已执行。</p>
+<p>裁决：Day1 = 当前 Java query/tool service + controlled LLM harness 的落地阶段；Day2 = Day1 后的 controlled agentic retrieval / MCP / impact / test planning 演进阶段。历史材料里的 Phase 1/Stage 1/token PoC 不再作为当前阶段命名。</p>
+<p>已采用：A。confirmed 默认文档使用 Day1/Day2 或 roadmap step；历史 Phase/Stage 只在 archive/reference 中作为原文或历史术语出现。</p>
+<h3 id="d2-oversized-confirmed-docs">D2. Oversized confirmed docs 是保留原样，还是拆成决策面<a class="headerlink" href="#d2-oversized-confirmed-docs" title="Permanent link">#</a></h3>
+<p>状态：已执行。final LLM agent plan、Day1 plan 和 Day2 plan 都已压缩，并归档原长版。</p>
+<p>原问题：Day1 plan、Day2 plan、final LLM agent plan 都很长，且部分内容重叠。它们现在可读，但会让 agent 和人类读者很难判断“这段是否仍是当前事实”。</p>
+<p>建议决定：</p>
+<ul>
+<li><strong>A 保留原长文</strong>：只靠 README 路由和 conflict rule 控制。</li>
+<li><strong>B 拆分为更小叶子文档</strong>：按 query service、LLM harness、MCP/tools、scenario adapters、memory/context、observability 拆。</li>
+<li><strong>C 先不拆，先把 final plan 压缩成路线图</strong>：详细实现事实回收到 Day1/Day2/新的 alignment docs。</li>
+</ul>
+<p>已采用：C。Day1/Day2 后续若实现继续增长，再按实际模块拆 B。</p>
+<h3 id="d3-java-index-layer-reference-plan-reference">D3. Java index layer reference plan 是否继续保留为长 reference<a class="headerlink" href="#d3-java-index-layer-reference-plan-reference" title="Permanent link">#</a></h3>
+<p>状态：已执行。旧全量方案已归档，默认 reference 路径改为短摘要。</p>
+<p>原问题：它保留了早期 Java 索引层全量设想，包含 OpenSearch/vector/Knowledge-Bases 等旧术语。虽然已有对齐备注，但仍可能让读者以为这是当前工程基线。</p>
+<p>建议决定：</p>
+<ul>
+<li><strong>A 保留长 reference</strong>：继续靠顶部备注说明它不是 baseline。</li>
+<li><strong>B 压缩为短 reference 摘要</strong>：只保留仍适用的 Java implementation ideas，删除旧阶段大纲。</li>
+<li><strong>C 归档原文，新增短 distilled reference</strong>：让默认 reference 只暴露当前可用思想。</li>
+</ul>
+<p>已采用：C。</p>
+<h3 id="d4-runtime-projection-governance-view">D4. Runtime projection 的 governance view 具体暴露到什么程度<a class="headerlink" href="#d4-runtime-projection-governance-view" title="Permanent link">#</a></h3>
+<p>当前 confirmed 方向：default operational view 低噪声；authorized governance view 可展开 evidence/review/report/adjudication pointer 或 summary。</p>
+<p>仍待决定：</p>
+<ul>
+<li><strong>A 只暴露 pointers</strong>：runtime service 默认不返回 evidence/review 原文。</li>
+<li><strong>B 暴露 structured summaries</strong>：授权后返回摘要、状态、裁决理由和引用。</li>
+<li><strong>C 暴露原文片段</strong>：仅在 audit/review 权限下读取受控片段。</li>
+</ul>
+<p>推荐：B 起步，C 作为后续权限化扩展。</p>
+<h3 id="d5-endpoint">D5. 第一个场景 endpoint 选择哪个<a class="headerlink" href="#d5-endpoint" title="Permanent link">#</a></h3>
+<p>状态：已冻结。</p>
+<p>当前缺口：结构化 API 已有价值，但用户体感需要一个端到端场景展示 managed AI 正常模式。</p>
+<p>裁决：先把 <code>/ask</code> 的 grounded managed analysis answer 做完整，再优先 <code>analyze_pr_diff</code>，然后是 <code>investigate_exception</code>。这些场景的 authority boundary 仍保留，但不再把 candidate 边界写成能力上限；LLM 不可用时，能力降级为信息提供服务。</p>
+<h3 id="d6-llm-providerframework">D6. LLM provider/framework 选择是否进入文档主线<a class="headerlink" href="#d6-llm-providerframework" title="Permanent link">#</a></h3>
+<p>当前方向：core service provider-neutral，provider SDK 只是 adapter；复杂 agent framework 不进入 truth core。</p>
+<p>仍待决定：</p>
+<ul>
+<li><strong>A 只记录 provider-neutral 接口</strong>：不把 OpenAI/Claude/LangChain 写成路线承诺。</li>
+<li><strong>B 选 OpenAI SDK 做第一 adapter</strong>：文档记录为 implementation choice，不是架构绑定。</li>
+<li><strong>C 引入 LangGraph/LangChain 做 workflow sidecar</strong>：只在有 long-running workflow 需求后考虑。</li>
+</ul>
+<p>推荐：A+B，暂不做 C。</p>
+<h3 id="d7-referenceproposals">D7. reference/proposals 是否继续保留<a class="headerlink" href="#d7-referenceproposals" title="Permanent link">#</a></h3>
+<p>当前状态：AI token review 已压缩；archive proposal 已去重。仍有一些 reference/proposal 历史材料可能继续产生噪声。</p>
+<p>建议决定：</p>
+<ul>
+<li><strong>A 保留当前 reference/proposals 目录</strong>：只在 README 标注历史。</li>
+<li><strong>B 继续压缩 reference/proposals</strong>：每个历史主题只留一个摘要。</li>
+<li><strong>C 移到 archive</strong>：reference 只保留 distilled docs。</li>
+</ul>
+<p>推荐：B 到 C 的渐进方案。</p>
+<h2 id="3">3. 下一轮整理规则<a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>之后删除或合并文档时使用以下规则：</p>
+<ol>
+<li>confirmed 中的当前事实优先；reference 不覆盖 confirmed；archive 只作历史。</li>
+<li>如果一篇历史文档的有用内容已经被 distilled reference 或 confirmed 吸收，删除原长稿或移动到 archive。</li>
+<li>如果一个文档主要贡献是决策背景，而不是当前事实，保留为短 rationale，不保留完整讨论流。</li>
+<li>如果一篇文档仍在表达旧口径，但只靠顶部备注纠偏，优先压缩或归档。</li>
+<li>如果一个决策点还需要 owner 拍板，先登记到本文，不在实现文档中同时保留多个互相竞争的方向。</li>
+</ol>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

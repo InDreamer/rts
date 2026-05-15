@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tradition -&gt; Stella FXD.NDF cutoff-fixing split pack | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">KB Pack · kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.md</p>
+      <h1>Tradition -&gt; Stella FXD.NDF cutoff-fixing split pack</h1>
+      <p>This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures local demo-signoff canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree:</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="ops-reference.html">Local Pipeline Ops Reference</a><a href="reports/closure-check.html">Closure Check</a><a href="reports/extraction-report.html">Extraction Report</a><a href="reports/review-checklist.html">Review Checklist</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures local demo-signoff canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree:</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures local demo-signoff canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree: /scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>KB Pack / role: KB Pack / layer: active</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Scope</h3>
+          <p>source_system: Tradition target_system: Stella rule_domain: cutoff-fixing product_scope: FXD.NDF status: demo_signoff</p>
+        </article>
+<article class="chapter-card">
+          <h3>Contents</h3>
+          <p>lookups/lk_fxd_ndf_cutoff_by_pair_and_locode.yaml: shared cutoff lookup against TraditionStella Cutoff helpers/hlp_fxd_ndf_fixing_quoted_currency_pair.yaml: reusable quoted-currency-pair normalization helper</p>
+        </article>
+<article class="chapter-card">
+          <h3>Source Inventory</h3>
+          <p>Excel AI bundle: Tradition_SCBML_mapping-ai-bundle.json Sheets: FXD, STAMP, TraditionStella Cutoff Java: FXDNdfFields.java, StaticMappingLookupCore.java, StaticMappingLookupUtils.java</p>
+        </article>
+<article class="chapter-card">
+          <h3>Modeling Choices</h3>
+          <p>1. One shared cutoff lookup models cutoff description, fixing time, fixing business center, and hedge primary source/page because they use the same key pattern and reverse-pair fallback.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Intentional Exclusions</h3>
+          <p>FXD deliverable-leg exchange-rate rules outside the NDF fixing subtree nonDeliverableSettlement/settlementCurrency portfolio, party identification, trader, counterparty, and strategy slices</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="tradition-stella-fxdndf-cutoff-fixing-split-pack">Tradition -&gt; Stella FXD.NDF cutoff-fixing split pack<a class="headerlink" href="#tradition-stella-fxdndf-cutoff-fixing-split-pack" title="Permanent link">#</a></h1>
+<p>This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures local demo-signoff canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree:</p>
+<p><code>/scb:SCBML/scb:payload/scb:FPMLPayload/conf:trade/scbextn:fxSingleLeg/conf:nonDeliverableSettlement/conf:fixing</code></p>
+<h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">#</a></h2>
+<ul>
+<li>source_system: Tradition</li>
+<li>target_system: Stella</li>
+<li>rule_domain: cutoff-fixing</li>
+<li>product_scope: FXD.NDF</li>
+<li>status: demo_signoff</li>
+</ul>
+<h2 id="contents">Contents<a class="headerlink" href="#contents" title="Permanent link">#</a></h2>
+<ul>
+<li><code>lookups/lk_fxd_ndf_cutoff_by_pair_and_locode.yaml</code>: shared cutoff lookup against <code>TraditionStella Cutoff</code></li>
+<li><code>helpers/hlp_fxd_ndf_fixing_quoted_currency_pair.yaml</code>: reusable quoted-currency-pair normalization helper</li>
+<li><code>rules/</code>: fixing block emission, quoted currency pair, fixing date, primary rate source, secondary rate source, and fixing time rules</li>
+<li><code>evidence/evidence-index.yaml</code>: pack-level evidence and diagnostic traces</li>
+<li><code>review/review-index.yaml</code>: reconstruction notes, ambiguity, and review status</li>
+<li><code>reports/</code>: extraction, closure, and review checklist notes</li>
+</ul>
+<h2 id="source-inventory">Source Inventory<a class="headerlink" href="#source-inventory" title="Permanent link">#</a></h2>
+<ul>
+<li>Excel AI bundle: <code>Tradition_SCBML_mapping-ai-bundle.json</code></li>
+<li>Sheets: <code>FXD</code>, <code>STAMP</code>, <code>TraditionStella Cutoff</code></li>
+<li>Java: <code>FXDNdfFields.java</code>, <code>StaticMappingLookupCore.java</code>, <code>StaticMappingLookupUtils.java</code></li>
+<li>XSLT: <code>fx-singleLeg-templates.xsl</code></li>
+<li>Tests and samples: <code>fxdNdfFpML.xml</code>, <code>FXDNdfFieldsTest.java</code>, <code>StaticMappingLookupCoreTest.java</code>, <code>StaticMappingLookupUtilsTest.java</code></li>
+</ul>
+<h2 id="modeling-choices">Modeling Choices<a class="headerlink" href="#modeling-choices" title="Permanent link">#</a></h2>
+<ol>
+<li>One shared cutoff lookup models cutoff description, fixing time, fixing business center, and hedge primary source/page because they use the same key pattern and reverse-pair fallback.</li>
+<li>One quoted-currency-pair helper models the inversion logic because the same branch decision drives three sibling target values.</li>
+<li>Block rules are used where Stella renders a stable block as a unit.</li>
+<li>Evidence and review are pack-level. Main object files stay thin and query-friendly.</li>
+<li>This pack is accepted as local demo signoff material. It remains photo-reconstructed and should be rechecked before production signoff.</li>
+</ol>
+<h2 id="intentional-exclusions">Intentional Exclusions<a class="headerlink" href="#intentional-exclusions" title="Permanent link">#</a></h2>
+<ul>
+<li>FXD deliverable-leg exchange-rate rules outside the NDF fixing subtree</li>
+<li><code>nonDeliverableSettlement/settlementCurrency</code></li>
+<li>portfolio, party identification, trader, counterparty, and strategy slices</li>
+<li>FXO option-specific cutoff columns such as <code>PRIMARY_SOUCE_FOR_OPT</code> and <code>PRIMARY_SOUCE_PAGE_FOR_OPT</code></li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

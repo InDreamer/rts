@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>架构边界 | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+<a class="nav-link" href="start-here.html">三分钟读懂</a>
+<a class="nav-link active" href="architecture.html">架构边界</a>
+<a class="nav-link" href="operations.html">运行与调用</a>
+<a class="nav-link" href="roadmap.html">路线图</a>
+<a class="nav-link" href="library.html">来源文档</a>
+    </nav>
+  </header>
+  <main>
+    <section class="page-hero">
+      <p class="kicker">RTS Reading Experience</p>
+      <h1>架构边界</h1>
+      <p>把 KB、projection、index、service、LLM 和 agent 的责任分清楚。</p>
+    </section>
+    
+    <section class="architecture-map">
+      <div class="layer source">
+        <span>01</span>
+        <h2>Source Material</h2>
+        <p>业务文档、代码、mapping、lookup、示例、clarification。</p>
+      </div>
+      <div class="layer govern">
+        <span>02</span>
+        <h2>Governed KB</h2>
+        <p>Rule、Rule pack、Evidence chain、review、adjudication、signoff。</p>
+      </div>
+      <div class="layer projection">
+        <span>03</span>
+        <h2>Runtime Projection</h2>
+        <p>release manifest、scope registry、object manifest、cards、L2、dependency。</p>
+      </div>
+      <div class="layer service">
+        <span>04</span>
+        <h2>RTS Service Gate</h2>
+        <p>release、scope、permission、hash、grounding、refusal、trace。</p>
+      </div>
+      <div class="layer consume">
+        <span>05</span>
+        <h2>Consumption</h2>
+        <p>query、ask、scenario、MCP、pipeline、external agent。</p>
+      </div>
+    </section>
+
+    <section class="split-explain">
+      <article id="atomic-capabilities">
+        <p class="kicker">Core A</p>
+        <h2>受控真相源原子能力</h2>
+        <p>这些能力回答“能不能安全地找到和读取 truth material”。它们是 deterministic information service，不是 AI 不可用时才存在的 fallback。</p>
+        <ul class="tag-list">
+          <li>resolve scope</li>
+          <li>find objects</li>
+          <li>read object card</li>
+          <li>read L2</li>
+          <li>dependency traversal</li>
+          <li>trace and grounding</li>
+        </ul>
+      </article>
+      <article id="managed-analysis">
+        <p class="kicker">Core B</p>
+        <h2>托管 LLM agent 分析</h2>
+        <p>这些能力回答“如何把 truth material 变成可用分析”。AI 可以规划、取证、表达 unknown 和 candidate，但不能拥有 truth authority。</p>
+        <ul class="tag-list">
+          <li>/ask</li>
+          <li>PR diff impact</li>
+          <li>exception investigation</li>
+          <li>failed message analysis</li>
+          <li>test planning</li>
+          <li>governance review</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="boundary-table">
+      <div>
+        <p class="kicker">Boundary Checks</p>
+        <h2>什么能支撑事实，什么不能。</h2>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead><tr><th>材料</th><th>用途</th><th>是否拥有 truth</th></tr></thead>
+          <tbody>
+            <tr><td>L2 runtime object</td><td>事实回答、诊断、测试规划 grounding</td><td>可以支撑事实</td></tr>
+            <tr><td>dependency edge</td><td>解释、影响候选、必要上下文加载</td><td>可以支撑依赖事实</td></tr>
+            <tr><td>object card / L0 / L1</td><td>导航、消歧、召回</td><td>不能替代 L2</td></tr>
+            <tr><td>LLM draft</td><td>分析草稿、表达、候选</td><td>不能自行成为 truth</td></tr>
+            <tr><td>memory / trace feedback</td><td>体验和检索辅助</td><td>不能参与 truth validation</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="source-strip">
+      <p class="kicker">主要来源</p>
+      <a href="docs/confirmed/kb-to-index-projection-contract-zh.html">Projection Contract</a>
+<a href="docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html">LLM Alignment</a>
+<a href="docs/confirmed/internal-llm-agent-service-implementation-plan-zh.html">Internal Agent Plan</a>
+    </section>
+    
+  </main>
+  <footer class="site-footer">
+    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+  </footer>
+  <script src="assets/search-index.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS API 调用方指南 | RTS 来源解读</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../index.html">首页</a>
+      <a class="nav-link" href="../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../architecture.html">架构边界</a>
+      <a class="nav-link" href="../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Operational · docs/api-caller-guide-zh.md</p>
+      <h1>RTS API 调用方指南</h1>
+      <p>API caller guide for RTS query, ask, object, dependency, and trace responses</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../docs/api-caller-guide-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要调用 RTS REST API 或理解响应字段</li>
+<li>需要确认 caller_id、API key、scope、refusal reason 或 warning 的语义</li>
+<li>需要给业务集成方或查询调用者说明 RTS service 用法</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要本地启动或维护 RTS Java service</li>
+<li>只需要修改 KB-to-index projection contract</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="java-service-runbook-zh.html">RTS Java Service Runbook</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>API caller guide for RTS query, ask, object, dependency, and trace responses</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>本文面向业务集成方和查询调用者，说明如何向 RTS 服务发起查询、理解返回结果、处理拒答，以及可用的 sample scope。 每个请求都需要携带 caller_id 和 API key。caller_id 放在请求 body，API key 放在 header。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Operational / role: leaf / layer: 2</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. 身份与认证</h3>
+          <p>每个请求都需要携带 caller_id 和 API key。caller_id 放在请求 body，API key 放在 header。 body 中： sample 环境内置 caller：</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Scope 说明</h3>
+          <p>Scope 由四个维度组成，必须全部提供，且必须属于当前 active release： 当前默认 active release 是： 默认可用 scope： 回滚 sample release 是 rel-2026-05-06。只有切换 active release 后，以下 scope 才可查询： scope 不属于当前 active release 时，服务会返回 scope_unclear。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. 主要入口</h3>
+          <p>下面所有示例默认使用当前 photo active release 的 scope： 用自然语言提问，返回基于 L2 truth 的结构化答案。不调用 LLM，结果来自 projection store。 最小请求 body： 关键字段： /ask 是 RTS 的 managed analysis service 入口。它使用受控 LLM harness 回答，工具链仍受 scope、permission、grounding 和 tra</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. 响应结构</h3>
+          <p>常见拒答原因：</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. 旧 sample release</h3>
+          <p>如果需要查询 payments、fees、accounts、fx 或 compliance，先按运行手册切换 active release 到： 切换后才可以使用这类 scope：</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. 注意事项</h3>
+          <p>所有请求 body 字段使用 snake_case，不要用 camelCase。 scope_hint 中的 scope 必须属于当前 active release，否则返回 scope_unclear。 warnings 或 governance summary 中出现 photo-reconstructed、demo-signoff、open_questions 或 production gate 标注时，返回内容不能作为 prod</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-api">RTS API 调用方指南<a class="headerlink" href="#rts-api" title="Permanent link">#</a></h1>
+<p>本文面向业务集成方和查询调用者，说明如何向 RTS 服务发起查询、理解返回结果、处理拒答，以及可用的 sample scope。</p>
+<h2 id="1">1. 身份与认证<a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>每个请求都需要携带 <code>caller_id</code> 和 API key。<code>caller_id</code> 放在请求 body，API key 放在 header。</p>
+<pre><code class="language-bash">-H 'X-RTS-API-Key: &lt;your-api-key&gt;'
+</code></pre>
+<p>body 中：</p>
+<pre><code class="language-json">{
+  &quot;caller_id&quot;: &quot;your-caller-id&quot;
+}
+</code></pre>
+<p>sample 环境内置 caller：</p>
+<pre><code class="language-text">caller_id: tester
+api_key: tester-key
+</code></pre>
+<h2 id="2-scope">2. Scope 说明<a class="headerlink" href="#2-scope" title="Permanent link">#</a></h2>
+<p>Scope 由四个维度组成，必须全部提供，且必须属于当前 active release：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+<th>sample 可用值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>channel</code></td>
+<td>渠道</td>
+<td><code>tradition</code></td>
+</tr>
+<tr>
+<td><code>product</code></td>
+<td>产品线</td>
+<td><code>stella</code></td>
+</tr>
+<tr>
+<td><code>pack</code></td>
+<td>规则包</td>
+<td>见下表</td>
+</tr>
+<tr>
+<td><code>domain</code></td>
+<td>领域</td>
+<td><code>cutoff-fixing</code> / <code>core</code></td>
+</tr>
+</tbody>
+</table>
+<p>当前默认 active release 是：</p>
+<pre><code class="language-text">rel-2026-05-06-photo-fxd-ndf-cutoff
+</code></pre>
+<p>默认可用 scope：</p>
+<table>
+<thead>
+<tr>
+<th>pack</th>
+<th>domain</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fxd-ndf-cutoff-fixing</code></td>
+<td><code>cutoff-fixing</code></td>
+<td>NDF fixing cutoff 规则，demo-signoff/photo reconstructed golden</td>
+</tr>
+</tbody>
+</table>
+<p>回滚 sample release 是 <code>rel-2026-05-06</code>。只有切换 active release 后，以下 scope 才可查询：</p>
+<table>
+<thead>
+<tr>
+<th>pack</th>
+<th>domain</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>payments</code></td>
+<td><code>core</code></td>
+<td>支付金额规则</td>
+</tr>
+<tr>
+<td><code>fees</code></td>
+<td><code>core</code></td>
+<td>手续费规则</td>
+</tr>
+<tr>
+<td><code>accounts</code></td>
+<td><code>core</code></td>
+<td>账户状态规则</td>
+</tr>
+<tr>
+<td><code>fx</code></td>
+<td><code>core</code></td>
+<td>汇率类型规则</td>
+</tr>
+<tr>
+<td><code>compliance</code></td>
+<td><code>core</code></td>
+<td>筛查标志规则</td>
+</tr>
+</tbody>
+</table>
+<p>scope 不属于当前 active release 时，服务会返回 <code>scope_unclear</code>。</p>
+<h2 id="3">3. 主要入口<a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>下面所有示例默认使用当前 photo active release 的 scope：</p>
+<pre><code class="language-json">{
+  &quot;channel&quot;: &quot;tradition&quot;,
+  &quot;product&quot;: &quot;stella&quot;,
+  &quot;pack&quot;: &quot;fxd-ndf-cutoff-fixing&quot;,
+  &quot;domain&quot;: &quot;cutoff-fixing&quot;
+}
+</code></pre>
+<h3 id="31-apiv1query">3.1 确定性查询 <code>/api/v1/query</code><a class="headerlink" href="#31-apiv1query" title="Permanent link">#</a></h3>
+<p>用自然语言提问，返回基于 L2 truth 的结构化答案。不调用 LLM，结果来自 projection store。</p>
+<p>最小请求 body：</p>
+<pre><code class="language-json">{
+  &quot;query&quot;: &quot;fixing time 怎么生成&quot;,
+  &quot;caller_id&quot;: &quot;tester&quot;,
+  &quot;scope_hint&quot;: {
+    &quot;channel&quot;: &quot;tradition&quot;,
+    &quot;product&quot;: &quot;stella&quot;,
+    &quot;pack&quot;: &quot;fxd-ndf-cutoff-fixing&quot;,
+    &quot;domain&quot;: &quot;cutoff-fixing&quot;
+  },
+  &quot;output_mode&quot;: &quot;default&quot;,
+  &quot;use_llm&quot;: false
+}
+</code></pre>
+<p>关键字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>query</code></td>
+<td>是</td>
+<td>自然语言问题</td>
+</tr>
+<tr>
+<td><code>caller_id</code></td>
+<td>是</td>
+<td>调用方 ID</td>
+</tr>
+<tr>
+<td><code>scope_hint</code></td>
+<td>建议</td>
+<td>channel/product/pack/domain；缺省则可能触发 <code>scope_unclear</code></td>
+</tr>
+<tr>
+<td><code>output_mode</code></td>
+<td>否</td>
+<td><code>default</code></td>
+</tr>
+<tr>
+<td><code>use_llm</code></td>
+<td>否</td>
+<td>当前 <code>/query</code> 仍按确定性查询路径处理；需要 controlled LLM harness 时调用 <code>/ask</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-llm-apiv1ask">3.2 LLM 增强查询 <code>/api/v1/ask</code><a class="headerlink" href="#32-llm-apiv1ask" title="Permanent link">#</a></h3>
+<p><code>/ask</code> 是 RTS 的 managed analysis service 入口。它使用受控 LLM harness 回答，工具链仍受 scope、permission、grounding 和 trace 约束。LLM 未启用或 provider 不可用时，<code>/ask</code> 会降级为结构化信息提供服务，而不是继续假装自己处于同等分析能力状态。</p>
+<p>请求 body 与 <code>/query</code> 类似，额外支持 <code>max_tool_calls</code>。LLM 仍只能通过 allowlisted RTS tools 读取 projection。</p>
+<p><code>/ask</code> 返回统一 answer envelope。成功答案除了 <code>answer</code> 文本外，仍必须包含：</p>
+<ul>
+<li><code>schema_version</code>：当前为 <code>service-answer.v2</code>。</li>
+<li><code>facts</code>：每条事实都必须来自本次读取过的 L2 object。</li>
+<li><code>cited_objects</code>：被引用的 object URI。</li>
+<li><code>grounding_map</code>：claim 到 L2 URI/content hash 的映射。</li>
+<li><code>budget_usage</code>：tool/L2/model/latency budget 使用情况。</li>
+<li><code>trace_id</code>：可用于审计工具序列、L2 reads 和 grounding。</li>
+<li><code>run_id</code>：managed <code>/ask</code> 开启 orchestrator 时返回的 RTS-owned <code>AgentRun</code> 标识；可通过 trace report 找到完整 run record、tool invocation、observation 和 validated claim。</li>
+</ul>
+<p>如果模型输出无法通过 claim-level grounding validation，服务会返回 <code>refusal.reason=unsupported_claim</code> 或 <code>hash_mismatch</code>，不会把自由文本当作事实答案。</p>
+<p>OpenAI-compatible Responses adapter 当前要求 provider 返回结构化 JSON schema draft：<code>analysis_text</code>、<code>claims</code>、<code>inferences</code>、<code>unknowns</code>、<code>candidates</code>、<code>warnings</code>、<code>citation_intents</code>、<code>tool_needs</code>。这些字段是受控分析草稿；最终 <code>facts</code> 仍只能来自本次 RTS 读取并通过 validator 的 L2/dependency/governance evidence。</p>
+<p><code>RTS_TOOL_ORCHESTRATOR_ENABLED=false</code> 时，<code>/ask</code> 会降级为 deterministic <code>/query</code> 风格的信息服务输出。显式开启 orchestrator 后，内部 <code>/ask</code> 链路会先生成受控 <code>AgentPlan</code>，记录 intent、scenario type、scope snapshot、release snapshot、tool plan 和 expected evidence。Planner 只允许决定工具计划或 clarification，不允许直接产出业务事实。执行时由 RTS service 拥有 plan/observe/revise/hard-stop loop：例如 dependency observation 发现目标场景还需要依赖对象 L2 evidence 时，service policy 可以追加 allowlisted <code>read_object_l2</code> 补证据，并在 trace 中记录 <code>decision=revise</code>；模型仍不能绕过 service recipe 自行发起工具调用。</p>
+<h3 id="33-scenario-endpoints">3.3 Scenario endpoints<a class="headerlink" href="#33-scenario-endpoints" title="Permanent link">#</a></h3>
+<p>复杂外部输入可以走 scenario endpoint。当前实现已经提供统一 <code>scenario-report.v1</code>、grounded candidate / information-service output、citations、grounding map、warnings 和 trace。外部输入只作为线索，不是真相。</p>
+<p>对 PR diff、exception impact、failed message、test planning 和 governance review 这类 AI-centric 场景，managed AI 是目标正常产品模式。当前核心 scenario endpoint 都会先进入 managed harness loop，形成 service-owned <code>AgentRun</code>，再由 scenario compiler 合并 grounded facts、inferences、unknowns、candidate suggestions、warnings、citations 和 grounding map。这个实现已经避免 scenario 直接把外部输入或 memory 当 truth，也能记录 service-owned observe/revise/hard-stop 决策；但 scenario 输出仍是 grounded candidate report，不是 human decision 或 signoff。对应 feature flag 关闭或 LLM 不可用时，服务会降级为结构化信息提供或 candidate support surface。本地验证或受控环境需要显式开启对应开关。</p>
+<p><code>AgentRun.context_snapshot</code> 由 service-side <code>ContextBuilder</code> 生成。当前 trace 只把 truth-eligible L2 URI/hash 指针、<code>context_hash</code>、<code>truth_eligible_count</code>、token estimate 和 redaction state 写入 run record；session memory、workspace hint、diff/log/raw message 等上下文不能支撑 facts。</p>
+<p><code>AgentRun.loop_transitions</code> 记录 service-owned observe/revise/hard-stop 判断，例如 L2 observed 后继续 claim validation、dependency gap observed 后 revise 读取依赖对象 L2、grounding observed 后 hard stop answer。模型不能绕过 recipe 自行发起新工具；与 recipe 不一致的 tool proposal 会被拒绝。</p>
+<p><code>/ask/contextual</code> 和 MCP <code>rts_contextual_ask</code> 可以使用 session scope 或 selected object 作为检索 hint；selected object hint 会先被重新绑定到 active release 和 caller permission，再只用于解析本轮 scope。事实输出仍必须由本轮 <code>/ask</code> 重新读取 L2/dependency/governance evidence。</p>
+<h3 id="331-automation-boundary">3.3.1 Automation boundary<a class="headerlink" href="#331-automation-boundary" title="Permanent link">#</a></h3>
+<p>无论是 <code>/ask</code> 还是 scenario endpoint，只要输出类型仍属于 <code>candidate</code>、<code>inference</code>、<code>unknown</code> 或 investigation path，它就不能被当作：</p>
+<ul>
+<li>release approval</li>
+<li>final root cause closure</li>
+<li>QA signoff</li>
+<li>pipeline allow/block gate</li>
+<li>unrecorded human decision</li>
+</ul>
+<p>只有两类内容可以直接驱动自动化动作：</p>
+<ol>
+<li>deterministic contract 已明确允许的 machine-readable result</li>
+<li>已记录的人类裁决 / approved truth / signed release state</li>
+</ol>
+<p>这条边界对 managed mode 和 external agent tool mode 同样成立。</p>
+<p>当前入口：</p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>场景</th>
+<th>输出边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /api/v1/scenario/analyze-pr-diff</code></td>
+<td>PR diff impact analysis</td>
+<td>impact/test candidate，不是 release approval</td>
+</tr>
+<tr>
+<td><code>POST /api/v1/scenario/investigate-exception</code></td>
+<td>exception/log investigation</td>
+<td>investigation path，不是 final root cause</td>
+</tr>
+<tr>
+<td><code>POST /api/v1/scenario/analyze-failed-message</code></td>
+<td>failed/raw message analysis</td>
+<td>target candidate，不是生产转换结果</td>
+</tr>
+<tr>
+<td><code>POST /api/v1/scenario/plan-tests</code></td>
+<td>test planning</td>
+<td>test suggestions，不是 QA signoff</td>
+</tr>
+<tr>
+<td><code>POST /api/v1/scenario/governance-review</code></td>
+<td>governance review assistant</td>
+<td>reviewer questions / conflict candidates，不是 human decision</td>
+</tr>
+</tbody>
+</table>
+<p>请求字段：</p>
+<pre><code class="language-json">{
+  &quot;input&quot;: &quot;diff/log/raw message text&quot;,
+  &quot;caller_id&quot;: &quot;tester&quot;,
+  &quot;scope&quot;: {
+    &quot;channel&quot;: &quot;tradition&quot;,
+    &quot;product&quot;: &quot;stella&quot;,
+    &quot;pack&quot;: &quot;fxd-ndf-cutoff-fixing&quot;,
+    &quot;domain&quot;: &quot;cutoff-fixing&quot;
+  },
+  &quot;output_mode&quot;: &quot;default&quot;,
+  &quot;max_objects&quot;: 5
+}
+</code></pre>
+<p>统一 report 字段包括 <code>schema_version</code>、<code>status</code>、<code>scenario_type</code>、<code>input_summary</code>、<code>facts</code>、<code>inferences</code>、<code>candidates</code>、<code>unknowns</code>、<code>next_evidence_needed</code>、<code>citations</code>、<code>grounding_map</code>、<code>trace_id</code>、<code>run_id</code>、<code>budget_usage</code>、<code>warnings</code>。<code>run_id</code> 只标识 RTS service 内部执行单元；scenario 输出仍是 candidate/report surface，不是 human decision。</p>
+<h3 id="34-apiv1find">3.4 候选搜索 <code>/api/v1/find</code><a class="headerlink" href="#34-apiv1find" title="Permanent link">#</a></h3>
+<p>按关键词搜索对象，返回候选列表。适合在发起精确查询前探索哪些对象存在。</p>
+<p>常用请求字段：<code>query</code>、<code>caller_id</code>、<code>scope</code>、<code>object_types</code>、<code>anchors</code>、<code>limit</code>、<code>output_mode</code>。</p>
+<h3 id="35-l2-apiv1objectscontent">3.5 读取对象 L2 内容 <code>/api/v1/objects/content</code><a class="headerlink" href="#35-l2-apiv1objectscontent" title="Permanent link">#</a></h3>
+<p>直接读取某个 object 的 L2 内容。</p>
+<p>常用请求字段：<code>uri</code>、<code>purpose</code>、<code>caller_id</code>。示例 URI：<code>rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_fixing_time</code>。</p>
+<h3 id="36-apiv1objectsdependencies">3.6 依赖遍历 <code>/api/v1/objects/dependencies</code><a class="headerlink" href="#36-apiv1objectsdependencies" title="Permanent link">#</a></h3>
+<p>查询某个 object 的依赖关系。</p>
+<p>常用请求字段：<code>uri</code>、<code>direction</code>、<code>depth</code>、<code>purpose</code>、<code>caller_id</code>。<code>direction</code> 可选值：<code>forward</code>、<code>reverse</code>、<code>both</code>。<code>depth</code> 受 RTS tool budget 控制，请求参数不能自授权扩大依赖遍历。</p>
+<h3 id="37-trace-apiv1tracestraceid">3.7 读取 Trace <code>/api/v1/traces/{traceId}</code><a class="headerlink" href="#37-trace-apiv1tracestraceid" title="Permanent link">#</a></h3>
+<p>查看某次查询的执行详情，包括用了哪些 L2 对象、grounding 情况、耗时。</p>
+<p><code>trace_id</code> 从 <code>/query</code> 或 <code>/ask</code> 的响应中获取。</p>
+<p>完整可复制 curl 命令见 sample runtime projection smoke test 文档。</p>
+<h3 id="38-evaluation-metrics-gates">3.8 Evaluation / metrics gates<a class="headerlink" href="#38-evaluation-metrics-gates" title="Permanent link">#</a></h3>
+<p><code>POST /api/v1/evaluation/run</code> 返回 scope、grounding、refusal、trace completeness 等安全门禁。对 <code>managed_ask</code>、<code>scenario_*</code>、<code>llm</code> 等 managed/AI 模式，还会返回 <code>ai_value_score_total</code> 和 <code>first_pass_useful_count</code>；这些是默认开启 managed normal mode 前的正向价值门禁，避免只用流畅度或“能回答”作为通过标准。</p>
+<ul>
+<li>safety gates：scope resolution、refusal correctness、trace completeness、top-k recall、unsupported claim count、wrong scope count。</li>
+<li>AI value gates：<code>first_pass_usefulness</code> 和 <code>ai_value_score_min</code>。只有 managed/scenario/LLM 模式需要满足，deterministic 基线不需要伪造 AI value。</li>
+<li><code>ai_value_score</code> 来自 grounded facts、inferences、unknowns、candidate suggestions、next evidence 等结构化输出信号；不能由未 grounded 的自由文本充数。</li>
+</ul>
+<h2 id="4">4. 响应结构<a class="headerlink" href="#4" title="Permanent link">#</a></h2>
+<h3 id="_1">正常答案<a class="headerlink" href="#_1" title="Permanent link">#</a></h3>
+<pre><code class="language-json">{
+  &quot;answer_type&quot;: &quot;answer&quot;,
+  &quot;scope&quot;: {
+    &quot;channel&quot;: &quot;tradition&quot;,
+    &quot;product&quot;: &quot;stella&quot;,
+    &quot;pack&quot;: &quot;fxd-ndf-cutoff-fixing&quot;,
+    &quot;domain&quot;: &quot;cutoff-fixing&quot;
+  },
+  &quot;release_id&quot;: &quot;rel-2026-05-06-photo-fxd-ndf-cutoff&quot;,
+  &quot;facts&quot;: [
+    {
+      &quot;text&quot;: &quot;...&quot;,
+      &quot;uri&quot;: &quot;rts://...&quot;,
+      &quot;release_id&quot;: &quot;rel-2026-05-06-photo-fxd-ndf-cutoff&quot;,
+      &quot;source&quot;: &quot;l2:sha256:...&quot;
+    }
+  ],
+  &quot;cited_objects&quot;: [&quot;rts://...&quot;],
+  &quot;dependencies&quot;: [],
+  &quot;trace_id&quot;: &quot;...&quot;,
+  &quot;schema_version&quot;: &quot;service-answer.v2&quot;,
+  &quot;grounding_map&quot;: {
+    &quot;claims&quot;: []
+  },
+  &quot;budget_usage&quot;: {},
+  &quot;warnings&quot;: []
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>answer_type</code></td>
+<td><code>answer</code> / <code>refusal</code> / <code>partial</code> / <code>clarification</code></td>
+</tr>
+<tr>
+<td><code>facts</code></td>
+<td>来自 L2 truth 的结构化事实，每条含来源 hash</td>
+</tr>
+<tr>
+<td><code>cited_objects</code></td>
+<td>本次答案引用的 object URI 列表</td>
+</tr>
+<tr>
+<td><code>dependencies</code></td>
+<td>关联依赖边</td>
+</tr>
+<tr>
+<td><code>trace_id</code></td>
+<td>可用于追踪本次查询执行详情</td>
+</tr>
+<tr>
+<td><code>run_id</code></td>
+<td>managed <code>/ask</code> 或 scenario report 对应的 AgentRun；deterministic <code>/query</code> 可为空</td>
+</tr>
+<tr>
+<td><code>grounding_map</code></td>
+<td>claim 到 L2 object/hash 的映射；search hit 或 memory 不能成为 fact source</td>
+</tr>
+<tr>
+<td><code>budget_usage</code></td>
+<td>本次请求的工具、L2、模型、延迟预算使用</td>
+</tr>
+<tr>
+<td><code>warnings</code></td>
+<td>非阻塞警告，如 demo-signoff/photo-reconstructed 标注</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_2">拒答<a class="headerlink" href="#_2" title="Permanent link">#</a></h3>
+<pre><code class="language-json">{
+  &quot;answer_type&quot;: &quot;refusal&quot;,
+  &quot;refusal&quot;: {
+    &quot;reason&quot;: &quot;scope_unclear&quot;,
+    &quot;what_is_missing&quot;: &quot;...&quot;,
+    &quot;what_user_can_provide&quot;: [],
+    &quot;partial_candidates_exist&quot;: false
+  },
+  &quot;trace_id&quot;: &quot;...&quot;
+}
+</code></pre>
+<p>常见拒答原因：</p>
+<table>
+<thead>
+<tr>
+<th><code>reason</code></th>
+<th>含义</th>
+<th>处理建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scope_unclear</code></td>
+<td>scope 未提供或不在 active release</td>
+<td>检查 scope_hint 四个字段是否正确，或切换 active release</td>
+</tr>
+<tr>
+<td><code>unauthorized_scope</code></td>
+<td>caller 无权访问该 scope</td>
+<td>确认 caller_id 和 api_key 正确，联系管理员确认权限</td>
+</tr>
+<tr>
+<td><code>object_not_found</code></td>
+<td>在该 scope 下未找到匹配对象</td>
+<td>用 <code>/find</code> 先搜索确认对象存在</td>
+</tr>
+<tr>
+<td><code>only_similarity_no_structured_match</code></td>
+<td>只有相似候选，无精确匹配</td>
+<td>换用更精确的查询词或用 <code>/find</code> 查候选</td>
+</tr>
+<tr>
+<td><code>tool_budget_exhausted</code></td>
+<td>tool、L2、依赖深度、上下文或延迟预算耗尽</td>
+<td>缩小问题范围或降低读取深度；不要使用半截结果作为事实</td>
+</tr>
+<tr>
+<td><code>model_provider_failure</code></td>
+<td>LLM provider timeout、不可用或返回格式非法</td>
+<td>稍后重试，或改用 <code>/query</code> / tool mode 获取 deterministic truth</td>
+</tr>
+<tr>
+<td><code>unsupported_claim</code></td>
+<td>模型或调用方请求的事实 claim 无法被本次 L2/依赖/governance evidence 支撑</td>
+<td>改用更明确的 object URI、target path 或读取 grounding report</td>
+</tr>
+<tr>
+<td><code>hash_mismatch</code></td>
+<td>claim 引用的 L2 hash 与本次读取结果不一致</td>
+<td>重新读取 active release；检查调用方是否混用了旧 trace 或旧 release</td>
+</tr>
+<tr>
+<td><code>active_release_missing</code></td>
+<td>服务未加载任何 release</td>
+<td>联系运维，检查 store 是否配置</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-sample-release">5. 旧 sample release<a class="headerlink" href="#5-sample-release" title="Permanent link">#</a></h2>
+<p>如果需要查询 payments、fees、accounts、fx 或 compliance，先按运行手册切换 active release 到：</p>
+<pre><code class="language-text">rel-2026-05-06
+</code></pre>
+<p>切换后才可以使用这类 scope：</p>
+<pre><code class="language-json">{
+  &quot;channel&quot;: &quot;tradition&quot;,
+  &quot;product&quot;: &quot;stella&quot;,
+  &quot;pack&quot;: &quot;payments&quot;,
+  &quot;domain&quot;: &quot;core&quot;
+}
+</code></pre>
+<h2 id="6">6. 注意事项<a class="headerlink" href="#6" title="Permanent link">#</a></h2>
+<ul>
+<li>所有请求 body 字段使用 <code>snake_case</code>，不要用 <code>camelCase</code>。</li>
+<li><code>scope_hint</code> 中的 scope 必须属于当前 active release，否则返回 <code>scope_unclear</code>。</li>
+<li><code>warnings</code> 或 governance summary 中出现 <code>photo-reconstructed</code>、<code>demo-signoff</code>、<code>open_questions</code> 或 production gate 标注时，返回内容不能作为 production signoff truth 使用。</li>
+<li><code>facts[].source</code> 以 <code>l2:sha256:...</code> 格式标识来源，可通过 trace 核查引用完整性。</li>
+<li>启用 LLM 时必须显式配置 base URL、API key 和模型；LLM 请求会把受控上下文发送到配置的模型端点，生产或敏感环境需要先确认数据外发边界。</li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

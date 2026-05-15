@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Constitution v2 | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/system-constitution-v1.md</p>
+      <h1>RTS Constitution v2</h1>
+      <p>RTS Constitution v2 for a rule truth service with multi-source governance, AI-first review, human final adjudication, permissioned service access, and runtime truth boundaries</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/system-constitution-v1.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>the request is about core RTS principles</li>
+<li>the request is about AI-first governance or human final adjudication</li>
+<li>the request is about API/MCP/pipeline/Q&amp;A service boundaries</li>
+<li>the request is about hallucination minimization by architecture</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>the request is only about a specific implementation detail</li>
+<li>the request is only about historical OV adoption mechanics</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="system-constitution-v1.html">RTS Constitution v2</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>RTS Constitution v2 for a rule truth service with multi-source governance, AI-first review, human final adjudication, permissioned service access, and runtime truth boundaries</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This document defines the constitutional rules for RTS as a dual-core rule truth service. RTS exists to turn multi-source transformation knowledge into governed rule truth that can be safely used through its internal Knowledge Base, retrieval layer, truth-source atomic capabilities, managed LLM analysis service, APIs, MCP tools, Q&amp;A surfaces, and system pipelines.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>What This Covers</h3>
+          <p>This document defines the constitutional rules for RTS as a dual-core rule truth service. RTS exists to turn multi-source transformation knowledge into governed rule truth that can be safely used through its internal Kno</p>
+        </article>
+<article class="chapter-card">
+          <h3>Constitutional Purpose</h3>
+          <p>RTS protects five things: truth must come from traceable sources source conflicts must be exposed, not hidden AI should do as much governed review and analysis work as possible, but must not become the final truth owner</p>
+        </article>
+<article class="chapter-card">
+          <h3>Core Objects</h3>
+          <p>RTS truth is built around three object groups that must not be separated in thinking: Rule: structured transformation logic for target fields, lookups, helpers, constants, conditions, and dependencies</p>
+        </article>
+<article class="chapter-card">
+          <h3>Constitutional Principles</h3>
+          <p>A rule becomes default service truth only after the relevant source material has been collected, AI review has exposed structure issues and conflicts, human review has裁决 material ambiguity, and signoff/publication state </p>
+        </article>
+<article class="chapter-card">
+          <h3>Default Output Discipline</h3>
+          <p>When answering a rule or impact question, RTS should prefer outputs that: name the answered scope distinguish signed truth, draft material, conflict-open material, and unknowns</p>
+        </article>
+<article class="chapter-card">
+          <h3>Service Non-Goals</h3>
+          <p>RTS is not trying to: maximize free-form conversational fluency make LLMs final business decision makers treat all documents as equal truth sources collapse source ingestion, governance, publication, retrieval, and runti</p>
+        </article>
+<article class="chapter-card">
+          <h3>Decision Rule</h3>
+          <p>When a future design choice is unclear, choose the option that best preserves governed truth, exposes source conflict, maximizes authorized AI value inside explicit safety boundaries, records human裁决, and keeps service o</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-constitution-v2">RTS Constitution v2<a class="headerlink" href="#rts-constitution-v2" title="Permanent link">#</a></h1>
+<h2 id="what-this-covers">What This Covers<a class="headerlink" href="#what-this-covers" title="Permanent link">#</a></h2>
+<p>This document defines the constitutional rules for RTS as a dual-core rule truth service.</p>
+<p>RTS exists to turn multi-source transformation knowledge into governed rule truth that can be safely used through its internal Knowledge Base, retrieval layer, truth-source atomic capabilities, managed LLM analysis service, APIs, MCP tools, Q&amp;A surfaces, and system pipelines.</p>
+<p>RTS includes LLM as a core internal capability. The LLM may retrieve, explain, analyze, detect conflicts, propose impact/test candidates, surface unsupported assertions, and express results based on governed Knowledge Base content, but an LLM answer is not automatically truth.</p>
+<p>The goal is not maximum generative fluency. The goal is controlled truth creation, controlled truth publication, controlled truth consumption, and high-value AI analysis that remains inside explicit truth and authority boundaries.</p>
+<h2 id="constitutional-purpose">Constitutional Purpose<a class="headerlink" href="#constitutional-purpose" title="Permanent link">#</a></h2>
+<p>RTS protects five things:</p>
+<ul>
+<li>truth must come from traceable sources</li>
+<li>source conflicts must be exposed, not hidden</li>
+<li>AI should do as much governed review and analysis work as possible, but must not become the final truth owner</li>
+<li>human review is the final裁决 for material ambiguity and conflict</li>
+<li>LLM outputs, candidates, and investigation paths must be separated from approved truth and recorded human decisions</li>
+<li>service outputs must stay permissioned, traceable, state-aware, and useful enough to create measurable AI value within those boundaries</li>
+</ul>
+<h2 id="core-objects">Core Objects<a class="headerlink" href="#core-objects" title="Permanent link">#</a></h2>
+<p>RTS truth is built around three object groups that must not be separated in thinking:</p>
+<ul>
+<li><strong>Rule</strong>: structured transformation logic for target fields, lookups, helpers, constants, conditions, and dependencies</li>
+<li><strong>Rule pack</strong>: the governance boundary for related rules, lookups, helpers, evidence, review records, reports, and signoff state</li>
+<li><strong>Evidence chain</strong>: the source-backed explanation of why a rule is trusted, disputed, incomplete, or superseded</li>
+</ul>
+<p>A rule without evidence is not enough. Evidence without review is not enough. A pack without explicit state is not safe to publish as default service truth.</p>
+<p>Canonical packs should keep main transformation objects separate from governance side layers. <code>rules/</code>, <code>lookups/</code>, and <code>helpers/</code> describe what the transformation does. <code>evidence/</code>, <code>review/</code>, and <code>reports/</code> explain why it is trusted, disputed, reviewed, or ready. Long evidence, review history, ambiguity discussion, and approval history should not be mixed into every main rule object.</p>
+<h2 id="constitutional-principles">Constitutional Principles<a class="headerlink" href="#constitutional-principles" title="Permanent link">#</a></h2>
+<h3 id="1-governed-review-establishes-default-service-truth">1. Governed Review Establishes Default Service Truth<a class="headerlink" href="#1-governed-review-establishes-default-service-truth" title="Permanent link">#</a></h3>
+<p>A rule becomes default service truth only after the relevant source material has been collected, AI review has exposed structure issues and conflicts, human review has裁决 material ambiguity, and signoff/publication state has been recorded.</p>
+<p>Pack completion alone is not sufficient if material conflicts remain unresolved.</p>
+<h3 id="2-truth-lives-in-governed-objects-not-runtime-behavior">2. Truth Lives In Governed Objects, Not Runtime Behavior<a class="headerlink" href="#2-truth-lives-in-governed-objects-not-runtime-behavior" title="Permanent link">#</a></h3>
+<p>The system of record is governed rule objects, evidence chains, review/adjudication records, and publication state.</p>
+<p>Chat logs, prompt outputs, runtime memory, retrieval traces, and agent behavior do not redefine truth.</p>
+<h3 id="3-ai-is-a-controlled-analysis-and-expression-layer-not-a-final-authority">3. AI Is A Controlled Analysis-And-Expression Layer, Not A Final Authority<a class="headerlink" href="#3-ai-is-a-controlled-analysis-and-expression-layer-not-a-final-authority" title="Permanent link">#</a></h3>
+<p>AI may:</p>
+<ul>
+<li>extract candidate rules from documents, code, XSLT, Excel, mapping tables, and other source material</li>
+<li>assemble draft rule packs</li>
+<li>check structural completeness</li>
+<li>cross-validate sources</li>
+<li>detect missing evidence, inconsistent logic, unsupported assertions, and ambiguity</li>
+<li>simplify reviewer questions and conflicts</li>
+<li>explain dependencies and non-obvious impact paths</li>
+<li>recommend confidence, risk, impact, test coverage, and next evidence needed</li>
+<li>explain signed truth under permission and scope constraints</li>
+<li>turn governed truth material into reviewer-friendly, agent-friendly, and pipeline-friendly analysis outputs</li>
+</ul>
+<p>AI may not:</p>
+<ul>
+<li>invent missing business logic</li>
+<li>silently resolve material conflicts</li>
+<li>override human review裁决</li>
+<li>publish truth without signoff</li>
+<li>write runtime learning back into canonical truth</li>
+<li>use candidate or investigative output as if it were recorded human decision or approved truth</li>
+</ul>
+<h3 id="4-human-review-is-the-final-for-material-conflict">4. Human Review Is The Final裁决 For Material Conflict<a class="headerlink" href="#4-human-review-is-the-final-for-material-conflict" title="Permanent link">#</a></h3>
+<p>When sources, rules, historical notes, or AI recommendations conflict, AI should expose and explain the conflict. The final decision must come from human review and must be recorded as governed adjudication.</p>
+<p>A hidden model judgment is not a裁决.</p>
+<h3 id="5-unknown-is-better-than-wrong">5. Unknown Is Better Than Wrong<a class="headerlink" href="#5-unknown-is-better-than-wrong" title="Permanent link">#</a></h3>
+<p>If available evidence is insufficient, RTS should return uncertainty, ambiguity, conflict-open, or not-enough-evidence rather than a polished unsupported answer.</p>
+<p>Refusal or qualified output is a correct service behavior when truth state does not support a confident answer.</p>
+<h3 id="6-evidence-outranks-narrative-adjudication-outranks-raw-conflict">6. Evidence Outranks Narrative; Adjudication Outranks Raw Conflict<a class="headerlink" href="#6-evidence-outranks-narrative-adjudication-outranks-raw-conflict" title="Permanent link">#</a></h3>
+<p>Every material rule assertion must be traceable to source evidence.</p>
+<p>If a narrative explanation disagrees with evidence, the explanation must be corrected. If sources conflict, the recorded human adjudication determines the governed service truth for that scope.</p>
+<h3 id="7-retrieval-tools-are-librarians-not-truth-owners">7. Retrieval Tools Are Librarians, Not Truth Owners<a class="headerlink" href="#7-retrieval-tools-are-librarians-not-truth-owners" title="Permanent link">#</a></h3>
+<p>Indexing, search, MCP tools, agent memory, vector retrieval, and OV-like systems may help locate and load truth. They must not own truth, certify truth, or mutate truth.</p>
+<p>A retrieval result is only useful because it points back to governed rule objects, evidence, review state, and publication state.</p>
+<h3 id="8-scope-partitioning-is-a-truth-safety-boundary">8. Scope Partitioning Is A Truth Safety Boundary<a class="headerlink" href="#8-scope-partitioning-is-a-truth-safety-boundary" title="Permanent link">#</a></h3>
+<p>Different source-target channels, products, packs, and rule scopes must be strongly separated in retrieval and service access.</p>
+<p>This is not only an indexing optimization. It is an anti-contamination principle: similar rules from the wrong system are dangerous when presented as relevant truth.</p>
+<h3 id="9-context-must-be-precise-not-maximal">9. Context Must Be Precise, Not Maximal<a class="headerlink" href="#9-context-must-be-precise-not-maximal" title="Permanent link">#</a></h3>
+<p>More context is not safer. Safer context is:</p>
+<ul>
+<li>within the correct channel/product/pack scope</li>
+<li>low noise</li>
+<li>structurally precise</li>
+<li>explicit about review and publication state</li>
+<li>traceable back to governed objects</li>
+</ul>
+<p>Navigation and scope narrowing should precede full reads.</p>
+<h3 id="10-llm-output-must-not-masquerade-as-approved-truth">10. LLM Output Must Not Masquerade As Approved Truth<a class="headerlink" href="#10-llm-output-must-not-masquerade-as-approved-truth" title="Permanent link">#</a></h3>
+<p>RTS outputs should distinguish facts, inferences, unknowns, candidate suggestions, and human decisions.</p>
+<p>The LLM may produce useful answers and analysis, but the service must not present a candidate, hypothesis, retrieval result, or model answer as if it were an approved rule or final human decision.</p>
+<h3 id="11-service-access-must-be-permissioned-and-state-aware">11. Service Access Must Be Permissioned And State-Aware<a class="headerlink" href="#11-service-access-must-be-permissioned-and-state-aware" title="Permanent link">#</a></h3>
+<p>RTS may expose facts, explanations, analysis, test planning, and workflow triggers. Access must depend on both caller permission and object state.</p>
+<p>Examples:</p>
+<ul>
+<li>ordinary Q&amp;A should primarily use signed or approved truth</li>
+<li>agents may receive rule IDs, dependencies, evidence references, and review state when authorized</li>
+<li>pipelines may trigger checks, reports, and publication gates</li>
+<li>governance users may inspect draft, conflict-open, AI-reviewed, adjudicated, deprecated, or superseded material</li>
+</ul>
+<p>Permission is not only user login. It includes service entry point, data state, field visibility, action type, and audit requirement.</p>
+<h3 id="12-publication-requires-an-explicit-contract">12. Publication Requires An Explicit Contract<a class="headerlink" href="#12-publication-requires-an-explicit-contract" title="Permanent link">#</a></h3>
+<p>Published service truth must have explicit release boundaries.</p>
+<p>RTS must not silently overwrite the rules used by external callers. Every approved truth change should create a new released version or artifact, with recorded activation state and rollback target.</p>
+<p>In the first safe stage, the pack is the default release unit: objects from a pack should not enter the default service surface until the pack has passed review/signoff as a whole.</p>
+<p>Conflicts must be handled before release, not guessed at query time. This includes object identity conflicts, target coverage conflicts, URI/address conflicts, and COMMON vs product-specific precedence conflicts.</p>
+<p>The service must refuse, degrade, or ask for clarification when truth state is insufficient: unresolved scope, unresolved conflict, unreleased dependency, missing active artifact, summary-only result without object truth, or unclear precedence.</p>
+<p>L0/L1 navigation outputs affect retrieval behavior, so they must be versioned and reviewable enough to support regression and audit.</p>
+<p>Every answer should trace back to canonical truth version, projection/release version, and query result.</p>
+<p>Dependency hints may guide display and navigation, but must not silently widen scope or override approval state.</p>
+<p>Permissions and retrieval scope must align: callers should not retrieve what they are not allowed to see.</p>
+<p>Reopened ambiguity must create a new truth/release path, not an in-place repair of the current answer surface.</p>
+<h3 id="13-evolution-requires-controlled-schema-and-workflow-change">13. Evolution Requires Controlled Schema And Workflow Change<a class="headerlink" href="#13-evolution-requires-controlled-schema-and-workflow-change" title="Permanent link">#</a></h3>
+<p>RTS may evolve, but schema, state, workflow, permissions, and publication semantics must change explicitly.</p>
+<p>Silent drift weakens trust, breaks explainability, and makes AI outputs harder to audit.</p>
+<h2 id="default-output-discipline">Default Output Discipline<a class="headerlink" href="#default-output-discipline" title="Permanent link">#</a></h2>
+<p>When answering a rule or impact question, RTS should prefer outputs that:</p>
+<ul>
+<li>name the answered scope</li>
+<li>distinguish signed truth, draft material, conflict-open material, and unknowns</li>
+<li>cite rule IDs or stable object references</li>
+<li>expose evidence and review state when the caller is allowed to see them</li>
+<li>separate factual rule statements from AI analysis or recommendations</li>
+<li>label degraded information-service output explicitly when managed analysis is unavailable</li>
+<li>refuse or qualify conclusions when truth state is insufficient</li>
+<li>prevent candidate or inference output from being consumed as approval, release gate, root-cause closure, or human decision without an explicit deterministic or recorded-decision contract</li>
+</ul>
+<h2 id="service-non-goals">Service Non-Goals<a class="headerlink" href="#service-non-goals" title="Permanent link">#</a></h2>
+<p>RTS is not trying to:</p>
+<ul>
+<li>maximize free-form conversational fluency</li>
+<li>make LLMs final business decision makers</li>
+<li>treat all documents as equal truth sources</li>
+<li>collapse source ingestion, governance, publication, retrieval, and runtime memory into one uncontrolled surface</li>
+<li>let pipeline or agent integrations bypass review/signoff state</li>
+<li>let degraded continuity behavior redefine RTS product identity as “just retrieval”</li>
+<li>let candidate or inference outputs silently become automation decisions</li>
+</ul>
+<h2 id="decision-rule">Decision Rule<a class="headerlink" href="#decision-rule" title="Permanent link">#</a></h2>
+<p>When a future design choice is unclear, choose the option that best preserves governed truth, exposes source conflict, maximizes authorized AI value inside explicit safety boundaries, records human裁决, and keeps service outputs permissioned, state-aware, traceable, and reviewable.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OV Retrieval Lessons Summary | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/ov-kb-retrieval-design.md</p>
+      <h1>OV Retrieval Lessons Summary</h1>
+      <p>distilled OpenViking-inspired retrieval lessons for RTS without making OV the runtime baseline</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/ov-kb-retrieval-design.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要理解 OV 对 RTS 检索设计的可借鉴点</li>
+<li>需要快速查看 L0/L1/L2、URI、layered loading 和 anti-hallucination 的历史来源</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要当前 confirmed baseline</li>
+<li>需要完整 OV retrieval 历史设计原文</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="rts-retrieval-principles.html">RTS Retrieval Principles</a><a href="ov-boundary-and-adoption.html">OV Boundary And Adoptable Surfaces</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>distilled OpenViking-inspired retrieval lessons for RTS without making OV the runtime baseline</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：distilled reference &gt; 原完整原文：docs/archive/reference-proposals/ov-kb-retrieval-design.md OV 讨论中仍适用于 RTS 的思想： L0/L1 are not replacements for L2. Final facts must return to L2 or authorized governance view.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>What RTS Keeps</h3>
+          <p>OV 讨论中仍适用于 RTS 的思想： Stable URI-like addressing for packs, rules, lookups, helpers. Layered loading: cheap navigation first, precise L2 read later. Scope-first retrieval before content recall.</p>
+        </article>
+<article class="chapter-card">
+          <h3>What RTS Rejects Or Downgrades</h3>
+          <p>OV is not the RTS runtime dependency baseline. OV memory extraction must not write rule truth. Vector retrieval cannot run before scope/permission/release gates.</p>
+        </article>
+<article class="chapter-card">
+          <h3>L0/L1/L2 Interpretation</h3>
+          <p>L0: cheap abstract for recall and scope filtering. L1/card: structured overview for navigation, rerank, and disambiguation. L2: structured runtime object or authorized governed source required for final answer.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Current Use</h3>
+          <p>Read this summary only for historical retrieval rationale. For active implementation, use: Day1 query/tool service baseline Day2 controlled agentic retrieval roadmap</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="ov-retrieval-lessons-summary">OV Retrieval Lessons Summary<a class="headerlink" href="#ov-retrieval-lessons-summary" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：distilled reference
+原完整原文：<code>docs/archive/reference-proposals/ov-kb-retrieval-design.md</code></p>
+</blockquote>
+<h2 id="what-rts-keeps">What RTS Keeps<a class="headerlink" href="#what-rts-keeps" title="Permanent link">#</a></h2>
+<p>OV 讨论中仍适用于 RTS 的思想：</p>
+<ul>
+<li>Stable URI-like addressing for packs, rules, lookups, helpers.</li>
+<li>Layered loading: cheap navigation first, precise L2 read later.</li>
+<li>Scope-first retrieval before content recall.</li>
+<li>L0/L1/card as navigation and disambiguation views.</li>
+<li>L2 as final service-readable fact surface.</li>
+<li>Traceable retrieval path for audit and debugging.</li>
+<li>Tool-based access instead of model-direct file access.</li>
+</ul>
+<h2 id="what-rts-rejects-or-downgrades">What RTS Rejects Or Downgrades<a class="headerlink" href="#what-rts-rejects-or-downgrades" title="Permanent link">#</a></h2>
+<ul>
+<li>OV is not the RTS runtime dependency baseline.</li>
+<li>OV memory extraction must not write rule truth.</li>
+<li>Vector retrieval cannot run before scope/permission/release gates.</li>
+<li>Resource tree shape is not mandatory; runtime projection may live in filesystem, database, object store, or other controlled store.</li>
+<li>Old “evidence/review/reports never enter runtime” has been replaced by operational view plus permissioned governance view.</li>
+<li>Bidirectional sync/write-back to canonical truth is forbidden.</li>
+</ul>
+<h2 id="l0l1l2-interpretation">L0/L1/L2 Interpretation<a class="headerlink" href="#l0l1l2-interpretation" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>L0</strong>: cheap abstract for recall and scope filtering.</li>
+<li><strong>L1/card</strong>: structured overview for navigation, rerank, and disambiguation.</li>
+<li><strong>L2</strong>: structured runtime object or authorized governed source required for final answer.</li>
+</ul>
+<p>L0/L1 are not replacements for L2. Final facts must return to L2 or authorized governance view.</p>
+<h2 id="current-use">Current Use<a class="headerlink" href="#current-use" title="Permanent link">#</a></h2>
+<p>Read this summary only for historical retrieval rationale. For active implementation, use:</p>
+<ul>
+<li>Day1 query/tool service baseline</li>
+<li>Day2 controlled agentic retrieval roadmap</li>
+<li>runtime projection contract</li>
+<li>RTS retrieval principles</li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

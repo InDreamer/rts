@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Final LLM Agent Service Roadmap | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/final-llm-agent-service-plan-zh.md</p>
+      <h1>RTS Final LLM Agent Service Roadmap</h1>
+      <p>compact final RTS LLM-agent service roadmap and current confirmed capability boundaries</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/final-llm-agent-service-plan-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要理解 RTS 最终如何服务 LLM agent</li>
+<li>需要把 Day1/Day2、LLM harness、MCP/API/Q&amp;A/pipeline 对齐到最终路线图</li>
+<li>需要确认最终形态中 managed mode、tool mode、context/memory、answer contract 和治理边界</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要当前 Day1 代码行为</li>
+<li>只需要 KB 到索引层的 projection contract</li>
+<li>需要完整历史长版 final plan 原文</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="system-constitution-v1.html">RTS Constitution v2</a><a href="kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a><a href="day1-query-service-and-llm-harness-plan-zh.html">RTS Day1 Query Service And Controlled LLM Harness</a><a href="day2-agentic-retrieval-evolution-plan-zh.html">RTS Day2 Controlled Agentic Retrieval Roadmap</a><a href="llm-harness-and-agent-integration-alignment-zh.html">RTS LLM Harness And Agent Integration Alignment</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>compact final RTS LLM-agent service roadmap and current confirmed capability boundaries</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：confirmed roadmap summary &gt; 压缩日期：2026-05-08 &gt; 原完整长版：docs/archive/reference-proposals/final-llm-agent-service-plan-zh.md &gt; 目的：保留最终服务方向和关键边界，把细节实现回收到 Day1、Day2 和 LLM harness alignment 文档，避免 final plan 成为第二套全量实现规格。 RTS 最终应成为 双核心、LLM-agent-ready 的规则真相服务。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. Final Goal</h3>
+          <p>RTS 最终应成为 双核心、LLM-agent-ready 的规则真相服务。 核心裁决： RTS 不是裸索引服务、普通 RAG、自由 ReAct agent，也不是把 OpenAI/Claude/LangChain/PageIndex 直接放进 truth core 的系统。</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Two Consumption Modes</h3>
+          <p>RTS 必须同时支持两种消费模式： 这两个模式共享同一个 runtime projection access boundary。区别只在“谁负责 workflow planning”，不是“谁拥有 truth”。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Capability Map</h3>
+          <p>最终 RTS service surface 分为六组能力： 1. Truth-source atomic capabilities query、find、read object card、read L2、dependency traversal、trace read、scope/navigation、grounding checks。</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Current Implementation Position</h3>
+          <p>截至 2026-05-10，按当前实现和本地验证结果，当前阶段更应按下面的判断理解： 已经明确的能力方向： filesystem runtime projection store active release scope and permission gates object manifest / cards Lucene candidate search</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. Roadmap</h3>
+          <p>已完成/持续维护： truth owner、LLM boundary、runtime projection contract、refusal principle、permissioned governance view。 目标： 让 approved runtime projection 可通过 Java service 被安全读取。</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Answer Contract</h3>
+          <p>所有最终服务输出都应该按消费方区分视图，但共享同一事实边界。 输出必须分清： facts inferences unknowns candidates human decisions</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Non-Negotiable Boundaries</h3>
+          <p>LLM answer is not truth. Search hit is not truth. Object card/L0/L1 is not final truth. Memory is not truth. External SDK/framework is not truth core. Final factual claims must ground to L2 or authorized governance view.</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. Where Details Live Now</h3>
+          <p>Current baseline and service vision: project-alignment-summary-zh.md Constitutional boundaries: system-constitution-v1.md Runtime projection contract: kb-to-index-projection-contract-zh.md</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-final-llm-agent-service-roadmap">RTS Final LLM Agent Service Roadmap<a class="headerlink" href="#rts-final-llm-agent-service-roadmap" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：confirmed roadmap summary
+压缩日期：2026-05-08
+原完整长版：<code>docs/archive/reference-proposals/final-llm-agent-service-plan-zh.md</code>
+目的：保留最终服务方向和关键边界，把细节实现回收到 Day1、Day2 和 LLM harness alignment 文档，避免 final plan 成为第二套全量实现规格。</p>
+</blockquote>
+<h2 id="1-final-goal">1. Final Goal<a class="headerlink" href="#1-final-goal" title="Permanent link">#</a></h2>
+<p>RTS 最终应成为 <strong>双核心、LLM-agent-ready 的规则真相服务</strong>。</p>
+<p>核心裁决：</p>
+<pre><code class="language-text">RTS owns governed transformation truth access.
+Runtime projection supplies approved truth material.
+RTS exposes a stable truth-source atomic capability surface.
+Managed LLM analysis performs controlled analysis and expression over that surface.
+External agents may use the same RTS tools, but cannot bypass RTS gates.
+Every factual claim must ground back to L2 / dependency / authorized governance view / trace.
+</code></pre>
+<p>RTS 不是裸索引服务、普通 RAG、自由 ReAct agent，也不是把 OpenAI/Claude/LangChain/PageIndex 直接放进 truth core 的系统。</p>
+<h2 id="2-two-consumption-modes">2. Two Consumption Modes<a class="headerlink" href="#2-two-consumption-modes" title="Permanent link">#</a></h2>
+<p>RTS 必须同时支持两种消费模式：</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Caller</th>
+<th>Who plans</th>
+<th>RTS must still enforce</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Managed mode</strong></td>
+<td><code>/ask</code>、scenario endpoints、普通服务、PR bot、pipeline adapter</td>
+<td>RTS internal controlled LLM harness</td>
+<td>scope、permission、release、L2 hash、dependency、grounding、refusal、trace</td>
+</tr>
+<tr>
+<td><strong>Tool mode</strong></td>
+<td>Codex/Claude/OpenAI agent、CI bot、外部 workflow agent、MCP client</td>
+<td>external agent</td>
+<td>every RTS tool call still enforces the same gates</td>
+</tr>
+</tbody>
+</table>
+<p>这两个模式共享同一个 runtime projection access boundary。区别只在“谁负责 workflow planning”，不是“谁拥有 truth”。</p>
+<h2 id="3-capability-map">3. Capability Map<a class="headerlink" href="#3-capability-map" title="Permanent link">#</a></h2>
+<p>最终 RTS service surface 分为六组能力：</p>
+<ol>
+<li>
+<p><strong>Truth-source atomic capabilities</strong>
+   query、find、read object card、read L2、dependency traversal、trace read、scope/navigation、grounding checks。</p>
+</li>
+<li>
+<p><strong>Managed LLM analysis service</strong>
+   intent classification、scope mediation、query planning、tool orchestration、context management、controlled analysis and expression、claim validation、refusal/clarification。</p>
+</li>
+<li>
+<p><strong>Agent/MCP tools</strong>
+   stable tool catalog、schema-constrained tool input/output、permission-aware tool calls、agent-view response。</p>
+</li>
+<li>
+<p><strong>Scenario adapters</strong>
+   <code>/ask</code>、PR diff impact analysis、exception investigation、failed message analysis、test planning candidate、pipeline/report adapters。</p>
+</li>
+<li>
+<p><strong>Context and memory</strong>
+   session/workspace/UI/retrieved/governance/trace context can improve usability. Memory is not truth and cannot participate in truth validation.</p>
+</li>
+<li>
+<p><strong>Governance and evaluation</strong>
+   evidence/review/adjudication visibility by permission, candidate/fact separation, golden set evaluation, value metrics, failure taxonomy, trace and metrics.</p>
+</li>
+</ol>
+<h2 id="4-current-implementation-position">4. Current Implementation Position<a class="headerlink" href="#4-current-implementation-position" title="Permanent link">#</a></h2>
+<p>截至 2026-05-10，按当前实现和本地验证结果，当前阶段更应按下面的判断理解：</p>
+<pre><code class="language-text">Dual-core RTS baseline established
+Truth-source atomic capability service mostly working
+Managed LLM harness present, but not yet the stable default surface across every AI-centric scenario
+Some scenario surfaces exist, but many are still described or operated as degraded information-service or candidate support surfaces rather than stable AI-normal-mode products
+</code></pre>
+<p>已经明确的能力方向：</p>
+<ul>
+<li>filesystem runtime projection store</li>
+<li>active release</li>
+<li>scope and permission gates</li>
+<li>object manifest / cards</li>
+<li>Lucene candidate search</li>
+<li>L2 read and hash validation</li>
+<li>dependency traversal</li>
+<li>structured REST API</li>
+<li>MCP/tool surface skeleton</li>
+<li>trace and refusal contract</li>
+<li>provider-neutral LLM client direction</li>
+</ul>
+<p>主要缺口：</p>
+<ul>
+<li><code>/ask</code> 需要在产品口径和服务合同里稳定成为 managed analysis surface，而不是被描述成附加表达层</li>
+<li>claim grounding validation 需要更强</li>
+<li>scope mediator、planner、tool orchestrator 需要从简单实现演进为受控 harness</li>
+<li>impact/test/governance 当前实现仍主要是 deterministic/candidate support surface；文档和产品口径需要继续把目标正常态固定为 managed analysis</li>
+<li>PR diff、exception、failed message 等场景还需要在文档和默认体验里明确为 managed AI 正常态</li>
+</ul>
+<h2 id="5-roadmap">5. Roadmap<a class="headerlink" href="#5-roadmap" title="Permanent link">#</a></h2>
+<h3 id="step-0-constitution-and-projection-contract-locked">Step 0: Constitution And Projection Contract Locked<a class="headerlink" href="#step-0-constitution-and-projection-contract-locked" title="Permanent link">#</a></h3>
+<p>已完成/持续维护：</p>
+<ul>
+<li>truth owner、LLM boundary、runtime projection contract、refusal principle、permissioned governance view。</li>
+</ul>
+<h3 id="step-1-day1-query-tool-service">Step 1: Day1 Query / Tool Service<a class="headerlink" href="#step-1-day1-query-tool-service" title="Permanent link">#</a></h3>
+<p>目标：</p>
+<ul>
+<li>让 approved runtime projection 可通过 Java service 被安全读取。</li>
+<li>提供 deterministic lookup、Lucene search、L2 read、dependency traversal、REST/MCP skeleton。</li>
+</ul>
+<p>成功标准：</p>
+<ul>
+<li>service 不绕过 active release、scope、permission、L2 hash、trace 和 refusal。</li>
+</ul>
+<h3 id="step-2-managed-ask">Step 2: Managed <code>/ask</code><a class="headerlink" href="#step-2-managed-ask" title="Permanent link">#</a></h3>
+<p>目标：</p>
+<ul>
+<li>让 RTS 自己完成受控多步查询，并返回 human-readable grounded managed analysis answer。</li>
+</ul>
+<p>必须包含：</p>
+<ul>
+<li>intent/scope mediation</li>
+<li>tool plan</li>
+<li>L2-backed citations</li>
+<li>controlled analysis and expression</li>
+<li>claim validation</li>
+<li>refusal/clarification</li>
+<li>trace</li>
+</ul>
+<h3 id="step-3-stable-tool-mode-and-mcp">Step 3: Stable Tool Mode And MCP<a class="headerlink" href="#step-3-stable-tool-mode-and-mcp" title="Permanent link">#</a></h3>
+<p>目标：</p>
+<ul>
+<li>外部 agent 可以通过 RTS REST/MCP tools 查询 truth，而不是直接读文件、PG 表或索引。</li>
+</ul>
+<p>必须包含：</p>
+<ul>
+<li>stable tool catalog</li>
+<li>schema-constrained tool outputs</li>
+<li>permissioned tool execution</li>
+<li>trace per tool call</li>
+<li>agent-friendly structured result</li>
+</ul>
+<h3 id="step-4-first-scenario-endpoint">Step 4: First Scenario Endpoint<a class="headerlink" href="#step-4-first-scenario-endpoint" title="Permanent link">#</a></h3>
+<p>建议顺序：</p>
+<ol>
+<li><code>/ask</code> managed analysis surface 完整化</li>
+<li><code>analyze_pr_diff</code></li>
+<li><code>investigate_exception</code> 或 <code>analyze_failed_message</code></li>
+</ol>
+<p>现有 impact/test/message/governance/pipeline 工具可以作为同一真相源原子能力面复用。当前 scenario endpoints 已能返回 grounded candidate report；这里的 first scenario endpoint 指把其中一个 AI-centric 场景升级为 managed LLM 端到端正常模式。所有场景输出默认遵守 authority boundary：它们不是 release approval、final root cause 或 final business decision；但对这些场景而言，managed AI 应是目标正常产品模式，deterministic 输出是当前底座或 LLM 不可用/受限时的降级信息服务。</p>
+<h3 id="step-5-context-memory-and-feedback">Step 5: Context, Memory, And Feedback<a class="headerlink" href="#step-5-context-memory-and-feedback" title="Permanent link">#</a></h3>
+<p>目标：</p>
+<ul>
+<li>支持 session/workspace/UI context 和 retrieval feedback。</li>
+<li>让用户体验变好，但不让 memory 污染 truth。</li>
+</ul>
+<p>规则：</p>
+<ul>
+<li>session memory is not truth.</li>
+<li>pipeline/subagent/automation does not write long-term memory by default.</li>
+<li>memory cannot satisfy grounding validation.</li>
+</ul>
+<h3 id="step-6-retrieval-enhancement">Step 6: Retrieval Enhancement<a class="headerlink" href="#step-6-retrieval-enhancement" title="Permanent link">#</a></h3>
+<p>顺序：</p>
+<ol>
+<li>deterministic routing</li>
+<li>BM25 / Lucene</li>
+<li>alias and entity boost</li>
+<li>negative/confusable retrieval</li>
+<li>optional rerank</li>
+<li>optional vector after evidence shows need</li>
+</ol>
+<p>vector/rerank 只能在 scope gate 后运行，且必须回到 URI/L2 才能成为事实依据。</p>
+<h3 id="step-7-advanced-agentic-analysis">Step 7: Advanced Agentic Analysis<a class="headerlink" href="#step-7-advanced-agentic-analysis" title="Permanent link">#</a></h3>
+<p>候选方向：</p>
+<ul>
+<li>impact analysis</li>
+<li>test planning</li>
+<li>rule diff explanation</li>
+<li>source-to-target investigation</li>
+<li>governance/audit explanation</li>
+</ul>
+<p>边界：</p>
+<ul>
+<li>output separates facts, inferences, unknowns, candidates, and human decisions.</li>
+<li>LLM can propose; human/governance decides.</li>
+<li>no autonomous truth mutation.</li>
+</ul>
+<h3 id="step-8-quality-loop">Step 8: Quality Loop<a class="headerlink" href="#step-8-quality-loop" title="Permanent link">#</a></h3>
+<p>需要持续建设：</p>
+<ul>
+<li>golden set</li>
+<li>grounded answer rate</li>
+<li>refusal correctness</li>
+<li>wrong-scope answer detection</li>
+<li>unsupported assertion tracking</li>
+<li>critical miss tracking</li>
+<li>impact/test candidate adoption and usefulness</li>
+<li>review question usefulness</li>
+<li>conflict simplification quality</li>
+<li>evidence review time saved</li>
+<li>prompt injection tests</li>
+<li>cost/budget metrics</li>
+<li>trace review</li>
+</ul>
+<h2 id="6-answer-contract">6. Answer Contract<a class="headerlink" href="#6-answer-contract" title="Permanent link">#</a></h2>
+<p>所有最终服务输出都应该按消费方区分视图，但共享同一事实边界。</p>
+<table>
+<thead>
+<tr>
+<th>View</th>
+<th>Audience</th>
+<th>Shape</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Human view</td>
+<td>business/BA/dev user</td>
+<td>readable explanation, citations, warnings, unknowns</td>
+</tr>
+<tr>
+<td>Agent view</td>
+<td>coding/review/workflow agents</td>
+<td>structured facts, object URIs, dependencies, tool trace, next actions</td>
+</tr>
+<tr>
+<td>Audit view</td>
+<td>reviewers/governance</td>
+<td>projection release, evidence/review pointers, L2 hash, claim grounding, refusal reason</td>
+</tr>
+<tr>
+<td>Pipeline view</td>
+<td>CI/CD or service integration</td>
+<td>deterministic status, machine-readable candidate/result, strict failure semantics</td>
+</tr>
+</tbody>
+</table>
+<p>输出必须分清：</p>
+<ul>
+<li>facts</li>
+<li>inferences</li>
+<li>unknowns</li>
+<li>candidates</li>
+<li>human decisions</li>
+</ul>
+<h2 id="7-non-negotiable-boundaries">7. Non-Negotiable Boundaries<a class="headerlink" href="#7-non-negotiable-boundaries" title="Permanent link">#</a></h2>
+<ul>
+<li>LLM answer is not truth.</li>
+<li>Search hit is not truth.</li>
+<li>Object card/L0/L1 is not final truth.</li>
+<li>Memory is not truth.</li>
+<li>External SDK/framework is not truth core.</li>
+<li>Final factual claims must ground to L2 or authorized governance view.</li>
+<li>RTS service owns release/scope/permission/hash/grounding/refusal/trace gates.</li>
+<li>External agents may plan broader workflows, but RTS tools remain the controlled truth access boundary.</li>
+</ul>
+<h2 id="8-where-details-live-now">8. Where Details Live Now<a class="headerlink" href="#8-where-details-live-now" title="Permanent link">#</a></h2>
+<ul>
+<li>Current baseline and service vision: <code>project-alignment-summary-zh.md</code></li>
+<li>Constitutional boundaries: <code>system-constitution-v1.md</code></li>
+<li>Runtime projection contract: <code>kb-to-index-projection-contract-zh.md</code></li>
+<li>Day1 query/tool service and harness implementation plan: <code>day1-query-service-and-llm-harness-plan-zh.md</code></li>
+<li>Day2 retrieval/LLM/MCP evolution: <code>day2-agentic-retrieval-evolution-plan-zh.md</code></li>
+<li>LLM placement, managed mode/tool mode, framework boundary, scenario priority: <code>llm-harness-and-agent-integration-alignment-zh.md</code></li>
+<li>Complete historical final plan: <code>docs/archive/reference-proposals/final-llm-agent-service-plan-zh.md</code></li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -34,12 +34,13 @@ Read these in order:
 1. [docs/confirmed/project-alignment-summary-zh.md](docs/confirmed/project-alignment-summary-zh.md)
 2. [docs/confirmed/system-constitution-v1.md](docs/confirmed/system-constitution-v1.md)
 3. [docs/confirmed/kb-to-index-projection-contract-zh.md](docs/confirmed/kb-to-index-projection-contract-zh.md)
-4. [docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md](docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md)
-5. [docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md](docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md)
-6. [docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md](docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md)
-7. [docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md](docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md)
-8. [docs/confirmed/final-llm-agent-service-plan-zh.md](docs/confirmed/final-llm-agent-service-plan-zh.md)
-9. [docs/confirmed/document-decision-register-zh.md](docs/confirmed/document-decision-register-zh.md)
+4. [docs/confirmed/runtime-projection-product-guide-zh.md](docs/confirmed/runtime-projection-product-guide-zh.md)
+5. [docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md](docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md)
+6. [docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md](docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md)
+7. [docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md](docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md)
+8. [docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md](docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md)
+9. [docs/confirmed/final-llm-agent-service-plan-zh.md](docs/confirmed/final-llm-agent-service-plan-zh.md)
+10. [docs/confirmed/document-decision-register-zh.md](docs/confirmed/document-decision-register-zh.md)
 
 These documents are the active development baseline.
 
@@ -51,7 +52,7 @@ Read them with this mental model:
 - when LLM is unavailable, scenario behavior degrades to structured information provision; that degraded mode does not redefine the product identity.
 - candidate-only and human decision boundaries are authority boundaries, not ceilings on analysis depth.
 
-For first implementation work, understand the dual-core positioning and truth boundaries before reading Day1/Day2 execution details. Read the LLM harness and agent integration alignment note when deciding whether capability belongs in managed mode, tool mode, or both. Read the internal LLM agent implementation plan when changing service contracts, tool orchestration, scenario endpoints, memory/context, evaluation, or rollout controls. Read Day1 and Day2 when deciding phased implementation order. Read the final roadmap when checking long-range direction rather than current authority. Read the decision register when continuing documentation cleanup or deciding what historical material to retain, compress, archive, or delete.
+For first implementation work, understand the dual-core positioning and truth boundaries before reading Day1/Day2 execution details. Read the runtime projection product guide when explaining the runtime package to PMs, product owners, integrators, or agents without needing exact field contracts. Read the LLM harness and agent integration alignment note when deciding whether capability belongs in managed mode, tool mode, or both. Read the internal LLM agent implementation plan when changing service contracts, tool orchestration, scenario endpoints, memory/context, evaluation, or rollout controls. Read Day1 and Day2 when deciding phased implementation order. Read the final roadmap when checking long-range direction rather than current authority. Read the decision register when continuing documentation cleanup or deciding what historical material to retain, compress, archive, or delete.
 
 For conflicts inside confirmed docs, use the topic-specific authority table in [docs/confirmed/README.md](docs/confirmed/README.md); dates and wording emphasis do not set precedence.
 

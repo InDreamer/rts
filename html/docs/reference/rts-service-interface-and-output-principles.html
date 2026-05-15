@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Service Interface and Output Principles | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/rts-service-interface-and-output-principles.md</p>
+      <h1>RTS Service Interface and Output Principles</h1>
+      <p>RTS service interface and output quality principles distilled from AI service strategy materials</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/rts-service-interface-and-output-principles.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要设计 API/MCP/agent tool surface</li>
+<li>需要定义 RTS/LLM 输出结构和失败类型</li>
+<li>需要区分事实、推断、候选建议和人工决定</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要最高层项目总纲</li>
+<li>只需要 token approval history</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="../confirmed/system-constitution-v1.html">RTS Constitution v2</a><a href="rts-retrieval-principles.html">RTS Retrieval Principles</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>RTS service interface and output quality principles distilled from AI service strategy materials</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This document keeps the useful long-term service ideas from the AI service strategy materials, without preserving the old broad token-approval framing. External callers should not need to know where every rule file lives.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. RTS Exposes A Service, Not A File Dump</h3>
+          <p>External callers should not need to know where every rule file lives. They should call RTS through controlled service surfaces such as API, MCP, Q&amp;A, workbench, SDK, or pipeline integration.</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Suggested API / Tool Surface</h3>
+          <p>These names are reference ideas, not final API commitments. A small, hard API surface is safer than a universal “ask anything” endpoint.</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Output Should Separate Five Things</h3>
+          <p>RTS/LLM output should clearly separate: 1. Facts: backed by rule IDs, source, evidence, review, or publication state 2. Inferences: analysis derived from facts 3. Unknowns: missing evidence, unresolved scope, or open con</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Impact Analysis Output Shape</h3>
+          <p>Impact analysis should prefer candidate language: affected object candidate dependency path candidate possible regression area unknown / needs review confidence or rationale</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. Test Planning Output Shape</h3>
+          <p>Test planning should distinguish: deterministic template output rule-condition-derived tests LLM-suggested additional cases unsupported or speculative cases reviewer accepted / rejected cases</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Agent Rule</h3>
+          <p>For external agents and MCP tools, the default rule is: Agents may help find gaps and propose candidates. They must not mutate canonical packs, approve rules, or convert conversation memory into truth.</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Failure Types To Track</h3>
+          <p>Useful failure categories: wrong scope: answer uses the wrong channel, product, pack, or rule scope unsupported assertion: material claim has no rule/evidence/review support</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. Sensitive Data Boundary</h3>
+          <p>RTS may know about many source systems, but LLM context assembly should be minimal and permission-aware. Be especially careful with: raw production messages customer/account/trade/message identifiers</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. Stable Atomic Capabilities Are First-Class</h3>
+          <p>RTS should not use LLM for work that stable structure can do better. First-class stable atomic capabilities include: scope resolution stable URI lookup dependency graph traversal</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-service-interface-and-output-principles">RTS Service Interface and Output Principles<a class="headerlink" href="#rts-service-interface-and-output-principles" title="Permanent link">#</a></h1>
+<p>This document keeps the useful long-term service ideas from the AI service strategy materials, without preserving the old broad token-approval framing.</p>
+<h2 id="1-rts-exposes-a-service-not-a-file-dump">1. RTS Exposes A Service, Not A File Dump<a class="headerlink" href="#1-rts-exposes-a-service-not-a-file-dump" title="Permanent link">#</a></h2>
+<p>External callers should not need to know where every rule file lives.</p>
+<p>They should call RTS through controlled service surfaces such as API, MCP, Q&amp;A, workbench, SDK, or pipeline integration.</p>
+<p>Inside RTS, the service can use Knowledge Base, index, retrieval, dependency metadata, and LLM to produce an answer. But the answer must remain traceable to governed truth.</p>
+<h2 id="2-suggested-api-tool-surface">2. Suggested API / Tool Surface<a class="headerlink" href="#2-suggested-api-tool-surface" title="Permanent link">#</a></h2>
+<p>These names are reference ideas, not final API commitments.</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Purpose</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>query_truth</code></td>
+<td>Ask a scoped question about approved truth.</td>
+<td>Must resolve scope or ask for clarification.</td>
+</tr>
+<tr>
+<td><code>find_objects</code></td>
+<td>Find candidate packs, rules, lookups, or helpers.</td>
+<td>Returns candidates, not final answers.</td>
+</tr>
+<tr>
+<td><code>read_object</code></td>
+<td>Read a specific rule / lookup / helper by stable URI.</td>
+<td>Object read should include snapshot/version.</td>
+</tr>
+<tr>
+<td><code>get_overview</code></td>
+<td>Read L1 overview for navigation.</td>
+<td>Overview helps decide what to read next; it is not final rule truth.</td>
+</tr>
+<tr>
+<td><code>get_tree</code></td>
+<td>Browse channel/product/pack structure.</td>
+<td>Must respect caller permissions.</td>
+</tr>
+<tr>
+<td><code>get_truth_changes</code></td>
+<td>Compare truth snapshots or ask what changed.</td>
+<td>Used for cache invalidation, impact analysis, and downstream awareness.</td>
+</tr>
+<tr>
+<td><code>submit_candidate</code></td>
+<td>Submit a possible issue, rule, conflict, or open question.</td>
+<td>Must enter candidate/review flow; cannot update approved truth directly.</td>
+</tr>
+</tbody>
+</table>
+<p>A small, hard API surface is safer than a universal “ask anything” endpoint.</p>
+<h2 id="3-output-should-separate-five-things">3. Output Should Separate Five Things<a class="headerlink" href="#3-output-should-separate-five-things" title="Permanent link">#</a></h2>
+<p>RTS/LLM output should clearly separate:</p>
+<ol>
+<li><strong>Facts</strong>: backed by rule IDs, source, evidence, review, or publication state</li>
+<li><strong>Inferences</strong>: analysis derived from facts</li>
+<li><strong>Unknowns</strong>: missing evidence, unresolved scope, or open conflicts</li>
+<li><strong>Candidates</strong>: suggested impact areas, tests, rules, questions, or explanations awaiting review</li>
+<li><strong>Human decisions</strong>: reviewer adjudication or signoff results</li>
+</ol>
+<p>Do not make candidates look like approved truth.</p>
+<h2 id="4-impact-analysis-output-shape">4. Impact Analysis Output Shape<a class="headerlink" href="#4-impact-analysis-output-shape" title="Permanent link">#</a></h2>
+<p>Impact analysis should prefer candidate language:</p>
+<ul>
+<li>affected object candidate</li>
+<li>dependency path candidate</li>
+<li>possible regression area</li>
+<li>unknown / needs review</li>
+<li>confidence or rationale</li>
+<li>cited rule / lookup / helper URI</li>
+</ul>
+<p>It should not present itself as the final impact conclusion unless the result is fully supported by governed truth and review state.</p>
+<h2 id="5-test-planning-output-shape">5. Test Planning Output Shape<a class="headerlink" href="#5-test-planning-output-shape" title="Permanent link">#</a></h2>
+<p>Test planning should distinguish:</p>
+<ul>
+<li>deterministic template output</li>
+<li>rule-condition-derived tests</li>
+<li>LLM-suggested additional cases</li>
+<li>unsupported or speculative cases</li>
+<li>reviewer accepted / rejected cases</li>
+</ul>
+<p>This keeps test planning useful without turning generated text into final QA authority.</p>
+<h2 id="6-agent-rule">6. Agent Rule<a class="headerlink" href="#6-agent-rule" title="Permanent link">#</a></h2>
+<p>For external agents and MCP tools, the default rule is:</p>
+<pre><code class="language-text">read approved truth, cite it, submit candidates; never rewrite truth directly
+</code></pre>
+<p>Agents may help find gaps and propose candidates. They must not mutate canonical packs, approve rules, or convert conversation memory into truth.</p>
+<h2 id="7-failure-types-to-track">7. Failure Types To Track<a class="headerlink" href="#7-failure-types-to-track" title="Permanent link">#</a></h2>
+<p>Useful failure categories:</p>
+<ul>
+<li><strong>wrong scope</strong>: answer uses the wrong channel, product, pack, or rule scope</li>
+<li><strong>unsupported assertion</strong>: material claim has no rule/evidence/review support</li>
+<li><strong>hallucinated dependency</strong>: invented dependency path or relationship</li>
+<li><strong>critical miss</strong>: misses an important affected rule, dependency, or test area</li>
+<li><strong>over-broad noise</strong>: produces broad generic risk lists that reduce signal</li>
+<li><strong>authority drift</strong>: candidate output reads like final truth or final decision</li>
+<li><strong>unsafe data handling</strong>: sensitive or unauthorized data enters prompt, output, or logs</li>
+<li><strong>instruction injection failure</strong>: untrusted source text changes model behavior</li>
+</ul>
+<p>These categories help evaluate RTS service quality beyond whether an answer sounds plausible.</p>
+<h2 id="8-sensitive-data-boundary">8. Sensitive Data Boundary<a class="headerlink" href="#8-sensitive-data-boundary" title="Permanent link">#</a></h2>
+<p>RTS may know about many source systems, but LLM context assembly should be minimal and permission-aware.</p>
+<p>Be especially careful with:</p>
+<ul>
+<li>raw production messages</li>
+<li>customer/account/trade/message identifiers</li>
+<li>defect attachments</li>
+<li>monitor alert text</li>
+<li>incident details</li>
+<li>release approval records</li>
+</ul>
+<p>The safest default is to provide structured, sanitized, scoped context unless a caller has explicit permission and the use case requires more.</p>
+<h2 id="9-stable-atomic-capabilities-are-first-class">9. Stable Atomic Capabilities Are First-Class<a class="headerlink" href="#9-stable-atomic-capabilities-are-first-class" title="Permanent link">#</a></h2>
+<p>RTS should not use LLM for work that stable structure can do better.</p>
+<p>First-class stable atomic capabilities include:</p>
+<ul>
+<li>scope resolution</li>
+<li>stable URI lookup</li>
+<li>dependency graph traversal</li>
+<li>L0/L1/L2 navigation</li>
+<li>fixed output templates</li>
+<li>trace construction</li>
+</ul>
+<p>These capabilities are not anti-AI. They are the governed substrate shared by internal managed analysis and external agent orchestration.</p>
+<p>For AI-centric scenario services, managed analysis remains the normal product mode. Deterministic/template-only outputs are bounded degraded continuity behavior unless the service contract explicitly defines them as the primary machine-readable result.</p>
+<p>LLM should add value by performing controlled analysis and expression: organizing evidence-backed explanations, finding non-obvious candidates, surfacing uncertainty, simplifying conflicts, and turning complex material into reviewer-friendly questions.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

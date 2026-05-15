@@ -52,6 +52,13 @@ documents:
   layer: 3
   parent: docs/confirmed/README.md
   summary: KB-to-index runtime projection contract
+- path: docs/confirmed/runtime-projection-product-guide-zh.md
+  role: leaf
+  layer: 3
+  parent: docs/confirmed/README.md
+  summary: PM-facing runtime projection product guide for release package roles,
+    active release, manifest, scope, L2, navigation, dependencies, governance,
+    permissions, index artifacts, and traces
 - path: docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md
   role: leaf
   layer: 3

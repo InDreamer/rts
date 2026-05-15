@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirmed Docs | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/README.md</p>
+      <h1>Confirmed Docs</h1>
+      <p>route confirmed RTS baseline documents</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/README.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要选择当前 RTS confirmed baseline 文档</li>
+<li>需要判断双核心服务定位、Day1/Day2 路线、managed mode / tool mode 边界</li>
+<li>需要理解 RTS 最终如何服务 LLM agent</li>
+<li>需要完整落地 RTS service 内部 LLM agent 接入</li>
+<li>第一次进入 confirmed 文档区</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>已经明确要读取某一篇 confirmed leaf</li>
+<li>只需要历史参考材料或 archived 材料</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="system-constitution-v1.html">RTS Constitution v2</a><a href="kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>route confirmed RTS baseline documents</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This directory contains the current internal alignment baseline for RTS. 1.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: domain / layer: 2</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Current baseline order</h3>
+          <p>1. project-alignment-summary-zh.md — 双核心总纲，定义 RTS 是规则真相服务 + 托管 LLM agent 分析服务，而不是静态文档库、普通 RAG 或单一实现方案。 2. system-constitution-v1.md — RTS Constitution v2，定义多源真相治理、受控分析与表达、人工最终裁决、权限化服务访问和运行时边界。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Read triggers</h3>
+          <p>只需要统一 RTS 总体方向：读 1 和 2。 需要开发 KB 和索引层之间的边界：读 1、2、3。 需要向 PM、产品 owner、集成方或 AI agent 解释 runtime projection 运行包各目录/内容的产品含义：读 1、3、4。 需要判断 managed mode、tool mode、场景正常态和降级态：读 1、2、5、6。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Conflict rule</h3>
+          <p>Confirmed docs use topic-specific authority. Resolve conflicts with this table before applying any general reading order: If a topic is not listed, follow the current baseline order above. docs/reference/ materials may e</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="confirmed-docs">Confirmed Docs<a class="headerlink" href="#confirmed-docs" title="Permanent link">#</a></h1>
+<p>This directory contains the current internal alignment baseline for RTS.</p>
+<h2 id="current-baseline-order">Current baseline order<a class="headerlink" href="#current-baseline-order" title="Permanent link">#</a></h2>
+<ol>
+<li><code>project-alignment-summary-zh.md</code> — 双核心总纲，定义 RTS 是规则真相服务 + 托管 LLM agent 分析服务，而不是静态文档库、普通 RAG 或单一实现方案。</li>
+<li><code>system-constitution-v1.md</code> — RTS Constitution v2，定义多源真相治理、受控分析与表达、人工最终裁决、权限化服务访问和运行时边界。</li>
+<li><code>kb-to-index-projection-contract-zh.md</code> — KB 到查询/索引层的运行时投影契约，定义 KB 必须产出什么、索引层只能读取什么、稳定原子能力面如何解释 projection。</li>
+<li><code>runtime-projection-product-guide-zh.md</code> — runtime projection 的产品/PM 视角说明，解释运行包中 active release、manifest、scope、L2、navigation、dependency、governance、permission、index 和 trace 各自做什么，不替代字段契约。</li>
+<li><code>llm-harness-and-agent-integration-alignment-zh.md</code> — RTS 内置 managed mode、外部 tool mode、runtime projection access boundary 和 PR diff / exception 等场景接入的当前对齐结论。</li>
+<li><code>internal-llm-agent-service-implementation-plan-zh.md</code> — RTS service 内部 LLM agent 接入的完整非阶段性落地计划，覆盖 agent runtime、多轮工具调用、工具参数权威、managed harness、tool orchestration、scenario endpoints、MCP/tool mode、memory/context、grounding、evaluation 和运维控制。</li>
+<li><code>day1-query-service-and-llm-harness-plan-zh.md</code> — Day1：建立受控真相源原子能力面和第一版 managed LLM harness 的 confirmed baseline。</li>
+<li><code>day2-agentic-retrieval-evolution-plan-zh.md</code> — Day2：在同一边界内扩展 controlled agentic retrieval、rerank、MCP、影响分析和测试规划演进方向。</li>
+<li><code>final-llm-agent-service-plan-zh.md</code> — RTS 最终面向 LLM agent 的服务路线图摘要，定义双核心栈、消费模式、能力地图、阶段路线和不可越界边界。</li>
+<li><code>document-decision-register-zh.md</code> — 文档审核中的关键抉择点、冻结口径和下一轮删减规则。</li>
+</ol>
+<h2 id="read-triggers">Read triggers<a class="headerlink" href="#read-triggers" title="Permanent link">#</a></h2>
+<ul>
+<li>只需要统一 RTS 总体方向：读 1 和 2。</li>
+<li>需要开发 KB 和索引层之间的边界：读 1、2、3。</li>
+<li>需要向 PM、产品 owner、集成方或 AI agent 解释 runtime projection 运行包各目录/内容的产品含义：读 1、3、4。</li>
+<li>需要判断 managed mode、tool mode、场景正常态和降级态：读 1、2、5、6。</li>
+<li>需要落地第一版服务：读 1、2、3、5、6、7。</li>
+<li>需要规划 Day1 后的检索/LLM/MCP 增强：读 1、2、3、5、6、7、8。</li>
+<li>需要规划最终 LLM agent 服务形态、harness、MCP/API/Q&amp;A/pipeline 统一入口：读 1、2、3、5、6、9。</li>
+<li>需要判断长期路线与当前 phased implementation 的关系：读 1、5、6、7、8、9。</li>
+<li>需要判断历史文档哪些保留、压缩、归档或删除：读 10。</li>
+</ul>
+<h2 id="conflict-rule">Conflict rule<a class="headerlink" href="#conflict-rule" title="Permanent link">#</a></h2>
+<p>Confirmed docs use topic-specific authority. Resolve conflicts with this table before applying any general reading order:</p>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTS identity, dual-core positioning, truth ownership, source/evidence/review/human adjudication/signoff, scenario normal mode vs degraded mode, and document zone meaning</td>
+<td><code>project-alignment-summary-zh.md</code></td>
+</tr>
+<tr>
+<td>Non-negotiable system principles, safety boundaries, permissioned access, controlled analysis-and-expression, AI-first review, human final decision, and AI value guardrails</td>
+<td><code>system-constitution-v1.md</code></td>
+</tr>
+<tr>
+<td>KB/runtime projection/index boundary, release artifact shape, L0/L1/L2 meaning, schema/release/read constraints, and stable truth-source atomic capability surface</td>
+<td><code>kb-to-index-projection-contract-zh.md</code></td>
+</tr>
+<tr>
+<td>PM/product explanation of runtime projection package roles, including active release, manifest, scope, L2, navigation, dependencies, governance, permissions, index artifacts, and traces</td>
+<td><code>runtime-projection-product-guide-zh.md</code></td>
+</tr>
+<tr>
+<td>LLM placement, managed mode vs tool mode, framework/SDK boundary, shared atomic capability reuse, and PR diff / exception / failed-message scenario integration</td>
+<td><code>llm-harness-and-agent-integration-alignment-zh.md</code></td>
+</tr>
+<tr>
+<td>Complete internal LLM agent implementation work packages, current shipped state, runtime defaults, agent runtime, multi-step tool loop, tool parameter authority, scenario endpoint availability, service contracts, validation gates, memory/context, evaluation, rollout controls, and degraded-mode semantics</td>
+<td><code>internal-llm-agent-service-implementation-plan-zh.md</code></td>
+</tr>
+<tr>
+<td>Current Day1 query/tool service, filesystem store, Lucene, L2 read/hash, REST/MCP skeleton, <code>/query</code>, <code>/ask</code>, and Day1 DoD</td>
+<td><code>day1-query-service-and-llm-harness-plan-zh.md</code></td>
+</tr>
+<tr>
+<td>Day2 retrieval evolution, planner/orchestrator, rerank/vector/confusable active use, expanded MCP, impact/test candidate evolution, and evaluation metrics</td>
+<td><code>day2-agentic-retrieval-evolution-plan-zh.md</code></td>
+</tr>
+<tr>
+<td>Final long-range service roadmap, capability map, consumer views, and sequencing after current alignment decisions</td>
+<td><code>final-llm-agent-service-plan-zh.md</code></td>
+</tr>
+<tr>
+<td>Documentation cleanup, compression, archive/delete/retain decisions</td>
+<td><code>document-decision-register-zh.md</code></td>
+</tr>
+</tbody>
+</table>
+<p>If a topic is not listed, follow the current baseline order above. <code>docs/reference/</code> materials may explain rationale but do not override confirmed docs. <code>docs/archive/</code> materials never override confirmed docs.</p>
+<p><code>docs/reference/java-index-layer-full-plan-zh.md</code> is a distilled index/query layer reference summary. The old full plan is archived and does not decide the current infrastructure stack.</p>
+<p>Use <code>docs/reference/</code> for supporting rationale, engineering references, external review, OV history, and historical context. Use <code>docs/archive/</code> only when tracing older discussions or prototypes before deletion/consolidation.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS AI-Readable Knowledge Artifact Format Strategy</title>
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --paper: #fffaf0;
+      --ink: #1c1915;
+      --muted: #655f54;
+      --line: #d8cdb9;
+      --accent: #0f6b5f;
+      --accent-2: #b45309;
+      --accent-3: #1f4d7a;
+      --bad: #9f1239;
+      --good: #0f766e;
+      --warn: #b45309;
+      --code-bg: #211f1b;
+      --code-ink: #f7efe0;
+      --chip: #ebe2d0;
+      --shadow: 0 18px 45px rgba(70, 55, 31, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(15, 107, 95, 0.12), transparent 28rem),
+        radial-gradient(circle at 90% 0%, rgba(180, 83, 9, 0.12), transparent 24rem),
+        linear-gradient(135deg, #f8f2e6 0%, var(--bg) 48%, #ece3d2 100%);
+      font-family: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      line-height: 1.65;
+    }
+
+    header {
+      padding: 64px clamp(20px, 5vw, 72px) 32px;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto 72px;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.15;
+      margin: 0;
+      letter-spacing: -0.035em;
+    }
+
+    h1 {
+      max-width: 980px;
+      font-size: clamp(40px, 7vw, 88px);
+      font-weight: 760;
+    }
+
+    h2 {
+      margin-top: 64px;
+      margin-bottom: 18px;
+      font-size: clamp(28px, 4vw, 48px);
+    }
+
+    h3 {
+      margin-top: 28px;
+      margin-bottom: 12px;
+      font-size: 24px;
+    }
+
+    p {
+      margin: 0 0 16px;
+    }
+
+    a {
+      color: var(--accent-3);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 250, 240, 0.72);
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .lede {
+      max-width: 940px;
+      margin-top: 28px;
+      color: #363027;
+      font-size: clamp(19px, 2.2vw, 27px);
+      line-height: 1.45;
+    }
+
+    .card {
+      padding: clamp(22px, 3vw, 34px);
+      border: 1px solid rgba(216, 205, 185, 0.9);
+      border-radius: 24px;
+      background: rgba(255, 250, 240, 0.84);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .span-4 {
+      grid-column: span 4;
+    }
+
+    .span-6 {
+      grid-column: span 6;
+    }
+
+    .span-8 {
+      grid-column: span 8;
+    }
+
+    .span-12 {
+      grid-column: span 12;
+    }
+
+    .metric {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 170px;
+    }
+
+    .metric strong {
+      color: var(--accent);
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .callout {
+      border-left: 6px solid var(--accent);
+      background: #fff6df;
+    }
+
+    .warning {
+      border-left: 6px solid var(--warn);
+      background: #fff4e5;
+    }
+
+    .danger {
+      border-left: 6px solid var(--bad);
+      background: #fff1f2;
+    }
+
+    .recommendation {
+      border-left: 6px solid var(--good);
+      background: #effcf7;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+      font-size: 15px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #eadfc9;
+      color: #2b261f;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .score {
+      display: inline-block;
+      min-width: 36px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--chip);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .score.good {
+      color: #064e3b;
+      background: #cfeee4;
+    }
+
+    .score.mid {
+      color: #7c2d12;
+      background: #fed7aa;
+    }
+
+    .score.bad {
+      color: #881337;
+      background: #fecdd3;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--chip);
+      color: #40382d;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    code {
+      padding: 0.12em 0.34em;
+      border-radius: 6px;
+      background: #eee3cf;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow: auto;
+      margin: 14px 0 0;
+      padding: 18px;
+      border-radius: 18px;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .path {
+      color: var(--muted);
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .flow {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .flow-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: #1f4d7a;
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .flow-content {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper);
+    }
+
+    .decision {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .do {
+      border-top: 6px solid var(--good);
+    }
+
+    .dont {
+      border-top: 6px solid var(--bad);
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .print-note {
+      margin-top: 44px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .grid, .decision {
+        grid-template-columns: 1fr;
+      }
+
+      .span-4, .span-6, .span-8, .span-12 {
+        grid-column: auto;
+      }
+
+      .flow-row {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      header {
+        padding-top: 24px;
+      }
+
+      .card {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">RTS format strategy · generated analysis · 2026-05-15</div>
+    <h1>AI-first 知识产物不应该统一成一种文件格式</h1>
+    <p class="lede">
+      对 RTS 来说，正确问题不是“HTML、JSON、YAML、Markdown、CSV 哪个最好”，而是：
+      哪一层需要承载 truth、哪一层需要被 AI 审核和维护、哪一层需要检索召回、哪一层只是给 AI 的短上下文。
+      本报告按 <strong>AI/agent 直接阅读与审核约 80%，人工直接查看约 20%</strong> 的假设修正权重。
+      结论是分层组合：<strong>KB authoring 用受限 YAML/Markdown，runtime projection 用 JSON/JSONL，表格原始数据用 CSV/TSV 并投影成 JSON，HTML 只做 AI-mediated presentation，不做权威 truth。</strong>
+    </p>
+  </header>
+
+  <main>
+    <section class="grid">
+      <div class="card metric span-4">
+        <strong>8:2</strong>
+        <span>推荐权重：AI/agent 阅读、审核、维护和运行时消费是主场；人类直接裸看只是少量抽查、裁决和审计场景。</span>
+      </div>
+      <div class="card metric span-4">
+        <strong>JSON</strong>
+        <span>当前 Java runtime store 已经把 projection manifest、object manifest、L2、governance summaries 等实现为 JSON/JSONL，并做 release、scope、hash、schema 校验。</span>
+      </div>
+      <div class="card metric span-4">
+        <strong>Prompt</strong>
+        <span>给 AI 的最终上下文不应等同于源文件。应由 resolver 从 projection 选择 L2/card/dependency，再渲染成短、可引用、可裁剪的上下文块。</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Executive Recommendation</h2>
+      <div class="card recommendation">
+        <p><strong>推荐基线：</strong>即使 KB 和 runtime projection 大部分时间都是给 AI 读，也不要让 AI 直接在仓库里自由读取各种后缀来判断 truth。AI 应该通过 RTS service 或 publisher 产出的受控 projection 读取；文件格式按层选择。人工可读性只作为副指标，不作为主导格式选择的理由。</p>
+        <p><strong>AI-first 修正：</strong>这里的“可维护性”主要指 AI/agent 能稳定 diff、校验、重写、生成补丁和复核，不是让人长期裸眼阅读。HTML/Markdown 的价值也不是“给人看所以重要”，而是它们能作为 AI-mediated review 和 compact context 的渲染层。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>层</th>
+              <th>推荐主格式</th>
+              <th>辅助格式</th>
+              <th>为什么</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Canonical KB 主对象</strong><br><span class="small">rules / lookups / helpers</span></td>
+              <td><code>受限 YAML</code></td>
+              <td><code>JSON canonical draft</code> 可作为机器中间态</td>
+              <td>适合 AI/agent authoring、patch、diff 和结构化 review；比 JSON 更少括号噪声，更适合作为 AI 可编辑源。发布前必须 schema validation，不能靠 YAML 自由形态进入 runtime。</td>
+            </tr>
+            <tr>
+              <td><strong>KB 治理材料</strong><br><span class="small">evidence / review / reports</span></td>
+              <td><code>Markdown + YAML front matter</code> 或 <code>YAML index</code></td>
+              <td><code>JSON</code> 摘要</td>
+              <td>治理材料有叙述、问题、裁决和证据链，Markdown 对 AI 做长文本审阅、摘要和问题整理很自然；但进入 runtime 时应投影成结构化 governance summary JSON。</td>
+            </tr>
+            <tr>
+              <td><strong>Runtime projection manifest / registry / cards / edges</strong></td>
+              <td><code>JSONL</code> 批量记录，<code>JSON</code> 单体 manifest</td>
+              <td>数据库表</td>
+              <td>可流式读取、逐行校验、适合索引和增量处理；schema、hash、release id、scope boundary 最清楚。</td>
+            </tr>
+            <tr>
+              <td><strong>L2 runtime object</strong></td>
+              <td><code>JSON</code></td>
+              <td>未来可加 canonical JSON / schema registry</td>
+              <td>L2 是服务可读事实对象，需要强校验、hash、字段级读取、grounding。不要用 Markdown 或 HTML 承载 L2 truth。</td>
+            </tr>
+            <tr>
+              <td><strong>Lookup 大表 / sample data</strong></td>
+              <td><code>CSV</code> 或 <code>TSV</code> 作为原始表</td>
+              <td><code>JSON</code> metadata + typed projection</td>
+              <td>表格数据用 CSV/TSV 最高效；但必须配 schema、key columns、types、fallback semantics，再投影成 lookup_definition L2。</td>
+            </tr>
+            <tr>
+              <td><strong>AI prompt/context bundle</strong></td>
+              <td><code>Markdown-like compact blocks</code> 或 <code>JSON envelope + text snippets</code></td>
+              <td>模型 provider 的 structured input</td>
+              <td>AI 最终阅读时需要低 token、低噪声、引用清楚。它可以是渲染结果，不必成为存储 truth。</td>
+            </tr>
+            <tr>
+              <td><strong>AI-mediated presentation / 少量人工抽查</strong></td>
+              <td><code>HTML</code></td>
+              <td>PDF / PNG</td>
+              <td>HTML 适合由 AI 生成解释、对比和审计视图，也适合少量人工抽查；不适合作为 authoritative runtime truth，因为 DOM 噪声、样式噪声和解析不稳定。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>当前仓库观察</h2>
+      <div class="grid">
+        <div class="card span-6">
+          <h3>活跃样例的格式分工</h3>
+          <p>当前仓库已经自然形成了一个合理方向：</p>
+          <ul>
+            <li><code>kb/.../rules/*.yaml</code>：canonical-ish authoring objects。</li>
+            <li><code>kb/.../reports/*.md</code>：治理说明、review checklist、extraction report。</li>
+            <li><code>sample-projection/.../release-manifest.json</code>：单体 release metadata。</li>
+            <li><code>sample-projection/.../*.jsonl</code>：manifest、scope、cards、edges、navigation 等批量记录。</li>
+            <li><code>sample-projection/.../l2/**/*.json</code>：服务可读 L2 fact object。</li>
+          </ul>
+        </div>
+        <div class="card span-6">
+          <h3>实现侧已固化的边界</h3>
+          <p>当前 Java store 读取 <code>release-manifest.json</code>、<code>scopes.jsonl</code>、<code>object-manifest.jsonl</code>、<code>object-cards.jsonl</code>、<code>dependency-edges.jsonl</code> 和 L2 <code>.json</code>，并校验：</p>
+          <ul>
+            <li>projection schema version。</li>
+            <li>release activation state。</li>
+            <li>object URI 唯一性。</li>
+            <li>scope active。</li>
+            <li>content ref 与 content hash。</li>
+            <li>L2 文件路径不能越界。</li>
+            <li>required dependency 必须已发布。</li>
+          </ul>
+        </div>
+      </div>
+      <p class="path">Representative files: /Users/tuziliji/projects/rts/kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/rules/rule_fxd_ndf_fixing_date.yaml · /Users/tuziliji/projects/rts/sample-projection/runtime-store/releases/rel-2026-05-06-photo-fxd-ndf-cutoff/l2/rules/rule_fxd_ndf_fixing_date.json</p>
+    </section>
+
+    <section>
+      <h2>格式评分矩阵</h2>
+      <p>评分是针对“AI/agent 可安全使用、审核、维护 RTS rule truth”的综合权衡，不是通用文件格式排名。权重按 AI 80%、人工直接查看 20% 估算。5 分最好。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>格式</th>
+            <th>Token 效率</th>
+            <th>可校验性</th>
+            <th>AI 维护/演进</th>
+            <th>运行时能力</th>
+            <th>AI 阅读效率</th>
+            <th>推荐角色</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>JSON</strong></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score mid">3</span></td>
+            <td>runtime L2、manifest、governance summary、API payload、hashable truth artifact。</td>
+          </tr>
+          <tr>
+            <td><strong>JSONL</strong></td>
+            <td><span class="score good">4</span></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score mid">3</span></td>
+            <td>大量同构记录：object manifest、cards、edges、aliases、trace、index docs。</td>
+          </tr>
+          <tr>
+            <td><strong>YAML</strong></td>
+            <td><span class="score good">4</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score mid">2</span></td>
+            <td><span class="score good">4</span></td>
+            <td>KB authoring、AI-editable canonical draft。发布前必须转成严格 projection。</td>
+          </tr>
+          <tr>
+            <td><strong>Markdown</strong></td>
+            <td><span class="score good">4</span></td>
+            <td><span class="score bad">2</span></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score bad">2</span></td>
+            <td><span class="score good">5</span></td>
+            <td>治理叙述、报告、AI prompt rendering、AI-mediated review，不承载最终结构化 truth。</td>
+          </tr>
+          <tr>
+            <td><strong>CSV</strong></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score good">4</span></td>
+            <td><span class="score mid">2</span></td>
+            <td>大 lookup 表、mapping table、测试矩阵。必须配 schema/metadata。</td>
+          </tr>
+          <tr>
+            <td><strong>TSV</strong></td>
+            <td><span class="score good">5</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score good">4</span></td>
+            <td><span class="score mid">3</span></td>
+            <td>比 CSV 更适合含逗号文本的表格，但仍需要 schema。</td>
+          </tr>
+          <tr>
+            <td><strong>HTML</strong></td>
+            <td><span class="score bad">1</span></td>
+            <td><span class="score bad">2</span></td>
+            <td><span class="score mid">3</span></td>
+            <td><span class="score bad">1</span></td>
+            <td><span class="score bad">2</span></td>
+            <td>AI-mediated 展示、审阅、导航报告。不要作为 KB/projection 的权威输入。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>为什么不是“全部给 AI 读 HTML”</h2>
+      <div class="grid">
+        <div class="card warning span-6">
+          <h3>HTML 在 AI-first 架构里的真实优点</h3>
+          <ul>
+            <li>非常适合把 AI 分析结果组织成对比、层次、颜色、交互和长报告。</li>
+            <li>可以把多个对象、依赖图、风险标记、样例放在一个 AI-mediated review 页面里。</li>
+            <li>可作为审阅界面、交付物、training/解释材料，以及少量人工抽查入口。</li>
+          </ul>
+        </div>
+        <div class="card danger span-6">
+          <h3>HTML 不适合承载 truth</h3>
+          <ul>
+            <li>标签、样式、脚本、导航元素会浪费 token。</li>
+            <li>DOM 结构不等于业务 schema，字段类型和必填约束弱。</li>
+            <li>同一内容可被多种 HTML 表达，hash/canonicalization 麻烦。</li>
+            <li>AI 可能把装饰性文字、隐藏文本、注释或页面说明误读成事实。</li>
+            <li>运行时服务很难基于 HTML 做稳定 scope、permission、dependency、L2 grounding。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card callout">
+        <p><strong>推荐定位：</strong>HTML 是 presentation projection，不是 runtime projection。即使主要读者是 AI，也应该让 AI 读受控 context / L2 / card，而不是读完整 HTML DOM。HTML 可以由 JSON/YAML/Markdown 生成，但不要让 HTML 回流成 truth source。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>分层处理方案</h2>
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-label">Layer 0<br>Source</div>
+          <div class="flow-content">
+            <strong>原始证据和输入材料</strong>
+            <p>PDF、Excel、XML、XSLT、Java、截图 OCR、业务说明等。这里格式由来源决定，不强行统一。RTS 只记录 source locator、hash、extraction state。</p>
+            <div class="chips">
+              <span class="chip">不直接作为默认 runtime truth</span>
+              <span class="chip">需要 evidence chain</span>
+              <span class="chip">可重抽取</span>
+            </div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-label">Layer 1<br>KB Authoring</div>
+          <div class="flow-content">
+            <strong>canonical rule / lookup / helper draft</strong>
+            <p>主对象用受限 YAML：AI 易读、易 patch、易 diff，也便于少量人工抽查。治理说明用 Markdown，索引用 YAML/JSON。这里可以有注释和解释，但进入发布必须通过 schema validation。</p>
+            <div class="chips">
+              <span class="chip">YAML for objects</span>
+              <span class="chip">Markdown for AI review/report</span>
+              <span class="chip">exception human adjudication</span>
+            </div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-label">Layer 2<br>Projection</div>
+          <div class="flow-content">
+            <strong>approved truth 的服务运行视图</strong>
+            <p>发布后生成 immutable JSON/JSONL projection：manifest、scope registry、object manifest、cards、dependency edges、content refs、L2 objects、governance summaries。这里是 query/index/agent 默认读取边界。</p>
+            <div class="chips">
+              <span class="chip">JSON / JSONL</span>
+              <span class="chip">schema version</span>
+              <span class="chip">release id</span>
+              <span class="chip">content hash</span>
+              <span class="chip">permission-aware</span>
+            </div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-label">Layer 3<br>Index</div>
+          <div class="flow-content">
+            <strong>召回和导航视图</strong>
+            <p>从 projection 派生 L0/L1/card/search text/alias/confusable。它帮助 resolver 找对象，但不拥有 truth。命中后必须回读 L2。</p>
+            <div class="chips">
+              <span class="chip">JSONL</span>
+              <span class="chip">Lucene/OpenSearch copy</span>
+              <span class="chip">not truth owner</span>
+            </div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-label">Layer 4<br>AI Context</div>
+          <div class="flow-content">
+            <strong>模型实际看到的低噪声上下文</strong>
+            <p>由 service 从 L2、dependency、authorized governance summary 生成。可以是 compact Markdown，也可以是 JSON envelope。关键是保留 URI、release id、hash、claim boundaries，而不是把整个文件塞给模型。</p>
+            <div class="chips">
+              <span class="chip">short snippets</span>
+              <span class="chip">citations</span>
+              <span class="chip">facts/inferences/unknowns</span>
+              <span class="chip">prompt-injection safe</span>
+            </div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-label">Layer 5<br>Presentation</div>
+          <div class="flow-content">
+            <strong>AI-mediated presentation / HTML / PDF / dashboard</strong>
+            <p>可展示 AI 生成的比较、推荐、图表、审阅视图，并支持少量人工抽查。它可以引用 projection 对象，但不应成为下一轮 runtime truth 输入。</p>
+            <div class="chips">
+              <span class="chip">HTML</span>
+              <span class="chip">AI-mediated dashboard</span>
+              <span class="chip">derived artifact</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>面向 AI 的 token 策略</h2>
+      <div class="card">
+        <p>Token 效率不是简单看文件体积。对 RTS 更重要的是“单位 token 中有多少可 ground 的事实”。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>策略</th>
+              <th>做法</th>
+              <th>原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>先定位，后读事实</strong></td>
+              <td>用 scope + manifest + card + L0/L1 找候选，再读 L2。</td>
+              <td>避免把整个 KB 或 projection 塞进 prompt，减少 wrong-scope 污染。</td>
+            </tr>
+            <tr>
+              <td><strong>prompt 渲染不要保留所有 JSON 噪声</strong></td>
+              <td>给模型的 context 可渲染成紧凑 Markdown，但每段携带 URI/hash。</td>
+              <td>JSON 适合运行时，Markdown 更适合模型阅读；二者角色不同。</td>
+            </tr>
+            <tr>
+              <td><strong>保留结构化语义，不保留治理长文</strong></td>
+              <td>L2 保留 pipeline、inputs、target、dependencies、examples、warnings；raw evidence/review 长文只在授权时展开。</td>
+              <td>异常诊断、影响分析和测试规划需要结构化 L2，不需要默认读完整 review 历史。</td>
+            </tr>
+            <tr>
+              <td><strong>表格不要转成自然语言</strong></td>
+              <td>大 lookup 表保持 CSV/TSV 或数据库；prompt 中只给匹配行、key semantics、fallback behavior。</td>
+              <td>整表自然语言化会极大浪费 token，并削弱可校验性。</td>
+            </tr>
+            <tr>
+              <td><strong>把候选、推断、事实分开</strong></td>
+              <td>context 和 answer 都显式标注 facts / inferences / unknowns / candidates / human decisions。</td>
+              <td>这是 RTS authority boundary，不是表达风格。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>内容实例：同一规则的三种形态</h2>
+      <div class="grid">
+        <div class="card span-4">
+          <h3>KB YAML：适合 authoring</h3>
+          <p class="small">短、AI 可编辑、易 review/diff；但不应直接作为 runtime 默认读取对象。</p>
+<pre>id: rule_fxd_ndf_fixing_date
+status: demo_signoff
+inputs:
+  - name: source_fixing_date
+    source_path: /FpML/.../fixingDate/text()
+logic:
+  summary: Copy the source NDF fixingDate directly.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/.../fixingDate/text()
+      out: source_fixing_date
+    - op: emit_value
+      from: source_fixing_date
+target:
+  kind: value
+  path: /scb:SCBML/.../fixingDate</pre>
+        </div>
+        <div class="card span-4">
+          <h3>L2 JSON：适合 runtime truth</h3>
+          <p class="small">字段更完整，可校验、可 hash、可 grounding。</p>
+<pre>{
+  "uri": "rts://.../rules/rule_fxd_ndf_fixing_date",
+  "id": "rule_fxd_ndf_fixing_date",
+  "object_type": "rule",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "runtime_state": "released",
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "logic": {
+    "pipeline": [
+      {"op": "read_xpath", "out": "source_fixing_date"},
+      {"op": "emit_value", "from": "source_fixing_date"}
+    ]
+  },
+  "content_hash": "sha256:..."
+}</pre>
+        </div>
+        <div class="card span-4">
+          <h3>AI Context：适合模型阅读</h3>
+          <p class="small">由 service 渲染，不是权威存储。</p>
+<pre>[FACT: rule]
+uri: rts://.../rule_fxd_ndf_fixing_date
+release: rel-2026-05-06-photo-fxd-ndf-cutoff
+l2_hash: sha256:...
+scope: tradition/stella/fxd-ndf-cutoff-fixing/cutoff-fixing
+
+Rule:
+- Target fixingDate is copied directly from source fixingDate.
+- Source XPath: /FpML/.../fixingDate/text()
+- Target XPath: /scb:SCBML/.../fixingDate
+- Dependencies: none
+
+Warnings:
+- Photo-reconstructed source; production recheck required.</pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>具体格式建议</h2>
+      <div class="grid">
+        <div class="card span-6">
+          <h3>JSON / JSONL</h3>
+          <p><strong>用在：</strong>runtime projection、L2、manifest、cards、dependencies、trace、API/tool contract。</p>
+          <p><strong>理由：</strong>它最适合服务端校验、hash、schema evolution、字段级读取、权限过滤和审计重放。</p>
+          <p><strong>注意：</strong>不要把完整 JSON 原样全塞进 prompt。运行时用 JSON，AI 上下文可以渲染成更短的 blocks。</p>
+        </div>
+        <div class="card span-6">
+          <h3>YAML</h3>
+          <p><strong>用在：</strong>KB authoring 的 rule/lookup/helper 主对象。</p>
+          <p><strong>理由：</strong>AI/agent 修改体验好，diff 清楚，少量结构化逻辑可读性强；人工直接看只是少量抽查时的附加收益。</p>
+          <p><strong>注意：</strong>YAML 有隐式类型、锚点、重复 key、解析器差异等风险。建议使用受限 YAML subset，并在 publish 前转 JSON canonical projection。</p>
+        </div>
+        <div class="card span-6">
+          <h3>Markdown</h3>
+          <p><strong>用在：</strong>报告、review checklist、extraction notes、human decision narrative、AI context rendering。</p>
+          <p><strong>理由：</strong>长文本最适合 Markdown；模型阅读、总结、批注和重写都自然。</p>
+          <p><strong>注意：</strong>Markdown heading 和 bullet 不等于 schema。关键事实必须在 YAML/JSON 对象中有结构化来源。</p>
+        </div>
+        <div class="card span-6">
+          <h3>CSV / TSV</h3>
+          <p><strong>用在：</strong>lookup table、mapping matrix、test case matrix、大量行数据。</p>
+          <p><strong>理由：</strong>token 和存储都高效，适合表格工具处理。</p>
+          <p><strong>注意：</strong>必须有 companion schema：delimiter、quote rules、column types、key columns、null/blank semantics、fallback behavior、source hash。</p>
+        </div>
+        <div class="card span-6">
+          <h3>HTML</h3>
+          <p><strong>用在：</strong>报告、dashboard、对比页面、审阅 UI、AI-mediated explanation。</p>
+          <p><strong>理由：</strong>能把结构、视觉层次和对比关系表达清楚，适合 AI 生成报告后给人少量抽查，也适合浏览器侧展示。</p>
+          <p><strong>注意：</strong>HTML 不应被 query resolver 或 LLM 当 authoritative truth 输入。它应由 projection 生成，而不是替代 projection。</p>
+        </div>
+        <div class="card span-6">
+          <h3>XML</h3>
+          <p><strong>用在：</strong>源系统样例、报文、schema/source evidence。</p>
+          <p><strong>理由：</strong>银行报文和 transformation source 常见 XML/XPath。</p>
+          <p><strong>注意：</strong>不要把 XML 原文直接当规则对象。规则应引用 XPath/source anchor，并在 L2 中保留结构化 source path。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>决策树</h2>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>如果你要保存的是...</th>
+              <th>优先选</th>
+              <th>不要优先选</th>
+              <th>发布前必须检查</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>一个 rule / helper 的结构化逻辑草稿</td>
+              <td><code>YAML</code></td>
+              <td><code>HTML</code> / 纯 <code>MD</code></td>
+              <td>object id、schema、target coverage、dependencies、examples、signoff state。</td>
+            </tr>
+            <tr>
+              <td>一个已发布 rule 的 runtime fact</td>
+              <td><code>JSON</code></td>
+              <td><code>YAML</code> / <code>MD</code></td>
+              <td>release id、scope、L2 hash、content ref、permission visibility。</td>
+            </tr>
+            <tr>
+              <td>很多同类对象的列表</td>
+              <td><code>JSONL</code></td>
+              <td>单个巨型 <code>JSON</code></td>
+              <td>每行独立 parse、release/type/schema 一致、可增量索引。</td>
+            </tr>
+            <tr>
+              <td>一个 lookup 表</td>
+              <td><code>CSV</code> / <code>TSV</code> + schema</td>
+              <td>自然语言列表</td>
+              <td>key columns、output columns、blank semantics、fallback/reverse/coalesce。</td>
+            </tr>
+            <tr>
+              <td>AI review 讨论或 extraction report</td>
+              <td><code>Markdown</code></td>
+              <td><code>JSON</code> 长字符串数组</td>
+              <td>把裁决、open questions、evidence refs 同步成结构化 governance summary。</td>
+            </tr>
+            <tr>
+              <td>给 LLM 的一次上下文</td>
+              <td>service-rendered compact context</td>
+              <td>直接塞目录里的原始文件</td>
+              <td>scope、URI、release、hash、truth/candidate labels、token budget。</td>
+            </tr>
+            <tr>
+              <td>给 AI / 少量人工抽查看的比较报告</td>
+              <td><code>HTML</code></td>
+              <td>把 HTML 当下一步 truth source</td>
+              <td>页面标明 derived from 哪个 release/projection，最好链接 URI/hash。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>落地规范建议</h2>
+      <div class="decision">
+        <div class="card do">
+          <h3>应该做</h3>
+          <ul>
+            <li>把 <code>schema_version</code>、<code>release_id</code>、<code>scope</code>、<code>content_hash</code> 作为 runtime projection 的硬字段。</li>
+            <li>为 YAML authoring 定义受限 subset：禁止复杂 anchors、禁止重复 key、明确 boolean/date/string 规则。</li>
+            <li>为 CSV/TSV 配 companion metadata，至少定义 delimiter、headers、types、key columns、blank semantics。</li>
+            <li>让 AI 生成的 HTML/Markdown 报告引用对象 URI，而不是复制并改写 truth。</li>
+            <li>让 LLM 通过 tool/API 读取 projection，不直接遍历文件系统。</li>
+            <li>把 AI context 视为临时渲染产物，保存 pointer/hash/trace，不保存为新 truth。</li>
+          </ul>
+        </div>
+        <div class="card dont">
+          <h3>避免做</h3>
+          <ul>
+            <li>不要因为“AI 能读 HTML/Markdown”就用它们承载 L2 truth。</li>
+            <li>不要让 OpenSearch/Lucene document 替代 L2 runtime object。</li>
+            <li>不要把 YAML 注释、Markdown 叙述、chat history 或 trace feedback 写回 canonical truth。</li>
+            <li>不要把 CSV 单元格类型、空值、fallback 交给模型猜。</li>
+            <li>不要让 prompt 里的 release/scope/permission 文字代替 service gate。</li>
+            <li>不要为了 token 少而裁掉 dependency、examples、warnings、source anchors 这些 grounding 必需字段。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>最终推荐架构</h2>
+      <div class="card recommendation">
+<pre>source materials
+  -> extracted assertions
+  -> KB authoring
+       rules/lookups/helpers: YAML
+       evidence/review/reports: Markdown + YAML index
+  -> AI-first validation/review + exception human adjudication/signoff
+  -> immutable runtime projection
+       release manifest: JSON
+       scope/object/card/edge/navigation/trace: JSONL
+       L2 runtime objects: JSON
+       lookup raw rows: CSV/TSV + JSON metadata when needed
+  -> RTS service gate
+       release/scope/permission/hash/dependency/refusal/trace
+  -> AI context renderer
+       compact fact blocks with URI/release/hash
+  -> managed answer / scenario report / HTML presentation</pre>
+        <p>这套分层同时满足：AI 能读懂、服务能校验、工程可维护、运行时可索引、审计可复盘、truth boundary 不失守。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>一句话结论</h2>
+      <div class="card callout">
+        <p><strong>如果只能记住一条：</strong>权威 truth 用结构化、可校验、可 hash 的 JSON/JSONL projection；AI 阅读、审核和表达体验通过受控渲染解决；人工直接阅读只是少量抽查，不要反过来让阅读格式成为 truth source。</p>
+      </div>
+    </section>
+
+    <p class="print-note">
+      Sources consulted in this repository: docs/confirmed/project-alignment-summary-zh.md, docs/confirmed/system-constitution-v1.md,
+      docs/confirmed/kb-to-index-projection-contract-zh.md, docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md,
+      docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md, current KB/projection samples, and Java store/query implementation.
+    </p>
+  </main>
+</body>
+</html>

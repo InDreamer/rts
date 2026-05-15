@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minimal OV Integration | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/minimal-ov-integration.md</p>
+      <h1>Minimal OV Integration</h1>
+      <p>define the smallest OV integration that improves retrieval without merging systems or risking truth pollution</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/minimal-ov-integration.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>the request is about a controlled OV adoption path</li>
+<li>the request is about engineering scope or stop rules before implementation</li>
+<li>the request is about mapping reviewed packs into a retrieval shell</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>the request is only about high-level conceptual boundary</li>
+<li>the request is only about constitutional principles</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="rts-project-background-and-pack-model.html">RTS Project Background and Pack Model</a><a href="minimal-ov-integration.html">Minimal OV Integration</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>define the smallest OV integration that improves retrieval without merging systems or risking truth pollution</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; Historical reference only. Current active baseline uses RTS runtime projection and Java query/tool service; OV is not the required runtime path.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>What This Covers</h3>
+          <p>This document defines the smallest acceptable OV integration path: one that improves discoverability and low-noise retrieval while keeping the Transformation Rule System as the sole owner of canonical truth.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Source Boundaries</h3>
+          <p>docs/reference/rts-project-background-and-pack-model.md — canonical pack structure, object model, and historical sample context. This document — engineering scope guardrails for controlled OV adoption.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Goal</h3>
+          <p>Improve agent retrieval quality and reduce hallucination pressure by projecting governed pack content into a low-noise, layered resource shell.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Non-Goals</h3>
+          <p>This integration does not attempt to: replace the pack repository rewrite canonical objects through OV merge review and signoff logic into OV use OV session memory as authoritative banking knowledge</p>
+        </article>
+<article class="chapter-card">
+          <h3>Scope Boundary</h3>
+          <p>one-way export from approved packs into OV resources runtime projection of rules, lookups, and helpers only LLM-assisted, human-confirmed abstracts and overviews</p>
+        </article>
+<article class="chapter-card">
+          <h3>Minimum Artifact Mapping</h3>
+          <p>Project only governed pack material. Project approved pack runtime content into an OV resource subtree shaped roughly like this: canonical repository remains primary</p>
+        </article>
+<article class="chapter-card">
+          <h3>Recommended State Filter</h3>
+          <p>Default projection set: approved Do not project review-ready or raw authoring content into the runtime retrieval namespace. The first runtime shell should expose only signoff-approved truth.</p>
+        </article>
+<article class="chapter-card">
+          <h3>L0 / L1 / L2 Strategy</h3>
+          <p>L0, L1, and L2 are three precision views of the same resource, not separate governance levels. Recommended layering for the narrowed projection: channel / product / pack: L0 + L1</p>
+        </article>
+<article class="chapter-card">
+          <h3>Relation Set</h3>
+          <p>Relations are not required for the first usable version. If a lightweight dependency layer is added later, start with: pack -&gt; rule pack -&gt; lookup pack -&gt; helper</p>
+        </article>
+<article class="chapter-card">
+          <h3>Runtime Contract</h3>
+          <p>Agent usage may retrieve projected pack material through OV. Runtime sessions may keep their own memory, but that memory must not be treated as truth-source content and must not update canonical pack files. Runtime retri</p>
+        </article>
+<article class="chapter-card">
+          <h3>Delivery Shape</h3>
+          <p>The smallest implementation should be a thin adapter, not a platform rewrite. export approved main-object files strip governance-only fields from projected YAML generate pack and object summaries</p>
+        </article>
+<article class="chapter-card">
+          <h3>Engineering Envelope</h3>
+          <p>Expected size for a disciplined MVP: about 1200 to 3800 lines of new code and tests That envelope assumes: narrowed runtime projection centered on rules, lookups, and helpers</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="minimal-ov-integration">Minimal OV Integration<a class="headerlink" href="#minimal-ov-integration" title="Permanent link">#</a></h1>
+<blockquote>
+<p>Historical reference only. Current active baseline uses RTS runtime projection and Java query/tool service; OV is not the required runtime path.</p>
+</blockquote>
+<h2 id="what-this-covers">What This Covers<a class="headerlink" href="#what-this-covers" title="Permanent link">#</a></h2>
+<p>This document defines the smallest acceptable OV integration path: one that improves discoverability and low-noise retrieval while keeping the Transformation Rule System as the sole owner of canonical truth.</p>
+<h2 id="source-boundaries">Source Boundaries<a class="headerlink" href="#source-boundaries" title="Permanent link">#</a></h2>
+<ul>
+<li><code>docs/reference/rts-project-background-and-pack-model.md</code> — canonical pack structure, object model, and historical sample context.</li>
+<li>This document — engineering scope guardrails for controlled OV adoption.</li>
+</ul>
+<h2 id="goal">Goal<a class="headerlink" href="#goal" title="Permanent link">#</a></h2>
+<p>Improve agent retrieval quality and reduce hallucination pressure by projecting governed pack content into a low-noise, layered resource shell.</p>
+<h2 id="non-goals">Non-Goals<a class="headerlink" href="#non-goals" title="Permanent link">#</a></h2>
+<p>This integration does not attempt to:</p>
+<ul>
+<li>replace the pack repository</li>
+<li>rewrite canonical objects through OV</li>
+<li>merge review and signoff logic into OV</li>
+<li>use OV session memory as authoritative banking knowledge</li>
+<li>deep-customize OV internals</li>
+</ul>
+<h2 id="scope-boundary">Scope Boundary<a class="headerlink" href="#scope-boundary" title="Permanent link">#</a></h2>
+<h3 id="in-scope">In Scope<a class="headerlink" href="#in-scope" title="Permanent link">#</a></h3>
+<ul>
+<li>one-way export from approved packs into OV resources</li>
+<li>runtime projection of rules, lookups, and helpers only</li>
+<li>LLM-assisted, human-confirmed abstracts and overviews</li>
+<li>deterministic or semi-deterministic retrieval entry points for agents</li>
+<li>optional lightweight dependency manifests only if they prove necessary</li>
+</ul>
+<h3 id="out-of-scope">Out Of Scope<a class="headerlink" href="#out-of-scope" title="Permanent link">#</a></h3>
+<ul>
+<li>OV core storage changes</li>
+<li>OV retrieval algorithm changes</li>
+<li>OV session or memory customization</li>
+<li>bidirectional sync</li>
+<li>automatic write-back into pack YAML</li>
+</ul>
+<h2 id="minimum-artifact-mapping">Minimum Artifact Mapping<a class="headerlink" href="#minimum-artifact-mapping" title="Permanent link">#</a></h2>
+<p>Project only governed pack material.</p>
+<h3 id="resource-tree-shape">Resource Tree Shape<a class="headerlink" href="#resource-tree-shape" title="Permanent link">#</a></h3>
+<p>Project approved pack runtime content into an OV resource subtree shaped roughly like this:</p>
+<pre><code class="language-text">resources/transformation-rule-system/tradition-stella/{product}/{pack}/
+  .abstract.md
+  .overview.md
+  rules/
+    rule_*.yaml
+    rule_*.abstract.md
+  lookups/
+    lk_*.yaml
+    lk_*.abstract.md
+  helpers/
+    hlp_*.yaml
+    hlp_*.abstract.md
+</code></pre>
+<h3 id="projection-rule">Projection Rule<a class="headerlink" href="#projection-rule" title="Permanent link">#</a></h3>
+<ul>
+<li>canonical repository remains primary</li>
+<li>OV receives a generated projection copy</li>
+<li>only signoff-approved main objects are projected by default</li>
+<li>evidence, review, and reports remain on the governed side and do not enter the first runtime shell</li>
+</ul>
+<h2 id="recommended-state-filter">Recommended State Filter<a class="headerlink" href="#recommended-state-filter" title="Permanent link">#</a></h2>
+<p>Default projection set:</p>
+<ul>
+<li><code>approved</code></li>
+</ul>
+<p>Do not project review-ready or raw authoring content into the runtime retrieval namespace. The first runtime shell should expose only signoff-approved truth.</p>
+<h2 id="l0-l1-l2-strategy">L0 / L1 / L2 Strategy<a class="headerlink" href="#l0-l1-l2-strategy" title="Permanent link">#</a></h2>
+<p>L0, L1, and L2 are three precision views of the same resource, not separate governance levels.</p>
+<p>Recommended layering for the narrowed projection:</p>
+<ul>
+<li><strong>channel / product / pack</strong>: L0 + L1</li>
+<li><strong>rule / lookup / helper object</strong>: L0 recommended, L2 YAML required</li>
+<li><strong>L2</strong>: raw projected runtime files only</li>
+</ul>
+<p>Pack L1 should focus on object list, target coverage, and dependency hints. It should not replay review state, open ambiguities, or evidence discussions.</p>
+<p>There is no review-item layer in the first runtime projection because review does not enter the runtime shell.</p>
+<h2 id="relation-set">Relation Set<a class="headerlink" href="#relation-set" title="Permanent link">#</a></h2>
+<p>Relations are not required for the first usable version.</p>
+<p>If a lightweight dependency layer is added later, start with:</p>
+<ul>
+<li>pack -&gt; rule</li>
+<li>pack -&gt; lookup</li>
+<li>pack -&gt; helper</li>
+<li>object -&gt; dependency object</li>
+<li>pack -&gt; upstream or adjacent pack when needed</li>
+</ul>
+<h2 id="runtime-contract">Runtime Contract<a class="headerlink" href="#runtime-contract" title="Permanent link">#</a></h2>
+<p>Agent usage may retrieve projected pack material through OV. Runtime sessions may keep their own memory, but that memory must not be treated as truth-source content and must not update canonical pack files. Runtime retrieval does not require evidence or review access in the first phase.</p>
+<h2 id="delivery-shape">Delivery Shape<a class="headerlink" href="#delivery-shape" title="Permanent link">#</a></h2>
+<p>The smallest implementation should be a thin adapter, not a platform rewrite.</p>
+<h3 id="adapter-responsibilities">Adapter Responsibilities<a class="headerlink" href="#adapter-responsibilities" title="Permanent link">#</a></h3>
+<ul>
+<li>export approved main-object files</li>
+<li>strip governance-only fields from projected YAML</li>
+<li>generate pack and object summaries</li>
+<li>push the projection into OV resources</li>
+<li>optionally emit lightweight dependency metadata later</li>
+<li>preserve read-only semantics</li>
+</ul>
+<h3 id="adapter-must-not">Adapter Must Not<a class="headerlink" href="#adapter-must-not" title="Permanent link">#</a></h3>
+<ul>
+<li>interpret banking logic</li>
+<li>repair incomplete rules</li>
+<li>decide approval state</li>
+<li>suppress ambiguity</li>
+<li>project evidence, review, or reports into the first runtime shell</li>
+</ul>
+<h2 id="engineering-envelope">Engineering Envelope<a class="headerlink" href="#engineering-envelope" title="Permanent link">#</a></h2>
+<p>Expected size for a disciplined MVP:</p>
+<ul>
+<li>about 1200 to 3800 lines of new code and tests</li>
+</ul>
+<p>That envelope assumes:</p>
+<ul>
+<li>narrowed runtime projection centered on rules, lookups, and helpers</li>
+<li>no OV core modification</li>
+<li>no bidirectional sync</li>
+<li>no custom runtime memory integration</li>
+<li>no deep UI</li>
+</ul>
+<p>The current narrowed scope should aim for the low end of that range. If evidence, review, or a rich relation graph come back into scope, reassess.</p>
+<h2 id="suggested-work-breakdown">Suggested Work Breakdown<a class="headerlink" href="#suggested-work-breakdown" title="Permanent link">#</a></h2>
+<h3 id="ov-step-1-exporter">OV Step 1: Exporter<a class="headerlink" href="#ov-step-1-exporter" title="Permanent link">#</a></h3>
+<p>Build a local exporter that reads approved packs and writes a clean runtime projection tree.</p>
+<h3 id="ov-step-2-metadata-and-layering">OV Step 2: Metadata And Layering<a class="headerlink" href="#ov-step-2-metadata-and-layering" title="Permanent link">#</a></h3>
+<p>Generate pack-level and object-level summaries plus optional lightweight dependency manifests.</p>
+<h3 id="ov-step-3-ov-ingestion-wrapper">OV Step 3: OV Ingestion Wrapper<a class="headerlink" href="#ov-step-3-ov-ingestion-wrapper" title="Permanent link">#</a></h3>
+<p>Push the projection tree into OV resources using a repeatable ingestion command or wrapper.</p>
+<h3 id="ov-step-4-retrieval-evaluation">OV Step 4: Retrieval Evaluation<a class="headerlink" href="#ov-step-4-retrieval-evaluation" title="Permanent link">#</a></h3>
+<p>Check whether common questions become easier to answer with less noise:</p>
+<ul>
+<li>where does this target value come from</li>
+<li>why is this field generated this way</li>
+<li>which pack covers this field</li>
+<li>which lookup or helper does this rule depend on</li>
+</ul>
+<h2 id="stop-rules">Stop Rules<a class="headerlink" href="#stop-rules" title="Permanent link">#</a></h2>
+<p>Stop and reassess if any of these becomes true:</p>
+<ul>
+<li>the adapter needs OV core changes</li>
+<li>projected content must write back into canonical packs</li>
+<li>projected draft content becomes indistinguishable from approved truth</li>
+<li>engineering scope climbs beyond roughly 5000 lines for the first usable version</li>
+<li>runtime memory starts influencing canonical answers</li>
+</ul>
+<h2 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">#</a></h2>
+<p>The integration is successful only if it produces all of these outcomes:</p>
+<ul>
+<li>lower retrieval noise</li>
+<li>clearer scope narrowing</li>
+<li>easier dependency traceability</li>
+<li>no weakening of approval or ambiguity boundaries</li>
+<li>no truth-source ownership shift away from the pack repository</li>
+</ul>
+<h2 id="final-recommendation">Final Recommendation<a class="headerlink" href="#final-recommendation" title="Permanent link">#</a></h2>
+<p>Adopt OV only as a projection and retrieval shell.</p>
+<p>Keep the Transformation Rule System as the source of truth, the review authority, and the only place where canonical banking transformation rules are created or changed.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

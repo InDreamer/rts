@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Pipeline Ops Reference | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">KB Pack · kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/ops-reference.md</p>
+      <h1>Local Pipeline Ops Reference</h1>
+      <p>These ops are lightweight semantic labels used inside this draft pack&#x27;s logic.pipeline sections.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/ops-reference.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="README.html">Tradition -&gt; Stella FXD.NDF cutoff-fixing split pack</a><a href="reports/closure-check.html">Closure Check</a><a href="reports/extraction-report.html">Extraction Report</a><a href="reports/review-checklist.html">Review Checklist</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>These ops are lightweight semantic labels used inside this draft pack&#x27;s logic.pipeline sections.</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>These ops are lightweight semantic labels used inside this draft pack&#x27;s logic.pipeline sections. These op names and binding conventions are descriptive only.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>KB Pack / role: KB Pack / layer: active</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Target Binding Conventions</h3>
+          <p>using_inputs: makes rule-to-lookup/helper input binding explicit without repeating lookup key construction or helper internal logic. from_lookup: indicates that a target emit binds to a named field returned by a precedin</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="local-pipeline-ops-reference">Local Pipeline Ops Reference<a class="headerlink" href="#local-pipeline-ops-reference" title="Permanent link">#</a></h1>
+<p>These ops are lightweight semantic labels used inside this draft pack's <code>logic.pipeline</code> sections.</p>
+<ul>
+<li><code>exists</code>: returns true when the referenced source node is present.</li>
+<li><code>read_xpath</code>: reads a source value from a named FpML XPath.</li>
+<li><code>concat</code>: concatenates string inputs with no separator unless a template says otherwise.</li>
+<li><code>equals</code>: compares two string values for exact equality.</li>
+<li><code>branch</code>: executes the <code>then</code> branch when the condition is true; otherwise executes the <code>else</code> branch.</li>
+<li><code>assign</code>: copies a value from a previously read or computed field.</li>
+<li><code>constant</code>: emits or stores a literal value.</li>
+<li><code>compose_key</code>: builds a lookup key from named values using a string template.</li>
+<li><code>lookup_value</code>: reads a named field from a lookup definition.</li>
+<li><code>invoke_helper</code>: calls a named helper definition and exposes named outputs for later pipeline steps and target binding.</li>
+<li><code>coalesce</code>: returns the first non-empty value from the supplied arguments.</li>
+<li><code>emit_block</code>: declares that a target block is rendered when its condition is satisfied.</li>
+<li><code>emit_value</code>: declares the final target value written to a target XPath.</li>
+</ul>
+<h2 id="target-binding-conventions">Target Binding Conventions<a class="headerlink" href="#target-binding-conventions" title="Permanent link">#</a></h2>
+<ul>
+<li><code>using_inputs</code>: makes rule-to-lookup/helper input binding explicit without repeating lookup key construction or helper internal logic.</li>
+<li><code>from_lookup</code>: indicates that a target emit binds to a named field returned by a preceding <code>lookup_value</code> step.</li>
+<li><code>from_helper</code>: indicates that a target emit binds to a named field exposed by a preceding <code>invoke_helper</code> step.</li>
+</ul>
+<p>These op names and binding conventions are descriptive only. They are not executable runtime instructions.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

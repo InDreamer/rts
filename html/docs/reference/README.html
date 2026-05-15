@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reference Docs | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/README.md</p>
+      <h1>Reference Docs</h1>
+      <p>route RTS reference materials that support but do not override confirmed baseline</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/README.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要历史 rationale、OV 背景、检索原则、术语表或早期 Java 参考方案</li>
+<li>confirmed docs 指向参考材料以解释背景</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要当前 active baseline 或 Day1/Day2 实现方向</li>
+<li>需要 archived archaeology</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/README.html">Confirmed Docs</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>route RTS reference materials that support but do not override confirmed baseline</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This directory contains useful supporting materials for RTS, but it is not the default baseline for day-to-day alignment. Use these files when a task needs: Current convention:</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: domain / layer: 2</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card"><h3>完整来源</h3><p>这篇文档没有明显章节，请直接展开完整 Markdown 来源核对。</p></article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="reference-docs">Reference Docs<a class="headerlink" href="#reference-docs" title="Permanent link">#</a></h1>
+<p>This directory contains useful supporting materials for RTS, but it is not the default baseline for day-to-day alignment.</p>
+<p>Use these files when a task needs:</p>
+<ul>
+<li>RTS project background and pack/object model (<code>rts-project-background-and-pack-model.md</code>)</li>
+<li>RTS publication, refusal, trace, and release safety principles (<code>rts-publication-and-refusal-principles.md</code>)</li>
+<li>RTS retrieval principles distilled from OV/KB history (<code>rts-retrieval-principles.md</code>)</li>
+<li>RTS service interface and output principles (<code>rts-service-interface-and-output-principles.md</code>)</li>
+<li>distilled LLM-mediated query and harness reference for scope mediation, context, memory, controlled tool use, and analysis-expression boundaries (<code>llm-enhanced-index-and-harness-design-zh.md</code>)</li>
+<li>OV boundary rationale and adoption discussion</li>
+<li>distilled Java index/query layer reference summary (<code>java-index-layer-full-plan-zh.md</code>)</li>
+<li>retrieval semantics and scope-aware loading details</li>
+<li>external critique or proposal background</li>
+<li>AI token review rationale summary (<code>proposals/ai-token-review/README.md</code>)</li>
+<li>a Chinese glossary of current project terms and examples (<code>project-keywords-glossary-zh.md</code>)</li>
+</ul>
+<p>Current convention:</p>
+<ul>
+<li>Treat <code>docs/confirmed/project-alignment-summary-zh.md</code> as the first alignment entry.</li>
+<li>Reference docs are non-normative support material: they may preserve rationale, guardrails, or terminology, but confirmed docs and runtime/API docs own active behavior contracts.</li>
+<li>Interpret every reference doc under the confirmed dual-core baseline: RTS is both a controlled truth-source atomic capability service and a managed LLM agent analysis service.</li>
+<li>Reference docs may preserve historical reasoning, but they must not be used to demote AI into mere answer organization or to redefine deterministic capability as the only real product identity.</li>
+<li><code>rts-project-background-and-pack-model.md</code> is the current reference for historical sample context and pack/object shape.</li>
+<li><code>rts-publication-and-refusal-principles.md</code> is the current RTS-owned publication/refusal/trace safety reference.</li>
+<li><code>rts-retrieval-principles.md</code> is the current RTS-owned retrieval principle document.</li>
+<li><code>rts-service-interface-and-output-principles.md</code> is the current RTS-owned API/MCP/output quality reference, but only as support for the confirmed baseline.</li>
+<li><code>llm-enhanced-index-and-harness-design-zh.md</code> is the distilled harness/reference doc. It should be read as support for controlled analysis-and-expression over stable truth-source atomic capabilities, not as a competing product stance.</li>
+<li>OV-related documents here are historical/reference thinking, not a final engineering baseline.</li>
+<li><code>java-index-layer-full-plan-zh.md</code> is the distilled Java index/query layer reference. The full historical plan lives in archive and is not a current infrastructure commitment.</li>
+<li><code>external-review-final-2026-04-20.md</code> is a historical critique that motivated confirmed contracts.</li>
+<li><code>proposals/ai-token-review/README.md</code> is a consolidated historical rationale summary. It preserves guardrails, not the active product thesis.</li>
+<li>Do not treat older proposals or handoff notes as overriding the confirmed docs.</li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

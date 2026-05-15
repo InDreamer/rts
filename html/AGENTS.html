@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AGENTS | RTS 来源解读</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="architecture.html">架构边界</a>
+      <a class="nav-link" href="library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Agent Guide · AGENTS.md</p>
+      <h1>AGENTS</h1>
+      <p>coding-agent document index and active development navigation for RTS</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../AGENTS.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>coding agent starts work in this repository</li>
+<li>need confirmed document reading order</li>
+<li>need repository-specific edit and archaeology boundaries</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>user only needs the public README route</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="docs/confirmed/README.html">Confirmed Docs</a><a href="docs/confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>coding-agent document index and active development navigation for RTS</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This file is the primary document index for future development work in this repository. Default rule: Read these in order: 1.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Agent Guide / role: agent / layer: 1</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Purpose</h3>
+          <p>This file is the primary document index for future development work in this repository. Default rule: Read only the confirmed documents listed below unless the task is explicitly about operational usage or historical rat</p>
+        </article>
+<article class="chapter-card">
+          <h3>Confirmed Docs</h3>
+          <p>Read these in order: 1. docs/confirmed/project-alignment-summary-zh.md 2. docs/confirmed/system-constitution-v1.md 3. docs/confirmed/kb-to-index-projection-contract-zh.md</p>
+        </article>
+<article class="chapter-card">
+          <h3>Reference Docs</h3>
+          <p>Open these only when needed: docs/reference/README.md Use when you need support materials that explain rationale, glossary terms, retrieval principles, or historical design tradeoffs without overriding confirmed baseline</p>
+        </article>
+<article class="chapter-card">
+          <h3>Operational Docs</h3>
+          <p>Open these when the task is about running or calling the local service rather than changing architecture: docs/java-service-runbook-zh.md Use for local startup, config, testing, troubleshooting, and admin/runtime operati</p>
+        </article>
+<article class="chapter-card">
+          <h3>Archived Material</h3>
+          <p>Do not read by default: docs/archive archive/python-mvp-2026-04-20 These locations contain: historical discussion legacy navigation files archived prototype material</p>
+        </article>
+<article class="chapter-card">
+          <h3>Active Direction</h3>
+          <p>The active implementation path is: JDK 17 Java query/index service RTS-controlled truth layer and stable atomic capability surface managed LLM harness inside RTS plus external tool mode for outside agents</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="agents">AGENTS<a class="headerlink" href="#agents" title="Permanent link">#</a></h1>
+<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">#</a></h2>
+<p>This file is the primary document index for future development work in this repository.</p>
+<p>Default rule:</p>
+<ul>
+<li>Read only the confirmed documents listed below unless the task is explicitly about operational usage or historical rationale.</li>
+<li>Use reference documents only when the task explicitly needs supporting rationale, terminology, retrieval background, or historical tradeoffs.</li>
+<li>Ignore archived material unless the user explicitly asks for archaeology.</li>
+</ul>
+<h2 id="confirmed-docs">Confirmed Docs<a class="headerlink" href="#confirmed-docs" title="Permanent link">#</a></h2>
+<p>Read these in order:</p>
+<ol>
+<li><a href="docs/confirmed/project-alignment-summary-zh.html">docs/confirmed/project-alignment-summary-zh.md</a></li>
+<li><a href="docs/confirmed/system-constitution-v1.html">docs/confirmed/system-constitution-v1.md</a></li>
+<li><a href="docs/confirmed/kb-to-index-projection-contract-zh.html">docs/confirmed/kb-to-index-projection-contract-zh.md</a></li>
+<li><a href="docs/confirmed/runtime-projection-product-guide-zh.html">docs/confirmed/runtime-projection-product-guide-zh.md</a></li>
+<li><a href="docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html">docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md</a></li>
+<li><a href="docs/confirmed/internal-llm-agent-service-implementation-plan-zh.html">docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md</a></li>
+<li><a href="docs/confirmed/day1-query-service-and-llm-harness-plan-zh.html">docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md</a></li>
+<li><a href="docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.html">docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md</a></li>
+<li><a href="docs/confirmed/final-llm-agent-service-plan-zh.html">docs/confirmed/final-llm-agent-service-plan-zh.md</a></li>
+<li><a href="docs/confirmed/document-decision-register-zh.html">docs/confirmed/document-decision-register-zh.md</a></li>
+</ol>
+<p>These documents are the active development baseline.</p>
+<p>Read them with this mental model:</p>
+<ul>
+<li>RTS is a <strong>dual-core stack</strong>: a controlled truth-source atomic capability service and a managed LLM agent analysis service.</li>
+<li>AI is a <strong>controlled analysis-and-expression layer</strong>, not an answer organizer.</li>
+<li>deterministic capability is first-class, but AI-centric scenario services treat managed analysis as the normal product mode.</li>
+<li>when LLM is unavailable, scenario behavior degrades to structured information provision; that degraded mode does not redefine the product identity.</li>
+<li>candidate-only and human decision boundaries are authority boundaries, not ceilings on analysis depth.</li>
+</ul>
+<p>For first implementation work, understand the dual-core positioning and truth boundaries before reading Day1/Day2 execution details. Read the runtime projection product guide when explaining the runtime package to PMs, product owners, integrators, or agents without needing exact field contracts. Read the LLM harness and agent integration alignment note when deciding whether capability belongs in managed mode, tool mode, or both. Read the internal LLM agent implementation plan when changing service contracts, tool orchestration, scenario endpoints, memory/context, evaluation, or rollout controls. Read Day1 and Day2 when deciding phased implementation order. Read the final roadmap when checking long-range direction rather than current authority. Read the decision register when continuing documentation cleanup or deciding what historical material to retain, compress, archive, or delete.</p>
+<p>For conflicts inside confirmed docs, use the topic-specific authority table in <a href="docs/confirmed/README.html">docs/confirmed/README.md</a>; dates and wording emphasis do not set precedence.</p>
+<h2 id="reference-docs">Reference Docs<a class="headerlink" href="#reference-docs" title="Permanent link">#</a></h2>
+<p>Open these only when needed:</p>
+<ul>
+<li><a href="docs/reference/README.html">docs/reference/README.md</a>
+  Use when you need support materials that explain rationale, glossary terms, retrieval principles, or historical design tradeoffs without overriding confirmed baseline.</li>
+<li><a href="docs/reference/ov-boundary-and-adoption.html">docs/reference/ov-boundary-and-adoption.md</a>
+  Use for OV boundary questions and what was intentionally borrowed or excluded.</li>
+<li><a href="docs/reference/ov-kb-retrieval-design.html">docs/reference/ov-kb-retrieval-design.md</a>
+  Use for L0/L1/L2 semantics and retrieval behavior reference.</li>
+<li><a href="docs/reference/java-index-layer-full-plan-zh.html">docs/reference/java-index-layer-full-plan-zh.md</a>
+  Use for the distilled Java index/query layer reference summary; the full historical plan is archived.</li>
+<li><a href="docs/reference/minimal-ov-integration.html">docs/reference/minimal-ov-integration.md</a>
+  Use for historical scope guardrails.</li>
+</ul>
+<h2 id="operational-docs">Operational Docs<a class="headerlink" href="#operational-docs" title="Permanent link">#</a></h2>
+<p>Open these when the task is about running or calling the local service rather than changing architecture:</p>
+<ul>
+<li><a href="docs/java-service-runbook-zh.html">docs/java-service-runbook-zh.md</a>
+  Use for local startup, config, testing, troubleshooting, and admin/runtime operations.</li>
+<li><a href="docs/api-caller-guide-zh.html">docs/api-caller-guide-zh.md</a>
+  Use for REST API requests, response fields, scope, warnings, refusal handling, deterministic truth/information queries, and managed analysis requests.</li>
+</ul>
+<h2 id="archived-material">Archived Material<a class="headerlink" href="#archived-material" title="Permanent link">#</a></h2>
+<p>Do not read by default:</p>
+<ul>
+<li><a href="../docs/archive">docs/archive</a></li>
+<li><span class="missing-link" title="Missing local target: archive/python-mvp-2026-04-20">archive/python-mvp-2026-04-20</span></li>
+</ul>
+<p>These locations contain:</p>
+<ul>
+<li>historical discussion</li>
+<li>legacy navigation files</li>
+<li>archived prototype material</li>
+<li>the Python MVP and its sample data</li>
+</ul>
+<p>They are not part of the active implementation path.</p>
+<h2 id="active-direction">Active Direction<a class="headerlink" href="#active-direction" title="Permanent link">#</a></h2>
+<p>The active implementation path is:</p>
+<ul>
+<li>JDK 17 Java query/index service</li>
+<li>RTS-controlled truth layer and stable atomic capability surface</li>
+<li>managed LLM harness inside RTS plus external tool mode for outside agents</li>
+<li>deterministic capability as first-class substrate</li>
+<li>scenario services whose normal product mode is managed analysis</li>
+<li>degraded information-service behavior when LLM is unavailable</li>
+<li>no OpenViking runtime dependency</li>
+<li>no active Python MVP development</li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="assets/app.js"></script>
+</body>
+</html>

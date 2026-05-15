@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>External Review Constraints Summary | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/external-review-final-2026-04-20.md</p>
+      <h1>External Review Constraints Summary</h1>
+      <p>distilled external review constraints for projection release, lifecycle, conflict, trace, permission, and refusal</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/external-review-final-2026-04-20.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要理解 projection/refusal/release constraints 的历史动机</li>
+<li>需要快速查看 external review 提炼出的 P0/P1/P2 约束</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要当前 active baseline 或实现计划</li>
+<li>需要完整 external review 原文</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a><a href="../confirmed/system-constitution-v1.html">RTS Constitution v2</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>distilled external review constraints for projection release, lifecycle, conflict, trace, permission, and refusal</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：distilled reference &gt; 原完整原文：docs/archive/reference-proposals/external-review-final-2026-04-20.md RTS 方向正确，但必须把原则变成硬工程约束：projection release、lifecycle、admission granularity、conflict/precedence、refusal、trace、permission 和 operational failure 都不能靠实现者自由解释。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>One-Line Conclusion</h3>
+          <p>RTS 方向正确，但必须把原则变成硬工程约束：projection release、lifecycle、admission granularity、conflict/precedence、refusal、trace、permission 和 operational failure 都不能靠实现者自由解释。</p>
+        </article>
+<article class="chapter-card">
+          <h3>P0 Constraints</h3>
+          <p>1. Projection artifact must be a release unit Include source revision, projection schema version, generated/released metadata, activation state, supersession/rollback identity.</p>
+        </article>
+<article class="chapter-card">
+          <h3>P1/P2 Constraints</h3>
+          <p>L0/L1/card summaries are governed navigation outputs, not unchecked text. Retrieval route should be deterministic narrowing -&gt; navigation -&gt; L2 read before any vector/rerank path.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Common Misimplementations To Avoid</h3>
+          <p>Mutable “latest projection” records instead of immutable release artifacts. Object-level partial releases accidentally becoming default. Vector/rerank used before deterministic scope narrowing.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Current Mapping</h3>
+          <p>Most of these concerns now live in: runtime projection contract Day1 refusal and trace rules service constitution final LLM agent roadmap Use the archived full review only when you need the original risk rationale and co</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="external-review-constraints-summary">External Review Constraints Summary<a class="headerlink" href="#external-review-constraints-summary" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：distilled reference
+原完整原文：<code>docs/archive/reference-proposals/external-review-final-2026-04-20.md</code></p>
+</blockquote>
+<h2 id="one-line-conclusion">One-Line Conclusion<a class="headerlink" href="#one-line-conclusion" title="Permanent link">#</a></h2>
+<p>RTS 方向正确，但必须把原则变成硬工程约束：projection release、lifecycle、admission granularity、conflict/precedence、refusal、trace、permission 和 operational failure 都不能靠实现者自由解释。</p>
+<h2 id="p0-constraints">P0 Constraints<a class="headerlink" href="#p0-constraints" title="Permanent link">#</a></h2>
+<ol>
+<li>
+<p><strong>Projection artifact must be a release unit</strong>
+   Include source revision, projection schema version, generated/released metadata, activation state, supersession/rollback identity.</p>
+</li>
+<li>
+<p><strong>Projection lifecycle must be immutable</strong>
+   Canonical changes create a new projection artifact and activate atomically. Never silently overwrite current truth surface.</p>
+</li>
+<li>
+<p><strong>Release admission granularity must be explicit</strong>
+   Phase-1 recommendation: no object enters released projection until the whole pack passes signoff.</p>
+</li>
+<li>
+<p><strong>Conflict/precedence must fail before release</strong>
+   Object id, target coverage, URI/address, COMMON/product override conflicts must not be resolved dynamically at query time.</p>
+</li>
+<li>
+<p><strong>Refusal contract must be formal</strong>
+   Refuse or ask clarification when scope unresolved, active artifact missing/ambiguous, conflicts remain, dependencies unreleased, permission insufficient, or only summaries exist without L2.</p>
+</li>
+</ol>
+<h2 id="p1p2-constraints">P1/P2 Constraints<a class="headerlink" href="#p1p2-constraints" title="Permanent link">#</a></h2>
+<ul>
+<li>L0/L1/card summaries are governed navigation outputs, not unchecked text.</li>
+<li>Retrieval route should be deterministic narrowing -&gt; navigation -&gt; L2 read before any vector/rerank path.</li>
+<li>Dependency hints should not rank, rerank, or expand retrieval scope without explicit purpose.</li>
+<li>Derived stores must be rebuildable and switch consistently with projection activation.</li>
+<li>Trace must connect canonical revision -&gt; projection artifact -&gt; query result.</li>
+<li>Permission boundaries and retrieval boundaries must align.</li>
+<li>Ambiguity reopen/close must create a new revision and reproject path.</li>
+<li>Canonical schema, projection schema, and summary/card schema versions should be separated.</li>
+<li>Failure playbook should cover failed publish, partial sync, rollback, and idempotent rebuild.</li>
+</ul>
+<h2 id="common-misimplementations-to-avoid">Common Misimplementations To Avoid<a class="headerlink" href="#common-misimplementations-to-avoid" title="Permanent link">#</a></h2>
+<ul>
+<li>Mutable “latest projection” records instead of immutable release artifacts.</li>
+<li>Object-level partial releases accidentally becoming default.</li>
+<li>Vector/rerank used before deterministic scope narrowing.</li>
+<li>L0/L1 summaries treated as fact owners.</li>
+<li>Canonical changes overwriting active projection in place.</li>
+</ul>
+<h2 id="current-mapping">Current Mapping<a class="headerlink" href="#current-mapping" title="Permanent link">#</a></h2>
+<p>Most of these concerns now live in:</p>
+<ul>
+<li>runtime projection contract</li>
+<li>Day1 refusal and trace rules</li>
+<li>service constitution</li>
+<li>final LLM agent roadmap</li>
+</ul>
+<p>Use the archived full review only when you need the original risk rationale and consequence analysis.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

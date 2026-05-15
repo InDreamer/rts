@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OV Boundary And Adoptable Surfaces | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/ov-boundary-and-adoption.md</p>
+      <h1>OV Boundary And Adoptable Surfaces</h1>
+      <p>define the clean boundary between the transformation rule system truth source and OpenViking, and list the safe surfaces to borrow</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/ov-boundary-and-adoption.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>the request is about whether OpenViking should be merged, adopted, or constrained</li>
+<li>the request is about conflict or alignment between the two system ideas</li>
+<li>the request is about what can be safely borrowed from OV</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>the request is only about the formal constitution text</li>
+<li>the request is already narrowed to the smallest OV integration plan</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="rts-project-background-and-pack-model.html">RTS Project Background and Pack Model</a><a href="ov-boundary-and-adoption.html">OV Boundary And Adoptable Surfaces</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>define the clean boundary between the transformation rule system truth source and OpenViking, and list the safe surfaces to borrow</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This document draws the boundary between the Transformation Rule System and OpenViking. It explains where the two ideas align, where they conflict, and which OV capabilities are worth borrowing without giving up truth-source control.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>What This Covers</h3>
+          <p>This document draws the boundary between the Transformation Rule System and OpenViking. It explains where the two ideas align, where they conflict, and which OV capabilities are worth borrowing without giving up truth-so</p>
+        </article>
+<article class="chapter-card">
+          <h3>Source Boundaries</h3>
+          <p>docs/reference/rts-project-background-and-pack-model.md — defines the governed pack model and historical sample context. This document — defines the conceptual boundary and adoption posture.</p>
+        </article>
+<article class="chapter-card">
+          <h3>First Principle</h3>
+          <p>The two systems are not peers solving the same problem. The Transformation Rule System decides what is true. OpenViking decides how an agent finds and loads context.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Where The Ideas Align</h3>
+          <p>Neither system wants the LLM to ingest arbitrary source material without shape. Both benefit from explicit object boundaries and discoverable organization. Your system already wants AI-readable and low-noise navigation. </p>
+        </article>
+<article class="chapter-card">
+          <h3>Where The Ideas Conflict</h3>
+          <p>Your system is a governed truth source. OV is a generalized context database. A context database does not inherently understand what counts as canonical banking truth.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Hard Boundary</h3>
+          <p>canonical pack storage canonical schema evolution evidence requirements review structure ambiguity state signoff state approval state final truth determination whether a rule is authoritative</p>
+        </article>
+<article class="chapter-card">
+          <h3>Safe OV Surfaces To Borrow</h3>
+          <p>Borrow the idea of stable addressable nodes for: pack rule lookup helper The exact URI syntax may be yours, but the addressability discipline is worth copying. Evidence, review, and reports may keep identifiers on the go</p>
+        </article>
+<article class="chapter-card">
+          <h3>OV Surfaces That Should Stay Out Of Canonical Truth</h3>
+          <p>Session memory may help future work, but it must not be allowed to redefine pack truth. Useful for runtime agents, dangerous for a banking truth source if not isolated. Extracted memories are too soft to be treated as ca</p>
+        </article>
+<article class="chapter-card">
+          <h3>Recommended Relationship</h3>
+          <p>The right relationship is not system merger. It is layered responsibility: truth-source layer: Transformation Rule System projection layer: controlled export of approved runtime objects only: rules, lookups, helpers, plu</p>
+        </article>
+<article class="chapter-card">
+          <h3>Architecture Asset</h3>
+          <p>Open the boundary architecture asset for the visual version of this layering model: docs/archive/assets/ov-truth-boundary.html</p>
+        </article>
+<article class="chapter-card">
+          <h3>Final Position</h3>
+          <p>Use OV as a retrieval and context-loading shell. Do not use OV as the owner of canonical transformation truth. The Transformation Rule System should remain the court of record. OV may act as the librarian.</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="ov-boundary-and-adoptable-surfaces">OV Boundary And Adoptable Surfaces<a class="headerlink" href="#ov-boundary-and-adoptable-surfaces" title="Permanent link">#</a></h1>
+<h2 id="what-this-covers">What This Covers<a class="headerlink" href="#what-this-covers" title="Permanent link">#</a></h2>
+<p>This document draws the boundary between the Transformation Rule System and OpenViking. It explains where the two ideas align, where they conflict, and which OV capabilities are worth borrowing without giving up truth-source control.</p>
+<h2 id="source-boundaries">Source Boundaries<a class="headerlink" href="#source-boundaries" title="Permanent link">#</a></h2>
+<ul>
+<li><code>docs/reference/rts-project-background-and-pack-model.md</code> — defines the governed pack model and historical sample context.</li>
+<li>This document — defines the conceptual boundary and adoption posture.</li>
+</ul>
+<h2 id="first-principle">First Principle<a class="headerlink" href="#first-principle" title="Permanent link">#</a></h2>
+<p>The two systems are not peers solving the same problem.</p>
+<ul>
+<li>The Transformation Rule System decides <strong>what is true</strong>.</li>
+<li>OpenViking decides <strong>how an agent finds and loads context</strong>.</li>
+</ul>
+<p>That difference must stay intact.</p>
+<h2 id="where-the-ideas-align">Where The Ideas Align<a class="headerlink" href="#where-the-ideas-align" title="Permanent link">#</a></h2>
+<h3 id="1-both-prefer-structured-knowledge-over-raw-dumps">1. Both Prefer Structured Knowledge Over Raw Dumps<a class="headerlink" href="#1-both-prefer-structured-knowledge-over-raw-dumps" title="Permanent link">#</a></h3>
+<p>Neither system wants the LLM to ingest arbitrary source material without shape. Both benefit from explicit object boundaries and discoverable organization.</p>
+<h3 id="2-both-need-progressive-reading">2. Both Need Progressive Reading<a class="headerlink" href="#2-both-need-progressive-reading" title="Permanent link">#</a></h3>
+<p>Your system already wants AI-readable and low-noise navigation. OV's layered reading model reinforces the same instinct: navigate first, dive later.</p>
+<h3 id="3-both-benefit-from-stable-addresses">3. Both Benefit From Stable Addresses<a class="headerlink" href="#3-both-benefit-from-stable-addresses" title="Permanent link">#</a></h3>
+<p>Your packs and runtime objects naturally want stable identifiers. OV's URI model is useful here because it turns knowledge traversal into an explicit path problem instead of a vague search problem. In the current narrowed runtime projection, the first-phase addressable nodes are pack, rule, lookup, and helper.</p>
+<h3 id="4-both-need-context-retrieval-to-be-inspectable">4. Both Need Context Retrieval To Be Inspectable<a class="headerlink" href="#4-both-need-context-retrieval-to-be-inspectable" title="Permanent link">#</a></h3>
+<p>You care about explainability because banking truth matters. OV's resource tree, relations, and layered retrieval support that same preference for visible structure.</p>
+<h2 id="where-the-ideas-conflict">Where The Ideas Conflict<a class="headerlink" href="#where-the-ideas-conflict" title="Permanent link">#</a></h2>
+<h3 id="1-truth-source-versus-context-container">1. Truth Source Versus Context Container<a class="headerlink" href="#1-truth-source-versus-context-container" title="Permanent link">#</a></h3>
+<p>Your system is a governed truth source. OV is a generalized context database. A context database does not inherently understand what counts as canonical banking truth.</p>
+<h3 id="2-governance-lifecycle-versus-runtime-lifecycle">2. Governance Lifecycle Versus Runtime Lifecycle<a class="headerlink" href="#2-governance-lifecycle-versus-runtime-lifecycle" title="Permanent link">#</a></h3>
+<p>Your system revolves around authoring, review, signoff, ambiguity, and approval. OV revolves around resource ingestion, retrieval, session commit, and runtime memory.</p>
+<h3 id="3-frozen-canonical-pack-versus-evolving-runtime-memory">3. Frozen Canonical Pack Versus Evolving Runtime Memory<a class="headerlink" href="#3-frozen-canonical-pack-versus-evolving-runtime-memory" title="Permanent link">#</a></h3>
+<p>Your completed pack should stabilize into goldensource. OV includes session and memory flows that are intentionally dynamic. That is useful for runtime learning but dangerous near canonical rule content.</p>
+<h3 id="4-explicit-ambiguity-versus-convenience-retrieval">4. Explicit Ambiguity Versus Convenience Retrieval<a class="headerlink" href="#4-explicit-ambiguity-versus-convenience-retrieval" title="Permanent link">#</a></h3>
+<p>Your system treats ambiguity as a first-class state. A generic retrieval platform may optimize for useful context delivery rather than strict uncertainty preservation unless that boundary is designed in.</p>
+<h2 id="hard-boundary">Hard Boundary<a class="headerlink" href="#hard-boundary" title="Permanent link">#</a></h2>
+<h3 id="the-transformation-rule-system-must-keep-control-of">The Transformation Rule System Must Keep Control Of<a class="headerlink" href="#the-transformation-rule-system-must-keep-control-of" title="Permanent link">#</a></h3>
+<ul>
+<li>canonical pack storage</li>
+<li>canonical schema evolution</li>
+<li>evidence requirements</li>
+<li>review structure</li>
+<li>ambiguity state</li>
+<li>signoff state</li>
+<li>approval state</li>
+<li>final truth determination</li>
+</ul>
+<h3 id="openviking-must-not-control">OpenViking Must Not Control<a class="headerlink" href="#openviking-must-not-control" title="Permanent link">#</a></h3>
+<ul>
+<li>whether a rule is authoritative</li>
+<li>whether missing evidence may be inferred away</li>
+<li>whether runtime observations rewrite canonical rules</li>
+<li>whether an ambiguous item is treated as resolved</li>
+</ul>
+<h2 id="safe-ov-surfaces-to-borrow">Safe OV Surfaces To Borrow<a class="headerlink" href="#safe-ov-surfaces-to-borrow" title="Permanent link">#</a></h2>
+<h3 id="1-uri-like-addressing">1. URI-Like Addressing<a class="headerlink" href="#1-uri-like-addressing" title="Permanent link">#</a></h3>
+<p>Borrow the idea of stable addressable nodes for:</p>
+<ul>
+<li>pack</li>
+<li>rule</li>
+<li>lookup</li>
+<li>helper</li>
+</ul>
+<p>The exact URI syntax may be yours, but the addressability discipline is worth copying. Evidence, review, and reports may keep identifiers on the governed side, but they are not first-phase OV runtime nodes.</p>
+<h3 id="2-layered-reading">2. Layered Reading<a class="headerlink" href="#2-layered-reading" title="Permanent link">#</a></h3>
+<p>Borrow the <code>navigate before full read</code> model:</p>
+<ul>
+<li>short pack abstract</li>
+<li>pack overview or navigation page</li>
+<li>detailed object content</li>
+</ul>
+<p>This is one of the highest-value, lowest-risk adoptions because it directly reduces noise and therefore reduces hallucination.</p>
+<h3 id="3-optional-lightweight-relations">3. Optional Lightweight Relations<a class="headerlink" href="#3-optional-lightweight-relations" title="Permanent link">#</a></h3>
+<p>If relation support is added later, start small:</p>
+<ul>
+<li>pack -&gt; object</li>
+<li>object -&gt; dependency</li>
+<li>pack -&gt; related pack</li>
+</ul>
+<p>Do not treat evidence or review linkage as a first-phase runtime requirement. The current design keeps relations as a deferred optimization rather than a prerequisite.</p>
+<h3 id="4-resource-projection">4. Resource Projection<a class="headerlink" href="#4-resource-projection" title="Permanent link">#</a></h3>
+<p>Borrow OV's resource ingestion and retrieval idea, but only for projected copies of approved packs, and only for stripped runtime objects: rules, lookups, and helpers. That gives agents a retrieval shell without relocating your truth source or replaying approval artifacts at runtime.</p>
+<h3 id="5-findsearch-split">5. Find/Search Split<a class="headerlink" href="#5-findsearch-split" title="Permanent link">#</a></h3>
+<p>Borrow the concept of:</p>
+<ul>
+<li>a cheaper deterministic lookup path for narrow questions</li>
+<li>a more context-aware retrieval path for broad task questions</li>
+</ul>
+<p>That split matches your need to avoid overloading every query with full semantic search.</p>
+<h2 id="ov-surfaces-that-should-stay-out-of-canonical-truth">OV Surfaces That Should Stay Out Of Canonical Truth<a class="headerlink" href="#ov-surfaces-that-should-stay-out-of-canonical-truth" title="Permanent link">#</a></h2>
+<h3 id="1-session-memory">1. Session Memory<a class="headerlink" href="#1-session-memory" title="Permanent link">#</a></h3>
+<p>Session memory may help future work, but it must not be allowed to redefine pack truth.</p>
+<h3 id="2-automatic-memory-extraction">2. Automatic Memory Extraction<a class="headerlink" href="#2-automatic-memory-extraction" title="Permanent link">#</a></h3>
+<p>Useful for runtime agents, dangerous for a banking truth source if not isolated. Extracted memories are too soft to be treated as canonical rule content.</p>
+<h3 id="3-runtime-skill-learning-as-truth-mutation">3. Runtime Skill Learning As Truth Mutation<a class="headerlink" href="#3-runtime-skill-learning-as-truth-mutation" title="Permanent link">#</a></h3>
+<p>Agent-learned shortcuts, habits, or prompt traces should remain runtime conveniences, not part of the canonical banking rule layer.</p>
+<h2 id="recommended-relationship">Recommended Relationship<a class="headerlink" href="#recommended-relationship" title="Permanent link">#</a></h2>
+<p>The right relationship is not system merger. It is layered responsibility:</p>
+<ul>
+<li><strong>truth-source layer</strong>: Transformation Rule System</li>
+<li><strong>projection layer</strong>: controlled export of approved runtime objects only: rules, lookups, helpers, plus L0/L1 summaries</li>
+<li><strong>retrieval layer</strong>: OV resource tree, layered summaries, optional lightweight dependency links, and bounded retrieval</li>
+<li><strong>runtime layer</strong>: agent sessions, tool use, and optional memory that never writes back to truth</li>
+</ul>
+<p>The boundary is one-way:</p>
+<ul>
+<li>pack truth may project into OV</li>
+<li>OV runtime state must not silently project back into pack truth</li>
+</ul>
+<h2 id="architecture-asset">Architecture Asset<a class="headerlink" href="#architecture-asset" title="Permanent link">#</a></h2>
+<p>Open the boundary architecture asset for the visual version of this layering model:</p>
+<ul>
+<li><code>docs/archive/assets/ov-truth-boundary.html</code></li>
+</ul>
+<h2 id="final-position">Final Position<a class="headerlink" href="#final-position" title="Permanent link">#</a></h2>
+<p>Use OV as a retrieval and context-loading shell.</p>
+<p>Do not use OV as the owner of canonical transformation truth.</p>
+<p>The Transformation Rule System should remain the court of record. OV may act as the librarian.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

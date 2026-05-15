@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Retrieval Principles | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/rts-retrieval-principles.md</p>
+      <h1>RTS Retrieval Principles</h1>
+      <p>RTS retrieval principles distilled from archived OV/KB discussions, expressed without making OV the engineering baseline</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/rts-retrieval-principles.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要理解 RTS 如何降低检索误召回和 AI 幻觉</li>
+<li>需要设计 API/MCP/Q&amp;A/agent 的读取顺序</li>
+<li>需要区分普通 runtime view 和权限化 evidence/review access</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要项目最高层总纲</li>
+<li>只需要 OV 历史实现细节</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="../confirmed/system-constitution-v1.html">RTS Constitution v2</a><a href="ov-kb-retrieval-design.html">OV Retrieval Lessons Summary</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>RTS retrieval principles distilled from archived OV/KB discussions, expressed without making OV the engineering baseline</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This document keeps the useful retrieval ideas from the archived OV/KB discussions without making OpenViking the RTS engineering baseline. Retrieval systems are librarians.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. Retrieval Is Not Truth</h3>
+          <p>Retrieval systems are librarians. They may help callers find and load governed truth, but they must not decide what is true, certify ambiguity, or write runtime learning back into canonical truth.</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Scope First, Content Later</h3>
+          <p>RTS should narrow scope before reading details. Preferred order: 1. identify source-target channel 2. identify product or domain area 3. identify pack 4. identify rule / lookup / helper</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. L0 / L1 / L2 Are Precision Views</h3>
+          <p>L0, L1, and L2 are not directory levels. They are different precision views of the same resource. L0: very short abstract used for cheap recall and scope filtering</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. L1 Is A Safety Layer, Not Documentation Decoration</h3>
+          <p>L1 quality determines whether the system can filter plausible but wrong candidates. A good L1 should help answer: what this channel/product/pack covers which rules/lookups/helpers are included</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. URI-Like Stable Addressing Is Preferred</h3>
+          <p>RTS should prefer stable, URI-like object addressing for service use. The exact scheme can evolve, but the address should be: stable across service calls reversible to channel/product/pack/object</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Runtime View Should Be Low-Noise But Not Blind</h3>
+          <p>Ordinary runtime retrieval should be low-noise. It should not dump all evidence, review notes, reports, and historical discussion into every AI context. However, RTS as a truth service must still support permissioned acc</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Generated Summaries Need Governance</h3>
+          <p>L0 and L1 can be AI-assisted, but governed content must not rely on unreviewed automatic summaries when precision matters. For high-trust rule use, L0/L1 should be versioned, reproducible, and reviewable enough that retr</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. OV Is A Reference Pattern Only</h3>
+          <p>OpenViking influenced these retrieval ideas: layered reading stable resource addressing scoped retrieval low-noise context loading RTS may borrow these ideas, but OV is not the truth owner and is not the required runtime</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-retrieval-principles">RTS Retrieval Principles<a class="headerlink" href="#rts-retrieval-principles" title="Permanent link">#</a></h1>
+<p>This document keeps the useful retrieval ideas from the archived OV/KB discussions without making OpenViking the RTS engineering baseline.</p>
+<h2 id="1-retrieval-is-not-truth">1. Retrieval Is Not Truth<a class="headerlink" href="#1-retrieval-is-not-truth" title="Permanent link">#</a></h2>
+<p>Retrieval systems are librarians.</p>
+<p>They may help callers find and load governed truth, but they must not decide what is true, certify ambiguity, or write runtime learning back into canonical truth.</p>
+<p>Every retrieval result should point back to governed RTS objects: rule, pack, evidence, review/adjudication state, and publication state.</p>
+<h2 id="2-scope-first-content-later">2. Scope First, Content Later<a class="headerlink" href="#2-scope-first-content-later" title="Permanent link">#</a></h2>
+<p>RTS should narrow scope before reading details.</p>
+<p>Preferred order:</p>
+<ol>
+<li>identify source-target channel</li>
+<li>identify product or domain area</li>
+<li>identify pack</li>
+<li>identify rule / lookup / helper</li>
+<li>load original object and authorized supporting context</li>
+</ol>
+<p>This is a safety principle, not only a performance optimization. Similar rules from the wrong channel or product can be more dangerous than no result.</p>
+<h2 id="3-l0-l1-l2-are-precision-views">3. L0 / L1 / L2 Are Precision Views<a class="headerlink" href="#3-l0-l1-l2-are-precision-views" title="Permanent link">#</a></h2>
+<p>L0, L1, and L2 are not directory levels. They are different precision views of the same resource.</p>
+<ul>
+<li><strong>L0</strong>: very short abstract used for cheap recall and scope filtering</li>
+<li><strong>L1</strong>: structured overview used for rerank, disambiguation, and navigation</li>
+<li><strong>L2</strong>: structured runtime object or authorized governed source needed for final answer</li>
+</ul>
+<p>RTS should avoid sending L2 content to AI before scope and candidate relevance are clear.</p>
+<p>L0/L1 are index views, not replacements for L2. L2 should not be reduced to a natural-language summary when the service needs structured rule logic, target bindings, lookup behavior, helper contracts, examples, warnings, or grounding metadata.</p>
+<h2 id="4-l1-is-a-safety-layer-not-documentation-decoration">4. L1 Is A Safety Layer, Not Documentation Decoration<a class="headerlink" href="#4-l1-is-a-safety-layer-not-documentation-decoration" title="Permanent link">#</a></h2>
+<p>L1 quality determines whether the system can filter plausible but wrong candidates.</p>
+<p>A good L1 should help answer:</p>
+<ul>
+<li>what this channel/product/pack covers</li>
+<li>which rules/lookups/helpers are included</li>
+<li>what dependencies matter</li>
+<li>whether the user question is outside this scope</li>
+<li>what known ambiguity or state constraints affect use</li>
+</ul>
+<p>Weak L1 turns retrieval into noisy similarity search. Strong L1 helps prevent cross-pack and cross-product contamination.</p>
+<h2 id="5-uri-like-stable-addressing-is-preferred">5. URI-Like Stable Addressing Is Preferred<a class="headerlink" href="#5-uri-like-stable-addressing-is-preferred" title="Permanent link">#</a></h2>
+<p>RTS should prefer stable, URI-like object addressing for service use.</p>
+<p>The exact scheme can evolve, but the address should be:</p>
+<ul>
+<li>stable across service calls</li>
+<li>reversible to channel/product/pack/object</li>
+<li>usable in API/MCP/Q&amp;A/pipeline responses</li>
+<li>traceable in audit logs</li>
+<li>independent from model-generated prose</li>
+</ul>
+<p>Examples may use URI-like forms, but the constitutional requirement is stable, traceable object identity.</p>
+<h2 id="6-runtime-view-should-be-low-noise-but-not-blind">6. Runtime View Should Be Low-Noise But Not Blind<a class="headerlink" href="#6-runtime-view-should-be-low-noise-but-not-blind" title="Permanent link">#</a></h2>
+<p>Ordinary runtime retrieval should be low-noise. It should not dump all evidence, review notes, reports, and historical discussion into every AI context.</p>
+<p>However, RTS as a truth service must still support permissioned access to evidence, review state, conflict records, and adjudication records when the caller is allowed and the task requires it.</p>
+<p>Therefore the adjusted principle is:</p>
+<ul>
+<li>default operational view: focused rules / lookups / helpers / essential metadata and allowed risk or governance summaries</li>
+<li>authorized explanation or governance view: evidence, review, reports, conflict, adjudication, and publication state can be expanded through permissioned projection views</li>
+</ul>
+<p>This replaces the older absolute rule that evidence/review/reports never enter runtime.</p>
+<p>The distinction is view and permission control, not human-readable KB versus machine-readable projection. Both KB and projection should be machine-first structures.</p>
+<h2 id="7-generated-summaries-need-governance">7. Generated Summaries Need Governance<a class="headerlink" href="#7-generated-summaries-need-governance" title="Permanent link">#</a></h2>
+<p>L0 and L1 can be AI-assisted, but governed content must not rely on unreviewed automatic summaries when precision matters.</p>
+<p>For high-trust rule use, L0/L1 should be versioned, reproducible, and reviewable enough that retrieval behavior can be explained later.</p>
+<h2 id="8-ov-is-a-reference-pattern-only">8. OV Is A Reference Pattern Only<a class="headerlink" href="#8-ov-is-a-reference-pattern-only" title="Permanent link">#</a></h2>
+<p>OpenViking influenced these retrieval ideas:</p>
+<ul>
+<li>layered reading</li>
+<li>stable resource addressing</li>
+<li>scoped retrieval</li>
+<li>low-noise context loading</li>
+</ul>
+<p>RTS may borrow these ideas, but OV is not the truth owner and is not the required runtime baseline.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM-Mediated Query And Harness Reference | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/llm-enhanced-index-and-harness-design-zh.md</p>
+      <h1>LLM-Mediated Query And Harness Reference</h1>
+      <p>distilled LLM-mediated RTS query and harness reference for scope mediation, context, memory, and controlled tool use</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/llm-enhanced-index-and-harness-design-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要从旧 LLM-enhanced index/harness 讨论中提取仍适用的设计原则</li>
+<li>需要设计 scope mediation、context management、memory boundary 或 controlled harness 增强</li>
+<li>需要理解 OpenViking、mem0、PageIndex 对 RTS 可借鉴但不可照搬的部分</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要当前 Day1 代码行为</li>
+<li>需要最终 LLM agent service 路线图</li>
+<li>需要完整历史讨论原文</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/day1-query-service-and-llm-harness-plan-zh.html">RTS Day1 Query Service And Controlled LLM Harness</a><a href="../confirmed/day2-agentic-retrieval-evolution-plan-zh.html">RTS Day2 Controlled Agentic Retrieval Roadmap</a><a href="../confirmed/final-llm-agent-service-plan-zh.html">RTS Final LLM Agent Service Roadmap</a><a href="../confirmed/llm-harness-and-agent-integration-alignment-zh.html">RTS LLM Harness And Agent Integration Alignment</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>distilled LLM-mediated RTS query and harness reference for scope mediation, context, memory, and controlled tool use</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：distilled reference &gt; 压缩日期：2026-05-08 &gt; 原完整长版：docs/archive/reference-proposals/llm-enhanced-index-and-harness-design-zh.md &gt; 目的：保留 LLM 如何增强 RTS query/index/harness 的实用原则，删除与 final roadmap、Day1/Day2 和 alignment note 重叠的长讨论。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. Current Boundary</h3>
+          <p>LLM 应位于用户和 RTS tools 之间，而不是位于 truth core 之内。 推荐心智模型： LLM 可以猜测 intent、候选 scope、术语扩展、读取顺序和答案表达。RTS 必须验证 scope、permission、release、L2 hash、grounding、refusal 和 trace。</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Scope Mediation Is First Priority</h3>
+          <p>当前最大风险不是语义召回不够高级，而是用户问题模糊时拿错 scope。 用户常问： LLM 不应在 scope 不明确时直接跨 pack 搜索并硬答。目标行为： 1. 从 UI/workspace/session context 找默认 scope。 2. 无默认 scope 时调用 scope/navigation 工具找候选。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Query Plan Before Tool Calls</h3>
+          <p>LLM 应把自然语言问题转换成结构化 query plan，再由 controlled harness 执行。 query plan 可以包含： intent scope candidates object type preference business terms expanded terms clarification requirement</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Controlled Harness</h3>
+          <p>Controlled harness 不是自由 agent。它应是 schema-constrained plan 或有限状态机。 推荐执行顺序： 必须约束： allowlisted tools only schema-constrained tool arguments tool call budget L2 read budget</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. Tool Surface To Add Over Time</h3>
+          <p>Day1 已有或接近已有： resolve_scope find_objects get_object_card read_object_l2 get_dependencies 后续可补： list_scopes search_scopes get_scope_summary get_pack_navigation find_confusable_objects</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Context Management</h3>
+          <p>RTS 需要 context management，但 context 不拥有 truth。 上下文类型： Context window 顺序： 上下文管理器必须去重、控制 L2 数量、控制 dependency depth、保留 URI/trace、区分 facts/inferences/unknowns，并避免把 session memory 混进事实上下文。</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Memory Boundary</h3>
+          <p>RTS agent 可以有 memory，但 memory 只能提升体验和检索质量，不能成为 truth。 允许： current scope user-selected candidate previous object current language preference workspace default channel/product</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. Lessons From OV, mem0, And PageIndex</h3>
+          <p>可借鉴： OpenViking: session/context memory 分类、tool call trace 可形成检索质量反馈。 mem0: memory isolation、filter/scope before recall、optional rerank after gated candidates。 PageIndex: metadata/structure first, tight read later;少工具、强结</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. Decision</h3>
+          <p>For current implementation priority, use the confirmed Day1/Day2 plans and the LLM harness alignment note. Use this reference only for design rationale around scope mediation, context, memory, and controlled tool orchest</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="llm-mediated-query-and-harness-reference">LLM-Mediated Query And Harness Reference<a class="headerlink" href="#llm-mediated-query-and-harness-reference" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：distilled reference
+压缩日期：2026-05-08
+原完整长版：<code>docs/archive/reference-proposals/llm-enhanced-index-and-harness-design-zh.md</code>
+目的：保留 LLM 如何增强 RTS query/index/harness 的实用原则，删除与 final roadmap、Day1/Day2 和 alignment note 重叠的长讨论。</p>
+</blockquote>
+<h2 id="1-current-boundary">1. Current Boundary<a class="headerlink" href="#1-current-boundary" title="Permanent link">#</a></h2>
+<p>LLM 应位于用户和 RTS tools 之间，而不是位于 truth core 之内。</p>
+<p>推荐心智模型：</p>
+<pre><code class="language-text">user / external agent
+  -&gt; LLM mediation
+  -&gt; RTS controlled tools
+  -&gt; L2 truth read / dependency / authorized governance view
+  -&gt; controlled analysis and expression
+  -&gt; grounding validation and trace
+</code></pre>
+<p>LLM 可以猜测 intent、候选 scope、术语扩展、读取顺序和答案表达。RTS 必须验证 scope、permission、release、L2 hash、grounding、refusal 和 trace。</p>
+<h2 id="2-scope-mediation-is-first-priority">2. Scope Mediation Is First Priority<a class="headerlink" href="#2-scope-mediation-is-first-priority" title="Permanent link">#</a></h2>
+<p>当前最大风险不是语义召回不够高级，而是用户问题模糊时拿错 scope。</p>
+<p>用户常问：</p>
+<pre><code class="language-text">fixing time 怎么生成？
+NDF cutoff 怎么查？
+Cortex 是哪里来的？
+quoted currency pair 为什么反了？
+</code></pre>
+<p>LLM 不应在 scope 不明确时直接跨 pack 搜索并硬答。目标行为：</p>
+<ol>
+<li>从 UI/workspace/session context 找默认 scope。</li>
+<li>无默认 scope 时调用 scope/navigation 工具找候选。</li>
+<li>唯一高置信候选可以带说明补全。</li>
+<li>多个候选接近时要求用户选择。</li>
+<li>无候选时拒答或要求补充。</li>
+</ol>
+<p>建议工具：</p>
+<ul>
+<li><code>list_scopes</code></li>
+<li><code>search_scopes</code></li>
+<li><code>get_scope_summary</code></li>
+<li><code>get_pack_navigation</code></li>
+<li><code>find_confusable_scopes</code></li>
+</ul>
+<p>这些工具返回结构化 scope/navigation 信息，不返回大段自由文本。</p>
+<h2 id="3-query-plan-before-tool-calls">3. Query Plan Before Tool Calls<a class="headerlink" href="#3-query-plan-before-tool-calls" title="Permanent link">#</a></h2>
+<p>LLM 应把自然语言问题转换成结构化 query plan，再由 controlled harness 执行。</p>
+<p>query plan 可以包含：</p>
+<ul>
+<li>intent</li>
+<li>scope candidates</li>
+<li>object type preference</li>
+<li>business terms</li>
+<li>expanded terms</li>
+<li>clarification requirement</li>
+<li>allowed tool sequence</li>
+<li>max tool calls</li>
+<li>max dependency depth</li>
+</ul>
+<p>注意：expanded terms 只能用于检索，不能成为事实。</p>
+<h2 id="4-controlled-harness">4. Controlled Harness<a class="headerlink" href="#4-controlled-harness" title="Permanent link">#</a></h2>
+<p>Controlled harness 不是自由 agent。它应是 schema-constrained plan 或有限状态机。</p>
+<p>推荐执行顺序：</p>
+<pre><code class="language-text">resolve or clarify scope
+find candidate objects
+inspect object cards
+select object
+read L2
+optionally read dependency L2
+assemble grounded answer
+validate answer
+write trace
+</code></pre>
+<p>必须约束：</p>
+<ul>
+<li>allowlisted tools only</li>
+<li>schema-constrained tool arguments</li>
+<li>tool call budget</li>
+<li>L2 read budget</li>
+<li>dependency depth limit</li>
+<li>every ask writes trace</li>
+<li>final answer passes L2/dependency grounding validation</li>
+</ul>
+<h2 id="5-tool-surface-to-add-over-time">5. Tool Surface To Add Over Time<a class="headerlink" href="#5-tool-surface-to-add-over-time" title="Permanent link">#</a></h2>
+<p>Day1 已有或接近已有：</p>
+<ul>
+<li><code>resolve_scope</code></li>
+<li><code>find_objects</code></li>
+<li><code>get_object_card</code></li>
+<li><code>read_object_l2</code></li>
+<li><code>get_dependencies</code></li>
+</ul>
+<p>后续可补：</p>
+<ul>
+<li><code>list_scopes</code></li>
+<li><code>search_scopes</code></li>
+<li><code>get_scope_summary</code></li>
+<li><code>get_pack_navigation</code></li>
+<li><code>find_confusable_objects</code></li>
+<li><code>read_lookup_sample</code></li>
+<li><code>read_pack_status</code></li>
+</ul>
+<p>工具输出必须结构化；human-readable answer 由 harness 或 caller 组织。</p>
+<h2 id="6-context-management">6. Context Management<a class="headerlink" href="#6-context-management" title="Permanent link">#</a></h2>
+<p>RTS 需要 context management，但 context 不拥有 truth。</p>
+<p>上下文类型：</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Examples</th>
+<th>Truth eligible</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UI context</td>
+<td>当前页面、当前 pack、当前 object、selected release</td>
+<td>only as hints</td>
+</tr>
+<tr>
+<td>Session context</td>
+<td>刚确认的 scope、上一轮对象、任务目标、语言偏好</td>
+<td>no</td>
+</tr>
+<tr>
+<td>Retrieved context</td>
+<td>object cards、L2 facts、dependencies、trace ids、warnings</td>
+<td>L2/dependency yes; cards only navigation</td>
+</tr>
+<tr>
+<td>Governance context</td>
+<td>draft/approved/signoff、ambiguity、review/release state</td>
+<td>yes only if authorized</td>
+</tr>
+</tbody>
+</table>
+<p>Context window 顺序：</p>
+<pre><code class="language-text">scope summary
+object cards
+selected L2
+required dependency L2
+authorized warnings / governance summary
+</code></pre>
+<p>上下文管理器必须去重、控制 L2 数量、控制 dependency depth、保留 URI/trace、区分 facts/inferences/unknowns，并避免把 session memory 混进事实上下文。</p>
+<h2 id="7-memory-boundary">7. Memory Boundary<a class="headerlink" href="#7-memory-boundary" title="Permanent link">#</a></h2>
+<p>RTS agent 可以有 memory，但 memory 只能提升体验和检索质量，不能成为 truth。</p>
+<p>允许：</p>
+<ul>
+<li>current scope</li>
+<li>user-selected candidate</li>
+<li>previous object</li>
+<li>current language preference</li>
+<li>workspace default channel/product</li>
+<li>retrieval feedback such as missed aliases or weak card search text</li>
+</ul>
+<p>禁止 memory 自动保存为：</p>
+<ul>
+<li>rule logic</li>
+<li>lookup mapping</li>
+<li>helper behavior</li>
+<li>human adjudication</li>
+<li>approval/signoff</li>
+<li>release status</li>
+</ul>
+<p>聊天中的业务判断最多是 candidate clarification，必须进入 review/adjudication flow，不能直接写入 runtime truth。</p>
+<h2 id="8-lessons-from-ov-mem0-and-pageindex">8. Lessons From OV, mem0, And PageIndex<a class="headerlink" href="#8-lessons-from-ov-mem0-and-pageindex" title="Permanent link">#</a></h2>
+<p>可借鉴：</p>
+<ul>
+<li>OpenViking: session/context memory 分类、tool call trace 可形成检索质量反馈。</li>
+<li>mem0: memory isolation、filter/scope before recall、optional rerank after gated candidates。</li>
+<li>PageIndex: metadata/structure first, tight read later;少工具、强结构、按需读内容。</li>
+</ul>
+<p>不可照搬：</p>
+<ul>
+<li>不把 session memory 写回 rule truth。</li>
+<li>不让 personalization memory 改变 approved truth。</li>
+<li>不让 reranker 或 vector 越过 scope/permission/release gate。</li>
+<li>不让 LLM 在无 scope gate 时遍历所有 pack。</li>
+</ul>
+<p>综合落地顺序：</p>
+<ol>
+<li>Scope mediation tools</li>
+<li>Controlled query plan</li>
+<li>Session/workspace context store</li>
+<li>Pack navigation / object graph tools</li>
+<li>Human/agent/audit controlled analysis and expression</li>
+<li>Trace feedback memory</li>
+<li>Optional reranker</li>
+<li>Optional alias/entity boost</li>
+<li>Optional vector retrieval</li>
+</ol>
+<h2 id="9-decision">9. Decision<a class="headerlink" href="#9-decision" title="Permanent link">#</a></h2>
+<pre><code class="language-text">LLM owns mediation, never truth.
+RTS tools own gated truth reads.
+Context owns relevance, never authority.
+Memory owns convenience, never truth.
+</code></pre>
+<p>For current implementation priority, use the confirmed Day1/Day2 plans and the LLM harness alignment note. Use this reference only for design rationale around scope mediation, context, memory, and controlled tool orchestration.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

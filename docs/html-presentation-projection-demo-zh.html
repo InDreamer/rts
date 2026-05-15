@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML as Presentation Projection Demo</title>
+  <style>
+    :root {
+      --bg: #eef3ec;
+      --paper: #fffdf7;
+      --ink: #1f241f;
+      --muted: #667064;
+      --line: #d6ddcf;
+      --green: #196f5f;
+      --blue: #24537a;
+      --amber: #a85d12;
+      --red: #9f1239;
+      --soft-green: #e1f4ed;
+      --soft-blue: #e3edf7;
+      --soft-amber: #fff1d6;
+      --shadow: 0 22px 50px rgba(42, 55, 37, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(25, 111, 95, 0.16), transparent 24rem),
+        radial-gradient(circle at 88% 4%, rgba(168, 93, 18, 0.14), transparent 24rem),
+        linear-gradient(135deg, #f8f5ea 0%, var(--bg) 100%);
+      font-family: Charter, "Iowan Old Style", Georgia, serif;
+      line-height: 1.62;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 56px 0 72px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.12;
+      letter-spacing: -0.035em;
+    }
+
+    h1 {
+      max-width: 940px;
+      font-size: clamp(40px, 7vw, 84px);
+    }
+
+    h2 {
+      margin: 42px 0 16px;
+      font-size: clamp(28px, 4vw, 44px);
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    code {
+      padding: 0.12em 0.34em;
+      border-radius: 6px;
+      background: #e9e0cc;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow: auto;
+      margin: 12px 0 0;
+      padding: 16px;
+      border-radius: 16px;
+      background: #20231f;
+      color: #f6f0df;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 18px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, 0.78);
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .lede {
+      max-width: 900px;
+      margin-top: 24px;
+      color: #3c423a;
+      font-size: clamp(19px, 2.2vw, 26px);
+      line-height: 1.45;
+    }
+
+    .card {
+      padding: clamp(20px, 3vw, 32px);
+      border: 1px solid rgba(214, 221, 207, 0.95);
+      border-radius: 24px;
+      background: rgba(255, 253, 247, 0.88);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-12 { grid-column: span 12; }
+
+    .status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e8efe1;
+      color: #334034;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pill.good {
+      background: var(--soft-green);
+      color: #07533f;
+    }
+
+    .pill.warn {
+      background: var(--soft-amber);
+      color: #7c3f08;
+    }
+
+    .pill.blue {
+      background: var(--soft-blue);
+      color: #1f4d7a;
+    }
+
+    .banner {
+      margin-top: 28px;
+      border-left: 7px solid var(--amber);
+      background: #fff5dc;
+    }
+
+    .banner strong {
+      color: #7c3f08;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .step {
+      min-height: 160px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+      position: relative;
+    }
+
+    .step::after {
+      content: "→";
+      position: absolute;
+      right: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 26px;
+    }
+
+    .step:last-child::after {
+      content: "";
+    }
+
+    .step small {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .truth {
+      border-top: 6px solid var(--green);
+    }
+
+    .presentation {
+      border-top: 6px solid var(--amber);
+    }
+
+    .blocked {
+      border-top: 6px solid var(--red);
+    }
+
+    .comparison {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+      font-size: 15px;
+    }
+
+    .comparison th,
+    .comparison td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .comparison th {
+      background: #e7eddf;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .comparison tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .object-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .object-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .object-title .badge {
+      flex: 0 0 auto;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--soft-green);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 8px 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .kv dt {
+      color: var(--muted);
+    }
+
+    .kv dd {
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .redline {
+      border: 1px solid #fecdd3;
+      background: #fff1f2;
+    }
+
+    .greenline {
+      border: 1px solid #bee9dc;
+      background: #effcf7;
+    }
+
+    @media (max-width: 900px) {
+      .grid,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .span-4,
+      .span-5,
+      .span-6,
+      .span-7,
+      .span-12 {
+        grid-column: auto;
+      }
+
+      .step::after {
+        content: "↓";
+        right: 18px;
+        top: auto;
+        bottom: -22px;
+      }
+
+      .step:last-child::after {
+        content: "";
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Demo · HTML as presentation projection</div>
+    <h1>HTML 只是展示投影，不是 RTS 运行时真相</h1>
+    <p class="lede">
+      这个页面演示 HTML 应该长什么样：它可以把 projection 中的规则、证据、风险、AI 分析组织成清晰的审阅界面；
+      但 runtime、tool、query 和 grounding 不能依赖解析这个页面。真正的 truth 仍来自 <code>JSON/JSONL runtime projection</code> 和 <code>L2 runtime object</code>。
+    </p>
+
+    <section class="card banner">
+      <p><strong>页面身份：</strong>这是由 projection 派生的 presentation view。它可以被 AI 或人阅读，但它不是 source of truth。</p>
+      <p><strong>禁止用法：</strong>不要让 QueryService、MCP tool、LLM grounding、release gate 或 dependency traversal 解析 HTML DOM 来获得事实。</p>
+      <div class="status">
+        <span class="pill good">Derived from projection</span>
+        <span class="pill good">Good for AI-mediated review</span>
+        <span class="pill warn">Not runtime truth</span>
+        <span class="pill warn">Not grounding source</span>
+      </div>
+    </section>
+
+    <h2>正确链路</h2>
+    <section class="flow">
+      <div class="step truth">
+        <small>Truth artifact</small>
+        <h3>Runtime Projection</h3>
+        <p>保存 release、scope、object manifest、L2、dependency、governance summary。</p>
+      </div>
+      <div class="step truth">
+        <small>Service gate</small>
+        <h3>RTS Service</h3>
+        <p>校验 permission、hash、release state、scope boundary 和 refusal contract。</p>
+      </div>
+      <div class="step truth">
+        <small>AI context</small>
+        <h3>Compact Context</h3>
+        <p>只给 AI 必要事实块，并保留 URI、release id、L2 hash。</p>
+      </div>
+      <div class="step presentation">
+        <small>Presentation</small>
+        <h3>HTML Report</h3>
+        <p>展示对比、解释、风险、证据引用和候选建议。</p>
+      </div>
+      <div class="step blocked">
+        <small>Blocked path</small>
+        <h3>No HTML Parsing</h3>
+        <p>下一次查询不能把本 HTML 当 truth，只能回到 RTS service。</p>
+      </div>
+    </section>
+
+    <h2>一个展示投影可以长这样</h2>
+    <section class="grid">
+      <div class="card span-7 object-card">
+        <div class="object-title">
+          <div>
+            <h3>Fixing Date Rule</h3>
+            <p class="mini">AI-mediated review card generated from L2 runtime object</p>
+          </div>
+          <span class="badge">released</span>
+        </div>
+
+        <p>
+          <strong>规则摘要：</strong>
+          目标 <code>fixingDate</code> 直接复制来源 NDF <code>fixingDate</code>。
+          本句用于展示和审阅，事实依据必须回到下方 URI/hash 指向的 L2。
+        </p>
+
+        <dl class="kv">
+          <dt>Object URI</dt>
+          <dd><code>rts://tradition/stella/fxd-ndf-cutoff-fixing/.../rule_fxd_ndf_fixing_date</code></dd>
+          <dt>Release</dt>
+          <dd><code>rel-2026-05-06-photo-fxd-ndf-cutoff</code></dd>
+          <dt>Scope</dt>
+          <dd><code>tradition / stella / fxd-ndf-cutoff-fixing / cutoff-fixing</code></dd>
+          <dt>L2 hash</dt>
+          <dd><code>sha256:0beceef...</code></dd>
+          <dt>Allowed use</dt>
+          <dd>review display, AI explanation, citation navigation</dd>
+          <dt>Not allowed</dt>
+          <dd>runtime fact extraction, permission bypass, grounding from HTML text</dd>
+        </dl>
+      </div>
+
+      <div class="card span-5">
+        <h3>AI Review Notes</h3>
+        <p><strong>Facts:</strong> source path 和 target path 已在 L2 中结构化保存。</p>
+        <p><strong>Warnings:</strong> photo-reconstructed source，需要 production recheck。</p>
+        <p><strong>Unknowns:</strong> 这个页面不裁决 open questions；只展示 projection 已授权的 summary。</p>
+        <p><strong>Next action:</strong> 如果需要事实回答，调用 <code>read_object_l2</code>，不要解析本卡片文字。</p>
+      </div>
+    </section>
+
+    <h2>HTML 可以展示，但不能接管 truth</h2>
+    <section class="grid">
+      <div class="card greenline span-6">
+        <h3>推荐用法</h3>
+        <p>由 RTS 或 publisher 从 projection 生成 HTML 报告。</p>
+        <p>页面中只展示 compact explanation、风险、引用、候选建议和 trace link。</p>
+        <p>每个展示块都带 <code>uri</code>、<code>release_id</code>、<code>content_hash</code>，方便 AI 或人回查。</p>
+      </div>
+      <div class="card redline span-6">
+        <h3>禁止用法</h3>
+        <p>不要让 runtime query 通过 CSS selector 或 DOM text 抽取规则事实。</p>
+        <p>不要让 LLM 把 HTML 页面中的解释文字当成 L2 fact。</p>
+        <p>不要把人工或 AI 在页面上的批注直接写回 canonical truth。</p>
+      </div>
+    </section>
+
+    <h2>格式责任对比</h2>
+    <table class="comparison">
+      <thead>
+        <tr>
+          <th>Artifact</th>
+          <th>能做什么</th>
+          <th>不能做什么</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>L2 JSON</strong></td>
+          <td>承载 service-readable structured rule truth，可 hash、可 schema validation、可 grounding。</td>
+          <td>不负责好看，不直接面向浏览器审阅体验。</td>
+        </tr>
+        <tr>
+          <td><strong>Object Card JSONL</strong></td>
+          <td>帮助 resolver 定位、消歧、召回和排序。</td>
+          <td>不能替代 L2 成为最终事实来源。</td>
+        </tr>
+        <tr>
+          <td><strong>HTML Presentation</strong></td>
+          <td>展示 AI 分析、对比、风险、引用和少量人工抽查界面。</td>
+          <td>不能被 runtime/tool/query 当成 truth source 或权限绕过入口。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>如果要给 AI 看，应该给什么？</h2>
+    <section class="grid">
+      <div class="card span-6">
+        <h3>不要给完整 HTML DOM</h3>
+<pre>&lt;div class="object-card"&gt;
+  &lt;h3&gt;Fixing Date Rule&lt;/h3&gt;
+  &lt;p style="..."&gt;... visual text ...&lt;/p&gt;
+  &lt;button&gt;Copy citation&lt;/button&gt;
+&lt;/div&gt;</pre>
+      </div>
+      <div class="card span-6">
+        <h3>给受控 AI Context Block</h3>
+<pre>[FACT: rule]
+uri: rts://.../rule_fxd_ndf_fixing_date
+release_id: rel-2026-05-06-photo-fxd-ndf-cutoff
+l2_hash: sha256:0beceef...
+allowed_use: grounded_analysis
+
+summary:
+- Target fixingDate copies source fixingDate directly.
+- Source XPath: /FpML/.../fixingDate/text()
+- Target XPath: /scb:SCBML/.../fixingDate
+
+warning:
+- Photo-reconstructed source; production recheck required.</pre>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

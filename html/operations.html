@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运行与调用 | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+<a class="nav-link" href="start-here.html">三分钟读懂</a>
+<a class="nav-link" href="architecture.html">架构边界</a>
+<a class="nav-link active" href="operations.html">运行与调用</a>
+<a class="nav-link" href="roadmap.html">路线图</a>
+<a class="nav-link" href="library.html">来源文档</a>
+    </nav>
+  </header>
+  <main>
+    <section class="page-hero">
+      <p class="kicker">RTS Reading Experience</p>
+      <h1>运行与调用</h1>
+      <p>把启动、验证、API 调用和常见误区放在一条可执行路径里。</p>
+    </section>
+    
+    <section class="run-cards">
+      <article>
+        <span class="card-number">01</span>
+        <h2>本地启动</h2>
+        <p>默认使用 sample runtime projection store。服务不直接读取 KB/candidate pack 作为 truth。</p>
+        <pre><code>RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
+mvn spring-boot:run</code></pre>
+      </article>
+      <article>
+        <span class="card-number">02</span>
+        <h2>快速验证</h2>
+        <p>先看 MCP 工具清单，再用当前 active release 的 photo scope 查询。</p>
+        <pre><code>curl -s http://localhost:8080/mcp/tools | jq</code></pre>
+      </article>
+      <article>
+        <span class="card-number">03</span>
+        <h2>提交前检查</h2>
+        <p>运行测试和 diff 检查，避免把运行配置或格式问题带进提交。</p>
+        <pre><code>JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn verify
+git diff --check
+git status --short</code></pre>
+      </article>
+    </section>
+
+    <section class="example-panel refined" id="examples">
+      <div>
+        <p class="kicker">Try It</p>
+        <h2>选择场景，生成可复制请求。</h2>
+        <p>这个示例生成器是为了降低调用门槛。它不会修改服务状态，也不会替代 API guide。</p>
+      </div>
+      <div class="example-builder">
+        <label>入口
+          <select id="example-endpoint">
+            <option value="query">/api/v1/query deterministic 查询</option>
+            <option value="ask">/api/v1/ask managed analysis</option>
+            <option value="scenario">/api/v1/scenario/analyze-failed-message</option>
+            <option value="mcp">/mcp/tools 工具清单</option>
+          </select>
+        </label>
+        <label>Scope
+          <select id="example-scope">
+            <option value="photo">当前默认 photo NDF cutoff scope</option>
+            <option value="payments">回滚 sample payments scope</option>
+          </select>
+        </label>
+        <pre class="example-output"><code id="example-output"></code></pre>
+        <button class="copy-example" type="button" data-copy-example>复制示例</button>
+      </div>
+    </section>
+
+    <section class="warning-panel">
+      <h2>调用时最容易踩的坑</h2>
+      <ul class="big-list compact">
+        <li><strong>scope 不完整</strong>：channel/product/pack/domain 必须属于当前 active release。</li>
+        <li><strong>字段名写错</strong>：请求 body 使用 snake_case，不要用 camelCase。</li>
+        <li><strong>LLM 不可用</strong>：/ask 会降级为结构化信息提供服务，不应被描述成等价 managed analysis。</li>
+        <li><strong>candidate 被误用</strong>：scenario 输出不是 release approval、final root cause 或 QA signoff。</li>
+      </ul>
+    </section>
+
+    <section class="source-strip">
+      <p class="kicker">主要来源</p>
+      <a href="docs/java-service-runbook-zh.html">Runbook</a>
+<a href="docs/api-caller-guide-zh.html">API Guide</a>
+<a href="docs/day1-sample-pack-test-commands.html">Sample Commands</a>
+    </section>
+    
+  </main>
+  <footer class="site-footer">
+    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+  </footer>
+  <script src="assets/search-index.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>路线图 | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+<a class="nav-link" href="start-here.html">三分钟读懂</a>
+<a class="nav-link" href="architecture.html">架构边界</a>
+<a class="nav-link" href="operations.html">运行与调用</a>
+<a class="nav-link active" href="roadmap.html">路线图</a>
+<a class="nav-link" href="library.html">来源文档</a>
+    </nav>
+  </header>
+  <main>
+    <section class="page-hero">
+      <p class="kicker">RTS Reading Experience</p>
+      <h1>路线图</h1>
+      <p>把 confirmed baseline、Day1、Day2、internal agent 和最终服务形态串成一条实现路径。</p>
+    </section>
+    
+    <section class="timeline">
+      <article>
+        <span>Baseline</span>
+        <h2>Constitution + Projection Contract</h2>
+        <p>先锁住 truth ownership、runtime projection、refusal、permissioned governance view。</p>
+      </article>
+      <article>
+        <span>Day1</span>
+        <h2>Query / Tool Service + Controlled Harness</h2>
+        <p>建立文件系统 store、Lucene、L2 read/hash、trace/refusal、REST/MCP 和第一版 /ask。</p>
+      </article>
+      <article>
+        <span>Internal Agent</span>
+        <h2>Service-owned Managed Loop</h2>
+        <p>planner、orchestrator、context snapshot、claim validation、scenario compiler、evaluation gate。</p>
+      </article>
+      <article>
+        <span>Day2</span>
+        <h2>Controlled Agentic Retrieval</h2>
+        <p>多步 retrieval、confusable、rerank、expanded MCP、impact/test candidate 和评估闭环。</p>
+      </article>
+      <article>
+        <span>Final</span>
+        <h2>LLM-agent-ready Rule Truth Service</h2>
+        <p>managed mode 与 external tool mode 共享稳定原子能力和同一 truth access boundary。</p>
+      </article>
+    </section>
+
+    <section class="decision-grid">
+      <article>
+        <h2>现在不该做什么</h2>
+        <p>不要把 OpenSearch、vector、外部 agent SDK 或 memory 写成 truth core；它们最多是 adapter、检索增强或 workflow sidecar。</p>
+      </article>
+      <article>
+        <h2>下一步真正重要什么</h2>
+        <p>不是让模型更会说，而是让 managed analysis 在 /ask 和 scenario endpoint 中成为稳定正常态，同时 claim validation 和 trace 能证明它没有越界。</p>
+      </article>
+    </section>
+
+    <section class="source-strip">
+      <p class="kicker">主要来源</p>
+      <a href="docs/confirmed/day1-query-service-and-llm-harness-plan-zh.html">Day1</a>
+<a href="docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.html">Day2</a>
+<a href="docs/confirmed/final-llm-agent-service-plan-zh.html">Final Roadmap</a>
+<a href="docs/confirmed/document-decision-register-zh.html">Decision Register</a>
+    </section>
+    
+  </main>
+  <footer class="site-footer">
+    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+  </footer>
+  <script src="assets/search-index.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

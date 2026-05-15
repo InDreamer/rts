@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KB-to-Index Runtime Projection Contract | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/kb-to-index-projection-contract-zh.md</p>
+      <h1>KB-to-Index Runtime Projection Contract</h1>
+      <p>Defines the governed runtime projection contract between the RTS Knowledge Base truth layer and the query/index layer</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/kb-to-index-projection-contract-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要定义 KB 发布后必须产出什么给索引层</li>
+<li>需要判断索引层可以读取哪些对象、不能读取哪些对象</li>
+<li>需要设计 query resolver、PostgreSQL projection、OpenSearch 索引或 MCP/API 查询边界</li>
+<li>需要区分 canonical truth、release pack、runtime projection、search hit 和 LLM answer</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要理解 RTS 总体愿景</li>
+<li>只需要查看历史 OpenViking 采用边界</li>
+<li>只需要实现某个具体数据库表字段</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="system-constitution-v1.html">RTS Constitution v2</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>Defines the governed runtime projection contract between the RTS Knowledge Base truth layer and the query/index layer</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：confirmed baseline &gt; 创建日期：2026-05-05 &gt; 范围：定义 RTS Knowledge Base 与查询/索引层之间的运行时投影契约 这里建议使用 Runtime Projection Contract，中文可以叫 运行时投影契约。 如果强调两层边界，也可以叫 KB-to-Index Projection Contract。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. 命名和定位</h3>
+          <p>这里建议使用 Runtime Projection Contract，中文可以叫 运行时投影契约。 如果强调两层边界，也可以叫 KB-to-Index Projection Contract。 不建议第一阶段叫 protocol。Protocol 更像网络通信协议或跨系统 wire format。当前真正需要固定的是： KB 发布后必须产出哪些结构化投影</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 核心原则</h3>
+          <p>RTS 的 Knowledge Base 决定什么是 governed truth。查询/索引层只负责让 governed truth 被稳定、低噪声、可追踪地找到。 KB、projection、index documents 都是机器优先结构，不是“人读文档”和“机器读文档”的区别。 更准确的边界是： KB 是完整 governed truth graph，包含规则逻辑和治理上下文。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. 上游输入和下游读取边界</h3>
+          <p>KB 基座负责管理完整 governed truth graph： source material candidate pack canonical pack canonical rule / lookup / helper object logic evidence review / ambiguity / adjudication</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Projection Admission Rules</h3>
+          <p>一个对象进入 runtime projection 前必须满足： 所属 release 已批准 所属 pack 已 signoff 对象 schema validation 通过 object id / URI 无冲突 target coverage conflict 已处理 COMMON 与 product-specific precedence 已处理</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. Required Projection Outputs</h3>
+          <p>release_manifest 说明这次 runtime projection 是谁、从哪里来、是否可用。 必须包含： release id canonical revision source release pack id projection schema version summary / card schema version</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Optional But Recommended Projection Outputs</h3>
+          <p>RTS 很容易出现相似但不该混用的规则，例如 COMMON 与 product-specific override、FXD 与 FXO 相似字段、同名 lookup 在不同 product 中含义不同。 建议 KB projection 产出 confusable / negative candidates： this object is similar to X but not applicable because Y</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Query / Index Layer Obligations</h3>
+          <p>索引层读取 projection 后，必须遵守以下义务： 先验证 release manifest 先按权限和 scope 收窄候选 优先使用 object manifest 做确定性查找 优先使用 rule card 做结构化 resolver dependency edge 只在允许的 traversal purpose 下使用</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. Query Resolver Input Contract</h3>
+          <p>Query resolver 不应该只接收一段自然语言然后直接搜索。 它应该把问题解析成结构化查询计划： intent: rule_lookup / explain / impact / test_plan / conflict_check / coverage_check scope: channel / product / pack / domain</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. Refusal and Degraded Output</h3>
+          <p>查询层在以下情况必须拒答、降级或要求澄清： scope 不清 caller 无权访问目标 scope active release 不存在或不唯一 manifest 校验失败 projection schema 不兼容 object card 命中但 L2 不可读 dependency 未发布 conflict / ambiguity 仍未解决</p>
+        </article>
+<article class="chapter-card">
+          <h3>10. Storage Mapping Guidance</h3>
+          <p>第一阶段推荐这样落地： PostgreSQL 保存 release manifest、scope registry、object manifest、rule cards、dependency edges、content refs、governance access refs、query trace OpenSearch 保存 L0/L1/card text 的召回副本</p>
+        </article>
+<article class="chapter-card">
+          <h3>11. MVP Cut</h3>
+          <p>第一版必须做： immutable release manifest scope registry object manifest rule / lookup / helper card dependency edges L2 content reference structured L2 runtime object deterministic L0/L1 generation</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="kb-to-index-runtime-projection-contract">KB-to-Index Runtime Projection Contract<a class="headerlink" href="#kb-to-index-runtime-projection-contract" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：confirmed baseline
+创建日期：2026-05-05
+范围：定义 RTS Knowledge Base 与查询/索引层之间的运行时投影契约</p>
+</blockquote>
+<h2 id="1">1. 命名和定位<a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p>这里建议使用 <strong>Runtime Projection Contract</strong>，中文可以叫 <strong>运行时投影契约</strong>。</p>
+<p>如果强调两层边界，也可以叫 <strong>KB-to-Index Projection Contract</strong>。</p>
+<p>不建议第一阶段叫 protocol。Protocol 更像网络通信协议或跨系统 wire format。当前真正需要固定的是：</p>
+<ul>
+<li>KB 发布后必须产出哪些结构化投影</li>
+<li>索引层只允许读取哪些投影</li>
+<li>索引层如何解释这些投影</li>
+<li>哪些内容绝不能由索引层自行推断为 truth</li>
+</ul>
+<p>因此它首先是 <strong>layer contract</strong>，后续如果暴露成 API、事件或文件包，再定义具体 protocol。</p>
+<h2 id="2">2. 核心原则<a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>RTS 的 Knowledge Base 决定什么是 governed truth。查询/索引层只负责让 governed truth 被稳定、低噪声、可追踪地找到。</p>
+<p>KB、projection、index documents 都是机器优先结构，不是“人读文档”和“机器读文档”的区别。</p>
+<p>更准确的边界是：</p>
+<ul>
+<li>KB 是完整 governed truth graph，包含规则逻辑和治理上下文。</li>
+<li>Runtime projection 是 approved truth 的服务运行视图，面向查询、索引、诊断、影响分析、测试规划和 agent 工具。</li>
+<li>Index documents 是 projection 派生出的召回和导航视图。</li>
+<li>Governance views 是 projection 中受权限控制的 evidence / review / report / adjudication 展开视图。</li>
+</ul>
+<p>Projection 可以裁剪治理噪声，但不能把规则真相降级成摘要文本。服务回答事实所需的结构化 L2 语义必须保留在 projection 内。</p>
+<p>稳定原则：</p>
+<ul>
+<li>KB owns truth。</li>
+<li>Release owns runtime admissibility。</li>
+<li>Projection owns index-readable shape。</li>
+<li>L2 runtime object owns service-readable structured rule content。</li>
+<li>Index owns retrieval and trace。</li>
+<li>Query resolver owns query plan。</li>
+<li>LLM answer never owns truth。</li>
+</ul>
+<p>索引层不能直接读取 candidate pack，也不能把 search hit、LLM summary、agent memory 或 query trace 当成新的规则真相。</p>
+<h2 id="3">3. 上游输入和下游读取边界<a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<h3 id="31-kb-truth-layer">3.1 KB / Truth Layer 必须管理<a class="headerlink" href="#31-kb-truth-layer" title="Permanent link">#</a></h3>
+<p>KB 基座负责管理完整 governed truth graph：</p>
+<ul>
+<li>source material</li>
+<li>candidate pack</li>
+<li>canonical pack</li>
+<li>canonical rule / lookup / helper object logic</li>
+<li>evidence</li>
+<li>review / ambiguity / adjudication</li>
+<li>signoff</li>
+<li>release pack</li>
+<li>truth version and rollback lineage</li>
+</ul>
+<p>这些内容属于 truth governance surface。索引层默认不直接消费 canonical authoring files；它应该通过 projection 的 operational view、governance-authorized view 和 index view 读取。</p>
+<h3 id="32-projection-publisher">3.2 Projection Publisher 必须产出<a class="headerlink" href="#32-projection-publisher" title="Permanent link">#</a></h3>
+<p>当一个 pack 或 release 被批准后，KB 侧必须生成一个不可变 runtime projection。</p>
+<p>这个 projection 是索引层的唯一默认输入。</p>
+<p>Projection publisher 至少要产出：</p>
+<ul>
+<li><code>release_manifest</code></li>
+<li><code>scope_registry</code></li>
+<li><code>object_manifest</code></li>
+<li><code>rule_card</code> / <code>object_card</code></li>
+<li><code>dependency_edges</code></li>
+<li><code>runtime_content_refs</code></li>
+<li>structured <code>L2 runtime objects</code></li>
+<li><code>l0_l1_navigation_views</code></li>
+<li>optional governance access views</li>
+</ul>
+<p>这些输出可以是 YAML、JSON、数据库 staging tables 或对象存储文件。第一阶段不强制文件格式，但必须有稳定 schema、版本、hash 和 release identity。</p>
+<h3 id="33-index-query-layer">3.3 Index / Query Layer 只能读取<a class="headerlink" href="#33-index-query-layer" title="Permanent link">#</a></h3>
+<p>普通运行时查询只能读取 projection 内已发布并通过权限过滤的视图：</p>
+<ul>
+<li>active runtime projection</li>
+<li>projection manifest</li>
+<li>projected rule / lookup / helper L2 content</li>
+<li>projected rule cards and manifests</li>
+<li>dependency edges</li>
+<li>L0/L1 navigation views</li>
+<li>permission-filtered governance summary, if explicitly authorized</li>
+</ul>
+<p>普通运行时查询不能把以下内容当成默认 operational truth 输入：</p>
+<ul>
+<li>candidate pack</li>
+<li>unapproved canonical pack</li>
+<li>raw review notes</li>
+<li>raw evidence bundle</li>
+<li>extraction report</li>
+<li>agent scratchpad</li>
+<li>chat history or memory</li>
+<li>Git working tree as runtime truth</li>
+<li>OpenSearch document as final truth source</li>
+</ul>
+<p>如果 governance view 需要 evidence、review 或 report，必须通过 projection 中受权限控制的 governance access view 读取，并在 query trace 中标明 purpose、caller、redaction state 和引用对象。它不应该混入默认 operational answer context，也不应该通过旁路读取 KB 文件绕过 release / permission / trace。</p>
+<h2 id="4-projection-admission-rules">4. Projection Admission Rules<a class="headerlink" href="#4-projection-admission-rules" title="Permanent link">#</a></h2>
+<p>一个对象进入 runtime projection 前必须满足：</p>
+<ul>
+<li>所属 release 已批准</li>
+<li>所属 pack 已 signoff</li>
+<li>对象 schema validation 通过</li>
+<li>object id / URI 无冲突</li>
+<li>target coverage conflict 已处理</li>
+<li>COMMON 与 product-specific precedence 已处理</li>
+<li>required lookup / helper / rule dependency 已发布</li>
+<li>L2 object 可读取</li>
+<li>projection manifest 可追溯到 canonical revision</li>
+</ul>
+<p>如果上述条件不满足，正确行为是拒绝发布 projection，或者把对象排除并记录 blocking reason。索引层不应该在查询时临时修复这些问题。</p>
+<h2 id="5-required-projection-outputs">5. Required Projection Outputs<a class="headerlink" href="#5-required-projection-outputs" title="Permanent link">#</a></h2>
+<h3 id="51-release_manifest">5.1 <code>release_manifest</code><a class="headerlink" href="#51-release_manifest" title="Permanent link">#</a></h3>
+<p><code>release_manifest</code> 说明这次 runtime projection 是谁、从哪里来、是否可用。</p>
+<p>必须包含：</p>
+<ul>
+<li>release id</li>
+<li>canonical revision</li>
+<li>source release pack id</li>
+<li>projection schema version</li>
+<li>summary / card schema version</li>
+<li>generated at / by</li>
+<li>released at / by</li>
+<li>activation state</li>
+<li>rollback target</li>
+<li>included channel / product / pack</li>
+<li>content hash summary</li>
+<li>blocking issues count</li>
+</ul>
+<p>索引层读取 projection 的第一步必须验证 manifest。没有有效 manifest，就没有可用 runtime truth。</p>
+<h3 id="52-scope_registry">5.2 <code>scope_registry</code><a class="headerlink" href="#52-scope_registry" title="Permanent link">#</a></h3>
+<p><code>scope_registry</code> 定义查询可以进入哪些 scope。</p>
+<p>至少覆盖：</p>
+<ul>
+<li>channel</li>
+<li>product</li>
+<li>pack</li>
+<li>domain</li>
+<li>active release</li>
+<li>permission boundary</li>
+<li>default precedence</li>
+<li>product-specific override rule</li>
+<li>deprecated / superseded state</li>
+</ul>
+<p>Query resolver 必须先解析 scope，再执行召回。scope 不是搜索 filter 的附属品，而是 truth safety boundary。</p>
+<h3 id="53-object_manifest">5.3 <code>object_manifest</code><a class="headerlink" href="#53-object_manifest" title="Permanent link">#</a></h3>
+<p><code>object_manifest</code> 是所有可索引对象的清单。</p>
+<p>每个对象至少包含：</p>
+<ul>
+<li>stable URI</li>
+<li>object id</li>
+<li>object type: rule / lookup / helper</li>
+<li>channel / product / pack</li>
+<li>domain</li>
+<li>target path, if applicable</li>
+<li>source anchors</li>
+<li>content hash</li>
+<li>L2 content reference</li>
+<li>object card reference</li>
+<li>release id</li>
+<li>schema version</li>
+</ul>
+<p>字段名、target path、source path、lookup id、helper id 的确定性查找都应该优先从 object manifest 建索引，而不是从全文搜索开始。</p>
+<h3 id="54-rule_card-object_card">5.4 <code>rule_card</code> / <code>object_card</code><a class="headerlink" href="#54-rule_card-object_card" title="Permanent link">#</a></h3>
+<p><code>rule_card</code> 是给索引层和 query resolver 使用的结构化导航单元，不是自然语言摘要。</p>
+<p>它应该由 KB projection 生成，索引层只能读取和索引，不能自行补业务含义。Card 可以包含 summary 和 search text，但它的职责是定位、消歧、导航和初步排序，不是承载完整规则真相。</p>
+<p><code>target_rule</code> card 至少包含：</p>
+<ul>
+<li>rule URI and id</li>
+<li>target kind and target path</li>
+<li>source anchors</li>
+<li>logic operation types</li>
+<li>business summary from governed rule</li>
+<li>applicability conditions</li>
+<li>not-applicable conditions, if known</li>
+<li>lookup dependencies</li>
+<li>helper dependencies</li>
+<li>rule dependencies</li>
+<li>example summary</li>
+<li>risk / ambiguity flags from release state</li>
+<li>override / supersession relation</li>
+<li>L2 content reference</li>
+</ul>
+<p><code>lookup_definition</code> card 至少包含：</p>
+<ul>
+<li>lookup URI and id</li>
+<li>lookup key columns</li>
+<li>output columns</li>
+<li>fallback behavior</li>
+<li>used by rules/helpers</li>
+<li>source table or mapping source reference</li>
+<li>released state</li>
+<li>L2 content reference</li>
+</ul>
+<p><code>helper_definition</code> card 至少包含：</p>
+<ul>
+<li>helper URI and id</li>
+<li>produced intermediate meaning</li>
+<li>source anchors</li>
+<li>logic operation types</li>
+<li>consumers</li>
+<li>dependencies</li>
+<li>released state</li>
+<li>L2 content reference</li>
+</ul>
+<p>Rule card 的价值是让查询层先做结构化 resolver，而不是直接把问题丢给语义搜索。</p>
+<h3 id="541-l2-runtime-object">5.4.1 <code>L2 runtime object</code><a class="headerlink" href="#541-l2-runtime-object" title="Permanent link">#</a></h3>
+<p><code>L2 runtime object</code> 是 projection 内的服务可读事实对象。</p>
+<p>它不是对 KB rule 的自然语言摘要，也不是只给最终答案拼一句话的 text blob。它应该尽量保留 canonical object 中对 AI、索引、诊断、影响分析和测试规划有用的结构化语义。</p>
+<p><code>target_rule</code> L2 至少应包含：</p>
+<ul>
+<li>rule URI and id</li>
+<li>status / signoff / release state</li>
+<li>target kind, target path, emitted child paths or output bindings</li>
+<li>source inputs and source anchors</li>
+<li>structured logic pipeline or equivalent rule expression</li>
+<li>constants, conditions, fallback behavior, not-applicable conditions if known</li>
+<li>lookup / helper / rule dependencies with binding purpose</li>
+<li>examples with inputs, decisions, and outputs</li>
+<li>warnings / ambiguity / production gate summary that is allowed in operational view</li>
+<li>content hash and source canonical revision reference</li>
+</ul>
+<p><code>lookup_definition</code> L2 至少应包含：</p>
+<ul>
+<li>lookup URI and id</li>
+<li>key composition and key columns</li>
+<li>return fields and source columns</li>
+<li>fallback / reverse / coalesce behavior</li>
+<li>blank / missing value semantics</li>
+<li>consumer rules/helpers</li>
+<li>examples including fallback or edge cases</li>
+<li>warnings and governance summary allowed in operational view</li>
+</ul>
+<p><code>helper_definition</code> L2 至少应包含：</p>
+<ul>
+<li>helper URI and id</li>
+<li>inputs and outputs</li>
+<li>structured logic pipeline or equivalent expression</li>
+<li>branch conditions</li>
+<li>consumers and dependencies</li>
+<li>examples</li>
+<li>warnings and governance summary allowed in operational view</li>
+</ul>
+<p>L2 可以比 canonical KB 裁剪 raw evidence、长 review notes 和 report body，但不能裁剪到只剩 <code>logic</code> 摘要。否则 AI 和服务端只能“读懂大意”，不能可靠回答异常诊断、改动分析、测试规划和 grounding 校验。</p>
+<h3 id="55-dependency_edges">5.5 <code>dependency_edges</code><a class="headerlink" href="#55-dependency_edges" title="Permanent link">#</a></h3>
+<p><code>dependency_edges</code> 是影响分析、解释、测试规划和必要上下文加载的基础。</p>
+<p>至少支持：</p>
+<ul>
+<li>rule -&gt; lookup</li>
+<li>rule -&gt; helper</li>
+<li>helper -&gt; lookup</li>
+<li>helper -&gt; helper</li>
+<li>rule -&gt; rule</li>
+<li>rule -&gt; source anchor</li>
+<li>rule -&gt; target path</li>
+<li>lookup/helper -&gt; consumer</li>
+</ul>
+<p>每条边至少包含：</p>
+<ul>
+<li>from URI</li>
+<li>to URI or external anchor</li>
+<li>edge type</li>
+<li>required / optional</li>
+<li>release id</li>
+<li>direction</li>
+<li>traversal purpose: navigation / impact / explanation / test planning</li>
+</ul>
+<p>第一阶段 dependency 可以用于导航、解释和影响分析。不要让 dependency 自动扩大 query scope，也不要让它越过权限或发布状态。</p>
+<h3 id="56-runtime_content_refs">5.6 <code>runtime_content_refs</code><a class="headerlink" href="#56-runtime_content_refs" title="Permanent link">#</a></h3>
+<p><code>runtime_content_refs</code> 说明 L2 原文对象在哪里。</p>
+<p>索引层最终回答事实时必须能回到 L2。</p>
+<p>如果只有 L0/L1/card 命中，但没有 L2 object，查询层应该拒答或降级为“只能定位候选，不能给出规则事实”。</p>
+<h3 id="57-l0_l1_navigation_views">5.7 <code>l0_l1_navigation_views</code><a class="headerlink" href="#57-l0_l1_navigation_views" title="Permanent link">#</a></h3>
+<p>L0/L1 是导航输出，不是最终 truth。</p>
+<p>L0 用于低成本候选过滤。L1 用于结构化导航、消歧和重排。</p>
+<p>L0/L1 也不是“给 L2 做摘要替代”。它们是 index views：可以浓缩、重排和标注，但事实回答必须回到 L2 runtime object 或授权治理视图。</p>
+<p>L0/L1 必须：</p>
+<ul>
+<li>从 approved projection 生成</li>
+<li>绑定 release id</li>
+<li>绑定 summary schema version</li>
+<li>可重新生成</li>
+<li>有 hash</li>
+<li>不包含未授权 evidence/review 细节</li>
+<li>不覆盖 L2 object 的事实</li>
+</ul>
+<p>高风险 rule content 不应依赖未审查的自由生成摘要。</p>
+<h2 id="6-optional-but-recommended-projection-outputs">6. Optional But Recommended Projection Outputs<a class="headerlink" href="#6-optional-but-recommended-projection-outputs" title="Permanent link">#</a></h2>
+<h3 id="61-confusable_index">6.1 <code>confusable_index</code><a class="headerlink" href="#61-confusable_index" title="Permanent link">#</a></h3>
+<p>RTS 很容易出现相似但不该混用的规则，例如 COMMON 与 product-specific override、FXD 与 FXO 相似字段、同名 lookup 在不同 product 中含义不同。</p>
+<p>建议 KB projection 产出 confusable / negative candidates：</p>
+<ul>
+<li>this object is similar to X but not applicable because Y</li>
+<li>this product-specific rule overrides COMMON rule X</li>
+<li>this rule supersedes old rule X</li>
+<li>this lookup name is shared but scoped differently</li>
+</ul>
+<p>这不是让模型“多看一些相似内容”，而是给 resolver 提供反证，避免拿错相似规则。</p>
+<h3 id="62-evidence_access_index">6.2 <code>evidence_access_index</code><a class="headerlink" href="#62-evidence_access_index" title="Permanent link">#</a></h3>
+<p>默认 operational query 不读取 raw evidence。</p>
+<p>但授权解释、审计或 governance view 需要知道 evidence 在哪里。</p>
+<p>建议单独产出 governance / evidence access view：</p>
+<ul>
+<li>object URI</li>
+<li>evidence summary</li>
+<li>evidence pointer</li>
+<li>review / report pointer</li>
+<li>conflict / ambiguity / adjudication status</li>
+<li>access level</li>
+<li>redaction state</li>
+</ul>
+<p>这样普通查询不会被治理噪声污染，授权查询仍然可以追溯证据。</p>
+<h2 id="7-query-index-layer-obligations">7. Query / Index Layer Obligations<a class="headerlink" href="#7-query-index-layer-obligations" title="Permanent link">#</a></h2>
+<p>索引层读取 projection 后，必须遵守以下义务：</p>
+<ul>
+<li>先验证 release manifest</li>
+<li>先按权限和 scope 收窄候选</li>
+<li>优先使用 object manifest 做确定性查找</li>
+<li>优先使用 rule card 做结构化 resolver</li>
+<li>dependency edge 只在允许的 traversal purpose 下使用</li>
+<li>OpenSearch / vector / BM25 只能在已收窄 scope 内召回</li>
+<li>最终事实必须读取 L2 object</li>
+<li>每次回答必须记录 query trace</li>
+<li>不得把搜索分数变成 truth confidence</li>
+<li>不得把 LLM 解释写回 projection</li>
+</ul>
+<p>查询层可以生成解释、影响候选和测试建议，但输出必须区分 approved truth、inference、unknown、candidate suggestion 和 human decision。</p>
+<h2 id="8-query-resolver-input-contract">8. Query Resolver Input Contract<a class="headerlink" href="#8-query-resolver-input-contract" title="Permanent link">#</a></h2>
+<p>Query resolver 不应该只接收一段自然语言然后直接搜索。</p>
+<p>它应该把问题解析成结构化查询计划：</p>
+<ul>
+<li>intent: rule_lookup / explain / impact / test_plan / conflict_check / coverage_check</li>
+<li>scope: channel / product / pack / domain</li>
+<li>anchors: target path / source path / rule id / lookup id / helper id / business term</li>
+<li>required states: approved / released / governance-authorized</li>
+<li>output mode: concise answer / trace / impact candidates / test suggestions / refusal</li>
+</ul>
+<p>这个 resolver 可以由规则、轻量 parser、LLM 辅助或混合方式实现。关键不是技术，而是查询必须先进入结构化计划，再读取 projection。</p>
+<h2 id="9-refusal-and-degraded-output">9. Refusal and Degraded Output<a class="headerlink" href="#9-refusal-and-degraded-output" title="Permanent link">#</a></h2>
+<p>查询层在以下情况必须拒答、降级或要求澄清：</p>
+<ul>
+<li>scope 不清</li>
+<li>caller 无权访问目标 scope</li>
+<li>active release 不存在或不唯一</li>
+<li>manifest 校验失败</li>
+<li>projection schema 不兼容</li>
+<li>object card 命中但 L2 不可读</li>
+<li>dependency 未发布</li>
+<li>conflict / ambiguity 仍未解决</li>
+<li>COMMON 与 product-specific precedence 不明确</li>
+<li>只有语义相似结果，没有结构化对象命中</li>
+<li>查询要求的 evidence/review 超出权限</li>
+</ul>
+<p>拒答不是失败。对 RTS 来说，unknown is safer than wrong。</p>
+<h2 id="10-storage-mapping-guidance">10. Storage Mapping Guidance<a class="headerlink" href="#10-storage-mapping-guidance" title="Permanent link">#</a></h2>
+<p>第一阶段推荐这样落地：</p>
+<ul>
+<li>PostgreSQL 保存 release manifest、scope registry、object manifest、rule cards、dependency edges、content refs、governance access refs、query trace</li>
+<li>OpenSearch 保存 L0/L1/card text 的召回副本</li>
+<li>object storage 或文件系统保存结构化 L2 runtime object 和授权治理视图内容</li>
+<li>API/MCP/query service 只通过 PostgreSQL active projection 读取默认 truth</li>
+</ul>
+<p>OpenSearch 可以帮助找候选，但不能成为 authoritative runtime boundary。</p>
+<h2 id="11-mvp-cut">11. MVP Cut<a class="headerlink" href="#11-mvp-cut" title="Permanent link">#</a></h2>
+<p>第一版必须做：</p>
+<ul>
+<li>immutable release manifest</li>
+<li>scope registry</li>
+<li>object manifest</li>
+<li>rule / lookup / helper card</li>
+<li>dependency edges</li>
+<li>L2 content reference</li>
+<li>structured L2 runtime object</li>
+<li>deterministic L0/L1 generation</li>
+<li>manifest validation</li>
+<li>query trace</li>
+<li>refusal contract</li>
+</ul>
+<p>第一版可以暂缓：</p>
+<ul>
+<li>full graph database</li>
+<li>autonomous agentic retrieval</li>
+<li>vector as primary entry</li>
+<li>object-level independent release</li>
+<li>raw evidence in default query</li>
+<li>full raw report/review expansion in default query</li>
+<li>complex DSL compiler</li>
+<li>cross-domain memory</li>
+</ul>
+<p>这份契约的目标不是把系统做重，而是让第一版的边界足够清楚：KB 产出受治理、可验证、可追踪的 runtime projection；索引层只读取这个 projection，并在 scope、权限、状态和 L2 truth 约束下服务查询。Projection 不是 KB 的摘要替身，而是 approved truth 面向服务端和 AI 的受控机器视图。</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

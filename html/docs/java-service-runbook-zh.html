@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Java Service Runbook | RTS 来源解读</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../index.html">首页</a>
+      <a class="nav-link" href="../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../architecture.html">架构边界</a>
+      <a class="nav-link" href="../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Operational · docs/java-service-runbook-zh.md</p>
+      <h1>RTS Java Service Runbook</h1>
+      <p>local runbook for running, validating, configuring, and troubleshooting the RTS Java service</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../docs/java-service-runbook-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要本地启动 RTS Java service</li>
+<li>需要配置 runtime projection、LLM、admin key 或端口</li>
+<li>需要执行测试、校验、排障或服务维护</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要理解 RTS 架构或 LLM harness 设计</li>
+<li>只需要 API 调用字段含义</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="api-caller-guide-zh.html">RTS API 调用方指南</a><a href="day1-sample-pack-test-commands.html">Sample Runtime Projection Test Commands</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>local runbook for running, validating, configuring, and troubleshooting the RTS Java service</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>本文说明如何在本地运行 RTS Java 服务、执行校验、调用 API/MCP，并处理常见启动问题。 检查 Java： macOS 推荐显式指定 JDK 17： 也可以使用固定 JDK 路径示例： 从仓库根目录执行： 更严格的全量重跑： 预期结果： verify 会执行普通测试和 golden 测试。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Operational / role: leaf / layer: 2</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. 环境需求</h3>
+          <p>JDK 17。 macOS/Linux shell。 Maven 3.8+。 可选工具：curl、jq、lsof。 网络：首次构建需要访问 Maven Central 下载依赖。 检查 Java： macOS 推荐显式指定 JDK 17： 也可以使用固定 JDK 路径示例：</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 基本校验</h3>
+          <p>从仓库根目录执行： 更严格的全量重跑： 预期结果： verify 会执行普通测试和 golden 测试。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Runtime Store</h3>
+          <p>RTS 运行时读取 runtime projection store，不直接读取 KB/candidate pack 作为 truth。 默认配置： 仓库提供 sample store： runtime projection 已切到多视图布局： 当前 sample 默认 active release 是： photo reconstructed golden scope：</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. 启动服务</h3>
+          <p>默认使用 Spring Boot 端口 8080： Keep this terminal running, then open another terminal for curl commands. 如果 8080 被占用，再指定其他端口： 如果不确定哪些端口可用，也可以使用随机空闲端口： 此时从启动日志读取实际端口，例如：</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. 快速验证</h3>
+          <p>预期：返回 JSON，包含： 默认 RTS_MCP_EXPANDED_TOOLS_ENABLED=false 时，tools 只包含 minimal tool mode：rts_find_objects、rts_read_object、rts_get_dependencies、rts_ask、rts_get_trace。</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. 常用入口</h3>
+          <p>POST /api/v1/query：确定性 truth/information 查询。 POST /api/v1/ask：受控 managed analysis 入口；默认本地 LLM disabled 时降级为结构化信息提供服务。 POST /api/v1/scenario/analyze-pr-diff：PR diff scenario surface；当前先接入 managed harness impact recipe，再编译</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. 权限和示例 caller</h3>
+          <p>sample store 内置 caller： 请求 header： 请求 body 使用 snake_case 字段，例如： 不要使用 camelCase，例如 callerId、scopeHint，否则会返回 400。</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. LLM 配置</h3>
+          <p>默认： 此时 /ask 不依赖外部 provider。若 RTS_TOOL_ORCHESTRATOR_ENABLED=false，/ask 直接降级为 deterministic /query 风格的信息服务；若显式开启 orchestrator，则使用 disabled LLM client 通过受控工具链返回 grounded answer。</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. 切换 sample active release</h3>
+          <p>默认 active release 是 photo pack： 如果要切回普通 sample，先停止服务，然后写入 active pointer。这个手写文件方式只用于本地 sample 验证；生产或共享环境应使用受控发布/切换流程，不要直接改 active pointer： 再重启服务并查询： 切回默认 photo pack：</p>
+        </article>
+<article class="chapter-card">
+          <h3>10. 常见问题</h3>
+          <p>说明你打到的端口不是 RTS，而是当前机器上其他服务。先查端口： 如果确认 8080 被其他服务占用，再用 --server.port=&lt;PORT&gt; 或 --server.port=0 启动 RTS。 换端口或用随机端口： 请求 JSON 字段必须用 snake_case： 查询 scope 不属于当前 active release。检查：</p>
+        </article>
+<article class="chapter-card">
+          <h3>11. 提交前检查</h3>
+          <p>提交代码前至少执行：</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-java-service-runbook">RTS Java Service Runbook<a class="headerlink" href="#rts-java-service-runbook" title="Permanent link">#</a></h1>
+<p>本文说明如何在本地运行 RTS Java 服务、执行校验、调用 API/MCP，并处理常见启动问题。</p>
+<h2 id="1">1. 环境需求<a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<ul>
+<li>JDK 17。</li>
+<li>macOS/Linux shell。</li>
+<li>Maven 3.8+。</li>
+<li>可选工具：<code>curl</code>、<code>jq</code>、<code>lsof</code>。</li>
+<li>网络：首次构建需要访问 Maven Central 下载依赖。</li>
+</ul>
+<p>检查 Java：</p>
+<pre><code class="language-bash">java -version
+</code></pre>
+<p>macOS 推荐显式指定 JDK 17：</p>
+<pre><code class="language-bash">export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+</code></pre>
+<p>也可以使用固定 JDK 路径示例：</p>
+<pre><code class="language-bash">export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+</code></pre>
+<h2 id="2">2. 基本校验<a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>从仓库根目录执行：</p>
+<pre><code class="language-bash">JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn verify
+</code></pre>
+<p>更严格的全量重跑：</p>
+<pre><code class="language-bash">JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn clean verify
+</code></pre>
+<p>预期结果：</p>
+<pre><code class="language-text">BUILD SUCCESS
+</code></pre>
+<p><code>verify</code> 会执行普通测试和 golden 测试。</p>
+<h2 id="3-runtime-store">3. Runtime Store<a class="headerlink" href="#3-runtime-store" title="Permanent link">#</a></h2>
+<p>RTS 运行时读取 runtime projection store，不直接读取 KB/candidate pack 作为 truth。</p>
+<p>默认配置：</p>
+<pre><code class="language-bash">RTS_STORE_ROOT=runtime-store
+RTS_TOOL_ORCHESTRATOR_ENABLED=false
+RTS_CONFUSABLE_CHECK_ENABLED=false
+RTS_IMPACT_CANDIDATES_ENABLED=false
+RTS_TEST_PLAN_CANDIDATES_ENABLED=false
+RTS_MCP_EXPANDED_TOOLS_ENABLED=false
+</code></pre>
+<p>仓库提供 sample store：</p>
+<pre><code class="language-bash">sample-projection/runtime-store
+</code></pre>
+<p>runtime projection 已切到多视图布局：</p>
+<pre><code class="language-text">runtime-store/
+  active-release.json
+  releases/&lt;release-id&gt;/
+    release-manifest.json
+    scopes.jsonl
+    object-manifest.jsonl
+    caller-profiles.jsonl
+    l2/{rules,lookups,helpers}/
+    navigation/{object-cards,l0-l1-views,aliases,confusables}.jsonl
+    governance/governance-access-refs.jsonl
+    governance/{evidence-summaries,review-summaries,report-summaries}/
+    dependencies/{dependency-edges,field-bindings}.jsonl
+    index-artifacts/{lucene,opensearch-docs.jsonl}
+  traces/
+</code></pre>
+<p>当前 sample 默认 active release 是：</p>
+<pre><code class="language-text">rel-2026-05-06-photo-fxd-ndf-cutoff
+</code></pre>
+<p>photo reconstructed golden scope：</p>
+<pre><code class="language-text">tradition / stella / fxd-ndf-cutoff-fixing / cutoff-fixing
+</code></pre>
+<p>回滚 sample release 是：</p>
+<pre><code class="language-text">rel-2026-05-06
+</code></pre>
+<p>其中可验证的 sample scope 包括：</p>
+<pre><code class="language-text">tradition / stella / payments / core
+tradition / stella / fees / core
+tradition / stella / accounts / core
+tradition / stella / fx / core
+tradition / stella / compliance / core
+</code></pre>
+<p>photo pack 是 demo-signoff/photo reconstructed golden release，用于验证多视图 runtime projection；其中仍保留 production gate 和 open questions，不能当 production signoff truth。</p>
+<p>注意：只有 active release 中存在的 scope 才能查询。scope 不在 active release 时，服务会返回 <code>scope_unclear</code>。</p>
+<h2 id="4">4. 启动服务<a class="headerlink" href="#4" title="Permanent link">#</a></h2>
+<p>默认使用 Spring Boot 端口 <code>8080</code>：</p>
+<pre><code class="language-bash">RTS_STORE_ROOT=&quot;$PWD/sample-projection/runtime-store&quot; \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
+mvn spring-boot:run
+</code></pre>
+<p>Keep this terminal running, then open another terminal for curl commands.</p>
+<p>如果 <code>8080</code> 被占用，再指定其他端口：</p>
+<pre><code class="language-bash">RTS_STORE_ROOT=&quot;$PWD/sample-projection/runtime-store&quot; \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=19091
+</code></pre>
+<p>如果不确定哪些端口可用，也可以使用随机空闲端口：</p>
+<pre><code class="language-bash">RTS_STORE_ROOT=&quot;$PWD/sample-projection/runtime-store&quot; \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=0
+</code></pre>
+<p>此时从启动日志读取实际端口，例如：</p>
+<pre><code class="language-text">Tomcat started on port &lt;RANDOM_PORT&gt;
+</code></pre>
+<p>如果端口被占用，可以先查占用：</p>
+<pre><code class="language-bash">lsof -nP -iTCP:8080 -sTCP:LISTEN
+</code></pre>
+<h2 id="5">5. 快速验证<a class="headerlink" href="#5" title="Permanent link">#</a></h2>
+<h3 id="mcp">MCP 工具清单<a class="headerlink" href="#mcp" title="Permanent link">#</a></h3>
+<pre><code class="language-bash">curl -s http://localhost:8080/mcp/tools | jq
+</code></pre>
+<p>预期：返回 JSON，包含：</p>
+<ul>
+<li>默认 <code>RTS_MCP_EXPANDED_TOOLS_ENABLED=false</code> 时，<code>tools</code> 只包含 minimal tool mode：<code>rts_find_objects</code>、<code>rts_read_object</code>、<code>rts_get_dependencies</code>、<code>rts_ask</code>、<code>rts_get_trace</code>。</li>
+<li>显式设置 <code>RTS_MCP_EXPANDED_TOOLS_ENABLED=true</code> 后，expanded catalog 才会包含并允许执行 <code>rts_read_object_l2</code>、<code>rts_trace_report</code>、<code>rts_analyze_pr_diff</code> 等扩展工具；关闭时直接调用这些 expanded endpoints 也会被拒绝。</li>
+<li><code>catalog</code>：每个工具的 purpose、required permission、required fields、possible refusal reasons、side effect class、truth output type、budget cost、max result size、idempotency、feature flag、redaction rule。</li>
+</ul>
+<p>MCP catalog 是 tool mode 入口说明；每个工具仍共享 REST service 的 scope、permission、release、L2 hash、trace 和 refusal gate。Catalog 元数据来自同一套 RTS tool registry，因此 MCP、REST agent tools 和内部 harness 的 tool name、purpose、permission、truth output type 和 refusal 语义保持一致。</p>
+<p><code>truth_output_type</code> 是工具输出能否支撑事实 claim 的权威元数据：</p>
+<ul>
+<li><code>l2_fact</code>、<code>dependency</code>、<code>authorized_governance_summary</code> 可以作为 fact grounding 的候选证据，但仍必须通过当前 run 的 scope、release、permission、hash 和 claim validation。</li>
+<li><code>navigation_only</code>、<code>candidate</code>、<code>trace_metadata</code>、<code>none</code> 不能直接支撑 facts，只能用于导航、候选分析、审计说明或非真相上下文。</li>
+<li><code>validated_answer_envelope</code> 表示 MCP managed <code>/ask</code> 包装器返回的是 RTS service 已校验的 answer envelope；外部 agent 不能把自己的中间 tool output 升格为 RTS fact。</li>
+</ul>
+<h3 id="photo-pack">查询 photo pack<a class="headerlink" href="#photo-pack" title="Permanent link">#</a></h3>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{
+    &quot;query&quot;: &quot;fixing time 怎么生成？&quot;,
+    &quot;caller_id&quot;: &quot;tester&quot;,
+    &quot;scope_hint&quot;: {
+      &quot;channel&quot;: &quot;tradition&quot;,
+      &quot;product&quot;: &quot;stella&quot;,
+      &quot;pack&quot;: &quot;fxd-ndf-cutoff-fixing&quot;,
+      &quot;domain&quot;: &quot;cutoff-fixing&quot;
+    },
+    &quot;output_mode&quot;: &quot;default&quot;,
+    &quot;use_llm&quot;: false
+  }' | jq
+</code></pre>
+<p>预期：</p>
+<ul>
+<li><code>answer_type</code> 为 <code>answer</code>。</li>
+<li>返回 <code>facts</code>、<code>cited_objects</code>、<code>dependencies</code>、<code>trace_id</code>。</li>
+<li>fact source 应包含 <code>l2:sha256:...</code>。</li>
+<li><code>warnings</code> 应保留 photo reconstructed / demo signoff 风险提示。</li>
+</ul>
+<h3 id="sample">查询回滚 sample<a class="headerlink" href="#sample" title="Permanent link">#</a></h3>
+<p>如果需要查询 payments 等普通 sample scope，先按第 9 节切换 active release 到 <code>rel-2026-05-06</code>，再查询对应 scope。</p>
+<h3 id="scope">scope 缺失拒答<a class="headerlink" href="#scope" title="Permanent link">#</a></h3>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{
+    &quot;query&quot;: &quot;payment amount 怎么生成？&quot;,
+    &quot;caller_id&quot;: &quot;tester&quot;,
+    &quot;output_mode&quot;: &quot;default&quot;,
+    &quot;use_llm&quot;: false
+  }' | jq
+</code></pre>
+<p>预期：</p>
+<ul>
+<li><code>answer_type</code> 为 <code>refusal</code>。</li>
+<li><code>refusal.reason</code> 为 <code>scope_unclear</code>。</li>
+</ul>
+<h3 id="trace">读取 trace<a class="headerlink" href="#trace" title="Permanent link">#</a></h3>
+<p>把 <code>&lt;TRACE_ID&gt;</code> 替换成查询返回的 <code>trace_id</code>：</p>
+<pre><code class="language-bash">curl -sS http://localhost:8080/api/v1/traces/&lt;TRACE_ID&gt; \
+  -H 'X-RTS-Caller-Id: tester' \
+  -H 'X-RTS-API-Key: tester-key' | jq
+</code></pre>
+<p>预期：返回 <code>l2_read_uris</code>、<code>grounding_map</code>、<code>budget_usage</code>、<code>status</code>。Managed <code>/ask</code> 或 scenario trace 还应包含 <code>run_id</code> 和 <code>agent_run</code>；<code>agent_run</code> 内的 argument binding、tool invocation、observation、context snapshot、validated claim 是 replay/audit 依据。<code>context_snapshot</code> 只保留 truth-eligible L2 URI/hash 指针、context hash、truthEligible count、token estimate 和 redaction state；不要期待在 trace 里看到原始 diff/log/message 或 memory 文本作为 fact context。</p>
+<p><code>agent_run.loop_transitions</code> 应显示 service-owned observe/revise/hard-stop 状态，例如 <code>l2_observed -&gt; continue -&gt; validate_claims</code> 和 <code>grounding_observed -&gt; answer -&gt; hard_stop</code>。这用于审计 service loop，不表示模型可以自由发起 recipe 外工具调用。</p>
+<p><code>/api/v1/ask/contextual</code> 和 MCP <code>rts_contextual_ask</code> 允许 session scope 或 selected object 作为 hint。selected object hint 必须重新绑定 active release 和 caller permission，最终 facts 仍来自本轮 L2/dependency/governance read。</p>
+<h3 id="managed-scenario-smoke-test">Managed scenario smoke test<a class="headerlink" href="#managed-scenario-smoke-test" title="Permanent link">#</a></h3>
+<p>如果 active release 切到回滚 sample <code>rel-2026-05-06</code>，可以验证 scenario report：</p>
+<p>scenario candidate 能力默认关闭。先在本地显式开启需要的 feature flag：</p>
+<pre><code class="language-bash">RTS_IMPACT_CANDIDATES_ENABLED=true
+RTS_TEST_PLAN_CANDIDATES_ENABLED=true
+</code></pre>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/scenario/analyze-failed-message \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{
+    &quot;input&quot;: &quot;src.amount=123.45\nsrc.currency=USD&quot;,
+    &quot;caller_id&quot;: &quot;tester&quot;,
+    &quot;scope&quot;: {
+      &quot;channel&quot;: &quot;tradition&quot;,
+      &quot;product&quot;: &quot;stella&quot;,
+      &quot;pack&quot;: &quot;payments&quot;,
+      &quot;domain&quot;: &quot;core&quot;
+    },
+    &quot;output_mode&quot;: &quot;default&quot;,
+    &quot;max_objects&quot;: 5
+  }' | jq
+</code></pre>
+<p>预期：返回 <code>schema_version=scenario-report.v1</code>、<code>status=candidate</code>、<code>candidates</code>、<code>citations</code>、<code>grounding_map</code>、<code>trace_id</code>、<code>run_id</code>。这些字段说明当前 scenario surface 已返回 grounded candidate / information-service result，并能定位到 service-owned <code>AgentRun</code>；trace 中应能看到 managed harness loop 的 tool steps、context snapshot、validated claims，以及必要时的 <code>decision=revise</code> 证据补读。scenario 输出仍遵守 authority boundary，不是 release approval、final root cause、QA signoff 或 human decision。</p>
+<h2 id="6">6. 常用入口<a class="headerlink" href="#6" title="Permanent link">#</a></h2>
+<h3 id="rest">REST<a class="headerlink" href="#rest" title="Permanent link">#</a></h3>
+<ul>
+<li><code>POST /api/v1/query</code>：确定性 truth/information 查询。</li>
+<li><code>POST /api/v1/ask</code>：受控 managed analysis 入口；默认本地 LLM disabled 时降级为结构化信息提供服务。</li>
+<li><code>POST /api/v1/scenario/analyze-pr-diff</code>：PR diff scenario surface；当前先接入 managed harness impact recipe，再编译 grounded impact/test candidate report。</li>
+<li><code>POST /api/v1/scenario/investigate-exception</code>：exception scenario surface；当前先接入 managed harness impact recipe，再编译 grounded investigation candidate report。</li>
+<li><code>POST /api/v1/scenario/analyze-failed-message</code>：failed/raw message scenario surface；当前先接入 managed harness target-message recipe，再编译 grounded target candidate report。</li>
+<li><code>POST /api/v1/scenario/plan-tests</code>：test planning scenario surface；当前先接入 managed harness test-planning recipe，再编译 grounded test candidate report。</li>
+<li><code>POST /api/v1/scenario/governance-review</code>：governance review scenario surface；当前先接入 managed harness governance/review recipe，再编译 governed review candidate report。</li>
+<li><code>POST /api/v1/find</code>：候选搜索。</li>
+<li><code>POST /api/v1/objects/get</code>：读取 object card 和 dependency summary。</li>
+<li><code>POST /api/v1/objects/content</code>：读取 L2 content。</li>
+<li><code>POST /api/v1/objects/dependencies</code>：依赖遍历。</li>
+<li><code>GET /api/v1/traces/{traceId}</code>：读取 trace。</li>
+<li><code>POST /api/v1/message/*</code>：raw message 到 target candidate 支持工具。</li>
+<li><code>POST /api/v1/analyze/*</code>：impact、test plan、grounding、readiness、compare、conflict。</li>
+<li><code>POST /api/v1/feedback/*</code>：feedback 和 non-truth memory。</li>
+<li><code>POST /api/v1/governance/*</code>：治理辅助和人工 decision 记录。</li>
+<li><code>POST /api/v1/pipeline/release-readiness</code>：pipeline 可读 readiness report。</li>
+<li><code>POST /api/v1/reports/trace</code>：trace report。</li>
+</ul>
+<h3 id="mcp_1">MCP<a class="headerlink" href="#mcp_1" title="Permanent link">#</a></h3>
+<ul>
+<li><code>GET /mcp/tools</code>：工具清单。</li>
+<li><code>POST /mcp/tools/rts_find_objects</code></li>
+<li><code>POST /mcp/tools/rts_read_object_l2</code></li>
+<li><code>POST /mcp/tools/rts_ask</code></li>
+<li><code>POST /mcp/tools/rts_trace_report</code></li>
+<li>其他工具以 <code>/mcp/tools/&lt;tool_name&gt;</code> 暴露。</li>
+</ul>
+<h2 id="7-caller">7. 权限和示例 caller<a class="headerlink" href="#7-caller" title="Permanent link">#</a></h2>
+<p>sample store 内置 caller：</p>
+<pre><code class="language-text">caller_id: tester
+api key: tester-key
+</code></pre>
+<p>请求 header：</p>
+<pre><code class="language-bash">-H 'X-RTS-API-Key: tester-key'
+</code></pre>
+<p>请求 body 使用 snake_case 字段，例如：</p>
+<pre><code class="language-json">{
+  &quot;caller_id&quot;: &quot;tester&quot;,
+  &quot;scope_hint&quot;: {},
+  &quot;output_mode&quot;: &quot;default&quot;
+}
+</code></pre>
+<p>不要使用 camelCase，例如 <code>callerId</code>、<code>scopeHint</code>，否则会返回 400。</p>
+<h2 id="8-llm">8. LLM 配置<a class="headerlink" href="#8-llm" title="Permanent link">#</a></h2>
+<p>默认：</p>
+<pre><code class="language-text">RTS_LLM_ENABLED=false
+</code></pre>
+<p>此时 <code>/ask</code> 不依赖外部 provider。若 <code>RTS_TOOL_ORCHESTRATOR_ENABLED=false</code>，<code>/ask</code> 直接降级为 deterministic <code>/query</code> 风格的信息服务；若显式开启 orchestrator，则使用 disabled LLM client 通过受控工具链返回 grounded answer。</p>
+<p>高风险候选能力的生产默认值保持关闭：<code>RTS_TOOL_ORCHESTRATOR_ENABLED=false</code>、<code>RTS_CONFUSABLE_CHECK_ENABLED=false</code>、<code>RTS_IMPACT_CANDIDATES_ENABLED=false</code>、<code>RTS_TEST_PLAN_CANDIDATES_ENABLED=false</code>、<code>RTS_MCP_EXPANDED_TOOLS_ENABLED=false</code>。只有评估通过后才逐项开启。</p>
+<p>默认开启 managed/scenario/LLM 模式前，evaluation 必须同时通过两类 gate：</p>
+<ul>
+<li>safety gates：scope resolution、refusal correctness、trace completeness、top-k recall、unsupported claim count、wrong scope count。</li>
+<li>AI value gates：<code>first_pass_usefulness</code> 和 <code>ai_value_score_min</code>，来源必须是 grounded facts、inferences、unknowns、candidate suggestions、next evidence 等结构化输出信号，不能用自由文本流畅度充数。</li>
+</ul>
+<p>如需启用 OpenAI-compatible endpoint：</p>
+<pre><code class="language-bash">RTS_LLM_ENABLED=true \
+RTS_TOOL_ORCHESTRATOR_ENABLED=true \
+RTS_LLM_BASE_URL=https://example.com \
+RTS_LLM_API_KEY=... \
+RTS_LLM_MODEL=... \
+RTS_LLM_WIRE_API=responses \
+RTS_STORE_ROOT=&quot;$PWD/sample-projection/runtime-store&quot; \
+JAVA_HOME=$(/usr/libexec/java_home -v 17) \
+mvn spring-boot:run
+</code></pre>
+<p>LLM 仍只能通过 allowlisted tools 读取 RTS truth，不能绕过 scope、permission、release、L2、trace 和 grounding validation。<code>ControlledLlmHarness</code> 的 plan/observe/revise/hard-stop loop 由 RTS service 拥有；模型可以产出结构化分析草稿和 tool needs，但不能直接授权新工具调用。若 service policy 判断依赖证据不足，会追加受控 L2 read 并把 revise 决策写入 <code>AgentRun.loop_transitions</code>。</p>
+<p>Responses provider 必须返回受控 JSON schema draft，字段包括 <code>analysis_text</code>、<code>claims</code>、<code>inferences</code>、<code>unknowns</code>、<code>candidates</code>、<code>warnings</code>、<code>citation_intents</code>、<code>tool_needs</code>。RTS 只把它作为分析草稿；最终 facts 仍由本次 service-owned L2/dependency/governance evidence 和 validator 裁决。</p>
+<p>调试 LLM provider 时可以开启：</p>
+<pre><code class="language-bash">RTS_LLM_DEBUG_RAW_OUTPUT=true
+</code></pre>
+<p>开启后服务日志会写入 raw model response 和 extracted output text，只适合本地调试；不要在包含敏感业务规则或生产消息的环境开启。</p>
+<p>claim validator 默认开启：</p>
+<pre><code class="language-bash">RTS_CLAIM_VALIDATOR_ENABLED=true
+</code></pre>
+<p>如需临时排查模型输出和 validator 的差异，可以在本地设置 <code>RTS_CLAIM_VALIDATOR_ENABLED=false</code>。这只绕过 final claim validation，不会绕过 scope、permission、release、tool orchestration、prompt guard 或 trace。</p>
+<p>启用 LLM 时，请先确认数据外发边界。RTS 只发送受控工具上下文和必要 L2 片段给配置的模型端点，但这些内容仍可能包含业务规则语义；生产或敏感环境需要使用获批 endpoint、密钥和日志策略。</p>
+<h2 id="9-sample-active-release">9. 切换 sample active release<a class="headerlink" href="#9-sample-active-release" title="Permanent link">#</a></h2>
+<p>默认 active release 是 photo pack：</p>
+<pre><code class="language-text">rel-2026-05-06-photo-fxd-ndf-cutoff
+</code></pre>
+<p>如果要切回普通 sample，先停止服务，然后写入 active pointer。这个手写文件方式只用于本地 sample 验证；生产或共享环境应使用受控发布/切换流程，不要直接改 active pointer：</p>
+<pre><code class="language-bash">cat &gt; &quot;$PWD/sample-projection/runtime-store/active-release.json&quot; &lt;&lt;'JSON'
+{
+  &quot;active_release_id&quot;: &quot;rel-2026-05-06&quot;,
+  &quot;rollback_target_release_id&quot;: null,
+  &quot;updated_at&quot;: &quot;2026-05-06T00:00:00Z&quot;,
+  &quot;updated_by&quot;: &quot;manual-validation&quot;
+}
+JSON
+</code></pre>
+<p>再重启服务并查询：</p>
+<pre><code class="language-bash">curl -sS -X POST http://localhost:8080/api/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-RTS-API-Key: tester-key' \
+  -d '{
+    &quot;query&quot;: &quot;payment amount 怎么生成？&quot;,
+    &quot;caller_id&quot;: &quot;tester&quot;,
+    &quot;scope_hint&quot;: {
+      &quot;channel&quot;: &quot;tradition&quot;,
+      &quot;product&quot;: &quot;stella&quot;,
+      &quot;pack&quot;: &quot;payments&quot;,
+      &quot;domain&quot;: &quot;core&quot;
+    },
+    &quot;output_mode&quot;: &quot;default&quot;,
+    &quot;use_llm&quot;: false
+  }' | jq
+</code></pre>
+<p>切回默认 photo pack：</p>
+<pre><code class="language-bash">cat &gt; &quot;$PWD/sample-projection/runtime-store/active-release.json&quot; &lt;&lt;'JSON'
+{
+  &quot;active_release_id&quot;: &quot;rel-2026-05-06-photo-fxd-ndf-cutoff&quot;,
+  &quot;rollback_target_release_id&quot;: &quot;rel-2026-05-06&quot;,
+  &quot;updated_at&quot;: &quot;2026-05-07T00:00:00Z&quot;,
+  &quot;updated_by&quot;: &quot;sample&quot;
+}
+JSON
+</code></pre>
+<h2 id="10">10. 常见问题<a class="headerlink" href="#10" title="Permanent link">#</a></h2>
+<h3 id="curl-sub2api-html">curl 返回 Sub2API HTML<a class="headerlink" href="#curl-sub2api-html" title="Permanent link">#</a></h3>
+<p>说明你打到的端口不是 RTS，而是当前机器上其他服务。先查端口：</p>
+<pre><code class="language-bash">lsof -nP -iTCP:8080 -sTCP:LISTEN
+</code></pre>
+<p>如果确认 <code>8080</code> 被其他服务占用，再用 <code>--server.port=&lt;PORT&gt;</code> 或 <code>--server.port=0</code> 启动 RTS。</p>
+<h3 id="port-already-in-use">Port already in use<a class="headerlink" href="#port-already-in-use" title="Permanent link">#</a></h3>
+<p>换端口或用随机端口：</p>
+<pre><code class="language-bash">mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=0
+</code></pre>
+<h3 id="400-unrecognized-field">400 Unrecognized field<a class="headerlink" href="#400-unrecognized-field" title="Permanent link">#</a></h3>
+<p>请求 JSON 字段必须用 snake_case：</p>
+<pre><code class="language-text">caller_id
+scope_hint
+output_mode
+use_llm
+max_tool_calls
+</code></pre>
+<h3 id="scope_unclear-scope-is-not-active-in-release">scope_unclear: Scope is not active in release<a class="headerlink" href="#scope_unclear-scope-is-not-active-in-release" title="Permanent link">#</a></h3>
+<p>查询 scope 不属于当前 active release。检查：</p>
+<pre><code class="language-bash">cat sample-projection/runtime-store/active-release.json
+cat sample-projection/runtime-store/releases/&lt;release_id&gt;/scopes.jsonl
+</code></pre>
+<h3 id="list-scopes">list scopes 返回空<a class="headerlink" href="#list-scopes" title="Permanent link">#</a></h3>
+<p>可能是当前 caller profile 没有 <code>scope_tools</code> 权限。普通 query 仍可能可用。用 <code>/api/v1/query</code> 直接验证业务 scope。</p>
+<h3 id="_1">依赖下载失败<a class="headerlink" href="#_1" title="Permanent link">#</a></h3>
+<p>确认网络能访问 Maven Central，或配置企业 Maven mirror。</p>
+<h2 id="11">11. 提交前检查<a class="headerlink" href="#11" title="Permanent link">#</a></h2>
+<p>提交代码前至少执行：</p>
+<pre><code class="language-bash">JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn verify
+git diff --check
+git status --short
+</code></pre>
+      </div>
+    </details>
+  </main>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

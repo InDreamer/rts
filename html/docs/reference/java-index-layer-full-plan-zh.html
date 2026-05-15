@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Java Index Layer Reference Summary | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/java-index-layer-full-plan-zh.md</p>
+      <h1>Java Index Layer Reference Summary</h1>
+      <p>distilled Java index/query layer reference; current safe ideas without old infrastructure commitments</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/java-index-layer-full-plan-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要从旧 Java 索引层方案中提取仍适用的工程原则</li>
+<li>需要判断当前 Java service 为什么采用 lightweight projection store、Lucene、L2 回读和受控 query boundary</li>
+<li>需要确认哪些早期 OpenSearch/vector/Knowledge-Bases 设想已经降级为历史参考</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要当前 RTS 全系统 baseline</li>
+<li>需要 Day1 服务的具体运行命令</li>
+<li>需要完整历史方案原文</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/day1-query-service-and-llm-harness-plan-zh.html">RTS Day1 Query Service And Controlled LLM Harness</a><a href="../confirmed/kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>distilled Java index/query layer reference; current safe ideas without old infrastructure commitments</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：distilled reference &gt; 日期：2026-05-08 &gt; 原始长文：docs/archive/reference-proposals/java-index-layer-full-plan-zh.md &gt; 目的：保留旧 Java index/query layer 方案里仍然有用的工程思想，删除默认阅读路径中的过时基础设施假设。 这份摘要不是当前 RTS 全系统 baseline，也不是最终技术栈决定。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Current Interpretation</h3>
+          <p>这份摘要不是当前 RTS 全系统 baseline，也不是最终技术栈决定。 当前 baseline 以 confirmed docs 为准： RTS 是 governed rule truth service。 runtime projection 是 approved truth 的服务运行视图，不是摘要替身。 query/index service 只能读取 approved runtime projection。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Still Useful Ideas</h3>
+          <p>旧方案中仍然适用的原则： 1. Java service as maintainable runtime boundary 查询/索引服务应是可测试、可部署、可观测的 Java 服务，而不是临时脚本或直接文件检索。 2. Truth ownership stays outside index/search 索引层不接管 canonical truth、review、signoff 或 human adjudication。</p>
+        </article>
+<article class="chapter-card">
+          <h3>Retired Or Downgraded Ideas</h3>
+          <p>以下旧设想不再作为默认 reference 路线：</p>
+        </article>
+<article class="chapter-card">
+          <h3>Current Safe Boundary</h3>
+          <p>推荐用下面的心智模型理解 Java query/index service： 关键边界： Java service 可以拥有 runtime truth access rules。 Java service 不拥有 canonical truth。 Index can find candidates. L2 read proves facts.</p>
+        </article>
+<article class="chapter-card">
+          <h3>When To Read The Archived Full Plan</h3>
+          <p>只有在以下场景才读 archive 原文： 需要追溯 2026-04-20 Java index layer 的完整阶段设想。 需要比较早期 OpenSearch/vector/PostgreSQL 方案与当前 Day1 方案的差异。 需要从旧方案中挖出被当前摘要遗漏的实现 checklist。 读 archive 原文时必须套用当前裁决：</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="java-index-layer-reference-summary">Java Index Layer Reference Summary<a class="headerlink" href="#java-index-layer-reference-summary" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：distilled reference
+日期：2026-05-08
+原始长文：<code>docs/archive/reference-proposals/java-index-layer-full-plan-zh.md</code>
+目的：保留旧 Java index/query layer 方案里仍然有用的工程思想，删除默认阅读路径中的过时基础设施假设。</p>
+</blockquote>
+<h2 id="current-interpretation">Current Interpretation<a class="headerlink" href="#current-interpretation" title="Permanent link">#</a></h2>
+<p>这份摘要不是当前 RTS 全系统 baseline，也不是最终技术栈决定。</p>
+<p>当前 baseline 以 confirmed docs 为准：</p>
+<ul>
+<li>RTS 是 governed rule truth service。</li>
+<li>runtime projection 是 approved truth 的服务运行视图，不是摘要替身。</li>
+<li>query/index service 只能读取 approved runtime projection。</li>
+<li>search hit、LLM answer、agent memory、index document 都不是 truth。</li>
+<li>Day1 采用 JDK 17 Java service、filesystem projection store、Lucene、本地 L2 content、受控 LLM harness。</li>
+</ul>
+<p>原始长文保留在 archive 中，仅用于历史追溯。</p>
+<h2 id="still-useful-ideas">Still Useful Ideas<a class="headerlink" href="#still-useful-ideas" title="Permanent link">#</a></h2>
+<p>旧方案中仍然适用的原则：</p>
+<ol>
+<li>
+<p><strong>Java service as maintainable runtime boundary</strong>
+   查询/索引服务应是可测试、可部署、可观测的 Java 服务，而不是临时脚本或直接文件检索。</p>
+</li>
+<li>
+<p><strong>Truth ownership stays outside index/search</strong>
+   索引层不接管 canonical truth、review、signoff 或 human adjudication。</p>
+</li>
+<li>
+<p><strong>Projection is a released artifact</strong>
+   runtime projection 必须可追踪、可重建、可激活/回滚，并带 release manifest。</p>
+</li>
+<li>
+<p><strong>Scope before content</strong>
+   查询应先确定 channel/product/pack/domain/object 范围，再读取 L2 结构化内容。</p>
+</li>
+<li>
+<p><strong>L0/L1/card help navigation, L2 supports final facts</strong>
+   L0/L1/card/search text 可以帮助召回和 disambiguation，但最终事实必须回到 L2 object 或授权 governance view。</p>
+</li>
+<li>
+<p><strong>Dependency graph is first-class</strong>
+   rule、lookup、helper、source anchor、target path 之间的依赖边应可查询、可追踪、可解释。</p>
+</li>
+<li>
+<p><strong>Derived stores are rebuildable</strong>
+   Lucene/OpenSearch/vector index 都只能是派生视图，不能成为 authoritative runtime boundary。</p>
+</li>
+<li>
+<p><strong>Refusal is product behavior</strong>
+   unresolved scope、missing release、hash mismatch、permission denied、dependency not released、only summary hit 等情况必须拒答或要求澄清。</p>
+</li>
+</ol>
+<h2 id="retired-or-downgraded-ideas">Retired Or Downgraded Ideas<a class="headerlink" href="#retired-or-downgraded-ideas" title="Permanent link">#</a></h2>
+<p>以下旧设想不再作为默认 reference 路线：</p>
+<table>
+<thead>
+<tr>
+<th>Old idea</th>
+<th>Current treatment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Knowledge-Bases/</code> tree as required runtime shape</td>
+<td>历史术语。当前使用 runtime projection，底层可在 filesystem、PostgreSQL、object store 或其他介质。</td>
+</tr>
+<tr>
+<td>Java 21 as baseline</td>
+<td>当前实现使用 JDK 17。未来升级另行决定。</td>
+</tr>
+<tr>
+<td>PostgreSQL + OpenSearch/Elasticsearch as initial infrastructure</td>
+<td>Day1 不要求。当前使用 filesystem store + Lucene，并保留替换接口。</td>
+</tr>
+<tr>
+<td>Vector/hybrid retrieval as first implementation</td>
+<td>Day1 不做；Day2 以后先证明 BM25/alias/card 不够，再评估。</td>
+</tr>
+<tr>
+<td>Projection strips governance fields absolutely</td>
+<td>已替换为 operational view / authorized governance view 模型。</td>
+</tr>
+<tr>
+<td>Full production-style audit/SSO/object-store stack on first pass</td>
+<td>当前不是 Day1 必选；后续按 deployment/security 需要推进。</td>
+</tr>
+<tr>
+<td>“TRS” as current primary name</td>
+<td>只作为历史名称或别名；当前统一 RTS。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-safe-boundary">Current Safe Boundary<a class="headerlink" href="#current-safe-boundary" title="Permanent link">#</a></h2>
+<p>推荐用下面的心智模型理解 Java query/index service：</p>
+<pre><code class="language-text">KB / governance side
+  -&gt; approved immutable runtime projection
+  -&gt; RTS Java query/index service
+     -&gt; active release and permission gate
+     -&gt; scope resolver
+     -&gt; object manifest / card / Lucene candidate search
+     -&gt; L2 read and hash validation
+     -&gt; dependency traversal
+     -&gt; trace / refusal / grounding
+  -&gt; REST / MCP / managed LLM harness / external tool callers
+</code></pre>
+<p>关键边界：</p>
+<ul>
+<li>Java service 可以拥有 runtime truth access rules。</li>
+<li>Java service 不拥有 canonical truth。</li>
+<li>Index can find candidates.</li>
+<li>L2 read proves facts.</li>
+<li>LLM can explain and plan tool use.</li>
+<li>Grounding/refusal must remain service-controlled.</li>
+</ul>
+<h2 id="when-to-read-the-archived-full-plan">When To Read The Archived Full Plan<a class="headerlink" href="#when-to-read-the-archived-full-plan" title="Permanent link">#</a></h2>
+<p>只有在以下场景才读 archive 原文：</p>
+<ul>
+<li>需要追溯 2026-04-20 Java index layer 的完整阶段设想。</li>
+<li>需要比较早期 OpenSearch/vector/PostgreSQL 方案与当前 Day1 方案的差异。</li>
+<li>需要从旧方案中挖出被当前摘要遗漏的实现 checklist。</li>
+</ul>
+<p>读 archive 原文时必须套用当前裁决：</p>
+<ul>
+<li>confirmed docs 覆盖 archive。</li>
+<li>old infrastructure choices are not commitments.</li>
+<li>old projection wording is historical.</li>
+<li>old TRS naming maps to current RTS.</li>
+</ul>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Runtime Projection Product Guide | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Confirmed Baseline · docs/confirmed/runtime-projection-product-guide-zh.md</p>
+      <h1>Runtime Projection Product Guide</h1>
+      <p>PM-facing runtime projection product guide explaining what each runtime package area does without replacing the technical projection contract</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/runtime-projection-product-guide-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要从产品、PM、集成方或 AI agent 视角解释 runtime projection 是什么</li>
+<li>需要理解 active release、manifest、scope、L2、navigation、dependency、governance、permission、index 和 trace 各自解决什么问题</li>
+<li>需要向非底层实现读者说明 sample-projection/runtime-store 的目录含义</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>需要精确字段、schema、admission rule、query resolver 读取约束</li>
+<li>需要修改 projection publisher 或 query/index 层实现</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a><a href="llm-harness-and-agent-integration-alignment-zh.html">RTS LLM Harness And Agent Integration Alignment</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>PM-facing runtime projection product guide explaining what each runtime package area does without replacing the technical projection contract</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>&gt; 状态：confirmed explanatory guide &gt; 创建日期：2026-05-15 &gt; 范围：用产品和 PM 视角解释 runtime projection 运行包的组成、用途和边界 &gt; 非目标：不替代 kb-to-index-projection-contract-zh.md 的字段契约、schema 约束和发布规则 runtime projection 是 RTS 把已批准的规则真相发布给运行时服务使用的产品化运行包。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. 一句话定义</h3>
+          <p>runtime projection 是 RTS 把已批准的规则真相发布给运行时服务使用的产品化运行包。 它不是 KB 原文，不是索引文档，不是 HTML 展示页，也不是 LLM 的回答素材拼接。它的产品职责是让 RTS service 能在明确 release、scope、permission、hash、dependency、governance 和 trace 边界内，对外提供查询、解释、影响分析、测试规划、agent tool 和</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 它解决什么产品问题</h3>
+          <p>Runtime projection 解决的不是“文件怎么存”这个问题，而是以下产品问题： 当前线上服务应该使用哪个规则版本。 用户或 agent 的问题属于哪个业务 scope。 哪些 rule、lookup、helper 已经 released，可以被默认服务读取。 最终事实应该从哪里读取，如何证明没有被搜索结果或 LLM 编造。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. 产品心智模型</h3>
+          <p>Runtime projection 可以被看成一个 release package，里面每类文件承担一个产品角色： 这些角色共同组成 RTS 的 runtime truth access boundary。任何单独一类文件都不应该被误读为完整真相服务。</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. 每类内容做什么</h3>
+          <p>这是当前服务应该使用的 release 指针。 它通常包含： active release id rollback target release id updated at / by PM 视角：这是发布开关。它让 RTS 明确“当前线上回答基于哪版规则”，并保留出现问题时回滚到哪一版的产品路径。 这是某个 runtime projection release 的身份证。</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. 它不是什么</h3>
+          <p>Runtime projection 不应该被理解为： 不是 KB 的完整治理图。 不是 candidate pack。 不是 raw evidence bundle。 不是人工或 AI 的审阅草稿。 不是搜索引擎索引。 不是 HTML/dashboard 展示页。 不是 LLM memory。 不是 query trace 反向写回 truth 的通道。</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. AI 和 agent 应该如何使用它</h3>
+          <p>AI/agent 不应该直接遍历 projection 文件并自行判断 truth。正确产品路径是： AI 可以阅读和分析 projection 材料，但事实 claim 必须 ground 到： L2 runtime object dependency edge / field binding authorized governance summary</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. 与技术契约的关系</h3>
+          <p>本文只解释产品含义和运行包角色。 如果需要决定以下问题，以 kb-to-index-projection-contract-zh.md 为准： projection publisher 必须产出哪些结构。 每类对象必须有哪些字段。 admission rule 如何判断对象是否能进入 projection。 query/index 层只能读取哪些内容。</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. PM 检查清单</h3>
+          <p>评审一个 runtime projection release 时，PM 或产品 owner 可以先问： 当前 active release 是哪一版？rollback target 是哪一版？ release manifest 是否显示 blocking issue 为 0？ scope 是否足够明确，是否可能与相似 product/pack 串线？</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="runtime-projection-product-guide">Runtime Projection Product Guide<a class="headerlink" href="#runtime-projection-product-guide" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：confirmed explanatory guide<br>
+创建日期：2026-05-15<br>
+范围：用产品和 PM 视角解释 runtime projection 运行包的组成、用途和边界<br>
+非目标：不替代 <code>kb-to-index-projection-contract-zh.md</code> 的字段契约、schema 约束和发布规则</p>
+</blockquote>
+<h2 id="1">1. 一句话定义<a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<p><code>runtime projection</code> 是 RTS 把已批准的规则真相发布给运行时服务使用的产品化运行包。</p>
+<p>它不是 KB 原文，不是索引文档，不是 HTML 展示页，也不是 LLM 的回答素材拼接。它的产品职责是让 RTS service 能在明确 release、scope、permission、hash、dependency、governance 和 trace 边界内，对外提供查询、解释、影响分析、测试规划、agent tool 和 managed analysis。</p>
+<p>从 PM 视角可以这样理解：</p>
+<pre><code class="language-text">KB 负责真相形成和治理
+runtime projection 负责把 approved truth 发布成可服务运行包
+RTS service 负责受控读取、校验、追踪和拒答
+AI/agent 负责在这些边界内做分析和表达
+</code></pre>
+<h2 id="2">2. 它解决什么产品问题<a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>Runtime projection 解决的不是“文件怎么存”这个问题，而是以下产品问题：</p>
+<ul>
+<li>当前线上服务应该使用哪个规则版本。</li>
+<li>用户或 agent 的问题属于哪个业务 scope。</li>
+<li>哪些 rule、lookup、helper 已经 released，可以被默认服务读取。</li>
+<li>最终事实应该从哪里读取，如何证明没有被搜索结果或 LLM 编造。</li>
+<li>如何低噪声找到正确规则，而不是把相似规则混进来。</li>
+<li>如何解释规则依赖、影响面和测试候选。</li>
+<li>哪些 evidence、review、report、open question 可以在授权时被展示。</li>
+<li>谁能访问哪个 pack、entrypoint 和输出模式。</li>
+<li>每次回答读了哪些对象、是否 ground 到 L2、为什么拒答或降级。</li>
+<li>如果当前 release 出问题，如何定位 rollback target。</li>
+</ul>
+<h2 id="3">3. 产品心智模型<a class="headerlink" href="#3" title="Permanent link">#</a></h2>
+<p>Runtime projection 可以被看成一个 release package，里面每类文件承担一个产品角色：</p>
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>产品角色</th>
+<th>主要回答的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>active release</td>
+<td>当前服务指针</td>
+<td>现在运行哪一版？回滚到哪一版？</td>
+</tr>
+<tr>
+<td>release manifest</td>
+<td>发布身份证</td>
+<td>这版从哪里来？能不能用？有没有 blocking issue？</td>
+</tr>
+<tr>
+<td>scope registry</td>
+<td>业务边界</td>
+<td>这个问题属于哪个 channel/product/pack/domain？</td>
+</tr>
+<tr>
+<td>object manifest</td>
+<td>对象目录</td>
+<td>这版有哪些 released rule/lookup/helper？</td>
+</tr>
+<tr>
+<td>L2 runtime objects</td>
+<td>事实正文</td>
+<td>规则到底怎么做？lookup/helper 怎么定义？</td>
+</tr>
+<tr>
+<td>navigation views</td>
+<td>查找和消歧</td>
+<td>用户不知道精确 id 时怎么找到正确对象？</td>
+</tr>
+<tr>
+<td>dependencies / bindings</td>
+<td>关系和影响</td>
+<td>规则依赖谁？字段从哪里来？改动影响哪里？</td>
+</tr>
+<tr>
+<td>governance summaries</td>
+<td>可信度和风险</td>
+<td>为什么可信？有什么 warning、open question、production gate？</td>
+</tr>
+<tr>
+<td>caller profiles</td>
+<td>权限边界</td>
+<td>谁能看哪些 pack、调用哪些入口？</td>
+</tr>
+<tr>
+<td>index artifacts</td>
+<td>检索加速</td>
+<td>怎么更快召回候选？</td>
+</tr>
+<tr>
+<td>traces</td>
+<td>审计复盘</td>
+<td>这次回答读了什么、为什么这么答或拒答？</td>
+</tr>
+</tbody>
+</table>
+<p>这些角色共同组成 RTS 的 runtime truth access boundary。任何单独一类文件都不应该被误读为完整真相服务。</p>
+<h2 id="4">4. 每类内容做什么<a class="headerlink" href="#4" title="Permanent link">#</a></h2>
+<h3 id="41-active-releasejson">4.1 <code>active-release.json</code><a class="headerlink" href="#41-active-releasejson" title="Permanent link">#</a></h3>
+<p>这是当前服务应该使用的 release 指针。</p>
+<p>它通常包含：</p>
+<ul>
+<li>active release id</li>
+<li>rollback target release id</li>
+<li>updated at / by</li>
+</ul>
+<p>PM 视角：这是发布开关。它让 RTS 明确“当前线上回答基于哪版规则”，并保留出现问题时回滚到哪一版的产品路径。</p>
+<h3 id="42-release-manifestjson">4.2 <code>release-manifest.json</code><a class="headerlink" href="#42-release-manifestjson" title="Permanent link">#</a></h3>
+<p>这是某个 runtime projection release 的身份证。</p>
+<p>它说明：</p>
+<ul>
+<li>release id</li>
+<li>canonical revision</li>
+<li>projection / card / summary schema version</li>
+<li>generated / released 时间</li>
+<li>activation state</li>
+<li>rollback target</li>
+<li>content hash summary</li>
+<li>blocking issues count</li>
+</ul>
+<p>PM 视角：这是上线可用性证明。没有有效 manifest，就没有可用 runtime truth。</p>
+<h3 id="43-scopesjsonl">4.3 <code>scopes.jsonl</code><a class="headerlink" href="#43-scopesjsonl" title="Permanent link">#</a></h3>
+<p>这是业务范围注册表。</p>
+<p>它定义服务能进入哪些业务区域，例如：</p>
+<pre><code class="language-text">channel / product / pack / domain
+</code></pre>
+<p>PM 视角：这是防串线机制。它防止用户问某个 product 或 pack 时，系统误拿另一个相似 product、相似 lookup 或相似字段的规则回答。</p>
+<h3 id="44-object-manifestjsonl">4.4 <code>object-manifest.jsonl</code><a class="headerlink" href="#44-object-manifestjsonl" title="Permanent link">#</a></h3>
+<p>这是 released 对象目录。</p>
+<p>它列出每个可服务对象：</p>
+<ul>
+<li>stable URI</li>
+<li>object id</li>
+<li>object type: rule / lookup / helper</li>
+<li>scope</li>
+<li>target path / source anchors</li>
+<li>content hash</li>
+<li>card ref</li>
+<li>L2 content ref</li>
+<li>schema version</li>
+<li>release state</li>
+</ul>
+<p>PM 视角：这是“本 release 提供哪些规则能力”的产品目录。确定性查找应优先从这里开始，而不是从全文搜索开始。</p>
+<h3 id="45-l2">4.5 <code>l2/</code><a class="headerlink" href="#45-l2" title="Permanent link">#</a></h3>
+<p><code>l2/rules/*.json</code>、<code>l2/lookups/*.json</code>、<code>l2/helpers/*.json</code> 是 runtime projection 中最重要的事实正文。</p>
+<p>它们保存服务可读的结构化规则事实，例如：</p>
+<ul>
+<li>inputs</li>
+<li>source path</li>
+<li>logic pipeline</li>
+<li>target path</li>
+<li>constants / conditions / fallback</li>
+<li>lookup/helper/rule dependencies</li>
+<li>examples</li>
+<li>warnings</li>
+<li>review state</li>
+<li>content hash</li>
+</ul>
+<p>PM 视角：这是 RTS 回答事实时必须回到的地方。搜索命中、card、HTML 展示、LLM summary 都不能替代 L2。</p>
+<h3 id="46-navigation">4.6 <code>navigation/</code><a class="headerlink" href="#46-navigation" title="Permanent link">#</a></h3>
+<p><code>navigation/</code> 是为了找对象，不是为了承载最终事实。</p>
+<p>常见内容：</p>
+<ul>
+<li><code>object-cards.jsonl</code>：对象卡片，用于定位、消歧、初步排序。</li>
+<li><code>l0-l1-views.jsonl</code>：低成本过滤和结构化导航视图。</li>
+<li><code>aliases.jsonl</code>：业务词、同义词、简称和别名。</li>
+<li><code>confusables.jsonl</code>：相似但不应混用的对象或反例候选。</li>
+</ul>
+<p>PM 视角：这是用户和 AI 的低噪声入口。它让调用方不用知道精确 rule id，也能找到正确对象；但找到以后必须回读 L2。</p>
+<h3 id="47-dependencies">4.7 <code>dependencies/</code><a class="headerlink" href="#47-dependencies" title="Permanent link">#</a></h3>
+<p><code>dependencies/</code> 描述对象关系和字段绑定。</p>
+<p>常见内容：</p>
+<ul>
+<li><code>dependency-edges.jsonl</code>：rule -&gt; lookup、rule -&gt; helper、rule -&gt; rule 等依赖关系。</li>
+<li><code>field-bindings.jsonl</code>：source field、target field、output field、via object 的绑定关系。</li>
+</ul>
+<p>PM 视角：这是影响分析、解释链和测试规划的基础。用户问“改这个 lookup 会影响哪些规则？”或“这个 target 字段从哪里来？”时，需要这里的信息。</p>
+<h3 id="48-governance">4.8 <code>governance/</code><a class="headerlink" href="#48-governance" title="Permanent link">#</a></h3>
+<p><code>governance/</code> 是受权限控制的可信度和治理解释视图。</p>
+<p>常见内容：</p>
+<ul>
+<li><code>governance-access-refs.jsonl</code>：每个对象有哪些 evidence/review/report summary 可访问，以及 redaction/access 状态。</li>
+<li><code>evidence-summaries/*.json</code>：证据摘要。</li>
+<li><code>review-summaries/*.json</code>：review 结论、open questions、production gate。</li>
+<li><code>report-summaries/*.json</code>：pack 或 release 级别总结。</li>
+</ul>
+<p>PM 视角：这是“为什么可信、哪里有风险、哪些仍需确认”的产品解释层。普通 operational answer 不应默认混入大量治理噪声；治理、审计或 AI review 场景可以在授权后读取。</p>
+<h3 id="49-caller-profilesjsonl">4.9 <code>caller-profiles.jsonl</code><a class="headerlink" href="#49-caller-profilesjsonl" title="Permanent link">#</a></h3>
+<p>这是运行时 caller 权限配置。</p>
+<p>它定义：</p>
+<ul>
+<li>caller id</li>
+<li>api key hash</li>
+<li>allowed channels / products / packs</li>
+<li>allowed entrypoints</li>
+<li>allowed output modes</li>
+<li>active flag</li>
+</ul>
+<p>PM 视角：这是产品访问控制。不同用户、pipeline、agent 或 admin 不应天然拥有同样的规则和治理视图权限。</p>
+<h3 id="410-index-artifacts">4.10 <code>index-artifacts/</code><a class="headerlink" href="#410-index-artifacts" title="Permanent link">#</a></h3>
+<p>这是 projection 派生出的索引副本或本地索引文件。</p>
+<p>例如：</p>
+<ul>
+<li><code>opensearch-docs.jsonl</code></li>
+<li>Lucene index files</li>
+</ul>
+<p>PM 视角：这是搜索性能和召回体验层。它可以帮助更快找到候选，但不能成为 final truth source。</p>
+<h3 id="411-traces">4.11 <code>traces/</code><a class="headerlink" href="#411-traces" title="Permanent link">#</a></h3>
+<p><code>traces/</code> 保存运行审计记录。</p>
+<p>常见内容：</p>
+<ul>
+<li><code>query-trace.jsonl</code></li>
+<li><code>llm-run-trace.jsonl</code></li>
+</ul>
+<p>它记录：</p>
+<ul>
+<li>query plan</li>
+<li>resolved scope</li>
+<li>candidate / selected URIs</li>
+<li>L2 read URIs</li>
+<li>refusal reason</li>
+<li>tool calls</li>
+<li>grounding map</li>
+<li>budget usage</li>
+<li>model run hash</li>
+</ul>
+<p>PM 视角：这是可解释、可复盘、可审计。用户质疑回答、生产排障、模型输出验证和权限审计都需要 trace。</p>
+<h2 id="5">5. 它不是什么<a class="headerlink" href="#5" title="Permanent link">#</a></h2>
+<p>Runtime projection 不应该被理解为：</p>
+<ul>
+<li>不是 KB 的完整治理图。</li>
+<li>不是 candidate pack。</li>
+<li>不是 raw evidence bundle。</li>
+<li>不是人工或 AI 的审阅草稿。</li>
+<li>不是搜索引擎索引。</li>
+<li>不是 HTML/dashboard 展示页。</li>
+<li>不是 LLM memory。</li>
+<li>不是 query trace 反向写回 truth 的通道。</li>
+</ul>
+<p>如果需要修改规则真相，应回到 canonical KB / governance / signoff / release process，再发布新的 projection。</p>
+<h2 id="6-ai-agent">6. AI 和 agent 应该如何使用它<a class="headerlink" href="#6-ai-agent" title="Permanent link">#</a></h2>
+<p>AI/agent 不应该直接遍历 projection 文件并自行判断 truth。正确产品路径是：</p>
+<pre><code class="language-text">caller / agent
+  -&gt; RTS API / MCP / managed harness
+  -&gt; resolve scope
+  -&gt; find object by manifest/card/navigation
+  -&gt; read L2 and allowed dependency/governance view
+  -&gt; produce grounded facts / inferences / unknowns / candidates
+  -&gt; emit trace
+</code></pre>
+<p>AI 可以阅读和分析 projection 材料，但事实 claim 必须 ground 到：</p>
+<ul>
+<li>L2 runtime object</li>
+<li>dependency edge / field binding</li>
+<li>authorized governance summary</li>
+<li>trace 中已记录的读取结果</li>
+</ul>
+<p>AI 输出仍然不是 truth owner。</p>
+<h2 id="7">7. 与技术契约的关系<a class="headerlink" href="#7" title="Permanent link">#</a></h2>
+<p>本文只解释产品含义和运行包角色。</p>
+<p>如果需要决定以下问题，以 <code>kb-to-index-projection-contract-zh.md</code> 为准：</p>
+<ul>
+<li>projection publisher 必须产出哪些结构。</li>
+<li>每类对象必须有哪些字段。</li>
+<li>admission rule 如何判断对象是否能进入 projection。</li>
+<li>query/index 层只能读取哪些内容。</li>
+<li>L0/L1/L2 的精确定义。</li>
+<li>refusal/degraded output 的触发条件。</li>
+<li>storage mapping 和 MVP cut。</li>
+</ul>
+<p>一句话：</p>
+<pre><code class="language-text">本 guide 解释“为什么这些东西存在、产品上解决什么问题”。
+projection contract 决定“这些东西必须长什么样、服务怎么安全读取”。
+</code></pre>
+<h2 id="8-pm">8. PM 检查清单<a class="headerlink" href="#8-pm" title="Permanent link">#</a></h2>
+<p>评审一个 runtime projection release 时，PM 或产品 owner 可以先问：</p>
+<ul>
+<li>当前 active release 是哪一版？rollback target 是哪一版？</li>
+<li>release manifest 是否显示 blocking issue 为 0？</li>
+<li>scope 是否足够明确，是否可能与相似 product/pack 串线？</li>
+<li>object manifest 是否覆盖本次要服务的 rule/lookup/helper？</li>
+<li>关键事实是否能回到 L2，而不是只存在 card 或搜索文本里？</li>
+<li>dependency 和 field binding 是否足够支持影响分析和测试规划？</li>
+<li>governance summary 是否明确 warning、open question 和 production gate？</li>
+<li>caller profile 是否符合预期用户/agent/pipeline 权限？</li>
+<li>index artifacts 是否只是加速层，没有被当成 truth？</li>
+<li>trace 是否能复盘一次回答读了哪些对象、基于哪个 release、是否有 L2 hash？</li>
+</ul>
+<p>如果这些问题答不清，说明 release 包还不是一个健康的 runtime projection 产品运行包。</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

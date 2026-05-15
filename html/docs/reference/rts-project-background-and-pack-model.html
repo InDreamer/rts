@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS Project Background and Pack Model | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
+      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Reference · docs/reference/rts-project-background-and-pack-model.md</p>
+      <h1>RTS Project Background and Pack Model</h1>
+      <p>RTS project background and pack/object model distilled from the historical handoff prompt</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">先读解读版</a>
+        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button ghost" href="../../../docs/reference/rts-project-background-and-pack-model.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">How To Read</p>
+          <h2>这不是原文搬运页</h2>
+          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要了解 Tradition -&gt; Stella 作为最早样例的业务背景</li>
+<li>需要理解 canonical pack 的目录结构和对象模型</li>
+<li>需要查看 target_rule、lookup_definition、evidence、review 的简化示例</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要最高层项目总纲</li>
+<li>只需要当前工程状态</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="../confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="../confirmed/system-constitution-v1.html">RTS Constitution v2</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>这篇的作用</h2>
+          <p>RTS project background and pack/object model distilled from the historical handoff prompt</p>
+        </article>
+<article class="insight-card">
+          <h2>先抓住</h2>
+          <p>This document keeps the useful project background and pack model from the historical handoff prompt. It is reference material, not the current project baseline.</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>Reference / role: leaf / layer: 3</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">Readable Outline</p>
+            <h2>这篇文档在讲什么</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. Original Sample Context</h3>
+          <p>The earliest concrete RTS sample was Tradition -&gt; Stella. Source system: Tradition Target system: Stella Source message format: FpML XML Target message format: SCBM/FpML XML</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. Source Materials</h3>
+          <p>RTS source material can include many forms of implementation and business truth: business documents Java extractors XSLT templates Excel mapping workbooks database/static mapping tables</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Minimal Rule Idea</h3>
+          <p>A transformation rule should be understandable through three questions: source: where the value comes from logic: how it is transformed target: where it is emitted</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Canonical Pack Structure</h3>
+          <p>A canonical pack is the governance unit for related transformation rules. Typical structure:</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. Object Groups</h3>
+          <p>These describe what the transformation does: target_rule: target field or block generation logic lookup_definition: mapping or static lookup behavior helper_definition: reusable stable intermediate logic</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. Runtime View Is Not The Full Pack</h3>
+          <p>The canonical pack is wider than the ordinary runtime view. Ordinary runtime retrieval should be low-noise and focused on signed/approved objects such as rules, lookups, helpers, and essential metadata.</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. Simplified target_rule Shape</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. Simplified lookup_definition Shape</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. Simplified Evidence Entry</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>10. Simplified Review Entry</h3>
+          <p>这一节用于展开该主题的细节、边界或操作说明。</p>
+        </article>
+<article class="chapter-card">
+          <h3>11. Historical Snapshot</h3>
+          <p>The historical handoff recorded this snapshot on 2026-04-16: 18 packs authored 9 packs reviewed COMMON and FXD_NDF had reviewed packs FXO packs were authored but not yet reviewed</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>完整 Markdown 来源</span>
+        <strong>用于核对事实、字段和原始措辞</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="rts-project-background-and-pack-model">RTS Project Background and Pack Model<a class="headerlink" href="#rts-project-background-and-pack-model" title="Permanent link">#</a></h1>
+<p>This document keeps the useful project background and pack model from the historical handoff prompt. It is reference material, not the current project baseline.</p>
+<h2 id="1-original-sample-context">1. Original Sample Context<a class="headerlink" href="#1-original-sample-context" title="Permanent link">#</a></h2>
+<p>The earliest concrete RTS sample was <code>Tradition -&gt; Stella</code>.</p>
+<ul>
+<li><strong>Source system</strong>: Tradition</li>
+<li><strong>Target system</strong>: Stella</li>
+<li><strong>Source message format</strong>: FpML XML</li>
+<li><strong>Target message format</strong>: SCBM/FpML XML</li>
+<li><strong>Example products</strong>: COMMON, FXD_NDF, FXO</li>
+</ul>
+<p>This sample helps explain RTS, but it is not the boundary of RTS. RTS should generalize to other source-target transformation channels.</p>
+<h2 id="2-source-materials">2. Source Materials<a class="headerlink" href="#2-source-materials" title="Permanent link">#</a></h2>
+<p>RTS source material can include many forms of implementation and business truth:</p>
+<ul>
+<li>business documents</li>
+<li>Java extractors</li>
+<li>XSLT templates</li>
+<li>Excel mapping workbooks</li>
+<li>database/static mapping tables</li>
+<li>examples and expected outputs</li>
+<li>reviewer decisions and clarification notes</li>
+</ul>
+<p>Source material is not automatically truth. RTS uses it as evidence for candidate rules, conflicts, review decisions, and approved truth.</p>
+<h2 id="3-minimal-rule-idea">3. Minimal Rule Idea<a class="headerlink" href="#3-minimal-rule-idea" title="Permanent link">#</a></h2>
+<p>A transformation rule should be understandable through three questions:</p>
+<pre><code class="language-text">source → logic → target
+</code></pre>
+<ul>
+<li><strong>source</strong>: where the value comes from</li>
+<li><strong>logic</strong>: how it is transformed</li>
+<li><strong>target</strong>: where it is emitted</li>
+</ul>
+<p>This keeps rule objects readable and helps AI, reviewers, developers, and testers discuss the same rule.</p>
+<h2 id="4-canonical-pack-structure">4. Canonical Pack Structure<a class="headerlink" href="#4-canonical-pack-structure" title="Permanent link">#</a></h2>
+<p>A canonical pack is the governance unit for related transformation rules.</p>
+<p>Typical structure:</p>
+<pre><code class="language-text">&lt;pack-root&gt;/
+  metadata.yaml
+  README.md
+  rules/
+    rule_*.yaml
+  lookups/
+    lk_*.yaml
+  helpers/
+    hlp_*.yaml
+  evidence/
+    evidence-index.yaml
+  review/
+    review-index.yaml
+  reports/
+    extraction-report.md
+    closure-check.md
+    review-checklist.md
+</code></pre>
+<h2 id="5-object-groups">5. Object Groups<a class="headerlink" href="#5-object-groups" title="Permanent link">#</a></h2>
+<h3 id="main-objects">Main objects<a class="headerlink" href="#main-objects" title="Permanent link">#</a></h3>
+<p>These describe what the transformation does:</p>
+<ul>
+<li><code>target_rule</code>: target field or block generation logic</li>
+<li><code>lookup_definition</code>: mapping or static lookup behavior</li>
+<li><code>helper_definition</code>: reusable stable intermediate logic</li>
+</ul>
+<h3 id="governance-side-layers">Governance side layers<a class="headerlink" href="#governance-side-layers" title="Permanent link">#</a></h3>
+<p>These explain why the rule is trusted, disputed, or ready:</p>
+<ul>
+<li><code>evidence/</code>: source references, code/XSLT/Excel support, source spans</li>
+<li><code>review/</code>: ambiguity, open items, review conclusions, signoff state</li>
+<li><code>reports/</code>: extraction/review summaries and handoff materials</li>
+</ul>
+<p>Main objects should stay focused. Evidence, review, ambiguity, approval history, and long trace should not be stuffed into every rule body.</p>
+<h2 id="6-runtime-view-is-not-the-full-pack">6. Runtime View Is Not The Full Pack<a class="headerlink" href="#6-runtime-view-is-not-the-full-pack" title="Permanent link">#</a></h2>
+<p>The canonical pack is wider than the ordinary runtime view.</p>
+<p>Ordinary runtime retrieval should be low-noise and focused on signed/approved objects such as rules, lookups, helpers, and essential metadata.</p>
+<p>Evidence, review, reports, conflicts, and adjudication records should remain available through permissioned governance or explanation views when needed.</p>
+<p>This does not mean the canonical pack is for humans and the runtime view is for machines. Both should be machine-first. The runtime view is narrower because of release state, service purpose, context budget, and permission boundaries, not because it is allowed to become a lossy summary of rule semantics.</p>
+<h2 id="7-simplified-target_rule-shape">7. Simplified target_rule Shape<a class="headerlink" href="#7-simplified-target_rule-shape" title="Permanent link">#</a></h2>
+<pre><code class="language-yaml">id: rule_scbml_initiated_timestamp
+status: draft
+signoff_status: none
+
+source:
+  inputs:
+    - name: creationTimestamp
+      source_path: /fpML/header/creationTimestamp/text()
+
+logic:
+  summary: Read the source creationTimestamp, convert it, and emit initiatedTimestamp.
+  pipeline:
+    - op: read_xpath
+      out: raw_timestamp
+    - op: format_datetime
+      in: raw_timestamp
+      out: converted_timestamp
+    - op: emit_value
+      from: converted_timestamp
+
+target:
+  kind: value
+  path: /scb:SCBM/scb:header/scb:originationDetails/scb:initiatedTimestamp/text()
+
+dependencies:
+  lookups: []
+  helpers: []
+  rules: []
+
+examples:
+  - name: iso_to_z_conversion
+    input:
+      creationTimestamp: &quot;2025-09-10T14:30:00&quot;
+    result:
+      target_value: &quot;2025-09-10T14:30:00Z&quot;
+</code></pre>
+<h2 id="8-simplified-lookup_definition-shape">8. Simplified lookup_definition Shape<a class="headerlink" href="#8-simplified-lookup_definition-shape" title="Permanent link">#</a></h2>
+<pre><code class="language-yaml">id: lk_fxd_ndf_cutoff_by_pair_and_locode
+status: draft
+signoff_status: none
+
+source:
+  mapping_table: TraditionStellaCutoff
+  inputs:
+    - name: fixing_currency1
+    - name: fixing_currency2
+    - name: cutoff_code
+
+logic:
+  summary: Query cutoff mapping by forward currency-pair order, then retry reverse order.
+  pipeline:
+    - op: compose_key
+      out: forward_key
+    - op: lookup_value
+      out: forward_result
+    - op: lookup_value
+      out: reverse_result
+      when: forward_result is empty
+    - op: coalesce
+      out: resolved_value
+
+output:
+  fields:
+    - name: cutoff_name
+    - name: cutoff_description
+    - name: fixing_time
+</code></pre>
+<h2 id="9-simplified-evidence-entry">9. Simplified Evidence Entry<a class="headerlink" href="#9-simplified-evidence-entry" title="Permanent link">#</a></h2>
+<pre><code class="language-yaml">entries:
+  - evidence_id: ev_c01_timestamp_java
+    object_id: rule_scbml_initiated_timestamp
+    kind: java
+    role: logic_support
+    summary: Java extractor supports the timestamp conversion behavior.
+    locator:
+      java:
+        path: extractor/common/MessageFields.java
+        members: [CREATION_TIMESTAMP]
+</code></pre>
+<h2 id="10-simplified-review-entry">10. Simplified Review Entry<a class="headerlink" href="#10-simplified-review-entry" title="Permanent link">#</a></h2>
+<pre><code class="language-yaml">items:
+  - review_id: rev_c01_tracking_id_source
+    object_id: rule_scbml_tracking_id
+    kind: ambiguity
+    status: open
+    summary: Source field has no matching Java enum definition.
+    follow_up: Confirm with Dev/BA what source produces this value.
+    supporting_evidence:
+      - ev_c01_tracking_id_xslt_only
+</code></pre>
+<h2 id="11-historical-snapshot">11. Historical Snapshot<a class="headerlink" href="#11-historical-snapshot" title="Permanent link">#</a></h2>
+<p>The historical handoff recorded this snapshot on 2026-04-16:</p>
+<ul>
+<li>18 packs authored</li>
+<li>9 packs reviewed</li>
+<li>COMMON and FXD_NDF had reviewed packs</li>
+<li>FXO packs were authored but not yet reviewed</li>
+</ul>
+<p>This is historical context only. Do not treat it as current project state without re-checking the current repository.</p>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>
