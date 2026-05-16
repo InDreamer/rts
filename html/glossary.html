@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>术语表 | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+<a class="nav-link" href="start-here.html">项目概览</a>
+<a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
+<a class="nav-link" href="operations.html">如何使用</a>
+<a class="nav-link" href="roadmap.html">推进路径</a>
+<a class="nav-link" href="library.html">来源文档</a>
+<a class="nav-link active" href="glossary.html">术语表</a>
+    </nav>
+  </header>
+  <main>
+    <section class="page-hero">
+      <p class="kicker">RTS 项目介绍</p>
+      <h1>术语表</h1>
+      <p>RTS 项目中反复出现的英文技术名词。英文保留是为了和真实文件名、字段名、API 接口保持一致。</p>
+    </section>
+
+    <section class="term-section" id="glossary">
+      <div class="section-heading compact">
+        <p class="kicker">Glossary · 核心术语</p>
+        <h2>KB、Projection 与服务层</h2>
+        <p>这些词对应 runtime projection 包里的真实区域或字段，会出现在 API 请求、响应和 trace 中。</p>
+      </div>
+      <div class="term-grid">
+        <article class="term-card">
+          <strong>RTS</strong>
+          <span>Rule Truth Source / Transformation Rule System</span>
+          <p>将分散的转换规则整理成可发布、可追溯、可查询的业务规则知识库，并提供内置 LLM 分析能力。</p>
+        </article>
+        <article class="term-card">
+          <strong>KB</strong>
+          <span>Knowledge Base，业务规则知识库</span>
+          <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整知识层。</p>
+        </article>
+        <article class="term-card">
+          <strong>Rule Pack</strong>
+          <span>规则包</span>
+          <p>按业务范围组织的一组 rule、lookup、helper，是整理、review 和发布的基本单位。</p>
+        </article>
+        <article class="term-card">
+          <strong>Runtime Projection</strong>
+          <span>运行时投影</span>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+        </article>
+        <article class="term-card">
+          <strong>Release Manifest</strong>
+          <span>发布清单</span>
+          <p>说明当前 projection 来自哪里、包含什么、是否可用，以及出现问题时如何回滚。</p>
+        </article>
+        <article class="term-card">
+          <strong>Scope</strong>
+          <span>业务范围</span>
+          <p>通常由 channel、product、pack、domain 组成，用来防止相似规则被串用。</p>
+        </article>
+        <article class="term-card">
+          <strong>L2 Runtime Object</strong>
+          <span>L2 运行时规则对象</span>
+          <p>runtime projection 中最重要的事实正文，保存服务可读的结构化规则逻辑。事实回答必须回到这里。</p>
+        </article>
+        <article class="term-card">
+          <strong>Object Card</strong>
+          <span>对象卡片</span>
+          <p>用于定位、消歧和召回规则对象；它帮助找到 L2，但不能替代 L2。</p>
+        </article>
+        <article class="term-card">
+          <strong>Dependency</strong>
+          <span>规则依赖</span>
+          <p>描述 rule、lookup、helper 之间的关系，是解释影响面和测试范围的基础。</p>
+        </article>
+        <article class="term-card">
+          <strong>Index Document</strong>
+          <span>索引文档</span>
+          <p>从 projection 派生出的搜索和导航视图，负责召回定位，规则权威仍在 L2。</p>
+        </article>
+        <article class="term-card">
+          <strong>Governance View</strong>
+          <span>治理视图</span>
+          <p>在权限允许时展示 evidence、review、open question、risk 和 signoff 信息。</p>
+        </article>
+        <article class="term-card">
+          <strong>Trace / Query Trace</strong>
+          <span>审计轨迹 / 查询轨迹</span>
+          <p>记录一次查询或调用读了哪些对象、如何命中、scope、dependency、grounding 和拒答原因，便于复盘和审计。</p>
+        </article>
+        <article class="term-card">
+          <strong>Grounding</strong>
+          <span>事实落点</span>
+          <p>把回答中的事实声明绑定回 L2、dependency、source 或授权治理材料，确保回答有据可查。</p>
+        </article>
+        <article class="term-card">
+          <strong>Managed Analysis</strong>
+          <span>内置 LLM 分析</span>
+          <p>RTS 内部 LLM 在服务边界内调用受控工具，生成规则解释、影响评估、测试建议和调查路径。</p>
+        </article>
+        <article class="term-card">
+          <strong>AI-assisted Consumer</strong>
+          <span>LLM / Agent 消费方</span>
+          <p>可以基于 projection 做解释、影响分析或辅助 review，但基础仍是 KB 和 runtime projection。</p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+  <footer class="site-footer">
+    <p>本页汇总 RTS 项目中反复出现的技术术语；各页面不再重复列出。</p>
+  </footer>
+  <script src="assets/search-index.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
