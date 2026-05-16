@@ -1,7 +1,7 @@
 <!-- docmeta
-role: analysis
-layer: supplemental
-parent: docs/ai-readable-format-strategy-zh.html
+role: leaf
+layer: 2
+parent: docs/INDEX.md
 children: []
 summary: Captures follow-up clarifications from the AI-first KB/projection format discussion that were not fully covered in the original HTML report.
 read_when:

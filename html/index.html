@@ -13,6 +13,7 @@
       <a class="nav-link active" href="index.html">首页</a>
 <a class="nav-link" href="start-here.html">项目概览</a>
 <a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
 <a class="nav-link" href="operations.html">如何使用</a>
 <a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
@@ -25,11 +26,6 @@
         <p class="kicker">RTS · Rule Truth Service & Runtime Projection</p>
         <h1>把分散的报文转换规则，治理成可发布、可追溯、可分析的规则真相服务。</h1>
         <p class="hero-text">报文转换背后是一组可复用的业务规则逻辑，不只是字段搬运。RTS 将散落在文档、代码、mapping、lookup 和 review 记录里的规则治理成 governed KB，并发布为 runtime projection；确定性查询、内部 managed LLM 分析、外部 agent tool mode 和业务平台都在同一 truth access boundary 内复用这些能力。</p>
-        <div class="hero-actions">
-          <a class="button primary" href="start-here.html">项目概览</a>
-          <a class="button secondary" href="kb-runtime-projection-design.html">看真实规则包手册</a>
-          <a class="button secondary" href="architecture.html">看 KB 与投影</a>
-        </div>
       </div>
       <div class="hero-dashboard" aria-label="RTS HTML 信息面板">
         <div class="dashboard-heading">
@@ -77,6 +73,26 @@
         <article>
           <strong>LLM/Agent 分析有依据</strong>
           <p>内部 managed LLM 和外部 agent 基于同一组受控原子能力做解释、影响候选、测试候选和调查分析。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="mode-panel">
+      <div class="mode-copy">
+        <p class="kicker">服务消费模式</p>
+        <h2>同一份规则真相，同时支撑托管分析和外部工具调用。</h2>
+        <p>RTS 把 approved KB 发布成 runtime projection 后，不让 LLM 或 agent 直接绕过服务读材料。内部场景由 RTS managed harness 负责分析和表达；外部 agent 通过 REST/MCP 调用原子能力。两种入口共享 release、scope、permission、grounding、refusal 和 trace 边界。</p>
+      </div>
+      <div class="mode-grid">
+        <article>
+          <h3>托管分析</h3>
+          <p>RTS 内部 /ask 和场景端点在服务边界内调用受控工具，生成规则解释、影响候选、测试候选和调查分析。</p>
+          <a href="docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html">看 LLM/Agent 边界</a>
+        </article>
+        <article>
+          <h3>外部工具模式</h3>
+          <p>Codex、CI bot 或业务平台通过 RTS API/MCP 读取规则、依赖、L2 和 trace，复用 KB 能力但不拥有 truth authority。</p>
+          <a href="docs/api-caller-guide-zh.html">看 API/MCP 用法</a>
         </article>
       </div>
     </section>
@@ -199,37 +215,17 @@
       </div>
     </section>
 
-    <section class="mode-panel">
-      <div class="mode-copy">
-        <p class="kicker">Service / LLM / Agent</p>
-        <h2>RTS service 同时提供原子能力和托管分析。</h2>
-        <p>内部 LLM 走 managed mode；外部 agent 走 REST/MCP tool mode。两种模式共享同一个 runtime projection access boundary，并由 RTS service 控制 release、scope、permission、grounding、refusal 和 trace。</p>
-      </div>
-      <div class="mode-grid">
-        <article>
-          <h3>Managed Analysis</h3>
-          <p>RTS 内部 LLM 在服务边界内基于 KB/projection 执行受控解释、影响候选、测试候选和调查分析。</p>
-          <a href="start-here.html">看项目概览</a>
-        </article>
-        <article>
-          <h3>External Agent Tools</h3>
-          <p>外部 agent 通过 RTS API/MCP 调用规则查询、依赖和 trace 等原子能力，复用 KB 但不绕过 service gate。</p>
-          <a href="architecture.html">看 KB 与投影</a>
-        </article>
-      </div>
-    </section>
-
     <section class="term-section" id="glossary">
       <div class="section-heading compact">
         <p class="kicker">Glossary · 术语解释</p>
         <h2>关键英文技术名词</h2>
-        <p>页面以中文为主；英文术语保留在关键位置，是为了和代码、API、文档标题保持一致。下面给出阅读时最容易混淆的词。</p>
+        <p>页面以中文为主，关键英文术语与代码、API 和文档标题保持一致。</p>
       </div>
       <div class="term-grid">
         <article class="term-card">
           <strong>RTS</strong>
           <span>Rule Truth Source / Transformation Rule System</span>
-          <p>RTS 是双核心规则真相服务：既提供受控真相源原子能力，也提供 managed LLM 分析服务。</p>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的业务规则 KB。</p>
         </article>
 <article class="term-card">
           <strong>KB</strong>
@@ -244,7 +240,7 @@
 <article class="term-card">
           <strong>Runtime Projection</strong>
           <span>运行时投影</span>
-          <p>把 approved truth 发布成服务可读取的运行包，让查询、索引、managed analysis 和外部 tool mode 有稳定输入。</p>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
         </article>
 <article class="term-card">
           <strong>L2 Runtime Object</strong>
@@ -327,7 +323,7 @@
         <code>docs/java-service-runbook-zh.md</code>
       </a>
     </article>
-<article class="source-card" data-category="KB Pack" data-search="tradition -&gt; stella fxd.ndf cutoff-fixing split pack this pack was reconstructed from photographed vs code screenshots supplied on 2026-05-06. it captures local demo-signoff canonical rules for the tradition-to-stella fxd.ndf fixing subtree: kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/readme.md kb 知识包">
+<article class="source-card" data-category="KB Pack" data-search="tradition -&gt; stella fxd.ndf cutoff-fixing split pack this pack was reconstructed from photographed vs code screenshots supplied on 2026-05-06. it captures local demo-signoff canonical rules for the tradition-to-stella fxd.ndf fixing subtree: kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/readme.md kb 包">
       <a href="kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.html">
         <span class="source-type">KB 包</span>
         <h3>Tradition -&gt; Stella FXD.NDF cutoff-fixing split pack</h3>
@@ -342,7 +338,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>从 36 篇非归档 Markdown 生成。更新时间：2026-05-16 13:15。原文不被改写，阅读体验由 HTML 层重新组织。</p>
+    <p>从 36 篇非归档 Markdown 和 2 篇展示型 HTML 组织。更新时间：2026-05-16 19:10。原文不被改写，阅读体验由 HTML 层重新组织。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>

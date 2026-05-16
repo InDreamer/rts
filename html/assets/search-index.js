@@ -49,24 +49,24 @@ window.RTS_DOCS = [
     "url": "docs/confirmed/kb-to-index-projection-contract-zh.html"
   },
   {
-    "title": "AI 辅助接入边界说明",
+    "title": "LLM/Agent 接入边界说明",
     "path": "docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md",
     "category": "已确认基线",
-    "summary": "说明 AI 辅助能力如何读取 runtime projection，以及哪些边界仍由 RTS 服务控制。",
+    "summary": "说明内部 LLM 与外部 agent 如何读取 runtime projection，以及哪些边界仍由 RTS 服务控制。",
     "url": "docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html"
   },
   {
-    "title": "RTS 内部 AI 辅助服务落地计划",
+    "title": "RTS 内部 LLM 服务落地计划",
     "path": "docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md",
     "category": "已确认基线",
-    "summary": "把 AI 辅助放在 RTS 规则服务边界内落地，避免绕过 KB 和 projection。",
+    "summary": "把内部 LLM 分析放在 RTS 规则服务边界内落地，避免绕过 KB 和 projection。",
     "url": "docs/confirmed/internal-llm-agent-service-implementation-plan-zh.html"
   },
   {
-    "title": "Day1 查询服务与 AI 辅助计划",
+    "title": "Day1 查询服务与 LLM harness 计划",
     "path": "docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md",
     "category": "已确认基线",
-    "summary": "Day1 查询服务、工具接口和基础 AI 辅助能力的实现计划。",
+    "summary": "Day1 查询服务、工具接口和基础 LLM harness 能力的实现计划。",
     "url": "docs/confirmed/day1-query-service-and-llm-harness-plan-zh.html"
   },
   {
@@ -143,7 +143,7 @@ window.RTS_DOCS = [
     "title": "LLM-Mediated Query And Harness Reference",
     "path": "docs/reference/llm-enhanced-index-and-harness-design-zh.md",
     "category": "背景参考",
-    "summary": "历史参考：在索引和服务边界内引入 AI 辅助的设计材料。",
+    "summary": "历史参考：在索引和服务边界内引入 LLM 分析的设计材料。",
     "url": "docs/reference/llm-enhanced-index-and-harness-design-zh.html"
   },
   {
@@ -212,35 +212,35 @@ window.RTS_DOCS = [
   {
     "title": "Tradition -> Stella FXD.NDF cutoff-fixing split pack",
     "path": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.md",
-    "category": "KB 知识包",
+    "category": "KB 包",
     "summary": "This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures local demo-signoff canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree:",
     "url": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.html"
   },
   {
     "title": "Local Pipeline Ops Reference",
     "path": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/ops-reference.md",
-    "category": "KB 知识包",
+    "category": "KB 包",
     "summary": "These ops are lightweight semantic labels used inside this draft pack's logic.pipeline sections.",
     "url": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/ops-reference.html"
   },
   {
     "title": "Closure Check",
     "path": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/closure-check.md",
-    "category": "KB 知识包",
+    "category": "KB 包",
     "summary": "Status: not closed.",
     "url": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/closure-check.html"
   },
   {
     "title": "Extraction Report",
     "path": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/extraction-report.md",
-    "category": "KB 知识包",
+    "category": "KB 包",
     "summary": "This draft pack was reconstructed from 16 photographed screenshots. macOS Vision OCR was used for first-pass extraction and then corrected against visible YAML fragments.",
     "url": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/extraction-report.html"
   },
   {
     "title": "Review Checklist",
     "path": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/review-checklist.md",
-    "category": "KB 知识包",
+    "category": "KB 包",
     "summary": "",
     "url": "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/review-checklist.html"
   },
@@ -250,5 +250,19 @@ window.RTS_DOCS = [
     "category": "其他活跃文档",
     "summary": "补充说明：AI 可读格式讨论中关于 KB、projection 和展示层的边界澄清。",
     "url": "docs/ai-first-format-conversation-followup-zh.html"
+  },
+  {
+    "title": "AI-readable Format Strategy",
+    "path": "docs/ai-readable-format-strategy-zh.html",
+    "category": "展示型 HTML",
+    "summary": "展示型说明：AI-first 知识产物格式分工，以及 HTML 不能承载 runtime truth 的边界。",
+    "url": "../docs/ai-readable-format-strategy-zh.html"
+  },
+  {
+    "title": "HTML Presentation Projection Demo",
+    "path": "docs/html-presentation-projection-demo-zh.html",
+    "category": "展示型 HTML",
+    "summary": "展示型说明：HTML 可以展示 runtime projection，但不能接管 truth、服务读取或 AI context。",
+    "url": "../docs/html-presentation-projection-demo-zh.html"
   }
 ];

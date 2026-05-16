@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RTS KB 与 Runtime Projection 设计说明</title>
+  <title>真实规则包 | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
   <style>
     :root {
       color-scheme: light;
@@ -34,45 +35,6 @@
 
     a { color: inherit; }
 
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 18px clamp(20px, 4vw, 56px);
-      background: rgba(255, 255, 255, .88);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(217, 226, 236, .8);
-    }
-
-    .brand {
-      font-weight: 800;
-      letter-spacing: .02em;
-      text-decoration: none;
-      color: var(--blue);
-      white-space: nowrap;
-    }
-
-    .nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .nav a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 14px;
-      padding: 8px 10px;
-      border-radius: 8px;
-    }
-
-    .nav a:hover { background: var(--soft); color: var(--ink); }
-
     main {
       width: min(1180px, calc(100% - 40px));
       margin: 0 auto;
@@ -81,26 +43,36 @@
 
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .72fr);
-      gap: 34px;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 24px;
       align-items: stretch;
       margin-bottom: 30px;
     }
 
     .hero-copy,
-    .intro-card,
+    .hero-side,
     .panel,
     .card,
     .term-card,
     .note,
-    .chapter-nav {
+    .chapter-nav,
+    .content-nav {
       background: rgba(255, 255, 255, .94);
       border: 1px solid var(--line);
       border-radius: 8px;
       box-shadow: var(--shadow);
     }
 
-    .hero-copy { padding: clamp(30px, 5vw, 58px); }
+    .hero-copy,
+    .hero-side {
+      padding: clamp(26px, 3.2vw, 38px);
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
     .kicker {
       margin: 0 0 12px;
@@ -113,10 +85,12 @@
 
     h1, h2, h3, p { margin-top: 0; }
 
-    h1 {
-      margin-bottom: 20px;
-      font-size: clamp(34px, 5vw, 58px);
-      line-height: 1.08;
+    .hero-copy h1 {
+      max-width: 820px;
+      margin-bottom: 18px;
+      font-size: clamp(32px, 2.9vw, 44px);
+      line-height: 1.18;
+      font-weight: 760;
       letter-spacing: 0;
     }
 
@@ -135,10 +109,10 @@
     }
 
     .hero-text {
-      margin-bottom: 26px;
+      margin-bottom: 0;
       color: #46566d;
-      font-size: 18px;
-      max-width: 780px;
+      font-size: 16px;
+      max-width: 760px;
     }
 
     .hero-actions,
@@ -164,22 +138,62 @@
     }
 
     .button.primary {
-      border-color: #214f96;
-      background: #214f96;
-      color: white;
+      border-color: var(--line);
+      background: #fff;
+      color: var(--ink);
     }
 
-    .intro-card {
-      padding: 24px;
+    .page-context {
+      align-self: flex-start;
+      margin: 0 0 18px;
+      padding: 7px 11px;
+      border: 1px solid #bfe4dc;
+      border-radius: 8px;
+      background: #f0fdfa;
+      color: #345044;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .page-context a {
+      color: var(--green);
+      font-weight: 800;
+      text-underline-offset: .18em;
+    }
+
+    .hero-meta {
       display: grid;
-      gap: 14px;
+      gap: 10px;
+      margin: 18px 0 0;
+    }
+
+    .hero-side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: none;
+      min-height: 100%;
+    }
+
+    .hero-side h2 {
+      margin-bottom: 0;
+      font-size: 22px;
     }
 
     .metric {
-      padding: 16px;
+      display: block;
+      min-width: 0;
+      padding: 14px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #f8fafc;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .metric:hover {
+      border-color: #9ccbc2;
+      background: #f0fdfa;
     }
 
     .metric span {
@@ -192,39 +206,97 @@
     .metric strong {
       display: block;
       margin-top: 4px;
-      font-size: 21px;
+      font-size: 15px;
       line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .metric-desc {
+      display: block;
+      margin-top: 7px;
+      color: #4f6075;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .metric em {
+      display: block;
+      margin-top: 9px;
+      color: var(--green);
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .hero-actions {
+      margin-top: 24px;
+    }
+
+    .hero-side .hero-meta {
+      flex: 1;
+      align-content: stretch;
+    }
+
+    .hero-side .metric {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .content-shell {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .content-shell > * {
+      min-width: 0;
+    }
+
+    .content-nav {
+      position: sticky;
+      top: 88px;
+      padding: 14px;
+      box-shadow: none;
+    }
+
+    .content-nav .kicker {
+      margin-bottom: 10px;
+      font-size: 11px;
     }
 
     .chapter-nav {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 1px;
-      padding: 8px;
-      margin: 24px 0 34px;
-      background: #e6edf4;
+      gap: 6px;
       box-shadow: none;
     }
 
     .chapter-nav a {
-      display: block;
-      min-height: 74px;
-      padding: 12px;
-      background: #fff;
-      border-radius: 7px;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 10px;
+      border: 1px solid transparent;
+      border-radius: 8px;
       text-decoration: none;
+      color: var(--ink);
+    }
+
+    .chapter-nav a:hover {
+      border-color: #cddae6;
+      background: #f8fafc;
     }
 
     .chapter-nav span {
-      display: block;
       color: var(--green);
       font-size: 12px;
       font-weight: 850;
     }
 
     .chapter-nav strong {
-      display: block;
-      margin-top: 5px;
       font-size: 14px;
       line-height: 1.22;
     }
@@ -260,6 +332,10 @@
     .term-card p,
     li {
       color: #4f6075;
+    }
+
+    #objects .card > p {
+      min-height: 142px;
     }
 
     .label,
@@ -301,8 +377,10 @@
     .flow-title { fill: #172033; font-size: 16px; font-weight: 800; }
     .flow-sub { fill: #637083; font-size: 12px; }
     .arrow { stroke: #8190a5; stroke-width: 2; fill: none; marker-end: url(#arrow); }
-    .boundary { fill: none; stroke: #b8c6d4; stroke-width: 1.2; stroke-dasharray: 8 6; rx: 12; }
+    .gate-link { stroke: #b8c6d4; stroke-width: 1.6; stroke-dasharray: 5 5; fill: none; }
     .boundary-label { fill: #607087; font-size: 12px; font-weight: 800; }
+    .gate-label { fill: #2f3b52; font-size: 13px; font-weight: 850; }
+    .gate-sub { fill: #637083; font-size: 11.5px; }
 
     table {
       width: 100%;
@@ -340,10 +418,11 @@
     }
 
     pre {
+      position: relative;
       margin: 14px 0 0;
       width: 100%;
       max-width: 100%;
-      padding: 16px;
+      padding: 42px 16px 16px;
       overflow-x: auto;
       border: 1px solid #d6e1eb;
       border-radius: 8px;
@@ -352,6 +431,25 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 13px;
       line-height: 1.62;
+    }
+
+    .copy-code {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      border: 1px solid #c8d6e5;
+      border-radius: 8px;
+      padding: 5px 10px;
+      background: #fff;
+      color: var(--blue);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .copy-code:hover {
+      background: #eff6ff;
     }
 
     details {
@@ -462,146 +560,187 @@
     }
 
     @media (max-width: 980px) {
+      .content-shell { grid-template-columns: 1fr; }
+      .content-nav { position: static; }
       .chapter-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     @media (max-width: 880px) {
-      .topbar { align-items: flex-start; flex-direction: column; }
-      .nav { justify-content: flex-start; }
       main { width: min(100% - 28px, 1180px); padding-top: 30px; }
       .hero,
+      .hero-meta,
       .grid-2,
       .grid-3,
       .term-grid,
       .chapter-nav {
         grid-template-columns: 1fr;
       }
+      .content-nav,
+      .chapter-nav {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
       .hero-copy { padding: 28px 22px; }
-      h1 { font-size: 36px; }
+      .hero-copy h1 { font-size: 34px; }
       .diagram-wrap svg { width: 100%; min-width: 0; }
       th, td { padding: 12px 10px; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="index.html">RTS</a>
-    <nav class="nav" aria-label="页面导航">
-      <a href="index.html">首页</a>
-      <a href="#pack">Pack</a>
-      <a href="#objects">真实对象</a>
-      <a href="#projection">Projection</a>
-      <a href="#walkthrough">查询演练</a>
-      <a href="#glossary">术语</a>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="start-here.html">项目概览</a>
+      <a class="nav-link" href="architecture.html">KB 与投影</a>
+      <a class="nav-link active" href="kb-runtime-projection-design.html">真实规则包</a>
+      <a class="nav-link" href="operations.html">如何使用</a>
+      <a class="nav-link" href="roadmap.html">推进路径</a>
+      <a class="nav-link" href="library.html">来源文档</a>
     </nav>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero-copy">
+        <p class="page-context"><a href="index.html">RTS 可读体验站首页</a> / 真实规则包章节</p>
         <p class="kicker">RTS KB / Runtime Projection Handbook</p>
         <h1>用一个真实规则包，看懂 KB、runtime projection 和 RTS 服务边界。</h1>
         <p class="hero-text">本页使用当前项目里的 <strong>Tradition -> Stella FXD.NDF cutoff-fixing</strong> 规则包说明：规则如何进入 KB，如何被治理和 signoff，如何发布成 runtime projection，最后服务如何用 release、scope、L2、dependency 和 trace 支撑确定性查询与 managed analysis。</p>
         <div class="hero-actions">
+          <a class="button" href="index.html">返回总览首页</a>
           <a class="button primary" href="#pack">从真实 Pack 开始</a>
           <a class="button" href="#objects">看 Rule / Lookup / Helper</a>
-          <a class="button" href="#walkthrough">看一次查询怎么走</a>
+          <a class="button" href="#walkthrough">看查询链路</a>
         </div>
       </div>
-      <aside class="intro-card" aria-label="当前示例">
-        <div class="metric">
-          <span>示例 Pack</span>
-          <strong>tradition-to-stella-fxd-ndf-cutoff-fixing-split</strong>
-        </div>
-        <div class="metric">
-          <span>当前 Runtime Release</span>
-          <strong>rel-2026-05-06-photo-fxd-ndf-cutoff</strong>
-        </div>
-        <div class="metric">
-          <span>这个包里有什么</span>
-          <strong>6 rules / 1 lookup / 1 helper</strong>
+      <aside class="hero-side" aria-label="示例入口">
+        <p class="kicker">Example Shortcuts</p>
+        <h2>示例入口</h2>
+        <div class="hero-meta" aria-label="示例入口">
+          <a class="metric" href="#pack">
+            <span>示例 Pack</span>
+            <strong>Tradition -> Stella FXD.NDF</strong>
+            <small class="metric-desc">cutoff-fixing split / demo_signoff / 规则逻辑与治理材料分层组织</small>
+            <em>查看 Pack 结构与治理边界</em>
+          </a>
+          <a class="metric" href="#projection">
+            <span>示例 Runtime Release</span>
+            <strong>rel-2026-05-06-photo-fxd-ndf-cutoff</strong>
+            <em>查看 projection 运行包</em>
+          </a>
+          <a class="metric" href="#objects">
+            <span>对象数量</span>
+            <strong>6 rules / 1 lookup / 1 helper</strong>
+            <em>查看真实对象</em>
+          </a>
         </div>
       </aside>
     </section>
 
-    <nav class="chapter-nav" aria-label="章节导航">
-      <a href="#flow"><span>01</span><strong>规则旅程</strong></a>
-      <a href="#pack"><span>02</span><strong>Pack 结构</strong></a>
-      <a href="#objects"><span>03</span><strong>真实对象</strong></a>
-      <a href="#projection"><span>04</span><strong>运行包</strong></a>
-      <a href="#layers"><span>05</span><strong>L0/L1/L2</strong></a>
-      <a href="#walkthrough"><span>06</span><strong>查询演练</strong></a>
-    </nav>
+    <div class="content-shell">
+      <aside class="content-nav" aria-label="章节导航">
+        <p class="kicker">Page Sections</p>
+        <nav class="chapter-nav">
+          <a href="#flow"><span>01</span><strong>规则旅程</strong></a>
+          <a href="#pack"><span>02</span><strong>Pack 结构</strong></a>
+          <a href="#objects"><span>03</span><strong>真实对象</strong></a>
+          <a href="#projection"><span>04</span><strong>运行包</strong></a>
+          <a href="#layers"><span>05</span><strong>L0/L1/L2</strong></a>
+          <a href="#walkthrough"><span>06</span><strong>查询演练</strong></a>
+          <a href="#failure"><span>07</span><strong>拒答边界</strong></a>
+          <a href="#glossary"><span>08</span><strong>术语</strong></a>
+        </nav>
+      </aside>
 
+      <div class="content-main">
     <section class="panel" id="flow">
       <p class="kicker">One Rule's Journey</p>
-      <h2>一条规则从原始材料到服务输出，中间经过四个稳定边界。</h2>
-      <p>RTS 不把文件直接交给搜索或模型回答；每个事实输出都必须说明来自哪个 release、属于哪个 scope、读了哪个 L2 对象、依赖了哪个 lookup/helper、是否留下 trace。</p>
+      <h2>主链路只有一条，门禁挂在对应节点下面。</h2>
+      <p>大节点表示规则产物如何前进：source 进入 KB，KB 发布 projection，service 读取 projection。每个大节点下方的小卡片说明它为什么能继续往下走，或服务到底读了什么；这些门禁不是另一套架构。</p>
       <div class="diagram-wrap">
-        <svg viewBox="0 0 1120 430" role="img" aria-label="RTS 规则发布与读取流程">
+        <svg viewBox="0 0 1120 450" role="img" aria-label="RTS 规则发布与读取流程">
           <defs>
             <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
               <path d="M0,0 L10,4 L0,8 Z" fill="#8190a5"></path>
             </marker>
           </defs>
-          <rect class="boundary" x="22" y="42" width="496" height="310"></rect>
-          <text class="boundary-label" x="42" y="36">KB / Truth Governance Surface</text>
-          <rect class="boundary" x="598" y="42" width="500" height="310"></rect>
-          <text class="boundary-label" x="620" y="36">Runtime Truth Access Boundary</text>
+          <text class="boundary-label" x="46" y="44">KB / Truth Governance Surface</text>
+          <text class="boundary-label" x="604" y="44">Runtime Truth Access Boundary</text>
 
-          <rect class="flow-box" x="54" y="90" width="170" height="94"></rect>
-          <text class="flow-title" x="78" y="124">Source Materials</text>
-          <text class="flow-sub" x="78" y="151">Excel / Java / XSLT</text>
-          <text class="flow-sub" x="78" y="169">业务文档 / 测试</text>
+          <rect class="flow-box" x="42" y="78" width="180" height="96"></rect>
+          <text class="flow-title" x="68" y="113">Source Materials</text>
+          <text class="flow-sub" x="68" y="141">Excel / Java / XSLT</text>
+          <text class="flow-sub" x="68" y="159">业务文档 / 测试</text>
 
-          <rect class="flow-box kb" x="306" y="82" width="184" height="110"></rect>
-          <text class="flow-title" x="332" y="118">KB Pack</text>
-          <text class="flow-sub" x="332" y="145">rules / lookups / helpers</text>
-          <text class="flow-sub" x="332" y="164">evidence / review / reports</text>
+          <rect class="flow-box kb" x="300" y="78" width="188" height="96"></rect>
+          <text class="flow-title" x="326" y="113">KB Pack</text>
+          <text class="flow-sub" x="326" y="141">rules / lookups / helpers</text>
+          <text class="flow-sub" x="326" y="159">evidence / review / reports</text>
 
-          <rect class="flow-box projection" x="634" y="82" width="216" height="110"></rect>
-          <text class="flow-title" x="660" y="118">Runtime Projection</text>
-          <text class="flow-sub" x="660" y="145">release / scope / manifest</text>
-          <text class="flow-sub" x="660" y="164">cards / L2 / dependency</text>
+          <rect class="flow-box projection" x="584" y="78" width="226" height="96"></rect>
+          <text class="flow-title" x="610" y="113">Runtime Projection</text>
+          <text class="flow-sub" x="610" y="141">release / scope / manifest</text>
+          <text class="flow-sub" x="610" y="159">cards / L2 / dependency</text>
 
-          <rect class="flow-box service" x="918" y="90" width="152" height="94"></rect>
-          <text class="flow-title" x="940" y="124">RTS Service</text>
-          <text class="flow-sub" x="940" y="151">query / ask / tools</text>
+          <rect class="flow-box service" x="900" y="78" width="178" height="96"></rect>
+          <text class="flow-title" x="928" y="113">RTS Service</text>
+          <text class="flow-sub" x="928" y="141">query / ask / tools</text>
 
-          <path class="arrow" d="M224 137 L306 137"></path>
-          <path class="arrow" d="M490 137 L634 137"></path>
-          <path class="arrow" d="M850 137 L918 137"></path>
+          <path class="arrow" d="M222 126 L300 126"></path>
+          <path class="arrow" d="M488 126 L584 126"></path>
+          <path class="arrow" d="M810 126 L900 126"></path>
 
-          <rect class="flow-box kb" x="72" y="256" width="176" height="64"></rect>
-          <text class="flow-title" x="96" y="284">治理判断</text>
-          <text class="flow-sub" x="96" y="306">demo_signoff / review</text>
+          <path class="gate-link" d="M394 174 L394 216"></path>
+          <rect class="flow-box kb" x="276" y="216" width="236" height="74"></rect>
+          <text class="gate-label" x="300" y="244">治理门禁</text>
+          <text class="gate-sub" x="300" y="267">有 evidence / review / signoff</text>
 
-          <rect class="flow-box kb" x="322" y="256" width="168" height="64"></rect>
-          <text class="flow-title" x="346" y="284">发布条件</text>
-          <text class="flow-sub" x="346" y="306">schema / dependency / hash</text>
+          <path class="gate-link" d="M530 126 L530 332 L276 332"></path>
+          <rect class="flow-box kb" x="276" y="332" width="236" height="74"></rect>
+          <text class="gate-label" x="300" y="360">发布门禁</text>
+          <text class="gate-sub" x="300" y="383">schema / dependency / hash 合格</text>
 
-          <rect class="flow-box projection" x="662" y="256" width="168" height="64"></rect>
-          <text class="flow-title" x="686" y="284">召回入口</text>
-          <text class="flow-sub" x="686" y="306">object card / L0 / L1</text>
+          <path class="gate-link" d="M697 174 L697 216"></path>
+          <rect class="flow-box projection" x="566" y="216" width="262" height="74"></rect>
+          <text class="gate-label" x="592" y="244">导航读取</text>
+          <text class="gate-sub" x="592" y="267">先用 object card / L0 / L1 找对象</text>
 
-          <rect class="flow-box projection" x="906" y="256" width="164" height="64"></rect>
-          <text class="flow-title" x="930" y="284">事实落点</text>
-          <text class="flow-sub" x="930" y="306">L2 / dependency / trace</text>
-
-          <path class="arrow" d="M248 288 L322 288"></path>
-          <path class="arrow" d="M490 288 L662 288"></path>
-          <path class="arrow" d="M830 288 L906 288"></path>
+          <path class="gate-link" d="M989 174 L989 216"></path>
+          <rect class="flow-box projection" x="872" y="216" width="236" height="74"></rect>
+          <text class="gate-label" x="896" y="244">事实读取</text>
+          <text class="gate-sub" x="896" y="267">最终回到 L2 / dependency / trace</text>
         </svg>
+      </div>
+      <div class="grid-2">
+        <article class="note green">
+          <h3>治理门禁</h3>
+          <p>规则进入 KB 后，不能只因为“看起来合理”就进入服务链路。它需要有来源证据、review 结论、demo signoff 或人工裁决记录，说明这条规则为什么可信。</p>
+        </article>
+        <article class="note green">
+          <h3>发布门禁</h3>
+          <p>KB Pack 只有通过 schema、依赖完整性、content hash 和 release 条件检查后，才能生成 runtime projection。未通过时，服务不应该在查询时临时修复。</p>
+        </article>
+        <article class="note blue">
+          <h3>导航读取</h3>
+          <p>Runtime projection 里的 object card、L0、L1 只帮助定位候选对象。它们适合召回和消歧，但不能直接支撑事实回答。</p>
+        </article>
+        <article class="note blue">
+          <h3>事实读取</h3>
+          <p>RTS Service 真正回答事实时必须读取 L2 runtime object、dependency 和 trace。没有这些落点时，正确行为是降级、拒答或要求澄清。</p>
+        </article>
       </div>
     </section>
 
     <section class="panel" id="pack">
       <p class="kicker">KB Pack Structure</p>
-      <h2>KB 不是一堆长文档，而是一个带治理侧面的规则包。</h2>
-      <p>这个 FXD.NDF pack 的主对象很薄：rule、lookup、helper 只承载稳定逻辑和例子。证据、review、closure report 被放在侧面目录里，避免每条规则都塞满历史讨论。</p>
+      <h2>KB pack 将规则逻辑与可信依据分离组织。</h2>
+      <p>这个 FXD.NDF pack 不是把所有说明塞进长文档。它把可执行的规则逻辑放在 rules、lookups、helpers 里；把来源证据、review 结论和检查报告放在 evidence、review、reports 里。这样读规则时不被历史讨论淹没，需要追溯时又能找到依据。</p>
       <div class="grid-2">
         <article class="card">
-          <span class="label">主对象层：转换做什么</span>
+          <span class="label">规则逻辑：系统实际怎么转换</span>
           <p><code>rules/</code> 保存 6 条 target rule，<code>lookups/</code> 保存 cutoff lookup，<code>helpers/</code> 保存 quoted currency pair 的复用逻辑。</p>
           <div class="tag-row">
             <span class="tag blue">rules/6</span>
@@ -610,8 +749,8 @@
           </div>
         </article>
         <article class="card">
-          <span class="label">治理侧面：为什么可信</span>
-          <p><code>evidence/</code> 指向来源材料，<code>review/</code> 记录歧义和结论，<code>reports/</code> 保留 extraction、checklist 和 closure。</p>
+          <span class="label">可信依据：为什么可以用这条规则</span>
+          <p><code>evidence/</code> 指向来源材料，<code>review/</code> 记录歧义和确认结论，<code>reports/</code> 保留抽取、检查和关闭状态。</p>
           <div class="tag-row">
             <span class="tag purple">evidence</span>
             <span class="tag purple">review</span>
@@ -841,7 +980,7 @@ example:
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel" id="failure">
       <p class="kicker">Failure Is A Feature</p>
       <h2>RTS 的可靠性，很大一部分来自“该拒答时拒答”。</h2>
       <div class="grid-2">
@@ -870,28 +1009,12 @@ example:
 
     <section class="panel" id="glossary">
       <p class="kicker">Glossary</p>
-      <h2>关键英文技术名词解释。</h2>
+      <h2>本手册只解释示例所需的关键英文技术名词。</h2>
       <div class="term-grid">
-        <article class="term-card">
-          <strong>RTS</strong>
-          <span>Rule Truth Source / Transformation Rule System</span>
-          <p>双核心规则真相服务：受控真相源原子能力和 managed LLM 分析共享同一 truth boundary。</p>
-        </article>
-        <article class="term-card">
-          <strong>KB</strong>
-          <span>Knowledge Base，规则知识库</span>
-          <p>完整保存 rule、lookup、helper 及其 source、evidence、review、adjudication、signoff 的治理层。</p>
-        </article>
-        <article class="term-card">
-          <strong>Runtime Projection</strong>
-          <span>运行时投影</span>
-          <p>从 KB 发布出来的 approved truth 服务运行包，是 query/index/service 默认读取的边界。</p>
-        </article>
-        <article class="term-card">
-          <strong>Rule Pack</strong>
-          <span>规则包</span>
-          <p>按业务范围组织的一组规则、lookup、helper、证据、review 和 report。</p>
-        </article>
+
+
+
+
         <article class="term-card">
           <strong>L2 Runtime Object</strong>
           <span>L2 运行时对象</span>
@@ -941,6 +1064,62 @@ example:
         <a href="architecture.html">现有 KB 与投影页</a>
       </div>
     </section>
+      </div>
+    </div>
   </main>
+  <script>
+    (function () {
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          return navigator.clipboard.writeText(text);
+        }
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const ok = document.execCommand("copy");
+        textarea.remove();
+        return ok ? Promise.resolve() : Promise.reject(new Error("copy failed"));
+      }
+
+      document.querySelectorAll("pre").forEach((pre) => {
+        if (pre.querySelector(".copy-code")) return;
+        const button = document.createElement("button");
+        button.className = "copy-code";
+        button.type = "button";
+        button.textContent = "复制";
+        button.addEventListener("click", async () => {
+          const text = Array.from(pre.childNodes)
+            .filter((node) => !(node.classList && node.classList.contains("copy-code")))
+            .map((node) => node.textContent)
+            .join("")
+            .trim();
+          try {
+            await copyText(text);
+            button.textContent = "已复制";
+            setTimeout(() => (button.textContent = "复制"), 1200);
+          } catch (error) {
+            button.textContent = "复制失败";
+            setTimeout(() => (button.textContent = "复制"), 1200);
+          }
+        });
+        pre.appendChild(button);
+      });
+
+      document.querySelectorAll("#objects details").forEach((details) => {
+        details.addEventListener("toggle", () => {
+          const grid = document.querySelector("#objects .grid-3");
+          if (!grid) return;
+          grid.style.display = "block";
+          grid.offsetHeight;
+          grid.style.display = "";
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

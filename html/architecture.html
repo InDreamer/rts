@@ -13,6 +13,7 @@
       <a class="nav-link" href="index.html">首页</a>
 <a class="nav-link" href="start-here.html">项目概览</a>
 <a class="nav-link active" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
 <a class="nav-link" href="operations.html">如何使用</a>
 <a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
@@ -22,14 +23,14 @@
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>KB 与 Runtime Projection</h1>
-      <p>KB 负责治理完整规则真相，runtime projection 负责把已批准内容发布成服务可读取、可审计、可分析的运行包。</p>
+      <p>KB 负责治理完整规则知识，runtime projection 负责把已批准内容发布成服务可读取的运行包。</p>
     </section>
     
     <section class="architecture-legend">
       <div>
         <p class="kicker">KB 与投影的分工</p>
         <h2>KB 保留完整治理，runtime projection 提供运行时视图。</h2>
-        <p>这是 RTS 里最重要的边界之一：KB 不是给人看的长文档集合，projection 也不是简单摘要。两者都是机器优先结构，只是承担的职责不同。</p>
+        <p>这是 RTS 里最重要的边界：KB 不是给人看的长文档集合，projection 也不是简单摘要。两者都是机器优先结构，只是承担的职责不同。</p>
       </div>
       <div class="legend-grid">
         <article class="ok">
@@ -62,7 +63,7 @@
       <div class="layer service">
         <span>04</span>
         <h2>服务读取 <small>Service Read</small></h2>
-        <p>查询、索引、API、managed LLM 和外部 agent 都通过 projection 读取规则。</p>
+        <p>查询、索引、API、影响分析、内部 LLM 和外部 agent 都通过 projection 读取规则。</p>
       </div>
       <div class="layer consume">
         <span>05</span>
@@ -127,11 +128,11 @@
         <article class="term-card">
           <strong>RTS</strong>
           <span>Rule Truth Source / Transformation Rule System</span>
-          <p>RTS 是双核心规则真相服务：既提供受控真相源原子能力，也提供 managed LLM 分析服务。</p>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的业务规则 KB。</p>
         </article>
 <article class="term-card">
           <strong>KB</strong>
-          <span>Knowledge Base，规则知识库</span>
+          <span>Knowledge Base，业务规则 KB</span>
           <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
         </article>
 <article class="term-card">
@@ -142,7 +143,7 @@
 <article class="term-card">
           <strong>Runtime Projection</strong>
           <span>运行时投影</span>
-          <p>把 approved truth 发布成服务可读取的运行包，让查询、索引、managed analysis 和外部 tool mode 有稳定输入。</p>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
         </article>
 <article class="term-card">
           <strong>L2 Runtime Object</strong>
@@ -185,9 +186,9 @@
           <p>从 projection 派生出的搜索和导航视图，只负责召回，不拥有最终规则真相。</p>
         </article>
 <article class="term-card">
-          <strong>Managed Analysis</strong>
-          <span>托管 LLM 分析</span>
-          <p>RTS 内部 LLM 基于 projection 和受控工具做解释、影响候选、测试候选和 review 加速，但不拥有 truth。</p>
+          <strong>AI-assisted Consumer</strong>
+          <span>LLM / Agent 消费方</span>
+          <p>可以基于 projection 做解释、影响分析或辅助 review，但基础仍是 KB 和 runtime projection。</p>
         </article>
       </div>
     </section>
@@ -206,7 +207,6 @@
             <tr><td>L2 runtime object</td><td>保存服务可读的结构化规则事实</td><td>回答事实时要回到这里</td></tr>
             <tr><td>Object card / L0 / L1</td><td>帮助搜索、导航和消歧</td><td>它是入口，不是最终规则正文</td></tr>
             <tr><td>Governance summary</td><td>解释可信度、风险和 open question</td><td>需要权限和场景控制</td></tr>
-            <tr><td>Managed analysis</td><td>在 truth boundary 内执行解释、影响候选和测试候选</td><td>它是核心服务能力，不是事实权威</td></tr>
             <tr><td>Trace</td><td>复盘一次服务调用读了什么</td><td>它证明过程，不反写规则真相</td></tr>
           </tbody>
         </table>

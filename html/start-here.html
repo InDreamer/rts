@@ -13,6 +13,7 @@
       <a class="nav-link" href="index.html">首页</a>
 <a class="nav-link active" href="start-here.html">项目概览</a>
 <a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
 <a class="nav-link" href="operations.html">如何使用</a>
 <a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
@@ -22,7 +23,7 @@
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>项目概览</h1>
-      <p>RTS 将分散的转换规则治理成可发布、可追溯的规则真相，并通过 runtime projection 支撑查询、审计、managed analysis 和外部 tool mode。</p>
+      <p>RTS 将分散的转换规则整理成可治理的 KB，并发布为 runtime projection，支撑查询、审计和后续分析。</p>
     </section>
     
     <section class="orientation-panel">
@@ -89,11 +90,11 @@
         <article class="term-card">
           <strong>RTS</strong>
           <span>Rule Truth Source / Transformation Rule System</span>
-          <p>RTS 是双核心规则真相服务：既提供受控真相源原子能力，也提供 managed LLM 分析服务。</p>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的业务规则 KB。</p>
         </article>
 <article class="term-card">
           <strong>KB</strong>
-          <span>Knowledge Base，规则知识库</span>
+          <span>Knowledge Base，业务规则 KB</span>
           <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
         </article>
 <article class="term-card">
@@ -104,7 +105,7 @@
 <article class="term-card">
           <strong>Runtime Projection</strong>
           <span>运行时投影</span>
-          <p>把 approved truth 发布成服务可读取的运行包，让查询、索引、managed analysis 和外部 tool mode 有稳定输入。</p>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
         </article>
 <article class="term-card">
           <strong>L2 Runtime Object</strong>
@@ -137,20 +138,20 @@
       <div class="tab-buttons" role="tablist">
         <button class="tab-button active" type="button" data-tab="business">领导/PM</button>
         <button class="tab-button" type="button" data-tab="developer">技术同事</button>
-        <button class="tab-button" type="button" data-tab="agent">LLM / Agent</button>
+        <button class="tab-button" type="button" data-tab="agent">LLM/Agent</button>
         <button class="tab-button" type="button" data-tab="reviewer">Review/治理</button>
       </div>
       <div class="tab-panel active" data-tab-panel="business">
         <h3>价值是把规则资产沉淀下来，而不是只做一个问答入口。</h3>
-        <p>关注规则来源能否追溯、发布版本是否清楚，以及是否能安全支撑查询、审计、分析和自动化。</p>
+        <p>可以关注：规则来源能否追溯、发布版本是否清楚、后续是否能支撑查询、审计、影响分析和自动化。</p>
       </div>
       <div class="tab-panel" data-tab-panel="developer">
         <h3>关键结构是 KB 到 runtime projection 的边界。</h3>
-        <p>关注 manifest、scope、object manifest、L2 runtime object、object card、dependency、governance view、permission 和 trace。</p>
+        <p>可以关注：manifest、scope、object manifest、L2 runtime object、object card、dependency、governance summary 和 trace。</p>
       </div>
       <div class="tab-panel" data-tab-panel="agent">
         <h3>Managed LLM 是核心服务能力，但不是 truth owner。</h3>
-        <p>LLM 在 RTS 边界内调用受控工具，执行解释、冲突发现、影响候选、测试候选和 reviewer-friendly 表达；外部 agent 通过 REST/MCP tool mode 复用同一组原子能力。</p>
+        <p>内部 LLM 可以做 managed analysis，外部 agent 可以通过工具模式读取规则、依赖和 trace；两者都不能绕过 service gate。</p>
       </div>
       <div class="tab-panel" data-tab-panel="reviewer">
         <h3>治理重点是证据、歧义和裁决能不能留下来。</h3>

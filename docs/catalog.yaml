@@ -31,6 +31,11 @@ documents:
   layer: 2
   parent: docs/INDEX.md
   summary: manual curl commands for current sample runtime projection smoke testing
+- path: docs/ai-first-format-conversation-followup-zh.md
+  role: leaf
+  layer: 2
+  parent: docs/INDEX.md
+  summary: follow-up clarifications for AI-readable KB/projection format boundaries
 - path: docs/confirmed/README.md
   role: domain
   layer: 2

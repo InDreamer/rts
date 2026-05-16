@@ -6,3 +6,6 @@ sample-projection/runtime-store/releases/*/lucene/
 sample-projection/runtime-store/releases/*/index-artifacts/lucene/
 sample-projection/runtime-store/traces/*.jsonl
 *.log
+.DS_Store
+/output/
+/.codex-kb-hero*.png

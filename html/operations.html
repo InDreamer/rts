@@ -13,6 +13,7 @@
       <a class="nav-link" href="index.html">首页</a>
 <a class="nav-link" href="start-here.html">项目概览</a>
 <a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
 <a class="nav-link active" href="operations.html">如何使用</a>
 <a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
@@ -22,14 +23,14 @@
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>如何使用</h1>
-      <p>本地服务和 API 通过 runtime projection 读取已发布规则，并返回 facts、citations、trace、managed analysis 或 refusal。</p>
+      <p>本地服务和 API 通过 runtime projection 读取已发布规则，并返回 facts、citations、trace 或 refusal。</p>
     </section>
     
     <section class="ops-lane">
       <div class="section-heading compact">
         <p class="kicker">如何使用</p>
-        <h2>使用 RTS 的前提，是先通过 runtime projection 进入 truth boundary。</h2>
-        <p>稳定入口是 projection store：它定义当前 release、可用 scope、可查询对象、事实正文位置和权限边界。</p>
+        <h2>使用 RTS 的前提，是先有一份 runtime projection。</h2>
+        <p>稳定入口是 projection store：它定义当前 release、可用 scope、可查询对象和事实正文位置。</p>
       </div>
       <div class="ops-flow">
         <article><span>1</span><strong>选择 release</strong><p>active-release 指向当前服务应该使用的规则版本。</p></article>
@@ -68,13 +69,13 @@ git status --short</code></pre>
       <div>
         <p class="kicker">调用示例</p>
         <h2>看服务如何消费 projection。</h2>
-        <p>这些入口共享同一读取纪律：请求带 scope，服务从当前 projection 找对象、读 L2，并按入口返回 facts/citations/trace、managed answer 或候选分析。</p>
+        <p>下面的请求只是 demo 入口。重点是：请求会带 scope，服务会从当前 projection 中找对象、读 L2、返回 facts/citations/trace。</p>
       </div>
       <div class="example-builder">
         <label>入口
           <select id="example-endpoint">
             <option value="query">/api/v1/query deterministic 查询</option>
-            <option value="ask">/api/v1/ask managed analysis</option>
+            <option value="ask">/api/v1/ask LLM 分析问答</option>
             <option value="scenario">/api/v1/scenario/analyze-failed-message</option>
             <option value="mcp">/mcp/tools 工具清单</option>
           </select>
@@ -100,11 +101,11 @@ git status --short</code></pre>
         <article class="term-card">
           <strong>RTS</strong>
           <span>Rule Truth Source / Transformation Rule System</span>
-          <p>RTS 是双核心规则真相服务：既提供受控真相源原子能力，也提供 managed LLM 分析服务。</p>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的业务规则 KB。</p>
         </article>
 <article class="term-card">
           <strong>KB</strong>
-          <span>Knowledge Base，规则知识库</span>
+          <span>Knowledge Base，业务规则 KB</span>
           <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
         </article>
 <article class="term-card">
@@ -115,7 +116,7 @@ git status --short</code></pre>
 <article class="term-card">
           <strong>Runtime Projection</strong>
           <span>运行时投影</span>
-          <p>把 approved truth 发布成服务可读取的运行包，让查询、索引、managed analysis 和外部 tool mode 有稳定输入。</p>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
         </article>
 <article class="term-card">
           <strong>L2 Runtime Object</strong>
@@ -153,11 +154,9 @@ git status --short</code></pre>
     <section class="warning-panel">
       <h2>介绍和使用时最容易误解的点</h2>
       <ul class="big-list compact">
-        <li><strong>HTML 只是介绍层</strong>：项目核心是 KB 和 runtime projection。</li>
         <li><strong>Projection 不是摘要</strong>：它必须保留 L2 结构化规则语义。</li>
         <li><strong>搜索结果不是事实</strong>：card、L0/L1、index document 只负责定位对象。</li>
-        <li><strong>LLM 是受控分析层</strong>：managed analysis 是核心能力，但事实声明必须基于 L2、dependency 或授权治理视图。</li>
-        <li><strong>降级不改产品身份</strong>：LLM 不可用时可以退回结构化信息服务，但这不是 AI-centric 场景的目标正常态。</li>
+        <li><strong>LLM/Agent 是消费层能力</strong>：分析和表达必须基于业务规则 KB 与运行包。</li>
       </ul>
     </section>
 
