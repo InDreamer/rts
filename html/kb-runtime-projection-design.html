@@ -500,8 +500,8 @@
     <section class="hero">
       <div class="hero-copy">
         <p class="kicker">RTS KB / Runtime Projection Handbook</p>
-        <h1>用一个真实规则包，看懂 KB 和 runtime projection 为什么要这样设计。</h1>
-        <p class="hero-text">本页使用当前项目里的 <strong>Tradition -> Stella FXD.NDF cutoff-fixing</strong> 规则包说明：规则如何进入 KB，如何被治理和 signoff，如何发布成 runtime projection，最后服务如何用 L2、dependency 和 trace 给出可复盘的答案。</p>
+        <h1>用一个真实规则包，看懂 KB、runtime projection 和 RTS 服务边界。</h1>
+        <p class="hero-text">本页使用当前项目里的 <strong>Tradition -> Stella FXD.NDF cutoff-fixing</strong> 规则包说明：规则如何进入 KB，如何被治理和 signoff，如何发布成 runtime projection，最后服务如何用 release、scope、L2、dependency 和 trace 支撑确定性查询与 managed analysis。</p>
         <div class="hero-actions">
           <a class="button primary" href="#pack">从真实 Pack 开始</a>
           <a class="button" href="#objects">看 Rule / Lookup / Helper</a>
@@ -535,8 +535,8 @@
 
     <section class="panel" id="flow">
       <p class="kicker">One Rule's Journey</p>
-      <h2>一条规则从原始材料到服务回答，中间经过四个稳定边界。</h2>
-      <p>这比“把文件丢给搜索或 AI”慢一点，但好处是每个答案都能说明：来自哪个 release、属于哪个 scope、读了哪个 L2 对象、依赖了哪个 lookup/helper、是否留下 trace。</p>
+      <h2>一条规则从原始材料到服务输出，中间经过四个稳定边界。</h2>
+      <p>RTS 不把文件直接交给搜索或模型回答；每个事实输出都必须说明来自哪个 release、属于哪个 scope、读了哪个 L2 对象、依赖了哪个 lookup/helper、是否留下 trace。</p>
       <div class="diagram-wrap">
         <svg viewBox="0 0 1120 430" role="img" aria-label="RTS 规则发布与读取流程">
           <defs>
@@ -566,7 +566,7 @@
 
           <rect class="flow-box service" x="918" y="90" width="152" height="94"></rect>
           <text class="flow-title" x="940" y="124">RTS Service</text>
-          <text class="flow-sub" x="940" y="151">query / API / trace</text>
+          <text class="flow-sub" x="940" y="151">query / ask / tools</text>
 
           <path class="arrow" d="M224 137 L306 137"></path>
           <path class="arrow" d="M490 137 L634 137"></path>
@@ -864,7 +864,7 @@ example:
       </div>
       <div class="note green">
         <h3>一句话原则</h3>
-        <p><strong>Unknown is safer than wrong.</strong> 对 RTS 来说，拒答、降级和要求澄清不是失败，而是避免把错误规则包装成事实。</p>
+        <p><strong>Unknown is safer than wrong.</strong> 对 RTS 来说，拒答、降级和要求澄清不是失败，而是避免把错误规则或无根据分析包装成事实。</p>
       </div>
     </section>
 
@@ -872,6 +872,11 @@ example:
       <p class="kicker">Glossary</p>
       <h2>关键英文技术名词解释。</h2>
       <div class="term-grid">
+        <article class="term-card">
+          <strong>RTS</strong>
+          <span>Rule Truth Source / Transformation Rule System</span>
+          <p>双核心规则真相服务：受控真相源原子能力和 managed LLM 分析共享同一 truth boundary。</p>
+        </article>
         <article class="term-card">
           <strong>KB</strong>
           <span>Knowledge Base，规则知识库</span>
@@ -916,6 +921,11 @@ example:
           <strong>Grounding</strong>
           <span>事实落点</span>
           <p>把回答中的事实声明绑定回 L2、dependency、source 或授权治理材料。</p>
+        </article>
+        <article class="term-card">
+          <strong>Managed Analysis</strong>
+          <span>托管 LLM 分析</span>
+          <p>RTS 内部 LLM 在服务边界内调用受控工具，生成解释、影响候选、测试候选和调查路径。</p>
         </article>
       </div>
     </section>

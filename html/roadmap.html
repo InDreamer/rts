@@ -22,14 +22,14 @@
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>推进路径</h1>
-      <p>RTS 的推进顺序是先沉淀 KB 和 runtime projection，再扩展查询、分析和 AI 辅助。</p>
+      <p>RTS 的推进顺序是先锁定 governed truth 和 runtime projection 边界，再稳定查询、tool mode 和 managed analysis。</p>
     </section>
     
     <section class="roadmap-brief">
       <div>
         <p class="kicker">推进路径</p>
-        <h2>先把规则知识和运行投影做扎实，再扩展查询和 AI 辅助。</h2>
-        <p>路线图从规则治理开始：先整理 KB，再发布 runtime projection，最后让服务和下游场景稳定消费。</p>
+        <h2>先把规则真相和运行投影做扎实，再扩展服务和托管分析。</h2>
+        <p>路线图从规则治理开始：先整理 KB，再发布 runtime projection，然后让确定性查询、外部 tool mode 和 managed LLM 场景稳定消费同一组原子能力。</p>
       </div>
       <div class="roadmap-scale">
         <span>KB 结构稳定</span>
@@ -61,8 +61,8 @@
       </article>
       <article>
         <span>Step 5</span>
-        <h2>接入 AI 辅助分析</h2>
-        <p>AI 消费 projection 做解释和分析，但不替代 KB、projection 和人工裁决。</p>
+        <h2>稳定 managed analysis 场景</h2>
+        <p>RTS 内部 LLM 在服务边界内调用受控工具做解释、冲突发现、影响候选、测试候选和调查分析；LLM 不可用时才降级为结构化信息服务。</p>
       </article>
     </section>
 
@@ -77,7 +77,7 @@
           <tr><td>KB</td><td>规则来源、证据、review 和裁决能被结构化追踪。</td><td>一堆给人看的 Markdown。</td></tr>
           <tr><td>Projection</td><td>已批准规则能被发布成服务可读的稳定运行包。</td><td>自然语言摘要或搜索索引。</td></tr>
           <tr><td>Service</td><td>查询能回到 scope、L2、dependency 和 trace。</td><td>直接问模型或直接扫工作区文件。</td></tr>
-          <tr><td>AI 辅助</td><td>在治理材料上做解释、分析和候选建议。</td><td>项目一开始就变成聊天或自动化应用。</td></tr>
+          <tr><td>Managed analysis</td><td>在同一 truth boundary 内做解释、分析、影响候选和测试候选。</td><td>让模型拥有 truth 或替代人工裁决。</td></tr>
         </tbody>
       </table>
     </section>
@@ -85,11 +85,11 @@
     <section class="decision-grid">
       <article>
         <h2>表达重点</h2>
-        <p>主线是规则如何从材料进入 KB，再如何发布成 projection；模型接入、SDK、harness 和工具模式属于后续实现层。</p>
+        <p>主线是规则如何从材料进入 KB，再如何发布成 projection，并通过同一个 RTS service 暴露为确定性原子能力、managed mode 和 external tool mode。</p>
       </article>
       <article>
         <h2>下一步真正重要什么</h2>
-        <p>让 sample pack 到 runtime projection 的链路更真实、更稳定，再用 API 和可视化把“查得到、查得准、可复盘”展示出来。</p>
+        <p>让 sample pack 到 runtime projection 的链路更真实、更稳定，再用 API、/ask 和场景端点把“查得到、查得准、可复盘、可受控分析”展示出来。</p>
       </article>
     </section>
 
@@ -97,13 +97,13 @@
       <div class="section-heading compact">
         <p class="kicker">Glossary · 术语解释</p>
         <h2>推进路径里的关键英文词</h2>
-        <p>这些词帮助同事理解项目从知识整理到服务运行的路径。AI 辅助是后续消费方式，不是唯一卖点。</p>
+        <p>这些词帮助同事理解项目从知识治理到服务运行的路径。Managed LLM 是核心服务能力之一，但不拥有规则真相。</p>
       </div>
       <div class="term-grid">
         <article class="term-card">
           <strong>RTS</strong>
           <span>Rule Truth Source / Transformation Rule System</span>
-          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的规则知识基础。</p>
+          <p>RTS 是双核心规则真相服务：既提供受控真相源原子能力，也提供 managed LLM 分析服务。</p>
         </article>
 <article class="term-card">
           <strong>KB</strong>
@@ -118,7 +118,7 @@
 <article class="term-card">
           <strong>Runtime Projection</strong>
           <span>运行时投影</span>
-          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+          <p>把 approved truth 发布成服务可读取的运行包，让查询、索引、managed analysis 和外部 tool mode 有稳定输入。</p>
         </article>
 <article class="term-card">
           <strong>L2 Runtime Object</strong>

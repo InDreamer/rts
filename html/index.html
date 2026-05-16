@@ -22,9 +22,9 @@
   <main>
     <section class="workbench-hero">
       <div class="hero-copy">
-        <p class="kicker">RTS · Rule Knowledge Base & Runtime Projection</p>
-        <h1>把分散的报文转换业务规则，沉淀为可发布、可查询、可复用的 KB。</h1>
-        <p class="hero-text">报文转换背后是一组可复用的业务规则逻辑，不只是字段搬运。RTS 将散落在文档、代码、mapping、lookup 和 review 记录里的规则整理成 governed KB，并发布为 runtime projection。服务、内部 LLM、外部 agent 和其他业务平台都可以在同一服务边界内查询、解释、分析和复用。</p>
+        <p class="kicker">RTS · Rule Truth Service & Runtime Projection</p>
+        <h1>把分散的报文转换规则，治理成可发布、可追溯、可分析的规则真相服务。</h1>
+        <p class="hero-text">报文转换背后是一组可复用的业务规则逻辑，不只是字段搬运。RTS 将散落在文档、代码、mapping、lookup 和 review 记录里的规则治理成 governed KB，并发布为 runtime projection；确定性查询、内部 managed LLM 分析、外部 agent tool mode 和业务平台都在同一 truth access boundary 内复用这些能力。</p>
         <div class="hero-actions">
           <a class="button primary" href="start-here.html">项目概览</a>
           <a class="button secondary" href="kb-runtime-projection-design.html">看真实规则包手册</a>
@@ -34,7 +34,7 @@
       <div class="hero-dashboard" aria-label="RTS HTML 信息面板">
         <div class="dashboard-heading">
           <p class="kicker">核心结构</p>
-          <h2>三层职责</h2>
+          <h2>双核心底座</h2>
         </div>
         <div class="dashboard-stat">
           <span>KB</span>
@@ -46,11 +46,11 @@
         </div>
         <div class="dashboard-stat">
           <span>Service</span>
-          <p>内部 LLM 和外部 agent 通过同一服务边界读取、分析和解释</p>
+          <p>确定性原子能力与 managed LLM 分析共享同一服务边界</p>
         </div>
         <div class="dashboard-note">
           <strong>工作边界</strong>
-          <p>KB 承载可治理的业务规则逻辑；runtime projection 提供运行时视图；RTS service 统一控制 scope、permission、grounding 和 trace。</p>
+          <p>KB 承载 governed truth graph；runtime projection 提供 approved truth 的服务运行视图；RTS service 统一控制 release、scope、permission、grounding、refusal 和 trace。</p>
         </div>
       </div>
     </section>
@@ -58,8 +58,8 @@
     <section class="html-principles">
       <div class="section-heading compact">
         <p class="kicker">项目价值</p>
-        <h2>核心价值是让业务规则 KB 可以被服务和平台复用。</h2>
-        <p>RTS 不只是降低检索成本。它把报文转换里的业务规则逻辑整理成可治理、可发布、可迁移的 KB，使规则可以进入查询、审计、迁移、影响分析、测试规划和 LLM/Agent 分析等业务场景。</p>
+        <h2>核心价值是让规则真相安全进入服务、平台和 AI 场景。</h2>
+        <p>RTS 不只是降低检索成本。它把报文转换里的业务规则逻辑治理成可发布、可追溯、可审查的 truth surface，并同时提供稳定原子能力和 managed LLM 分析服务。</p>
       </div>
       <div class="principle-grid">
         <article>
@@ -76,7 +76,7 @@
         </article>
         <article>
           <strong>LLM/Agent 分析有依据</strong>
-          <p>内部 LLM 和外部 agent 基于 governed KB 做解释、影响分析和测试建议。</p>
+          <p>内部 managed LLM 和外部 agent 基于同一组受控原子能力做解释、影响候选、测试候选和调查分析。</p>
         </article>
       </div>
     </section>
@@ -84,13 +84,13 @@
     <section class="system-map-panel">
       <div class="section-heading compact">
         <p class="kicker">项目主线</p>
-        <h2>从材料，到 KB，再到 runtime projection。</h2>
-        <p>RTS 先把业务规则逻辑治理成 KB，再发布为 runtime projection；搜索、API、内部 LLM 和外部 agent 都基于这份运行包工作。</p>
+        <h2>从材料，到 governed KB，再到 runtime projection。</h2>
+        <p>RTS 先把业务规则逻辑治理成 KB，再发布为 runtime projection；搜索、API、managed LLM 和外部 agent 都必须通过服务边界读取。</p>
       </div>
       <div class="system-map">
         <svg viewBox="0 0 1120 410" role="img" aria-labelledby="system-map-title system-map-desc">
           <title id="system-map-title">RTS truth flow and service boundary</title>
-          <desc id="system-map-desc">Source material enters governed KB, becomes runtime projection, passes service gate, then supports APIs, search, trace, and assisted analysis.</desc>
+          <desc id="system-map-desc">Source material enters governed KB, becomes runtime projection, passes the RTS service gate, then supports APIs, search, trace, managed analysis, and external agent tools.</desc>
           <defs>
             <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
               <path d="M0,0 L0,6 L8,3 z"></path>
@@ -172,8 +172,8 @@
     <section class="story-panel">
       <div class="section-heading">
         <p class="kicker">核心过程</p>
-        <h2>RTS 建立的是“业务规则 KB 发布链路”。</h2>
-        <p>规则先进入 KB，再发布成 projection，最后由服务、API、内部 LLM 和外部 agent 复用。</p>
+        <h2>RTS 建立的是“规则真相发布与服务消费链路”。</h2>
+        <p>规则先进入 KB 治理，再发布成 projection，最后由确定性查询、managed LLM 和外部 agent tool mode 复用。</p>
       </div>
       <div class="flow-line">
         <article>
@@ -194,7 +194,7 @@
         <article>
           <span>04</span>
           <h3>服务消费</h3>
-          <p>查询、API、搜索、内部 LLM 和外部 agent 都从同一份 projection 读取。</p>
+          <p>查询、API、搜索、managed LLM 和外部 agent 都从同一份 projection 读取，并留下 trace。</p>
         </article>
       </div>
     </section>
@@ -202,13 +202,13 @@
     <section class="mode-panel">
       <div class="mode-copy">
         <p class="kicker">Service / LLM / Agent</p>
-        <h2>RTS service 把 KB 能力开放给内部 LLM 和外部 agent。</h2>
-        <p>内部 LLM 走 managed analysis；外部 agent 走 REST/MCP tool mode。两种模式都由 RTS service 控制 scope、grounding、permission 和 trace。</p>
+        <h2>RTS service 同时提供原子能力和托管分析。</h2>
+        <p>内部 LLM 走 managed mode；外部 agent 走 REST/MCP tool mode。两种模式共享同一个 runtime projection access boundary，并由 RTS service 控制 release、scope、permission、grounding、refusal 和 trace。</p>
       </div>
       <div class="mode-grid">
         <article>
           <h3>Managed Analysis</h3>
-          <p>RTS 内部 LLM 在服务边界内基于 KB/projection 组织解释、影响分析、测试建议和调查路径。</p>
+          <p>RTS 内部 LLM 在服务边界内基于 KB/projection 执行受控解释、影响候选、测试候选和调查分析。</p>
           <a href="start-here.html">看项目概览</a>
         </article>
         <article>
@@ -229,7 +229,7 @@
         <article class="term-card">
           <strong>RTS</strong>
           <span>Rule Truth Source / Transformation Rule System</span>
-          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的业务规则 KB。</p>
+          <p>RTS 是双核心规则真相服务：既提供受控真相源原子能力，也提供 managed LLM 分析服务。</p>
         </article>
 <article class="term-card">
           <strong>KB</strong>
@@ -244,7 +244,7 @@
 <article class="term-card">
           <strong>Runtime Projection</strong>
           <span>运行时投影</span>
-          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+          <p>把 approved truth 发布成服务可读取的运行包，让查询、索引、managed analysis 和外部 tool mode 有稳定输入。</p>
         </article>
 <article class="term-card">
           <strong>L2 Runtime Object</strong>
