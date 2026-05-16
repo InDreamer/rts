@@ -23,14 +23,14 @@
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>KB 与 Runtime Projection</h1>
-      <p>KB 负责治理完整规则知识，runtime projection 负责把已批准内容发布成服务可读取的运行包。</p>
+      <p>KB 负责整理完整规则知识，runtime projection 负责把已批准内容发布成服务可读取的运行包。</p>
     </section>
     
     <section class="architecture-legend">
       <div>
         <p class="kicker">KB 与投影的分工</p>
-        <h2>KB 保留完整治理，runtime projection 提供运行时视图。</h2>
-        <p>这是 RTS 里最重要的边界：KB 不是给人看的长文档集合，projection 也不是简单摘要。两者都是机器优先结构，只是承担的职责不同。</p>
+        <h2>KB 保留完整知识上下文，runtime projection 提供运行时视图。</h2>
+        <p>这是 RTS 里最重要的分层：KB 不是给人看的长文档集合，projection 也不是简单摘要。两者都是机器优先结构，只是承担的职责不同。</p>
       </div>
       <div class="legend-grid">
         <article class="ok">
@@ -76,7 +76,7 @@
       <article id="kb-layer">
         <p class="kicker">KB Layer</p>
         <h2>KB 里应该保留什么？</h2>
-        <p>KB 是完整 governed truth graph，不只是规则正文。它需要保存规则本身，也要保存规则为什么可信、哪里还有歧义、谁做了裁决。</p>
+        <p>KB 是完整的规则知识图谱，保存规则本身，也保存规则为什么可信、哪里还有歧义、谁做了裁决。</p>
         <ul class="tag-list">
           <li>rule / lookup / helper</li>
           <li>source material</li>
@@ -89,7 +89,7 @@
       <article id="projection-layer">
         <p class="kicker">Runtime Projection</p>
         <h2>Projection 里应该发布什么？</h2>
-        <p>Projection 是 approved truth 的服务运行视图。它应该降低运行时噪声，但不能把规则事实压成只有自然语言摘要。</p>
+        <p>Projection 是已批准规则的服务运行视图。它降低运行时噪声，但保留完整的结构化规则事实。</p>
         <ul class="tag-list">
           <li>release manifest</li>
           <li>scope registry</li>
@@ -106,8 +106,8 @@
     <section class="context-envelope">
       <div>
         <p class="kicker">为什么不直接用搜索索引？</p>
-        <h2>索引能帮忙找到对象，但不能成为规则事实。</h2>
-        <p>Object card、L0/L1、alias、confusable 和全文索引适合召回和消歧。真正回答“规则怎么生成”时，服务必须回到 L2 runtime object、dependency 和授权 governance view。</p>
+        <h2>索引能帮忙找到对象，但它本身不是规则事实。</h2>
+        <p>Object card、L0/L1、alias、confusable 和全文索引适合召回和消歧。真正回答”规则怎么生成”时，服务需要回到 L2 runtime object、dependency 和授权 governance view。</p>
       </div>
       <div class="envelope-steps">
         <span>先确定 scope</span>
@@ -183,7 +183,7 @@
 <article class="term-card">
           <strong>Index Document</strong>
           <span>索引文档</span>
-          <p>从 projection 派生出的搜索和导航视图，只负责召回，不拥有最终规则真相。</p>
+          <p>从 projection 派生出的搜索和导航视图，负责召回定位，规则权威仍在 L2。</p>
         </article>
 <article class="term-card">
           <strong>AI-assisted Consumer</strong>

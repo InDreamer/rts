@@ -23,7 +23,7 @@
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>如何使用</h1>
-      <p>本地服务和 API 通过 runtime projection 读取已发布规则，并返回 facts、citations、trace 或 refusal。</p>
+      <p>本地服务和 API 通过 runtime projection 读取已发布规则，返回 facts、citations、trace 或拒答说明。</p>
     </section>
     
     <section class="ops-lane">
@@ -44,7 +44,7 @@
       <article>
         <span class="card-number">01</span>
         <h2>本地 demo 启动</h2>
-        <p>当前 demo 使用 sample runtime projection store。它展示的是“服务读取 projection”，不是直接读取 KB 草稿。</p>
+        <p>当前 demo 使用 sample runtime projection store。它展示的是”服务读取 projection”的流程，而非直接读取 KB 草稿。</p>
         <pre><code>RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
 JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run</code></pre>
@@ -69,7 +69,7 @@ git status --short</code></pre>
       <div>
         <p class="kicker">调用示例</p>
         <h2>看服务如何消费 projection。</h2>
-        <p>下面的请求只是 demo 入口。重点是：请求会带 scope，服务会从当前 projection 中找对象、读 L2、返回 facts/citations/trace。</p>
+        <p>下面的请求是 demo 入口。重点：请求带 scope，服务从当前 projection 中找对象、读 L2、返回 facts/citations/trace。</p>
       </div>
       <div class="example-builder">
         <label>入口
@@ -152,11 +152,11 @@ git status --short</code></pre>
     </section>
 
     <section class="warning-panel">
-      <h2>介绍和使用时最容易误解的点</h2>
+      <h2>介绍和使用时容易误解的点</h2>
       <ul class="big-list compact">
-        <li><strong>Projection 不是摘要</strong>：它必须保留 L2 结构化规则语义。</li>
-        <li><strong>搜索结果不是事实</strong>：card、L0/L1、index document 只负责定位对象。</li>
-        <li><strong>LLM/Agent 是消费层能力</strong>：分析和表达必须基于业务规则 KB 与运行包。</li>
+        <li><strong>Projection 不是摘要</strong>：它保留 L2 结构化规则语义。</li>
+        <li><strong>搜索结果不是事实</strong>：card、L0/L1、index document 负责定位对象，事实在 L2。</li>
+        <li><strong>LLM/Agent 是消费层</strong>：分析和表达基于 KB 与运行包，而非独立生成。</li>
       </ul>
     </section>
 

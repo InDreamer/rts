@@ -24,29 +24,29 @@
     <section class="workbench-hero">
       <div class="hero-copy">
         <p class="kicker">RTS · Rule Truth Service & Runtime Projection</p>
-        <h1>把分散的报文转换规则，治理成可发布、可追溯、可分析的规则真相服务。</h1>
-        <p class="hero-text">报文转换背后是一组可复用的业务规则逻辑，不只是字段搬运。RTS 将散落在文档、代码、字段映射、查表逻辑和评审记录里的规则治理成规则知识库，并发布为可运行的规则投影；确定性查询、内部托管智能分析、外部工具调用和业务平台，都在同一套受控真相边界内复用这些能力。</p>
+        <h1>把分散的报文转换规则，整理成可发布、可追溯、可查询的业务知识服务。</h1>
+        <p class="hero-text">报文转换背后是一组可复用的业务逻辑，散落在文档、代码、字段映射、查表和评审记录里。RTS 将它们收敛进结构化知识库（KB），再发布为运行时投影（runtime projection）。确定性查询、内置 LLM 分析、外部工具调用和业务平台，都从同一份投影获取一致的规则答案。</p>
       </div>
       <div class="hero-dashboard" aria-label="RTS HTML 信息面板">
         <div class="dashboard-heading">
           <p class="kicker">核心结构</p>
-          <h2>两个核心：受控真相源与托管分析服务</h2>
+          <h2>两个核心：稳定知识源与内置 LLM 分析服务</h2>
         </div>
         <div class="dashboard-stat core-stat">
-          <span>受控真相源</span>
-          <p>受控规则真相服务：稳定提供规则、证据、依赖、原文片段和审计追踪。</p>
+          <span>稳定知识源</span>
+          <p>提供规则正文、来源证据、依赖关系、原文片段和审计追踪。</p>
         </div>
         <div class="dashboard-stat core-stat">
-          <span>托管分析服务</span>
-          <p>托管智能分析服务：在 RTS 内完成规则解释、影响候选、测试候选和调查分析。</p>
+          <span>内置 LLM 分析</span>
+          <p>在服务内部完成规则解释、影响评估、测试建议和调查分析。</p>
         </div>
         <div class="dashboard-stat boundary-stat">
           <span>统一服务边界</span>
-          <p>规则知识库和运行投影共同供给两个核心，避免分析层绕过真相边界。</p>
+          <p>知识库和运行投影共同支撑两个核心，分析能力始终基于已发布的规则内容。</p>
         </div>
         <div class="dashboard-note">
           <strong>工作边界</strong>
-          <p>规则知识库承载已治理的业务真相；运行投影提供已批准内容的服务视图；RTS 统一控制发布版本、业务范围、调用权限、依据校验、拒答规则和追踪记录。</p>
+          <p>知识库承载已整理的业务规则；运行投影提供已批准内容的服务视图；RTS 统一管控发布版本、业务范围、调用权限、依据校验和追踪记录。</p>
         </div>
       </div>
     </section>
@@ -54,45 +54,25 @@
     <section class="html-principles">
       <div class="section-heading compact">
         <p class="kicker">项目价值</p>
-        <h2>核心价值是让规则真相安全进入服务、平台和 AI 场景。</h2>
-        <p>RTS 不只是降低检索成本。它把报文转换里的业务规则逻辑治理成可发布、可追溯、可审查的 truth surface，并同时提供稳定原子能力和 managed LLM 分析服务。</p>
+        <h2>核心价值：业务规则经结构化整理并借助 AI 分析，为服务、平台和 AGENT 提供可查询、可解释的规则能力。</h2>
+        <p>RTS 将报文转换中的业务逻辑整理成结构化知识库，发布为运行时投影，并借助内置 LLM 分析能力，为服务、平台和外部 agent 提供确定性查询与智能解释。</p>
       </div>
       <div class="principle-grid">
         <article>
           <strong>业务逻辑可沉淀</strong>
-          <p>规则不再停留在零散文档或代码里，而是进入结构化 KB。</p>
+          <p>规则从零散文档和代码中收敛，进入结构化知识库。</p>
         </article>
         <article>
           <strong>跨平台可复用</strong>
-          <p>不同服务、agent 或业务平台可以基于同一套 KB/projection 取得一致答案。</p>
+          <p>不同服务、agent 或业务平台基于同一份 KB/projection 获取一致答案。</p>
         </article>
         <article>
           <strong>运行边界可控制</strong>
-          <p>service 统一管理 release、scope、permission、grounding 和 trace。</p>
+          <p>服务统一管理版本发布、业务范围、调用权限、依据校验和审计追踪。</p>
         </article>
         <article>
           <strong>LLM/Agent 分析有依据</strong>
-          <p>内部 managed LLM 和外部 agent 基于同一组受控原子能力做解释、影响候选、测试候选和调查分析。</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="mode-panel">
-      <div class="mode-copy">
-        <p class="kicker">服务消费模式</p>
-        <h2>同一份规则真相，同时支撑托管分析和外部工具调用。</h2>
-        <p>RTS 把 approved KB 发布成 runtime projection 后，不让 LLM 或 agent 直接绕过服务读材料。内部场景由 RTS managed harness 负责分析和表达；外部 agent 通过 REST/MCP 调用原子能力。两种入口共享 release、scope、permission、grounding、refusal 和 trace 边界。</p>
-      </div>
-      <div class="mode-grid">
-        <article>
-          <h3>托管分析</h3>
-          <p>RTS 内部 /ask 和场景端点在服务边界内调用受控工具，生成规则解释、影响候选、测试候选和调查分析。</p>
-          <a href="docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html">看 LLM/Agent 边界</a>
-        </article>
-        <article>
-          <h3>外部工具模式</h3>
-          <p>Codex、CI bot 或业务平台通过 RTS API/MCP 读取规则、依赖、L2 和 trace，复用 KB 能力但不拥有 truth authority。</p>
-          <a href="docs/api-caller-guide-zh.html">看 API/MCP 用法</a>
+          <p>内置 LLM 和外部 agent 基于同一组原子能力做解释、影响评估、测试建议和调查分析。</p>
         </article>
       </div>
     </section>
@@ -100,8 +80,8 @@
     <section class="system-map-panel">
       <div class="section-heading compact">
         <p class="kicker">项目主线</p>
-        <h2>从材料，到 governed KB，再到 runtime projection。</h2>
-        <p>RTS 先把业务规则逻辑治理成 KB，再发布为 runtime projection；搜索、API、managed LLM 和外部 agent 都必须通过服务边界读取。</p>
+        <h2>从材料，到结构化 KB，再到 runtime projection。</h2>
+        <p>RTS 先把业务规则整理成 KB，再发布为 runtime projection，供查询、内置分析和外部 agent 统一消费。</p>
       </div>
       <div class="system-map">
         <svg viewBox="0 0 1120 410" role="img" aria-labelledby="system-map-title system-map-desc">
@@ -151,6 +131,56 @@
       </div>
     </section>
 
+    <section class="story-panel">
+      <div class="section-heading">
+        <p class="kicker">核心过程</p>
+        <h2>四步完成从材料到服务消费的完整链路。</h2>
+        <p>规则先进入 KB 整理，再发布成 projection，最后由确定性查询、内置 LLM 和外部 agent 工具模式复用。</p>
+      </div>
+      <div class="flow-line">
+        <article>
+          <span>01</span>
+          <h3>收集材料</h3>
+          <p>业务文档、Java/XSLT、Excel mapping、lookup、样例和 review 结论。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>整理成 KB</h3>
+          <p>规则、lookup、helper、证据链、歧义、人工裁决和 signoff 被结构化保存。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>发布投影</h3>
+          <p>approved 内容被生成 release manifest、scope、object manifest、L2、dependency 等运行包。</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>服务消费</h3>
+          <p>查询、API、搜索、内置 LLM 和外部 agent 都从同一份 projection 读取，并留下 trace。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="mode-panel">
+      <div class="mode-copy">
+        <p class="kicker">服务消费模式</p>
+        <h2>同一份规则投影，同时支撑内置 LLM 分析和外部工具调用。</h2>
+        <p>RTS 将已批准的 KB 内容发布为 runtime projection 后，所有消费方都通过服务接口读取。内部场景由 RTS 内置分析引擎负责解释和表达；外部 agent 通过 REST/MCP 调用原子能力。两种入口共享版本、范围、权限和追踪机制。</p>
+      </div>
+      <div class="mode-grid">
+        <article>
+          <h3>内置分析</h3>
+          <p>RTS 内部 /ask 和场景端点在服务边界内调用工具，生成规则解释、影响评估、测试建议和调查路径。</p>
+          <a href="docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html">看 LLM/Agent 边界</a>
+        </article>
+        <article>
+          <h3>外部工具模式</h3>
+          <p>Codex、CI bot 或业务平台通过 RTS API/MCP 读取规则、依赖、L2 和 trace，复用知识库能力但不承担规则权威。</p>
+          <a href="docs/api-caller-guide-zh.html">看 API/MCP 用法</a>
+        </article>
+      </div>
+    </section>
+
     <section class="reader-paths">
       <div class="section-heading">
         <p class="kicker">阅读入口</p>
@@ -182,36 +212,6 @@
           <h3>推进路径</h3>
           <p>从 KB/projection 到查询、分析和 agent 接入。</p>
         </a>
-      </div>
-    </section>
-
-    <section class="story-panel">
-      <div class="section-heading">
-        <p class="kicker">核心过程</p>
-        <h2>RTS 建立的是“规则真相发布与服务消费链路”。</h2>
-        <p>规则先进入 KB 治理，再发布成 projection，最后由确定性查询、managed LLM 和外部 agent tool mode 复用。</p>
-      </div>
-      <div class="flow-line">
-        <article>
-          <span>01</span>
-          <h3>收集材料</h3>
-          <p>业务文档、Java/XSLT、Excel mapping、lookup、样例和 review 结论。</p>
-        </article>
-        <article>
-          <span>02</span>
-          <h3>整理成 KB</h3>
-          <p>规则、lookup、helper、证据链、歧义、人工裁决和 signoff 被结构化保存。</p>
-        </article>
-        <article>
-          <span>03</span>
-          <h3>发布投影</h3>
-          <p>approved 内容被生成 release manifest、scope、object manifest、L2、dependency 等运行包。</p>
-        </article>
-        <article>
-          <span>04</span>
-          <h3>服务消费</h3>
-          <p>查询、API、搜索、managed LLM 和外部 agent 都从同一份 projection 读取，并留下 trace。</p>
-        </article>
       </div>
     </section>
 
@@ -338,7 +338,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>从 36 篇非归档 Markdown 和 2 篇展示型 HTML 组织。更新时间：2026-05-16 19:10。原文不被改写，阅读体验由 HTML 层重新组织。</p>
+    <p>从 36 篇非归档 Markdown 和 2 篇展示型 HTML 组织。更新时间：2026-05-16 19:10。原文保持不变，阅读体验由 HTML 层重新组织。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>

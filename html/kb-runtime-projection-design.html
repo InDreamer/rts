@@ -607,8 +607,8 @@
       <div class="hero-copy">
         <p class="page-context"><a href="index.html">RTS 可读体验站首页</a> / 真实规则包章节</p>
         <p class="kicker">RTS KB / Runtime Projection Handbook</p>
-        <h1>用一个真实规则包，看懂 KB、runtime projection 和 RTS 服务边界。</h1>
-        <p class="hero-text">本页使用当前项目里的 <strong>Tradition -> Stella FXD.NDF cutoff-fixing</strong> 规则包说明：规则如何进入 KB，如何被治理和 signoff，如何发布成 runtime projection，最后服务如何用 release、scope、L2、dependency 和 trace 支撑确定性查询与 managed analysis。</p>
+        <h1>用一个真实规则包，看懂 KB、runtime projection 和服务读取流程。</h1>
+        <p class="hero-text">本页使用当前项目里的 <strong>Tradition -> Stella FXD.NDF cutoff-fixing</strong> 规则包说明：规则如何进入 KB，如何经过 review 和 signoff，如何发布成 runtime projection，最后服务如何用 release、scope、L2、dependency 和 trace 支撑确定性查询与内置 LLM 分析。</p>
         <div class="hero-actions">
           <a class="button" href="index.html">返回总览首页</a>
           <a class="button primary" href="#pack">从真实 Pack 开始</a>
@@ -659,7 +659,7 @@
     <section class="panel" id="flow">
       <p class="kicker">One Rule's Journey</p>
       <h2>主链路只有一条，门禁挂在对应节点下面。</h2>
-      <p>大节点表示规则产物如何前进：source 进入 KB，KB 发布 projection，service 读取 projection。每个大节点下方的小卡片说明它为什么能继续往下走，或服务到底读了什么；这些门禁不是另一套架构。</p>
+      <p>大节点表示规则产物如何前进：source 进入 KB，KB 发布 projection，service 读取 projection。每个大节点下方的小卡片说明它为什么能继续往下走，或服务到底读了什么。</p>
       <div class="diagram-wrap">
         <svg viewBox="0 0 1120 450" role="img" aria-label="RTS 规则发布与读取流程">
           <defs>
@@ -717,27 +717,27 @@
       <div class="grid-2">
         <article class="note green">
           <h3>治理门禁</h3>
-          <p>规则进入 KB 后，不能只因为“看起来合理”就进入服务链路。它需要有来源证据、review 结论、demo signoff 或人工裁决记录，说明这条规则为什么可信。</p>
+          <p>规则进入 KB 后，需要有来源证据、review 结论、demo signoff 或人工裁决记录，说明这条规则为什么可信。</p>
         </article>
         <article class="note green">
           <h3>发布门禁</h3>
-          <p>KB Pack 只有通过 schema、依赖完整性、content hash 和 release 条件检查后，才能生成 runtime projection。未通过时，服务不应该在查询时临时修复。</p>
+          <p>KB Pack 通过 schema、依赖完整性、content hash 和 release 条件检查后，才能生成 runtime projection。</p>
         </article>
         <article class="note blue">
           <h3>导航读取</h3>
-          <p>Runtime projection 里的 object card、L0、L1 只帮助定位候选对象。它们适合召回和消歧，但不能直接支撑事实回答。</p>
+          <p>Runtime projection 里的 object card、L0、L1 帮助定位候选对象，适合召回和消歧，事实回答需要进一步读取 L2。</p>
         </article>
         <article class="note blue">
           <h3>事实读取</h3>
-          <p>RTS Service 真正回答事实时必须读取 L2 runtime object、dependency 和 trace。没有这些落点时，正确行为是降级、拒答或要求澄清。</p>
+          <p>RTS Service 回答事实时读取 L2 runtime object、dependency 和 trace。没有这些落点时，正确行为是降级、拒答或要求澄清。</p>
         </article>
       </div>
     </section>
 
     <section class="panel" id="pack">
       <p class="kicker">KB Pack Structure</p>
-      <h2>KB pack 将规则逻辑与可信依据分离组织。</h2>
-      <p>这个 FXD.NDF pack 不是把所有说明塞进长文档。它把可执行的规则逻辑放在 rules、lookups、helpers 里；把来源证据、review 结论和检查报告放在 evidence、review、reports 里。这样读规则时不被历史讨论淹没，需要追溯时又能找到依据。</p>
+      <h2>KB pack 将规则逻辑与可信依据分层组织。</h2>
+      <p>这个 FXD.NDF pack 把可执行的规则逻辑放在 rules、lookups、helpers 里；把来源证据、review 结论和检查报告放在 evidence、review、reports 里。读规则时不被历史讨论淹没，需要追溯时又能找到依据。</p>
       <div class="grid-2">
         <article class="card">
           <span class="label">规则逻辑：系统实际怎么转换</span>
@@ -779,7 +779,7 @@
       </details>
       <div class="note green">
         <h3>Scope 是安全边界，不只是筛选条件。</h3>
-        <p>这个 pack 的 scope 是 <code>Tradition -> Stella / FXD.NDF / cutoff-fixing</code>。相似字段可能出现在 FXO 或其他 product 里，scope 先收窄，才能避免“看起来像但其实错”的规则被拿来回答。</p>
+        <p>这个 pack 的 scope 是 <code>Tradition -> Stella / FXD.NDF / cutoff-fixing</code>。相似字段可能出现在 FXO 或其他 product 里，scope 先收窄范围，才能避免相似但不适用的规则被错误引用。</p>
       </div>
     </section>
 
@@ -859,8 +859,8 @@ if true:
 
     <section class="panel" id="projection">
       <p class="kicker">Runtime Projection</p>
-      <h2>Projection 是“已批准规则的服务运行包”，不是 KB 摘要。</h2>
-      <p>当前 sample runtime store 的 active release 指向 <code>rel-2026-05-06-photo-fxd-ndf-cutoff</code>。服务不会直接读 KB 草稿，而是从这个 release 的 manifest、scope、object manifest、navigation、L2、dependency 和 governance view 里读取。</p>
+      <h2>Projection 是”已批准规则的服务运行包”。</h2>
+      <p>当前 sample runtime store 的 active release 指向 <code>rel-2026-05-06-photo-fxd-ndf-cutoff</code>。服务从这个 release 的 manifest、scope、object manifest、navigation、L2、dependency 和 governance view 里读取，而非直接读 KB 草稿。</p>
       <div class="grid-2">
         <article class="card">
           <span class="label">当前服务指针</span>
@@ -940,7 +940,7 @@ example:
       </div>
       <div class="note rose">
         <h3>关键约束</h3>
-        <p>如果只有 L0/L1/card 命中，但没有 L2 object，查询层应该拒答或降级为“只能定位候选，不能给出规则事实”。这不是失败，这是 RTS 比普通搜索更可靠的地方。</p>
+        <p>如果只有 L0/L1/card 命中而没有 L2 object，查询层应拒答或降级为”只能定位候选，无法给出规则事实”。这正是 RTS 比普通搜索更可靠的地方。</p>
       </div>
     </section>
 
@@ -955,7 +955,7 @@ example:
         </article>
         <article class="step" data-step="2">
           <h3>Permission Check</h3>
-          <p>检查 caller 是否允许访问这个 pack、entrypoint 和输出模式。权限不是展示细节，而是 truth access boundary。</p>
+          <p>检查 caller 是否允许访问这个 pack、entrypoint 和输出模式。权限控制的是规则访问边界。</p>
         </article>
         <article class="step" data-step="3">
           <h3>Object Discovery</h3>
@@ -971,7 +971,7 @@ example:
         </article>
         <article class="step" data-step="6">
           <h3>Grounded Answer</h3>
-          <p>返回事实：<code>hedge_primary_source = RTRS</code>，<code>hedge_primary_source_page = TAIFX1</code>。同时引用 rule 和 lookup，不把搜索分数当作 truth confidence。</p>
+          <p>返回事实：<code>hedge_primary_source = RTRS</code>，<code>hedge_primary_source_page = TAIFX1</code>。同时引用 rule 和 lookup 作为依据。</p>
         </article>
         <article class="step" data-step="7">
           <h3>Trace Emit</h3>
@@ -986,11 +986,11 @@ example:
       <div class="grid-2">
         <article class="note blue">
           <h3>Scope 不清</h3>
-          <p>不能确定 product/pack/domain 时，应要求澄清，而不是拿相似规则猜一个。</p>
+          <p>不能确定 product/pack/domain 时，应要求澄清，而非拿相似规则猜测。</p>
         </article>
         <article class="note blue">
           <h3>L2 不可读</h3>
-          <p>只找到 card 或 L1 时，只能说“定位到候选”，不能给出规则事实。</p>
+          <p>只找到 card 或 L1 时，只能说”定位到候选”，事实回答需要 L2 支撑。</p>
         </article>
         <article class="note blue">
           <h3>依赖未发布</h3>
@@ -998,12 +998,12 @@ example:
         </article>
         <article class="note blue">
           <h3>治理仍有冲突</h3>
-          <p>open question 或 precedence 没有裁决时，不能让运行时临时修复。</p>
+          <p>open question 或 precedence 没有裁决时，运行时不应临时修复。</p>
         </article>
       </div>
       <div class="note green">
         <h3>一句话原则</h3>
-        <p><strong>Unknown is safer than wrong.</strong> 对 RTS 来说，拒答、降级和要求澄清不是失败，而是避免把错误规则或无根据分析包装成事实。</p>
+        <p><strong>Unknown is safer than wrong.</strong> 对 RTS 来说，拒答、降级和要求澄清是保护机制，防止把错误规则或无根据分析包装成事实。</p>
       </div>
     </section>
 
@@ -1047,7 +1047,7 @@ example:
         </article>
         <article class="term-card">
           <strong>Managed Analysis</strong>
-          <span>托管 LLM 分析</span>
+          <span>内置 LLM 分析</span>
           <p>RTS 内部 LLM 在服务边界内调用受控工具，生成解释、影响候选、测试候选和调查路径。</p>
         </article>
       </div>

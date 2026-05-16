@@ -23,14 +23,14 @@
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>项目概览</h1>
-      <p>RTS 将分散的转换规则整理成可治理的 KB，并发布为 runtime projection，支撑查询、审计和后续分析。</p>
+      <p>RTS 将分散的转换规则整理成结构化 KB，发布为 runtime projection，并借助内置 AI 分析，为服务、平台和外部 agent 提供可查询、可解释的规则能力。</p>
     </section>
     
     <section class="orientation-panel">
       <div>
         <p class="kicker">项目概览</p>
-        <h2>RTS 解决“规则散落、难以证明、难以安全消费”的问题。</h2>
-        <p>在报文转换场景里，同一条规则可能散在业务文档、Java/XSLT、Excel mapping、lookup table、样例和 review 记录里。RTS 不是聊天机器人或普通 RAG，而是把这些材料治理成 KB，发布成 runtime projection，并在同一服务边界内提供确定性原子能力和 managed LLM 分析。</p>
+        <h2>RTS 解决的问题：规则散落、难以证明、难以安全消费。</h2>
+        <p>在报文转换场景里，同一条规则可能散在业务文档、Java/XSLT、Excel mapping、lookup table、样例和 review 记录里。RTS 将这些材料整理成 KB，发布为 runtime projection，并在同一服务边界内提供确定性查询和内置 LLM 分析。</p>
       </div>
       <div class="mini-matrix">
         <article>
@@ -43,7 +43,7 @@
         </article>
         <article>
           <span>交付</span>
-          <strong>Projection 支撑查询与托管分析</strong>
+          <strong>Projection 支撑查询与内置分析</strong>
         </article>
       </div>
     </section>
@@ -51,18 +51,18 @@
     <section class="briefing-grid">
       <article class="briefing-card highlight">
         <span class="card-number">01</span>
-        <h2>KB 是规则知识的治理层。</h2>
-        <p>它保存 rule、lookup、helper、source、evidence、review、ambiguity、adjudication 和 signoff。这里关心的是规则为什么可信。</p>
+        <h2>KB 是规则知识的整理层。</h2>
+        <p>它保存 rule、lookup、helper、source、evidence、review、ambiguity、adjudication 和 signoff。核心关注点：规则为什么可信。</p>
       </article>
       <article class="briefing-card">
         <span class="card-number">02</span>
         <h2>Runtime projection 是运行时交付层。</h2>
-        <p>它把 approved truth 生成 release、scope、object manifest、L2 runtime object、dependency 和 governance summary，供服务稳定读取。</p>
+        <p>它把已批准内容生成 release、scope、object manifest、L2 runtime object、dependency 和 governance summary，供服务稳定读取。</p>
       </article>
       <article class="briefing-card">
         <span class="card-number">03</span>
-        <h2>API、MCP 和 LLM 都是受控消费面，不是事实源。</h2>
-        <p>确定性查询、索引、managed analysis 和外部 agent tool mode 都必须基于 projection 读取规则，而不是直接猜测、搜索草稿或读取未批准材料。</p>
+        <h2>API、MCP 和 LLM 都是消费面，规则权威留在 KB 和 projection。</h2>
+        <p>确定性查询、索引、内置分析和外部 agent 工具模式都基于 projection 读取规则，而非直接搜索草稿或未批准材料。</p>
       </article>
     </section>
 
@@ -72,8 +72,8 @@
         <h2>五句话概括。</h2>
       </div>
       <ol class="big-list">
-        <li>RTS 不是把规则文档简单丢进搜索，而是建设双核心规则真相服务。</li>
-        <li>KB 保存完整治理上下文：规则逻辑、来源证据、review、歧义、裁决和 signoff。</li>
+        <li>RTS 建设的是双核心业务规则服务：稳定知识源和内置 LLM 分析，共同为服务、平台和外部 agent 提供规则能力。</li>
+        <li>KB 保存完整上下文：规则逻辑、来源证据、review、歧义、裁决和 signoff。</li>
         <li>Runtime projection 把已批准内容发布成运行时服务可以读取的稳定包。</li>
         <li>服务回答必须能回到 L2 规则对象、依赖关系、授权治理视图或 trace。</li>
         <li>LLM 是受控分析与表达层：可以解释、分析和提出候选，但不能替代规则事实或人工裁决。</li>
@@ -142,19 +142,19 @@
         <button class="tab-button" type="button" data-tab="reviewer">Review/治理</button>
       </div>
       <div class="tab-panel active" data-tab-panel="business">
-        <h3>价值是把规则资产沉淀下来，而不是只做一个问答入口。</h3>
-        <p>可以关注：规则来源能否追溯、发布版本是否清楚、后续是否能支撑查询、审计、影响分析和自动化。</p>
+        <h3>价值是把规则资产沉淀下来，而非只做一个问答入口。</h3>
+        <p>可以关注：规则来源能否追溯、发布版本是否清楚、后续能否支撑查询、审计、影响分析和自动化。</p>
       </div>
       <div class="tab-panel" data-tab-panel="developer">
-        <h3>关键结构是 KB 到 runtime projection 的边界。</h3>
+        <h3>关键结构是 KB 到 runtime projection 的分层。</h3>
         <p>可以关注：manifest、scope、object manifest、L2 runtime object、object card、dependency、governance summary 和 trace。</p>
       </div>
       <div class="tab-panel" data-tab-panel="agent">
-        <h3>Managed LLM 是核心服务能力，但不是 truth owner。</h3>
-        <p>内部 LLM 可以做 managed analysis，外部 agent 可以通过工具模式读取规则、依赖和 trace；两者都不能绕过 service gate。</p>
+        <h3>内置 LLM 是核心服务能力，但规则权威留在 KB 和 projection。</h3>
+        <p>内部 LLM 做内置分析，外部 agent 通过工具模式读取规则、依赖和 trace；两者都通过服务接口消费。</p>
       </div>
       <div class="tab-panel" data-tab-panel="reviewer">
-        <h3>治理重点是证据、歧义和裁决能不能留下来。</h3>
+        <h3>重点是证据、歧义和裁决能否留存。</h3>
         <p>KB 里要记录 source、evidence、review、open question、adjudication 和 signoff；projection 只发布运行时需要的视图。</p>
       </div>
     </section>
