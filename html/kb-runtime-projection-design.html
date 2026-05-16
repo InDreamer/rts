@@ -235,12 +235,17 @@
     .hero-side .hero-meta {
       flex: 1;
       align-content: stretch;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .hero-side .metric {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
+    }
+
+    .hero-side .metric em {
+      margin-top: auto;
     }
 
     .content-shell {
