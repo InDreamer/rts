@@ -494,7 +494,7 @@ def write_index(docs: list[Doc]) -> None:
         <label>入口
           <select id="example-endpoint">
             <option value="query">/api/v1/query deterministic 查询</option>
-            <option value="ask">/api/v1/ask managed analysis</option>
+            <option value="ask">/api/v1/ask LLM 分析问答</option>
             <option value="scenario">/api/v1/scenario/analyze-failed-message</option>
             <option value="mcp">/mcp/tools 工具清单</option>
           </select>
@@ -1523,6 +1523,165 @@ APP_JS = r"""
 """
 
 
+CATEGORY_LABELS = {
+    "Entry": "入口",
+    "Agent Guide": "开发指引",
+    "Navigation": "文档导航",
+    "Confirmed Baseline": "已确认基线",
+    "Operational": "运行与调用",
+    "Reference": "背景参考",
+    "KB Pack": "KB 包",
+    "Other Active": "其他活跃文档",
+}
+
+TITLE_LABELS = {
+    "README.md": "RTS 仓库入口",
+    "AGENTS.md": "开发导航",
+    "docs/INDEX.md": "RTS 文档总路由",
+    "docs/confirmed/README.md": "已确认基线阅读顺序",
+    "docs/confirmed/system-constitution-v1.md": "RTS 系统宪法 v2",
+    "docs/confirmed/kb-to-index-projection-contract-zh.md": "KB 到索引的运行时投影契约",
+    "docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md": "LLM/Agent 接入边界说明",
+    "docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md": "RTS 内部 LLM 服务落地计划",
+    "docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md": "Day1 查询服务与 LLM harness 计划",
+    "docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md": "Day2 受控检索演进路线图",
+    "docs/confirmed/final-llm-agent-service-plan-zh.md": "长期服务能力路线图",
+    "docs/confirmed/runtime-projection-product-guide-zh.md": "Runtime Projection 产品说明",
+    "docs/java-service-runbook-zh.md": "Java 服务运行手册",
+    "docs/api-caller-guide-zh.md": "API 调用方指南",
+    "docs/day1-sample-pack-test-commands.md": "Day1 Sample Pack 测试命令",
+    "docs/reference/README.md": "Reference 文档索引",
+}
+
+SUMMARY_LABELS = {
+    "README.md": "RTS 仓库入口，指向 KB、runtime projection、运行手册和参考材料。",
+    "AGENTS.md": "面向开发协作的文档索引、阅读顺序和修改边界。",
+    "docs/INDEX.md": "RTS 文档的主路由，帮助读者进入 confirmed、operational 或 reference 区域。",
+    "docs/confirmed/README.md": "已确认基线文档的权威顺序、阅读触发条件和冲突处理规则。",
+    "docs/confirmed/system-constitution-v1.md": "定义 RTS 作为规则真相服务的核心原则、权限边界和系统纪律。",
+    "docs/confirmed/kb-to-index-projection-contract-zh.md": "定义 KB truth layer 到 query/index layer 的 runtime projection 契约。",
+    "docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md": "说明内部 LLM 与外部 agent 如何读取 runtime projection，以及哪些边界仍由 RTS 服务控制。",
+    "docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md": "把内部 LLM 分析放在 RTS 规则服务边界内落地，避免绕过 KB 和 projection。",
+    "docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md": "Day1 查询服务、工具接口和基础 LLM harness 能力的实现计划。",
+    "docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md": "Day2 在受控 projection 上扩展检索、排序、影响分析和测试建议。",
+    "docs/confirmed/final-llm-agent-service-plan-zh.md": "长期服务路线：先稳住规则真相和运行包，再扩展解释、分析和场景能力。",
+    "docs/confirmed/runtime-projection-product-guide-zh.md": "从产品和集成视角解释 runtime projection 运行包里每类内容解决什么问题。",
+    "docs/java-service-runbook-zh.md": "本地运行、配置、验证、排错和提交前检查手册。",
+    "docs/api-caller-guide-zh.md": "查询、/ask、object、dependency、trace 和 refusal 响应的调用方说明。",
+    "docs/reference/llm-enhanced-index-and-harness-design-zh.md": "历史参考：在索引和服务边界内引入 LLM 分析的设计材料。",
+    "docs/reference/proposals/ai-token-review/README.md": "历史参考：AI token review 的风险原则和保留结论。",
+    "docs/ai-first-format-conversation-followup-zh.md": "补充说明：AI 可读格式讨论中关于 KB、projection 和展示层的边界澄清。",
+}
+
+TERM_GLOSSARY = [
+    {
+        "term": "RTS",
+        "zh": "Rule Truth Source / Transformation Rule System",
+        "desc": "RTS 将分散的转换规则整理成可治理、可发布、可查询的业务规则 KB。",
+    },
+    {
+        "term": "KB",
+        "zh": "Knowledge Base，业务规则 KB",
+        "desc": "保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。",
+    },
+    {
+        "term": "Rule Pack",
+        "zh": "规则包",
+        "desc": "按业务范围组织的一组 rule、lookup、helper，是整理、review 和发布的基本单位。",
+    },
+    {
+        "term": "Runtime Projection",
+        "zh": "运行时投影",
+        "desc": "把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。",
+    },
+    {
+        "term": "L2 Runtime Object",
+        "zh": "L2 运行时规则对象",
+        "desc": "runtime projection 中最重要的事实正文，保存服务可读的结构化规则逻辑。",
+    },
+    {
+        "term": "Object Card",
+        "zh": "对象卡片",
+        "desc": "用于定位、消歧和召回规则对象；它帮助找到 L2，但不能替代 L2。",
+    },
+    {
+        "term": "Release Manifest",
+        "zh": "发布清单",
+        "desc": "说明当前 projection 来自哪里、包含什么、是否可用，以及出现问题时如何回滚。",
+    },
+    {
+        "term": "Scope",
+        "zh": "业务范围",
+        "desc": "通常由 channel、product、pack、domain 组成，用来防止相似规则被串用。",
+    },
+    {
+        "term": "Dependency",
+        "zh": "规则依赖",
+        "desc": "描述 rule、lookup、helper 之间的关系，是解释影响面和测试范围的基础。",
+    },
+    {
+        "term": "Governance View",
+        "zh": "治理视图",
+        "desc": "在权限允许时展示 evidence、review、open question、risk 和 signoff 信息。",
+    },
+    {
+        "term": "Trace",
+        "zh": "审计轨迹",
+        "desc": "记录一次查询或调用读了哪些对象、如何命中、如何拒答，便于复盘和审计。",
+    },
+    {
+        "term": "Index Document",
+        "zh": "索引文档",
+        "desc": "从 projection 派生出的搜索和导航视图，只负责召回，不拥有最终规则真相。",
+    },
+    {
+        "term": "AI-assisted Consumer",
+        "zh": "LLM / Agent 消费方",
+        "desc": "可以基于 projection 做解释、影响分析或辅助 review，但基础仍是 KB 和 runtime projection。",
+    },
+]
+
+
+def zh_category(category: str) -> str:
+    return CATEGORY_LABELS.get(category, category)
+
+
+def display_title(doc: Doc) -> str:
+    return TITLE_LABELS.get(doc.rel_path, doc.title)
+
+
+def display_summary(doc: Doc) -> str:
+    return SUMMARY_LABELS.get(doc.rel_path, doc.summary)
+
+
+def glossary_cards(limit: int | None = None) -> str:
+    terms = TERM_GLOSSARY if limit is None else TERM_GLOSSARY[:limit]
+    cards = []
+    for item in terms:
+        cards.append(
+            f"""<article class="term-card">
+          <strong>{esc(item["term"])}</strong>
+          <span>{esc(item["zh"])}</span>
+          <p>{esc(item["desc"])}</p>
+        </article>"""
+        )
+    return "\n".join(cards)
+
+
+def render_glossary_section(title: str = "关键英文技术名词", lede: str = "", limit: int | None = None) -> str:
+    intro = lede or "页面以中文为主，关键英文术语与代码、API 和文档标题保持一致。"
+    return f"""<section class="term-section" id="glossary">
+      <div class="section-heading compact">
+        <p class="kicker">Glossary · 术语解释</p>
+        <h2>{esc(title)}</h2>
+        <p>{esc(intro)}</p>
+      </div>
+      <div class="term-grid">
+        {glossary_cards(limit)}
+      </div>
+    </section>"""
+
+
 def build_experience_site() -> None:
     docs = load_docs()
     docs_by_rel = {doc.rel_path: doc for doc in docs}
@@ -1546,10 +1705,10 @@ def write_experience_assets(docs: list[Doc]) -> None:
     (ASSETS / "app.js").write_text(EXPERIENCE_JS, encoding="utf-8")
     docs_payload = [
         {
-            "title": doc.title,
+            "title": display_title(doc),
             "path": doc.rel_path,
-            "category": doc.category,
-            "summary": doc.summary,
+            "category": zh_category(doc.category),
+            "summary": display_summary(doc),
             "url": rel_url(OUT / "index.html", doc.output_path),
         }
         for doc in docs
@@ -1563,10 +1722,10 @@ def write_experience_assets(docs: list[Doc]) -> None:
 def site_nav(current: str = "") -> str:
     items = [
         ("index.html", "首页", "home"),
-        ("start-here.html", "三分钟读懂", "start"),
-        ("architecture.html", "架构边界", "architecture"),
-        ("operations.html", "运行与调用", "operations"),
-        ("roadmap.html", "路线图", "roadmap"),
+        ("start-here.html", "项目概览", "start"),
+        ("architecture.html", "KB 与投影", "architecture"),
+        ("operations.html", "如何使用", "operations"),
+        ("roadmap.html", "推进路径", "roadmap"),
         ("library.html", "来源文档", "library"),
     ]
     links = []
@@ -1594,7 +1753,20 @@ def doc_href(docs_by_rel: dict[str, Doc], rel_path: str, from_file: Path) -> str
 def write_experience_home(docs: list[Doc]) -> None:
     index_path = OUT / "index.html"
     docs_by_rel = {doc.rel_path: doc for doc in docs}
-    doc_cards = "\n".join(render_experience_doc_card(doc, index_path) for doc in docs)
+    featured_docs = [
+        "docs/confirmed/project-alignment-summary-zh.md",
+        "docs/confirmed/kb-to-index-projection-contract-zh.md",
+        "docs/confirmed/runtime-projection-product-guide-zh.md",
+        "docs/api-caller-guide-zh.md",
+        "docs/java-service-runbook-zh.md",
+        "kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.md",
+    ]
+    docs_by_rel = {doc.rel_path: doc for doc in docs}
+    doc_cards = "\n".join(
+        render_experience_doc_card(docs_by_rel[rel_path], index_path)
+        for rel_path in featured_docs
+        if rel_path in docs_by_rel
+    )
     generated = datetime.now().strftime("%Y-%m-%d %H:%M")
     body = f"""<!doctype html>
 <html lang="zh-CN">
@@ -1613,131 +1785,213 @@ def write_experience_home(docs: list[Doc]) -> None:
   </header>
 
   <main>
-    <section class="hero-stage">
+    <section class="workbench-hero">
       <div class="hero-copy">
-        <p class="kicker">Rule Truth Source · Transformation Rule System</p>
-        <h1>读懂 RTS：<br>从规则文档到可信服务。</h1>
-        <p class="hero-text">RTS 是面向银行报文转换的双核心规则真相服务：一边提供受控真相源原子能力，一边提供托管 LLM agent 分析能力。这个 HTML 站点不再搬运 Markdown，而是把活跃文档重组为更容易进入、理解和使用的阅读体验。</p>
+        <p class="kicker">RTS · Rule Knowledge Base & Runtime Projection</p>
+        <h1>把分散的报文转换业务规则，沉淀为可发布、可查询、可复用的 KB。</h1>
+        <p class="hero-text">报文转换背后是一组可复用的业务规则逻辑，不只是字段搬运。RTS 将散落在文档、代码、mapping、lookup 和 review 记录里的规则整理成 governed KB，并发布为 runtime projection。服务、内部 LLM、外部 agent 和其他业务平台都可以在同一服务边界内查询、解释、分析和复用。</p>
         <div class="hero-actions">
-          <a class="button primary" href="start-here.html">先用三分钟读懂</a>
-          <a class="button secondary" href="architecture.html">看架构边界</a>
+          <a class="button primary" href="start-here.html">项目概览</a>
+          <a class="button secondary" href="kb-runtime-projection-design.html">看真实规则包手册</a>
+          <a class="button secondary" href="architecture.html">看 KB 与投影</a>
         </div>
       </div>
-      <div class="truth-orbit" aria-label="RTS 双核心模型">
-        <div class="orbit-card core">
-          <span>RTS</span>
-          <strong>service gates and proves</strong>
+      <div class="hero-dashboard" aria-label="RTS HTML 信息面板">
+        <div class="dashboard-heading">
+          <p class="kicker">核心结构</p>
+          <h2>三层职责</h2>
         </div>
-        <div class="orbit-card truth">
-          <span>Truth core</span>
-          <p>L2 / dependency / release / trace</p>
+        <div class="dashboard-stat">
+          <span>KB</span>
+          <p>沉淀业务规则逻辑、证据、review 和裁决</p>
         </div>
-        <div class="orbit-card agent">
-          <span>Analysis core</span>
-          <p>managed LLM / scenario / tool mode</p>
+        <div class="dashboard-stat">
+          <span>Projection</span>
+          <p>把 approved KB 发布成服务可读运行包</p>
         </div>
+        <div class="dashboard-stat">
+          <span>Service</span>
+          <p>内部 LLM 和外部 agent 通过同一服务边界读取、分析和解释</p>
+        </div>
+        <div class="dashboard-note">
+          <strong>工作边界</strong>
+          <p>KB 承载可治理的业务规则逻辑；runtime projection 提供运行时视图；RTS service 统一控制 scope、permission、grounding 和 trace。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="html-principles">
+      <div class="section-heading compact">
+        <p class="kicker">项目价值</p>
+        <h2>核心价值是让业务规则 KB 可以被服务和平台复用。</h2>
+        <p>RTS 不只是降低检索成本。它把报文转换里的业务规则逻辑整理成可治理、可发布、可迁移的 KB，使规则可以进入查询、审计、迁移、影响分析、测试规划和 LLM/Agent 分析等业务场景。</p>
+      </div>
+      <div class="principle-grid">
+        <article>
+          <strong>业务逻辑可沉淀</strong>
+          <p>规则不再停留在零散文档或代码里，而是进入结构化 KB。</p>
+        </article>
+        <article>
+          <strong>跨平台可复用</strong>
+          <p>不同服务、agent 或业务平台可以基于同一套 KB/projection 取得一致答案。</p>
+        </article>
+        <article>
+          <strong>运行边界可控制</strong>
+          <p>service 统一管理 release、scope、permission、grounding 和 trace。</p>
+        </article>
+        <article>
+          <strong>LLM/Agent 分析有依据</strong>
+          <p>内部 LLM 和外部 agent 基于 governed KB 做解释、影响分析和测试建议。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="system-map-panel">
+      <div class="section-heading compact">
+        <p class="kicker">项目主线</p>
+        <h2>从材料，到 KB，再到 runtime projection。</h2>
+        <p>RTS 先把业务规则逻辑治理成 KB，再发布为 runtime projection；搜索、API、内部 LLM 和外部 agent 都基于这份运行包工作。</p>
+      </div>
+      <div class="system-map">
+        <svg viewBox="0 0 1120 410" role="img" aria-labelledby="system-map-title system-map-desc">
+          <title id="system-map-title">RTS truth flow and service boundary</title>
+          <desc id="system-map-desc">Source material enters governed KB, becomes runtime projection, passes service gate, then supports APIs, search, trace, and assisted analysis.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L8,3 z"></path>
+            </marker>
+          </defs>
+          <g class="map-row truth">
+            <rect x="24" y="70" width="180" height="110"></rect>
+            <text x="48" y="110">源材料</text>
+            <text x="48" y="138">文档 / 代码 / mapping</text>
+            <rect x="248" y="70" width="180" height="110"></rect>
+            <text x="272" y="110">KB</text>
+            <text x="272" y="138">规则 / 证据 / review</text>
+            <rect x="472" y="70" width="210" height="110"></rect>
+            <text x="496" y="110">Runtime Projection</text>
+            <text x="496" y="138">已批准规则的运行包</text>
+            <rect x="726" y="70" width="180" height="110"></rect>
+            <text x="750" y="110">服务读取</text>
+            <text x="750" y="138">scope / L2 / trace</text>
+          </g>
+          <g class="map-arrows">
+            <line x1="204" y1="125" x2="248" y2="125"></line>
+            <line x1="428" y1="125" x2="472" y2="125"></line>
+            <line x1="682" y1="125" x2="726" y2="125"></line>
+          </g>
+          <g class="map-row consume">
+            <rect x="756" y="246" width="170" height="96"></rect>
+            <text x="780" y="284">查询与 API</text>
+            <text x="780" y="310">规则查询 / 依赖 / 审计</text>
+            <rect x="950" y="246" width="146" height="96"></rect>
+            <text x="974" y="284">LLM / Agent</text>
+            <text x="974" y="310">解释 / 分析 / 复用</text>
+          </g>
+          <g class="map-arrows">
+            <line x1="816" y1="180" x2="816" y2="246"></line>
+            <line x1="888" y1="180" x2="1023" y2="246"></line>
+          </g>
+          <g class="map-boundary">
+            <rect x="706" y="42" width="410" height="322"></rect>
+            <text x="726" y="42">运行时服务边界</text>
+          </g>
+        </svg>
       </div>
     </section>
 
     <section class="reader-paths">
       <div class="section-heading">
-        <p class="kicker">Choose Your Path</p>
-        <h2>你现在想解决什么问题？</h2>
+        <p class="kicker">阅读入口</p>
+        <h2>快速入口。</h2>
       </div>
       <div class="path-grid">
         <a class="path-card large" href="start-here.html">
           <span>01</span>
-          <h3>第一次进入项目</h3>
-          <p>先建立 RTS 不是 RAG、不是普通聊天机器人、也不是单一 SDK 包装的心智模型。</p>
+          <h3>项目概览</h3>
+          <p>业务规则 KB 和 runtime projection 的核心价值。</p>
         </a>
         <a class="path-card" href="architecture.html">
           <span>02</span>
-          <h3>我要判断边界</h3>
-          <p>看 truth owner、runtime projection、service gate、LLM 和 agent 的分工。</p>
+          <h3>核心结构</h3>
+          <p>看 KB、runtime projection、L2、object card、dependency 的分工。</p>
+        </a>
+        <a class="path-card" href="kb-runtime-projection-design.html">
+          <span>03</span>
+          <h3>真实例子</h3>
+          <p>用 FXD.NDF pack 看 Rule、Lookup、Helper、L0/L1/L2 和查询演练。</p>
         </a>
         <a class="path-card" href="operations.html">
-          <span>03</span>
-          <h3>我要跑起来或调用</h3>
-          <p>直接进入本地启动、sample scope、query/ask/scenario/MCP 调用示例。</p>
+          <span>04</span>
+          <h3>使用方式</h3>
+          <p>看服务如何读取 projection，以及调用方能拿到哪些结果。</p>
         </a>
         <a class="path-card" href="roadmap.html">
-          <span>04</span>
-          <h3>我要看实现顺序</h3>
-          <p>理解 Day1、Day2、internal agent 和最终路线图之间的关系。</p>
+          <span>05</span>
+          <h3>推进路径</h3>
+          <p>从 KB/projection 到查询、分析和 agent 接入。</p>
         </a>
       </div>
     </section>
 
     <section class="story-panel">
       <div class="section-heading">
-        <p class="kicker">The Story</p>
-        <h2>RTS 的核心不是“把规则放进 AI 问答”。</h2>
-        <p>它的目标是让规则从 source material 走到可治理、可追溯、可审查、可查询、可解释的服务真相。</p>
+        <p class="kicker">核心过程</p>
+        <h2>RTS 建立的是“业务规则 KB 发布链路”。</h2>
+        <p>规则先进入 KB，再发布成 projection，最后由服务、API、内部 LLM 和外部 agent 复用。</p>
       </div>
       <div class="flow-line">
         <article>
-          <span>Source</span>
-          <h3>多源材料</h3>
-          <p>业务文档、Java/XSLT、Excel mapping、lookup、示例和 reviewer clarification。</p>
+          <span>01</span>
+          <h3>收集材料</h3>
+          <p>业务文档、Java/XSLT、Excel mapping、lookup、样例和 review 结论。</p>
         </article>
         <article>
-          <span>Govern</span>
-          <h3>AI-first review</h3>
-          <p>AI 做结构校验、冲突发现、证据整理和问题简化；人工做最终裁决。</p>
+          <span>02</span>
+          <h3>整理成 KB</h3>
+          <p>规则、lookup、helper、证据链、歧义、人工裁决和 signoff 被结构化保存。</p>
         </article>
         <article>
-          <span>Publish</span>
-          <h3>Runtime projection</h3>
-          <p>approved truth 被发布成服务可读取的 projection，而不是直接读工作区文档。</p>
+          <span>03</span>
+          <h3>发布投影</h3>
+          <p>approved 内容被生成 release manifest、scope、object manifest、L2、dependency 等运行包。</p>
         </article>
         <article>
-          <span>Serve</span>
-          <h3>API / MCP / Ask</h3>
-          <p>所有调用都经过 release、scope、permission、L2 hash、grounding、trace gate。</p>
+          <span>04</span>
+          <h3>服务消费</h3>
+          <p>查询、API、搜索、内部 LLM 和外部 agent 都从同一份 projection 读取。</p>
         </article>
       </div>
     </section>
 
     <section class="mode-panel">
       <div class="mode-copy">
-        <p class="kicker">Dual Core</p>
-        <h2>两个核心能力，不是主次关系。</h2>
-        <p>确定性能力是第一等公民，托管 LLM 分析也是第一等公民。LLM 不拥有 truth，但它是 RTS 正常产品形态中的受控分析与表达层。</p>
+        <p class="kicker">Service / LLM / Agent</p>
+        <h2>RTS service 把 KB 能力开放给内部 LLM 和外部 agent。</h2>
+        <p>内部 LLM 走 managed analysis；外部 agent 走 REST/MCP tool mode。两种模式都由 RTS service 控制 scope、grounding、permission 和 trace。</p>
       </div>
       <div class="mode-grid">
         <article>
-          <h3>受控真相源原子能力</h3>
-          <p>query、find、read L2、dependency、trace、scope/navigation、grounding check。</p>
-          <a href="architecture.html#atomic-capabilities">看原子能力</a>
+          <h3>Managed Analysis</h3>
+          <p>RTS 内部 LLM 在服务边界内基于 KB/projection 组织解释、影响分析、测试建议和调查路径。</p>
+          <a href="start-here.html">看项目概览</a>
         </article>
         <article>
-          <h3>托管 LLM agent 分析</h3>
-          <p>/ask、PR diff、exception、failed message、test planning、governance review。</p>
-          <a href="architecture.html#managed-analysis">看 managed mode</a>
+          <h3>External Agent Tools</h3>
+          <p>外部 agent 通过 RTS API/MCP 调用规则查询、依赖和 trace 等原子能力，复用 KB 但不绕过 service gate。</p>
+          <a href="architecture.html">看 KB 与投影</a>
         </article>
       </div>
     </section>
 
-    <section class="proof-panel">
-      <div>
-        <p class="kicker">Start From Sources</p>
-        <h2>想核对原文？每个主题都能回到来源。</h2>
-        <p>体验页负责重组表达；文档页负责保留完整原文和 docmeta。你可以先读策展内容，再展开完整 Markdown 来源。</p>
-      </div>
-      <div class="source-picks">
-        <a href="{doc_href(docs_by_rel, "docs/confirmed/project-alignment-summary-zh.md", index_path)}">项目总纲</a>
-        <a href="{doc_href(docs_by_rel, "docs/confirmed/system-constitution-v1.md", index_path)}">Constitution</a>
-        <a href="{doc_href(docs_by_rel, "docs/confirmed/kb-to-index-projection-contract-zh.md", index_path)}">Projection Contract</a>
-        <a href="{doc_href(docs_by_rel, "docs/api-caller-guide-zh.md", index_path)}">API Guide</a>
-      </div>
-    </section>
+    {render_glossary_section(limit=9)}
 
     <section class="library-preview" id="library">
       <div class="docs-toolbar">
         <div>
-          <p class="kicker">Source Library</p>
+          <p class="kicker">Source Library · 来源库</p>
           <h2>活跃来源文档</h2>
-          <p>这里是来源索引，不再是默认阅读入口。需要核对细节时再进入。</p>
+          <p>用于核对字段、边界和原始措辞。</p>
         </div>
         <label class="search-box">
           <span>搜索来源</span>
@@ -1789,14 +2043,14 @@ def write_topic_shell(path: Path, key: str, title: str, lede: str, body_html: st
   </header>
   <main>
     <section class="page-hero">
-      <p class="kicker">RTS Reading Experience</p>
+      <p class="kicker">RTS 项目介绍</p>
       <h1>{esc(title)}</h1>
       <p>{esc(lede)}</p>
     </section>
     {body_html}
   </main>
   <footer class="site-footer">
-    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+    <p>本页根据项目文档重组表达；需要逐字核对时请进入来源文档页。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>
@@ -1817,64 +2071,88 @@ def source_badges(items: list[tuple[str, str]], docs_by_rel: dict[str, Doc], fro
 def write_start_page(docs: list[Doc], docs_by_rel: dict[str, Doc]) -> None:
     path = OUT / "start-here.html"
     body = f"""
+    <section class="orientation-panel">
+      <div>
+        <p class="kicker">项目概览</p>
+        <h2>RTS 把报文转换业务规则沉淀成可复用的 KB。</h2>
+        <p>在报文转换场景里，同一条业务规则可能散在业务文档、Java/XSLT、Excel mapping、lookup table、样例和 review 记录里。RTS 将这些规则整理成可治理的 KB，再发布成 runtime projection，供服务、API、内部 LLM 和外部 agent 复用。</p>
+      </div>
+      <div class="mini-matrix">
+        <article>
+          <span>现状</span>
+          <strong>规则分散，靠人翻找和解释</strong>
+        </article>
+        <article>
+          <span>建设</span>
+          <strong>KB 沉淀规则、证据和 review</strong>
+        </article>
+        <article>
+          <span>交付</span>
+          <strong>Runtime projection 支撑服务查询</strong>
+        </article>
+      </div>
+    </section>
+
     <section class="briefing-grid">
       <article class="briefing-card highlight">
         <span class="card-number">01</span>
-        <h2>RTS 是规则真相服务，不是普通 RAG。</h2>
-        <p>RTS 的核心职责是从多源材料形成 governed truth，再以 API、MCP、/ask 和 scenario endpoint 对外提供可追溯能力。</p>
+        <h2>KB 是业务规则治理层。</h2>
+        <p>它保存 rule、lookup、helper、source、evidence、review、ambiguity、adjudication 和 signoff。这里关心的是规则为什么可信。</p>
       </article>
       <article class="briefing-card">
         <span class="card-number">02</span>
-        <h2>LLM 是核心能力，但不是 truth owner。</h2>
-        <p>LLM 做受控分析、冲突发现、影响候选、测试候选和表达；事实必须回到 L2、dependency、授权治理视图或 trace。</p>
+        <h2>Runtime projection 是运行时交付层。</h2>
+        <p>它把 approved truth 生成 release、scope、object manifest、L2 runtime object、dependency 和 governance summary，供服务稳定读取。</p>
       </article>
       <article class="briefing-card">
         <span class="card-number">03</span>
-        <h2>candidate 边界不是能力上限。</h2>
-        <p>场景服务可以做深入分析，但 impact/test/root cause 等输出必须区分 facts、inferences、unknowns、candidates 和 human decisions。</p>
+        <h2>API、LLM 和 agent 是消费层，不是事实源。</h2>
+        <p>查询、索引、影响分析、内部 LLM 和外部 agent 都应该基于 projection 读取规则，而不是直接猜测、搜索草稿或读取未批准材料。</p>
       </article>
     </section>
 
     <section class="reading-lane">
       <div>
-        <p class="kicker">Mental Model</p>
-        <h2>先记住这五句话。</h2>
+        <p class="kicker">核心表述</p>
+        <h2>五句话概括。</h2>
       </div>
       <ol class="big-list">
-        <li><strong>KB owns truth</strong>：完整治理图在 KB，而不是搜索索引或聊天记录。</li>
-        <li><strong>Projection serves truth</strong>：runtime projection 是 approved truth 的服务运行视图。</li>
-        <li><strong>Service gates truth</strong>：RTS service 负责 release、scope、permission、hash、grounding、refusal、trace。</li>
-        <li><strong>LLM analyzes truth</strong>：AI 可以分析和表达，但不能偷偷裁决事实。</li>
-        <li><strong>Human decides conflict</strong>：材料冲突和关键歧义最终由人工 review/adjudication 记录。</li>
+        <li>RTS 不是把规则文档简单丢进搜索，而是沉淀一套可治理、可发布、可复用的业务规则 KB。</li>
+        <li>KB 保存完整治理上下文：规则逻辑、来源证据、review、歧义、裁决和 signoff。</li>
+        <li>Runtime projection 把已批准内容发布成运行时服务可以读取的稳定包。</li>
+        <li>服务回答必须能回到 L2 规则对象、依赖关系、授权治理视图或 trace。</li>
+        <li>LLM 可以帮助解释和分析，但它消费的是这套已治理材料，不替代规则事实。</li>
       </ol>
     </section>
 
+    {render_glossary_section("核心术语", "这些词会在介绍、文档和接口里反复出现；英文保留是为了和真实文件名、字段名和接口一致。", limit=8)}
+
     <section class="choice-panel" data-tabs>
       <div class="section-heading">
-        <p class="kicker">Reader Modes</p>
-        <h2>按你的角色进入。</h2>
+        <p class="kicker">视角</p>
+        <h2>不同场景的关注点。</h2>
       </div>
       <div class="tab-buttons" role="tablist">
-        <button class="tab-button active" type="button" data-tab="business">业务/BA</button>
-        <button class="tab-button" type="button" data-tab="developer">开发</button>
-        <button class="tab-button" type="button" data-tab="agent">Agent 集成</button>
-        <button class="tab-button" type="button" data-tab="reviewer">治理/Review</button>
+        <button class="tab-button active" type="button" data-tab="business">领导/PM</button>
+        <button class="tab-button" type="button" data-tab="developer">技术同事</button>
+        <button class="tab-button" type="button" data-tab="agent">LLM/Agent</button>
+        <button class="tab-button" type="button" data-tab="reviewer">Review/治理</button>
       </div>
       <div class="tab-panel active" data-tab-panel="business">
-        <h3>你要关心：答案是否有证据、scope 是否正确、unknown 是否被说清楚。</h3>
-        <p>优先读项目总纲、Constitution 和 API guide。不要把 candidate 当 final business decision。</p>
+        <h3>价值是把规则资产沉淀下来，而不是只做一个问答入口。</h3>
+        <p>可以关注：规则来源能否追溯、发布版本是否清楚、后续是否能支撑查询、审计、影响分析和自动化。</p>
       </div>
       <div class="tab-panel" data-tab-panel="developer">
-        <h3>你要关心：projection、L2、dependency、trace 和 refusal 是否稳定。</h3>
-        <p>优先读 projection contract、Day1 baseline、runbook 和 internal agent implementation plan。</p>
+        <h3>关键结构是 KB 到 runtime projection 的边界。</h3>
+        <p>可以关注：manifest、scope、object manifest、L2 runtime object、object card、dependency、governance summary 和 trace。</p>
       </div>
       <div class="tab-panel" data-tab-panel="agent">
-        <h3>你要关心：managed mode 与 tool mode 共享同一个 truth access boundary。</h3>
-        <p>外部 agent 可以规划工作流，但每个 RTS tool call 仍要走 service gate。</p>
+        <h3>LLM 和 agent 通过 RTS service 复用 KB 能力。</h3>
+        <p>当规则被整理成 projection 后，内部 LLM 可以做 managed analysis，外部 agent 可以通过工具模式读取规则、依赖和 trace。</p>
       </div>
       <div class="tab-panel" data-tab-panel="reviewer">
-        <h3>你要关心：AI-first review 不是 AI-final decision。</h3>
-        <p>AI 简化冲突、找证据、提问题；人工裁决和 signoff 才能进入 approved truth。</p>
+        <h3>治理重点是证据、歧义和裁决能不能留下来。</h3>
+        <p>KB 里要记录 source、evidence、review、open question、adjudication 和 signoff；projection 只发布运行时需要的视图。</p>
       </div>
     </section>
 
@@ -1887,83 +2165,121 @@ def write_start_page(docs: list[Doc], docs_by_rel: dict[str, Doc]) -> None:
       ], docs_by_rel, path)}
     </section>
     """
-    write_topic_shell(path, "start", "三分钟读懂 RTS", "先不读长文档，用一条清楚的故事建立 RTS 的核心心智模型。", body)
+    write_topic_shell(path, "start", "项目概览", "RTS 将分散的转换规则整理成可治理的 KB，并发布为 runtime projection，支撑查询、审计和后续分析。", body)
 
 
 def write_architecture_page(docs: list[Doc], docs_by_rel: dict[str, Doc]) -> None:
     path = OUT / "architecture.html"
     body = f"""
+    <section class="architecture-legend">
+      <div>
+        <p class="kicker">KB 与投影的分工</p>
+        <h2>KB 保留完整治理，runtime projection 提供运行时视图。</h2>
+        <p>这是 RTS 里最重要的边界：KB 不是给人看的长文档集合，projection 也不是简单摘要。两者都是机器优先结构，只是承担的职责不同。</p>
+      </div>
+      <div class="legend-grid">
+        <article class="ok">
+          <strong>KB 关注“规则为什么可信”</strong>
+          <p>source、evidence、review、ambiguity、adjudication、signoff 和 lineage。</p>
+        </article>
+        <article class="warn">
+          <strong>Projection 关注“服务如何读取”</strong>
+          <p>release、scope、object manifest、L2、cards、dependency、governance summary 和 trace。</p>
+        </article>
+      </div>
+    </section>
+
     <section class="architecture-map">
       <div class="layer source">
         <span>01</span>
-        <h2>Source Material</h2>
-        <p>业务文档、代码、mapping、lookup、示例、clarification。</p>
+        <h2>源材料 <small>Source Material</small></h2>
+        <p>业务文档、Java/XSLT、Excel mapping、lookup table、样例和澄清记录。</p>
       </div>
       <div class="layer govern">
         <span>02</span>
-        <h2>Governed KB</h2>
-        <p>Rule、Rule pack、Evidence chain、review、adjudication、signoff。</p>
+        <h2>KB <small>Knowledge Base</small></h2>
+        <p>完整规则知识图：rule、lookup、helper、evidence、review、adjudication、signoff。</p>
       </div>
       <div class="layer projection">
         <span>03</span>
-        <h2>Runtime Projection</h2>
-        <p>release manifest、scope registry、object manifest、cards、L2、dependency。</p>
+        <h2>运行时投影 <small>Runtime Projection</small></h2>
+        <p>已批准内容的运行包：release manifest、scope registry、object manifest、cards、L2、dependency。</p>
       </div>
       <div class="layer service">
         <span>04</span>
-        <h2>RTS Service Gate</h2>
-        <p>release、scope、permission、hash、grounding、refusal、trace。</p>
+        <h2>服务读取 <small>Service Read</small></h2>
+        <p>查询、索引、API、影响分析、内部 LLM 和外部 agent 都通过 projection 读取规则。</p>
       </div>
       <div class="layer consume">
         <span>05</span>
-        <h2>Consumption</h2>
-        <p>query、ask、scenario、MCP、pipeline、external agent。</p>
+        <h2>复盘与演进 <small>Trace / Feedback</small></h2>
+        <p>调用 trace、review feedback 和新裁决回到治理流程，再发布新 projection。</p>
       </div>
     </section>
 
     <section class="split-explain">
-      <article id="atomic-capabilities">
-        <p class="kicker">Core A</p>
-        <h2>受控真相源原子能力</h2>
-        <p>这些能力回答“能不能安全地找到和读取 truth material”。它们是 deterministic information service，不是 AI 不可用时才存在的 fallback。</p>
+      <article id="kb-layer">
+        <p class="kicker">KB Layer</p>
+        <h2>KB 里应该保留什么？</h2>
+        <p>KB 是完整 governed truth graph，不只是规则正文。它需要保存规则本身，也要保存规则为什么可信、哪里还有歧义、谁做了裁决。</p>
         <ul class="tag-list">
-          <li>resolve scope</li>
-          <li>find objects</li>
-          <li>read object card</li>
-          <li>read L2</li>
-          <li>dependency traversal</li>
-          <li>trace and grounding</li>
+          <li>rule / lookup / helper</li>
+          <li>source material</li>
+          <li>evidence chain</li>
+          <li>review notes</li>
+          <li>ambiguity / open question</li>
+          <li>human adjudication / signoff</li>
         </ul>
       </article>
-      <article id="managed-analysis">
-        <p class="kicker">Core B</p>
-        <h2>托管 LLM agent 分析</h2>
-        <p>这些能力回答“如何把 truth material 变成可用分析”。AI 可以规划、取证、表达 unknown 和 candidate，但不能拥有 truth authority。</p>
+      <article id="projection-layer">
+        <p class="kicker">Runtime Projection</p>
+        <h2>Projection 里应该发布什么？</h2>
+        <p>Projection 是 approved truth 的服务运行视图。它应该降低运行时噪声，但不能把规则事实压成只有自然语言摘要。</p>
         <ul class="tag-list">
-          <li>/ask</li>
-          <li>PR diff impact</li>
-          <li>exception investigation</li>
-          <li>failed message analysis</li>
-          <li>test planning</li>
-          <li>governance review</li>
+          <li>release manifest</li>
+          <li>scope registry</li>
+          <li>object manifest</li>
+          <li>object cards</li>
+          <li>L2 runtime objects</li>
+          <li>dependency edges</li>
+          <li>governance summaries</li>
+          <li>caller profiles</li>
         </ul>
       </article>
     </section>
 
+    <section class="context-envelope">
+      <div>
+        <p class="kicker">为什么不直接用搜索索引？</p>
+        <h2>索引能帮忙找到对象，但不能成为规则事实。</h2>
+        <p>Object card、L0/L1、alias、confusable 和全文索引适合召回和消歧。真正回答“规则怎么生成”时，服务必须回到 L2 runtime object、dependency 和授权 governance view。</p>
+      </div>
+      <div class="envelope-steps">
+        <span>先确定 scope</span>
+        <span>用 card 找对象</span>
+        <span>读取 L2 规则正文</span>
+        <span>展开 dependency</span>
+        <span>记录 trace</span>
+      </div>
+    </section>
+
+    {render_glossary_section("KB 与投影里的关键英文词", "这些词对应 runtime projection 包里的真实区域或字段。", limit=None)}
+
     <section class="boundary-table">
       <div>
-        <p class="kicker">Boundary Checks</p>
-        <h2>什么能支撑事实，什么不能。</h2>
+        <p class="kicker">边界表</p>
+        <h2>哪些内容负责治理，哪些内容负责运行？</h2>
       </div>
       <div class="table-card">
         <table>
-          <thead><tr><th>材料</th><th>用途</th><th>是否拥有 truth</th></tr></thead>
+          <thead><tr><th>内容</th><th>主要用途</th><th>介绍时怎么说</th></tr></thead>
           <tbody>
-            <tr><td>L2 runtime object</td><td>事实回答、诊断、测试规划 grounding</td><td>可以支撑事实</td></tr>
-            <tr><td>dependency edge</td><td>解释、影响候选、必要上下文加载</td><td>可以支撑依赖事实</td></tr>
-            <tr><td>object card / L0 / L1</td><td>导航、消歧、召回</td><td>不能替代 L2</td></tr>
-            <tr><td>LLM draft</td><td>分析草稿、表达、候选</td><td>不能自行成为 truth</td></tr>
-            <tr><td>memory / trace feedback</td><td>体验和检索辅助</td><td>不能参与 truth validation</td></tr>
+            <tr><td>KB canonical objects</td><td>保存完整规则和治理上下文</td><td>这是规则知识资产本体</td></tr>
+            <tr><td>Runtime projection</td><td>发布给服务读取的运行包</td><td>这是已批准规则的服务视图</td></tr>
+            <tr><td>L2 runtime object</td><td>保存服务可读的结构化规则事实</td><td>回答事实时要回到这里</td></tr>
+            <tr><td>Object card / L0 / L1</td><td>帮助搜索、导航和消歧</td><td>它是入口，不是最终规则正文</td></tr>
+            <tr><td>Governance summary</td><td>解释可信度、风险和 open question</td><td>需要权限和场景控制</td></tr>
+            <tr><td>Trace</td><td>复盘一次服务调用读了什么</td><td>它证明过程，不反写规则真相</td></tr>
           </tbody>
         </table>
       </div>
@@ -1973,36 +2289,50 @@ def write_architecture_page(docs: list[Doc], docs_by_rel: dict[str, Doc]) -> Non
       <p class="kicker">主要来源</p>
       {source_badges([
           ("Projection Contract", "docs/confirmed/kb-to-index-projection-contract-zh.md"),
-          ("LLM Alignment", "docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md"),
-          ("Internal Agent Plan", "docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md"),
+          ("Runtime Projection 产品说明", "docs/confirmed/runtime-projection-product-guide-zh.md"),
+          ("项目总纲", "docs/confirmed/project-alignment-summary-zh.md"),
       ], docs_by_rel, path)}
     </section>
     """
-    write_topic_shell(path, "architecture", "架构边界", "把 KB、projection、index、service、LLM 和 agent 的责任分清楚。", body)
+    write_topic_shell(path, "architecture", "KB 与 Runtime Projection", "KB 负责治理完整规则知识，runtime projection 负责把已批准内容发布成服务可读取的运行包。", body)
 
 
 def write_operations_page(docs: list[Doc], docs_by_rel: dict[str, Doc]) -> None:
     path = OUT / "operations.html"
     body = f"""
+    <section class="ops-lane">
+      <div class="section-heading compact">
+        <p class="kicker">如何使用</p>
+        <h2>使用 RTS 的前提，是先有一份 runtime projection。</h2>
+        <p>稳定入口是 projection store：它定义当前 release、可用 scope、可查询对象和事实正文位置。</p>
+      </div>
+      <div class="ops-flow">
+        <article><span>1</span><strong>选择 release</strong><p>active-release 指向当前服务应该使用的规则版本。</p></article>
+        <article><span>2</span><strong>解析 scope</strong><p>channel/product/pack/domain 防止相似规则串用。</p></article>
+        <article><span>3</span><strong>读取 L2</strong><p>事实回答回到结构化规则正文和依赖关系。</p></article>
+        <article><span>4</span><strong>留下 trace</strong><p>记录这次查询读了什么，方便复盘和审计。</p></article>
+      </div>
+    </section>
+
     <section class="run-cards">
       <article>
         <span class="card-number">01</span>
-        <h2>本地启动</h2>
-        <p>默认使用 sample runtime projection store。服务不直接读取 KB/candidate pack 作为 truth。</p>
+        <h2>本地 demo 启动</h2>
+        <p>当前 demo 使用 sample runtime projection store。它展示的是“服务读取 projection”，不是直接读取 KB 草稿。</p>
         <pre><code>RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \\
 JAVA_HOME=$(/usr/libexec/java_home -v 17) \\
 mvn spring-boot:run</code></pre>
       </article>
       <article>
         <span class="card-number">02</span>
-        <h2>快速验证</h2>
-        <p>先看 MCP 工具清单，再用当前 active release 的 photo scope 查询。</p>
+        <h2>先验证服务面</h2>
+        <p>先查看可用工具或 API，再使用当前 active release 的 sample scope 查询。</p>
         <pre><code>curl -s http://localhost:8080/mcp/tools | jq</code></pre>
       </article>
       <article>
         <span class="card-number">03</span>
-        <h2>提交前检查</h2>
-        <p>运行测试和 diff 检查，避免把运行配置或格式问题带进提交。</p>
+        <h2>确认变更可发布</h2>
+        <p>如果修改了文档、projection 或服务代码，提交前至少要跑测试和格式检查。</p>
         <pre><code>JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn verify
 git diff --check
 git status --short</code></pre>
@@ -2011,15 +2341,15 @@ git status --short</code></pre>
 
     <section class="example-panel refined" id="examples">
       <div>
-        <p class="kicker">Try It</p>
-        <h2>选择场景，生成可复制请求。</h2>
-        <p>这个示例生成器是为了降低调用门槛。它不会修改服务状态，也不会替代 API guide。</p>
+        <p class="kicker">调用示例</p>
+        <h2>看服务如何消费 projection。</h2>
+        <p>下面的请求只是 demo 入口。重点是：请求会带 scope，服务会从当前 projection 中找对象、读 L2、返回 facts/citations/trace。</p>
       </div>
       <div class="example-builder">
         <label>入口
           <select id="example-endpoint">
             <option value="query">/api/v1/query deterministic 查询</option>
-            <option value="ask">/api/v1/ask managed analysis</option>
+            <option value="ask">/api/v1/ask LLM 分析问答</option>
             <option value="scenario">/api/v1/scenario/analyze-failed-message</option>
             <option value="mcp">/mcp/tools 工具清单</option>
           </select>
@@ -2035,13 +2365,14 @@ git status --short</code></pre>
       </div>
     </section>
 
+    {render_glossary_section("使用时会遇到的英文词", "这些词会出现在 projection 包、API 请求、响应和 trace 中。", limit=10)}
+
     <section class="warning-panel">
-      <h2>调用时最容易踩的坑</h2>
+      <h2>介绍和使用时最容易误解的点</h2>
       <ul class="big-list compact">
-        <li><strong>scope 不完整</strong>：channel/product/pack/domain 必须属于当前 active release。</li>
-        <li><strong>字段名写错</strong>：请求 body 使用 snake_case，不要用 camelCase。</li>
-        <li><strong>LLM 不可用</strong>：/ask 会降级为结构化信息提供服务，不应被描述成等价 managed analysis。</li>
-        <li><strong>candidate 被误用</strong>：scenario 输出不是 release approval、final root cause 或 QA signoff。</li>
+        <li><strong>Projection 不是摘要</strong>：它必须保留 L2 结构化规则语义。</li>
+        <li><strong>搜索结果不是事实</strong>：card、L0/L1、index document 只负责定位对象。</li>
+        <li><strong>LLM/Agent 是消费层能力</strong>：分析和表达必须基于业务规则 KB 与运行包。</li>
       </ul>
     </section>
 
@@ -2050,66 +2381,99 @@ git status --short</code></pre>
       {source_badges([
           ("Runbook", "docs/java-service-runbook-zh.md"),
           ("API Guide", "docs/api-caller-guide-zh.md"),
+          ("Runtime Projection 产品说明", "docs/confirmed/runtime-projection-product-guide-zh.md"),
           ("Sample Commands", "docs/day1-sample-pack-test-commands.md"),
       ], docs_by_rel, path)}
     </section>
     """
-    write_topic_shell(path, "operations", "运行与调用", "把启动、验证、API 调用和常见误区放在一条可执行路径里。", body)
+    write_topic_shell(path, "operations", "如何使用", "本地服务和 API 通过 runtime projection 读取已发布规则，并返回 facts、citations、trace 或 refusal。", body)
 
 
 def write_roadmap_page(docs: list[Doc], docs_by_rel: dict[str, Doc]) -> None:
     path = OUT / "roadmap.html"
     body = f"""
+    <section class="roadmap-brief">
+      <div>
+        <p class="kicker">推进路径</p>
+        <h2>先把业务规则 KB 和运行投影做扎实，再扩展查询、LLM 和 agent。</h2>
+        <p>路线图从规则治理开始：先整理 KB，再发布 runtime projection，最后让服务和下游场景稳定消费。</p>
+      </div>
+      <div class="roadmap-scale">
+        <span>KB 结构稳定</span>
+        <span>Projection 可发布</span>
+        <span>服务可查询和复盘</span>
+      </div>
+    </section>
+
     <section class="timeline">
       <article>
-        <span>Baseline</span>
-        <h2>Constitution + Projection Contract</h2>
-        <p>先锁住 truth ownership、runtime projection、refusal、permissioned governance view。</p>
+        <span>Step 1</span>
+        <h2>整理规则材料进入 KB</h2>
+        <p>把 rule、lookup、helper、source、evidence、review、open question 和 signoff 结构化保存。</p>
       </article>
       <article>
-        <span>Day1</span>
-        <h2>Query / Tool Service + Controlled Harness</h2>
-        <p>建立文件系统 store、Lucene、L2 read/hash、trace/refusal、REST/MCP 和第一版 /ask。</p>
+        <span>Step 2</span>
+        <h2>定义 runtime projection contract</h2>
+        <p>明确发布包必须包含 release manifest、scope、object manifest、L2、cards、dependency 和 governance views。</p>
       </article>
       <article>
-        <span>Internal Agent</span>
-        <h2>Service-owned Managed Loop</h2>
-        <p>planner、orchestrator、context snapshot、claim validation、scenario compiler、evaluation gate。</p>
+        <span>Step 3</span>
+        <h2>让服务只读取 projection</h2>
+        <p>查询、API 和索引都从 active projection 读取，不直接读取 candidate pack 或工作区草稿。</p>
       </article>
       <article>
-        <span>Day2</span>
-        <h2>Controlled Agentic Retrieval</h2>
-        <p>多步 retrieval、confusable、rerank、expanded MCP、impact/test candidate 和评估闭环。</p>
+        <span>Step 4</span>
+        <h2>扩展可用场景</h2>
+        <p>在稳定投影之上做规则查询、依赖解释、影响分析、测试建议、review 辅助和 pipeline 检查。</p>
       </article>
       <article>
-        <span>Final</span>
-        <h2>LLM-agent-ready Rule Truth Service</h2>
-        <p>managed mode 与 external tool mode 共享稳定原子能力和同一 truth access boundary。</p>
+        <span>Step 5</span>
+        <h2>接入 LLM/Agent 分析</h2>
+        <p>内部 LLM 和外部 agent 消费 projection 做解释和分析，但不替代 KB、projection 和人工裁决。</p>
       </article>
+    </section>
+
+    <section class="roadmap-matrix">
+      <div class="section-heading compact">
+        <p class="kicker">判断标准</p>
+        <h2>每一步真正要证明什么？</h2>
+      </div>
+      <table>
+        <thead><tr><th>节点</th><th>要证明的价值</th><th>不要误解成</th></tr></thead>
+        <tbody>
+          <tr><td>KB</td><td>规则来源、证据、review 和裁决能被结构化追踪。</td><td>一堆给人看的 Markdown。</td></tr>
+          <tr><td>Projection</td><td>已批准规则能被发布成服务可读的稳定运行包。</td><td>自然语言摘要或搜索索引。</td></tr>
+          <tr><td>Service</td><td>查询能回到 scope、L2、dependency 和 trace。</td><td>直接问模型或直接扫工作区文件。</td></tr>
+          <tr><td>LLM/Agent</td><td>在治理材料上做解释、分析和候选建议。</td><td>项目一开始就变成聊天或自动化应用。</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="decision-grid">
       <article>
-        <h2>现在不该做什么</h2>
-        <p>不要把 OpenSearch、vector、外部 agent SDK 或 memory 写成 truth core；它们最多是 adapter、检索增强或 workflow sidecar。</p>
+        <h2>表达重点</h2>
+        <p>主线是规则如何从材料进入 KB，再如何发布成 projection；模型接入、SDK、harness 和工具模式属于后续实现层。</p>
       </article>
       <article>
         <h2>下一步真正重要什么</h2>
-        <p>不是让模型更会说，而是让 managed analysis 在 /ask 和 scenario endpoint 中成为稳定正常态，同时 claim validation 和 trace 能证明它没有越界。</p>
+        <p>让 sample pack 到 runtime projection 的链路更真实、更稳定，再用 API 和可视化把“查得到、查得准、可复盘”展示出来。</p>
       </article>
     </section>
+
+    {render_glossary_section("推进路径里的关键英文词", "这些词帮助同事理解项目从业务规则 KB 到服务运行的路径。LLM 和 agent 是后续消费方式，不是唯一卖点。", limit=10)}
 
     <section class="source-strip">
       <p class="kicker">主要来源</p>
       {source_badges([
+          ("项目总纲", "docs/confirmed/project-alignment-summary-zh.md"),
+          ("Projection Contract", "docs/confirmed/kb-to-index-projection-contract-zh.md"),
+          ("Runtime Projection 产品说明", "docs/confirmed/runtime-projection-product-guide-zh.md"),
           ("Day1", "docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md"),
           ("Day2", "docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md"),
-          ("Final Roadmap", "docs/confirmed/final-llm-agent-service-plan-zh.md"),
-          ("Decision Register", "docs/confirmed/document-decision-register-zh.md"),
       ], docs_by_rel, path)}
     </section>
     """
-    write_topic_shell(path, "roadmap", "路线图", "把 confirmed baseline、Day1、Day2、internal agent 和最终服务形态串成一条实现路径。", body)
+    write_topic_shell(path, "roadmap", "推进路径", "RTS 的推进顺序是先沉淀 KB 和 runtime projection，再扩展查询、分析、LLM 和 agent。", body)
 
 
 def write_library_page(docs: list[Doc]) -> None:
@@ -2119,9 +2483,9 @@ def write_library_page(docs: list[Doc]) -> None:
     <section class="library-preview full">
       <div class="docs-toolbar">
         <div>
-          <p class="kicker">Source Library</p>
+          <p class="kicker">来源文档</p>
           <h2>所有活跃来源文档</h2>
-          <p>这里保留完整来源入口。默认排除 archive；reference 只作 rationale，不覆盖 confirmed baseline。</p>
+          <p>完整来源入口用于核对字段、边界、阅读顺序和原始措辞。</p>
         </div>
         <label class="search-box">
           <span>搜索来源</span>
@@ -2133,8 +2497,9 @@ def write_library_page(docs: list[Doc]) -> None:
       </div>
       <p class="empty-state" data-empty-state hidden>没有匹配的来源文档。</p>
     </section>
+    {render_glossary_section("来源库分类说明", "部分标题保留英文，因为它们来自真实文档、字段或代码命名。", limit=8)}
     """
-    write_topic_shell(path, "library", "来源文档库", "当你需要逐字核对或继续开发时，从这里进入完整来源。", body)
+    write_topic_shell(path, "library", "来源文档", "完整来源文档用于核对字段、边界、阅读顺序和原始措辞。", body)
 
 
 def write_experience_doc_page(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, Doc]) -> None:
@@ -2147,7 +2512,9 @@ def write_experience_doc_page(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, 
     chapter_cards = render_chapter_cards(doc)
     meta_cards = render_doc_meta_cards(doc, docs_by_rel)
     related = render_related_sources(doc, docs, docs_by_rel)
-    page_title = f"{doc.title} | RTS 来源解读"
+    title = display_title(doc)
+    summary = display_summary(doc)
+    page_title = f"{title} | RTS 来源解读"
     body = f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -2161,29 +2528,37 @@ def write_experience_doc_page(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, 
     <a class="brand-mark" href="{home_href}">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="{home_href}">首页</a>
-      <a class="nav-link" href="{rel_url(doc.output_path, OUT / "start-here.html")}">三分钟读懂</a>
-      <a class="nav-link" href="{rel_url(doc.output_path, OUT / "architecture.html")}">架构边界</a>
+      <a class="nav-link" href="{rel_url(doc.output_path, OUT / "start-here.html")}">项目概览</a>
+      <a class="nav-link" href="{rel_url(doc.output_path, OUT / "architecture.html")}">KB 与投影</a>
       <a class="nav-link" href="{rel_url(doc.output_path, OUT / "library.html")}">来源文档</a>
     </nav>
   </header>
   <main class="source-page">
     <section class="source-hero">
-      <p class="kicker">{esc(doc.category)} · {esc(doc.rel_path)}</p>
-      <h1>{esc(doc.title)}</h1>
-      <p>{esc(doc.summary)}</p>
+      <p class="kicker">{esc(zh_category(doc.category))} · {esc(doc.rel_path)}</p>
+      <h1>{esc(title)}</h1>
+      <p>{esc(summary)}</p>
       <div class="hero-actions">
-        <a class="button primary" href="#readable">先读解读版</a>
-        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
         <a class="button ghost" href="{source_href}">Markdown 源文件</a>
       </div>
     </section>
 
-    <section class="readable-layout" id="readable">
+      <section class="readable-layout" id="readable">
       <aside class="readable-aside">
         <div class="aside-card">
-          <p class="kicker">How To Read</p>
-          <h2>这不是原文搬运页</h2>
-          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
         </div>
         {meta_cards}
         {related}
@@ -2194,8 +2569,8 @@ def write_experience_doc_page(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, 
         </section>
         <section class="chapter-section">
           <div class="section-heading">
-            <p class="kicker">Readable Outline</p>
-            <h2>这篇文档在讲什么</h2>
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
           </div>
           <div class="chapter-grid">
             {chapter_cards}
@@ -2206,8 +2581,8 @@ def write_experience_doc_page(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, 
 
     <details class="source-drawer" id="source">
       <summary>
-        <span>完整 Markdown 来源</span>
-        <strong>用于核对事实、字段和原始措辞</strong>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
       </summary>
       <div class="markdown-body">
         {doc.body_html}
@@ -2224,13 +2599,11 @@ def write_experience_doc_page(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, 
 def render_doc_insights(doc: Doc) -> str:
     role = doc.meta.get("role") or doc.category
     layer = doc.meta.get("layer") or "active"
-    intro = first_meaningful_sentences(doc.body_markdown, 2)
-    if not intro:
-        intro = doc.summary
+    intro = display_summary(doc) or first_meaningful_sentences(doc.body_markdown, 2)
     insights = [
-        ("这篇的作用", doc.summary or "说明当前 RTS 活跃文档中的一个主题。"),
-        ("先抓住", intro),
-        ("权威层级", f"{doc.category} / role: {role} / layer: {layer}"),
+        ("文档定位", display_summary(doc) or "说明当前 RTS 活跃文档中的一个主题。"),
+        ("核心摘要", intro),
+        ("权威层级", f"{zh_category(doc.category)} / role: {role} / layer: {layer}"),
     ]
     cards = []
     for title, text in insights:
@@ -2266,12 +2639,12 @@ def first_meaningful_sentences(markdown_text: str, count: int) -> str:
 def render_chapter_cards(doc: Doc) -> str:
     sections = extract_heading_sections(doc.body_markdown)
     if not sections:
-        return '<article class="chapter-card"><h3>完整来源</h3><p>这篇文档没有明显章节，请直接展开完整 Markdown 来源核对。</p></article>'
+        return '<article class="chapter-card"><h3>Markdown 原文</h3><p>该文档没有明显章节，请以 Markdown 原文为准。</p></article>'
     cards = []
     for title, excerpt in sections[:12]:
         cards.append(f"""<article class="chapter-card">
           <h3>{esc(title)}</h3>
-          <p>{esc(excerpt or "这一节用于展开该主题的细节、边界或操作说明。")}</p>
+          <p>{esc(excerpt or "本节说明该主题的细节、边界或操作要求。")}</p>
         </article>""")
     return "\n".join(cards)
 
@@ -2345,11 +2718,11 @@ def render_related_sources(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, Doc
         target = docs_by_rel.get(clean)
         if target:
             href = rel_url(doc.output_path, target.output_path)
-            links.append(f'<a href="{href}">{esc(target.title)}</a>')
+            links.append(f'<a href="{href}">{esc(display_title(target))}</a>')
     if not links:
         peers = [item for item in docs if item.category == doc.category and item.rel_path != doc.rel_path][:5]
         for peer in peers:
-            links.append(f'<a href="{rel_url(doc.output_path, peer.output_path)}">{esc(peer.title)}</a>')
+            links.append(f'<a href="{rel_url(doc.output_path, peer.output_path)}">{esc(display_title(peer))}</a>')
     if not links:
         return ""
     return f"""<div class="aside-card related-card">
@@ -2360,12 +2733,15 @@ def render_related_sources(doc: Doc, docs: list[Doc], docs_by_rel: dict[str, Doc
 
 def render_experience_doc_card(doc: Doc, from_file: Path) -> str:
     href = rel_url(from_file, doc.output_path)
-    search_text = " ".join([doc.title, doc.summary, doc.rel_path, doc.category]).lower()
+    title = display_title(doc)
+    summary = display_summary(doc)
+    category = zh_category(doc.category)
+    search_text = " ".join([title, summary, doc.rel_path, category]).lower()
     return f"""<article class="source-card" data-category="{esc(doc.category)}" data-search="{esc(search_text)}">
       <a href="{href}">
-        <span class="source-type">{esc(doc.category)}</span>
-        <h3>{esc(doc.title)}</h3>
-        <p>{esc(doc.summary)}</p>
+        <span class="source-type">{esc(category)}</span>
+        <h3>{esc(title)}</h3>
+        <p>{esc(summary)}</p>
         <code>{esc(doc.rel_path)}</code>
       </a>
     </article>"""
@@ -2373,22 +2749,26 @@ def render_experience_doc_card(doc: Doc, from_file: Path) -> str:
 
 EXPERIENCE_STYLES = r"""
 :root {
-  --ink: #17211d;
-  --muted: #68746e;
-  --paper: #fffaf0;
-  --paper-strong: #f5ead7;
-  --canvas: #efe2ca;
-  --line: rgba(72, 57, 37, .18);
-  --green: #0d7069;
-  --green-dark: #084a46;
-  --green-soft: #d9eee8;
-  --amber: #c58228;
-  --clay: #994b26;
-  --blue: #2a6478;
-  --shadow: 0 24px 70px rgba(49, 38, 22, .16);
-  --radius-xl: 36px;
-  --radius-lg: 24px;
-  --radius-md: 16px;
+  color-scheme: light;
+  --ink: #111827;
+  --muted: #667085;
+  --paper: #ffffff;
+  --paper-strong: #f7fafc;
+  --canvas: #eef3f7;
+  --line: rgba(17, 24, 39, .14);
+  --green: #0f766e;
+  --green-dark: #115e59;
+  --green-soft: #dff7f1;
+  --amber: #b7791f;
+  --amber-soft: #fff3d6;
+  --blue: #2563eb;
+  --blue-soft: #e8f0ff;
+  --rose: #be123c;
+  --rose-soft: #ffe7ed;
+  --shadow: 0 16px 42px rgba(15, 23, 42, .10);
+  --radius-xl: 8px;
+  --radius-lg: 8px;
+  --radius-md: 6px;
   --content: min(1180px, calc(100vw - 40px));
   font-family: "Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Avenir Next", sans-serif;
 }
@@ -2399,9 +2779,10 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at 10% 0%, rgba(13, 112, 105, .22), transparent 28%),
-    radial-gradient(circle at 95% 5%, rgba(197, 130, 40, .22), transparent 26%),
-    linear-gradient(135deg, #f4ead8, #fff8e9 48%, #ead9bd);
+    linear-gradient(90deg, rgba(37, 99, 235, .06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(15, 118, 110, .06) 1px, transparent 1px),
+    linear-gradient(135deg, #f8fafc 0%, #edf6f3 46%, #f7f1e6 100%);
+  background-size: 32px 32px, 32px 32px, auto;
   line-height: 1.65;
 }
 
@@ -2411,7 +2792,7 @@ code, pre, kbd { font-family: "JetBrains Mono", "SFMono-Regular", Consolas, mono
 .site-header {
   width: var(--content);
   margin: 0 auto;
-  padding: 18px 0;
+  padding: 14px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2420,20 +2801,21 @@ code, pre, kbd { font-family: "JetBrains Mono", "SFMono-Regular", Consolas, mono
   top: 0;
   z-index: 20;
   backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(17, 24, 39, .08);
 }
 
 .brand-mark {
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--ink);
+  background: linear-gradient(135deg, var(--ink), var(--green-dark));
   color: var(--paper);
   text-decoration: none;
   font-weight: 950;
-  letter-spacing: -.05em;
+  letter-spacing: 0;
   box-shadow: var(--shadow);
 }
 
@@ -2446,12 +2828,12 @@ code, pre, kbd { font-family: "JetBrains Mono", "SFMono-Regular", Consolas, mono
 
 .nav-link {
   padding: 9px 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   color: var(--ink);
   text-decoration: none;
   font-size: .92rem;
   font-weight: 800;
-  background: rgba(255, 250, 240, .48);
+  background: rgba(255, 255, 255, .66);
   border: 1px solid transparent;
 }
 
@@ -2466,8 +2848,9 @@ main, .site-footer {
   margin: 0 auto;
 }
 
-.hero-stage {
-  min-height: calc(100vh - 96px);
+.hero-stage,
+.workbench-hero {
+  min-height: calc(100vh - 84px);
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(340px, .82fr);
   gap: 34px;
@@ -2477,7 +2860,7 @@ main, .site-footer {
 
 .kicker {
   margin: 0 0 12px;
-  color: var(--clay);
+  color: var(--green-dark);
   text-transform: uppercase;
   letter-spacing: .15em;
   font-size: .74rem;
@@ -2489,9 +2872,9 @@ h1, h2, h3 { line-height: 1.12; }
 .page-hero h1,
 .source-hero h1 {
   margin: 0;
-  font-size: clamp(3rem, 6.7vw, 6.7rem);
-  line-height: .98;
-  letter-spacing: -.065em;
+  font-size: 3.45rem;
+  line-height: 1.08;
+  letter-spacing: 0;
 }
 
 .hero-copy h1 {
@@ -2501,8 +2884,8 @@ h1, h2, h3 { line-height: 1.12; }
 .hero-text,
 .page-hero p,
 .source-hero p {
-  max-width: 760px;
-  font-size: clamp(1.08rem, 2vw, 1.42rem);
+  max-width: 820px;
+  font-size: 1.12rem;
   color: #33413b;
 }
 
@@ -2518,15 +2901,258 @@ h1, h2, h3 { line-height: 1.12; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 12px 17px;
   text-decoration: none;
   border: 1px solid var(--line);
   font-weight: 900;
+  font: inherit;
+  cursor: pointer;
 }
 .button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .button.secondary { background: var(--paper); color: var(--ink); }
 .button.ghost { background: transparent; color: var(--green-dark); }
+
+.hero-dashboard,
+.html-principles,
+.system-map-panel,
+.orientation-panel,
+.architecture-legend,
+.context-envelope,
+.ops-lane,
+.roadmap-brief,
+.roadmap-matrix,
+.term-section {
+  margin: 28px 0;
+  padding: 28px;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, .82);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.hero-dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-self: stretch;
+  align-content: center;
+}
+
+.dashboard-heading {
+  grid-column: 1 / -1;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+}
+
+.dashboard-heading h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.dashboard-stat,
+.dashboard-note {
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+}
+
+.dashboard-stat span {
+  display: block;
+  color: var(--blue);
+  font-size: 1.8rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.dashboard-stat p,
+.dashboard-note p {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+
+.dashboard-note {
+  grid-column: 1 / -1;
+  min-height: auto;
+  background: linear-gradient(135deg, var(--blue-soft), var(--green-soft));
+}
+
+.principle-grid,
+.term-grid,
+.legend-grid,
+.mini-matrix,
+.ops-flow {
+  display: grid;
+  gap: 12px;
+}
+
+.principle-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.principle-grid article,
+.term-card,
+.legend-grid article,
+.mini-matrix article,
+.ops-flow article,
+.roadmap-scale span,
+.envelope-steps span {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+}
+
+.principle-grid strong,
+.term-card strong,
+.legend-grid strong,
+.mini-matrix strong,
+.ops-flow strong {
+  display: block;
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.principle-grid p,
+.term-card p,
+.legend-grid p,
+.mini-matrix p,
+.ops-flow p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.system-map {
+  overflow-x: auto;
+}
+
+.system-map svg {
+  display: block;
+  min-width: 880px;
+  width: 100%;
+  height: auto;
+}
+
+.system-map rect {
+  fill: #fff;
+  stroke: rgba(17, 24, 39, .18);
+  rx: 8;
+}
+
+.system-map .truth rect:nth-of-type(2) { fill: var(--green-soft); }
+.system-map .truth rect:nth-of-type(3) { fill: var(--blue-soft); }
+.system-map .consume rect { fill: var(--amber-soft); }
+.system-map text {
+  fill: var(--ink);
+  font-size: 18px;
+  font-weight: 850;
+}
+.system-map text:nth-child(3n) {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+}
+.system-map .map-arrows line {
+  stroke: var(--green-dark);
+  stroke-width: 2.5;
+  marker-end: url(#arrow);
+}
+.system-map marker path {
+  fill: var(--green-dark);
+}
+.system-map .map-boundary rect {
+  fill: transparent;
+  stroke: rgba(37, 99, 235, .42);
+  stroke-dasharray: 8 8;
+}
+.system-map .map-boundary text {
+  fill: var(--blue);
+  font-size: 14px;
+}
+
+.term-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.term-card span {
+  display: block;
+  margin-top: 4px;
+  color: var(--green-dark);
+  font-weight: 800;
+}
+
+.term-card p {
+  font-size: .94rem;
+}
+
+.orientation-panel,
+.architecture-legend,
+.context-envelope,
+.ops-lane,
+.roadmap-brief {
+  display: grid;
+  grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.mini-matrix,
+.legend-grid,
+.ops-flow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.legend-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.legend-grid .ok {
+  background: var(--green-soft);
+}
+
+.legend-grid .warn {
+  background: var(--amber-soft);
+}
+
+.mini-matrix span,
+.ops-flow span {
+  display: inline-flex;
+  margin-bottom: 8px;
+  min-width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--ink);
+  color: white;
+  font-weight: 900;
+}
+
+.envelope-steps,
+.roadmap-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.envelope-steps span,
+.roadmap-scale span {
+  background: var(--blue-soft);
+  color: #1d4ed8;
+  font-weight: 850;
+}
+
+.ops-flow {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.roadmap-scale span {
+  flex: 1 1 150px;
+}
 
 .truth-orbit {
   position: relative;
@@ -2579,12 +3205,22 @@ h1, h2, h3 { line-height: 1.12; }
 .proof-panel h2,
 .reading-lane h2,
 .boundary-table h2,
-.warning-panel h2 {
+.warning-panel h2,
+.term-section h2,
+.html-principles h2,
+.system-map-panel h2,
+.orientation-panel h2,
+.architecture-legend h2,
+.context-envelope h2,
+.ops-lane h2,
+.roadmap-brief h2,
+.roadmap-matrix h2 {
   margin: 0;
-  font-size: clamp(2rem, 4vw, 4rem);
-  letter-spacing: -.06em;
+  font-size: 2.15rem;
+  letter-spacing: 0;
 }
 .section-heading p:last-child { margin: 0; color: var(--muted); max-width: 760px; }
+.section-heading.compact h2 { font-size: 2rem; }
 
 .reader-paths,
 .story-panel,
@@ -2597,18 +3233,19 @@ h1, h2, h3 { line-height: 1.12; }
 .boundary-table,
 .warning-panel,
 .source-drawer,
-.example-panel {
+.example-panel,
+.roadmap-matrix {
   margin: 28px 0;
 }
 
 .path-grid {
   display: grid;
-  grid-template-columns: 1.15fr .85fr;
-  gap: 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
 }
 .path-card {
-  min-height: 230px;
-  padding: 24px;
+  min-height: 132px;
+  padding: 16px;
   border-radius: var(--radius-lg);
   text-decoration: none;
   color: var(--ink);
@@ -2618,7 +3255,7 @@ h1, h2, h3 { line-height: 1.12; }
   transition: transform .18s ease, box-shadow .18s ease;
 }
 .path-card:hover { transform: translateY(-4px); box-shadow: 0 30px 80px rgba(49, 38, 22, .18); }
-.path-card.large { grid-row: span 2; }
+.path-card.large { grid-row: auto; }
 .path-card span,
 .card-number {
   display: inline-flex;
@@ -2626,13 +3263,13 @@ h1, h2, h3 { line-height: 1.12; }
   height: 46px;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
+  border-radius: 8px;
   background: var(--green-soft);
   color: var(--green-dark);
   font-weight: 950;
 }
-.path-card h3 { margin: 22px 0 10px; font-size: 1.7rem; letter-spacing: -.035em; }
-.path-card p { margin: 0; color: var(--muted); }
+.path-card h3 { margin: 14px 0 8px; font-size: 1.18rem; letter-spacing: 0; }
+.path-card p { margin: 0; color: var(--muted); font-size: .92rem; line-height: 1.45; }
 
 .story-panel,
 .mode-panel,
@@ -2644,7 +3281,7 @@ h1, h2, h3 { line-height: 1.12; }
 .example-panel {
   padding: 30px;
   border-radius: var(--radius-xl);
-  background: rgba(255, 250, 240, .72);
+  background: rgba(255, 255, 255, .82);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
@@ -2667,7 +3304,7 @@ h1, h2, h3 { line-height: 1.12; }
 .flow-line span,
 .timeline span,
 .source-type {
-  color: var(--clay);
+  color: var(--green-dark);
   font-size: .76rem;
   font-weight: 950;
   text-transform: uppercase;
@@ -2733,7 +3370,7 @@ h1, h2, h3 { line-height: 1.12; }
 .source-strip a,
 .related-card a {
   padding: 10px 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--paper);
   border: 1px solid var(--line);
   text-decoration: none;
@@ -2754,9 +3391,10 @@ h1, h2, h3 { line-height: 1.12; }
   font-weight: 850;
 }
 input[type="search"], select {
+  min-width: 0;
   min-height: 46px;
   border: 1px solid var(--line);
-  border-radius: 15px;
+  border-radius: 8px;
   background: var(--paper);
   padding: 10px 12px;
   font: inherit;
@@ -2797,6 +3435,10 @@ input[type="search"], select {
   gap: 14px;
   margin: 24px 0;
 }
+
+.run-cards article {
+  min-width: 0;
+}
 .briefing-card.highlight {
   grid-column: span 1;
   background: var(--ink);
@@ -2804,6 +3446,9 @@ input[type="search"], select {
 }
 .briefing-card.highlight p,
 .briefing-card.highlight .card-number { color: var(--paper); }
+.briefing-card.highlight .card-number {
+  background: rgba(255, 255, 255, .16);
+}
 
 .big-list {
   margin: 0;
@@ -2821,7 +3466,7 @@ input[type="search"], select {
 }
 .tab-button {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 10px 13px;
   background: var(--paper);
   cursor: pointer;
@@ -2856,7 +3501,7 @@ input[type="search"], select {
   align-items: center;
   padding: 18px;
   border-radius: var(--radius-lg);
-  background: rgba(255, 250, 240, .76);
+  background: rgba(255, 255, 255, .86);
   border: 1px solid var(--line);
 }
 .layer span {
@@ -2865,13 +3510,20 @@ input[type="search"], select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 18px;
+  border-radius: 8px;
   background: var(--green-soft);
   color: var(--green-dark);
   font-weight: 950;
 }
 .layer h2,
 .timeline h2 { margin: 0; }
+.layer h2 small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 750;
+}
 .layer p,
 .timeline p { margin: 0; color: var(--muted); }
 
@@ -2886,7 +3538,7 @@ input[type="search"], select {
 .table-card {
   padding: 26px;
   border-radius: var(--radius-xl);
-  background: rgba(255, 250, 240, .76);
+  background: rgba(255, 255, 255, .82);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
@@ -2901,21 +3553,29 @@ th, td {
   vertical-align: top;
 }
 th { color: var(--clay); }
+thead th { background: var(--paper-strong); }
 
 pre {
   position: relative;
   overflow: auto;
+  max-width: 100%;
   padding: 18px;
-  border-radius: 18px;
-  background: #16201c;
+  border-radius: 8px;
+  background: #101828;
   color: #f4fbf5;
+}
+
+pre code {
+  display: inline-block;
+  min-width: max-content;
+  white-space: pre;
 }
 .copy-code {
   position: absolute;
   top: 10px;
   right: 10px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 6px 10px;
   background: var(--green);
   color: white;
@@ -2925,7 +3585,7 @@ pre {
 .copy-example {
   justify-self: start;
   border: 0;
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 10px 14px;
   background: var(--green-dark);
   color: white;
@@ -2936,16 +3596,19 @@ pre {
   display: grid;
   grid-template-columns: .8fr 1.2fr;
   gap: 24px;
+  min-width: 0;
 }
 .example-builder {
   display: grid;
   gap: 12px;
+  min-width: 0;
 }
 .example-builder label {
   display: grid;
   gap: 6px;
   color: var(--muted);
   font-weight: 850;
+  min-width: 0;
 }
 .example-output { min-height: 250px; margin: 0; }
 
@@ -2972,7 +3635,7 @@ pre {
 .chapter-card {
   padding: 18px;
   border-radius: var(--radius-lg);
-  background: rgba(255, 250, 240, .8);
+  background: rgba(255, 255, 255, .86);
   border: 1px solid var(--line);
 }
 .aside-card h2,
@@ -2991,7 +3654,7 @@ pre {
   margin-top: 22px;
   padding: 26px;
   border-radius: var(--radius-xl);
-  background: rgba(255, 250, 240, .62);
+  background: rgba(255, 255, 255, .76);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
@@ -3011,7 +3674,7 @@ pre {
 .source-drawer {
   margin: 34px 0 60px;
   border-radius: var(--radius-xl);
-  background: rgba(255, 250, 240, .78);
+  background: rgba(255, 255, 255, .86);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -3052,7 +3715,7 @@ pre {
   padding: 14px 16px;
   border-left: 5px solid var(--green);
   background: var(--green-soft);
-  border-radius: 0 16px 16px 0;
+  border-radius: 0 8px 8px 0;
 }
 .markdown-body table {
   display: block;
@@ -3062,16 +3725,24 @@ pre {
 .markdown-body :not(pre) > code,
 .site-footer code {
   padding: .12em .34em;
-  border-radius: 7px;
+  border-radius: 6px;
   background: var(--green-soft);
   color: var(--green-dark);
 }
 .missing-link {
   padding: .1em .34em;
-  border-radius: 7px;
+  border-radius: 6px;
   background: #f8e8d6;
   color: #8f3f1d;
   cursor: help;
+}
+
+.term-aside ul {
+  padding-left: 18px;
+}
+
+.term-aside strong {
+  color: var(--ink);
 }
 .empty-state { color: var(--muted); }
 .site-footer {
@@ -3083,13 +3754,19 @@ pre {
   :root { --content: min(100vw - 24px, 760px); }
   .site-header,
   .hero-stage,
+  .workbench-hero,
   .mode-panel,
   .proof-panel,
   .docs-toolbar,
   .example-panel.refined,
   .readable-layout,
   .split-explain,
-  .boundary-table {
+  .boundary-table,
+  .orientation-panel,
+  .architecture-legend,
+  .context-envelope,
+  .ops-lane,
+  .roadmap-brief {
     grid-template-columns: 1fr;
   }
   .truth-orbit { min-height: 420px; }
@@ -3101,7 +3778,13 @@ pre {
   .run-cards,
   .decision-grid,
   .insight-grid,
-  .chapter-grid {
+  .chapter-grid,
+  .principle-grid,
+  .term-grid,
+  .mini-matrix,
+  .legend-grid,
+  .ops-flow,
+  .hero-dashboard {
     grid-template-columns: 1fr;
   }
   .path-card.large { grid-row: auto; }
@@ -3113,7 +3796,38 @@ pre {
   .hero-copy h1,
   .page-hero h1,
   .source-hero h1 {
-    font-size: clamp(2.6rem, 14vw, 4.4rem);
+    font-size: 3rem;
+  }
+  .run-cards article,
+  .example-builder,
+  .example-builder label,
+  .example-output,
+  input[type="search"],
+  select,
+  pre {
+    min-width: 0;
+  }
+  .run-cards pre,
+  .example-output {
+    width: 100%;
+  }
+  .section-heading h2,
+  .mode-copy h2,
+  .story-panel h2,
+  .proof-panel h2,
+  .reading-lane h2,
+  .boundary-table h2,
+  .warning-panel h2,
+  .term-section h2,
+  .html-principles h2,
+  .system-map-panel h2,
+  .orientation-panel h2,
+  .architecture-legend h2,
+  .context-envelope h2,
+  .ops-lane h2,
+  .roadmap-brief h2,
+  .roadmap-matrix h2 {
+    font-size: 2rem;
   }
 }
 """
@@ -3139,6 +3853,39 @@ EXPERIENCE_JS = r"""
   }
   if (searchInput) searchInput.addEventListener("input", filterCards);
 
+  document.querySelectorAll("[data-copy-value]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const original = button.textContent;
+      try {
+        await copyText(button.dataset.copyValue || "");
+        button.textContent = "已复制";
+        setTimeout(() => (button.textContent = original), 1200);
+      } catch (error) {
+        button.textContent = "复制失败";
+        setTimeout(() => (button.textContent = original), 1200);
+      }
+    });
+  });
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+    const ok = document.execCommand("copy");
+    textarea.remove();
+    if (!ok) throw new Error("copy failed");
+  }
+
   document.querySelectorAll("[data-tabs]").forEach((root) => {
     const buttons = Array.from(root.querySelectorAll("[data-tab]"));
     const panels = Array.from(root.querySelectorAll("[data-tab-panel]"));
@@ -3160,7 +3907,7 @@ EXPERIENCE_JS = r"""
     button.addEventListener("click", async () => {
       const text = pre.innerText.replace(/^复制\s*/, "");
       try {
-        await navigator.clipboard.writeText(text);
+        await copyText(text);
         button.textContent = "已复制";
         setTimeout(() => (button.textContent = "复制"), 1200);
       } catch (error) {
@@ -3250,7 +3997,7 @@ EXPERIENCE_JS = r"""
   if (copyExample && output) {
     copyExample.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(output.textContent || "");
+        await copyText(output.textContent || "");
         copyExample.textContent = "已复制";
         setTimeout(() => (copyExample.textContent = "复制示例"), 1200);
       } catch (error) {

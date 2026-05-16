@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RTS | RTS 来源解读</title>
+  <title>RTS 仓库入口 | RTS 来源解读</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -11,29 +11,37 @@
     <a class="brand-mark" href="index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="index.html">首页</a>
-      <a class="nav-link" href="start-here.html">三分钟读懂</a>
-      <a class="nav-link" href="architecture.html">架构边界</a>
+      <a class="nav-link" href="start-here.html">项目概览</a>
+      <a class="nav-link" href="architecture.html">KB 与投影</a>
       <a class="nav-link" href="library.html">来源文档</a>
     </nav>
   </header>
   <main class="source-page">
     <section class="source-hero">
-      <p class="kicker">Entry · README.md</p>
-      <h1>RTS</h1>
-      <p>repository entry for RTS dual-core baseline, operational docs, and supporting references</p>
+      <p class="kicker">入口 · README.md</p>
+      <h1>RTS 仓库入口</h1>
+      <p>RTS 仓库入口，指向 KB、runtime projection、运行手册和参考材料。</p>
       <div class="hero-actions">
-        <a class="button primary" href="#readable">先读解读版</a>
-        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
         <a class="button ghost" href="../README.md">Markdown 源文件</a>
       </div>
     </section>
 
-    <section class="readable-layout" id="readable">
+      <section class="readable-layout" id="readable">
       <aside class="readable-aside">
         <div class="aside-card">
-          <p class="kicker">How To Read</p>
-          <h2>这不是原文搬运页</h2>
-          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
         </div>
         <div class="aside-card">
       <p class="kicker">适合阅读</p>
@@ -46,28 +54,28 @@
     </div>
         <div class="aside-card related-card">
       <p class="kicker">关联来源</p>
-      <a href="README.html">RTS</a><a href="docs/confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a>
+      <a href="README.html">RTS 仓库入口</a><a href="docs/confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a>
     </div>
       </aside>
       <div class="readable-main">
         <section class="insight-grid">
           <article class="insight-card">
-          <h2>这篇的作用</h2>
-          <p>repository entry for RTS dual-core baseline, operational docs, and supporting references</p>
+          <h2>文档定位</h2>
+          <p>RTS 仓库入口，指向 KB、runtime projection、运行手册和参考材料。</p>
         </article>
 <article class="insight-card">
-          <h2>先抓住</h2>
-          <p>RTS（Rule Truth Source / Transformation Rule System）是面向银行报文转换场景的双核心服务： 它不是静态文档库、普通 RAG 问答机器人，也不是某个固定 agent SDK 的包装。RTS 的核心职责是从尽可能准确和充分的 source 中整理 transformation rules，通过 AI-first review、人工最终裁决和 signoff 形成可信规则真相，并按权限把这些真相能力和受控分析能力提供给系统、人和 agent 使用。</p>
+          <h2>核心摘要</h2>
+          <p>RTS 仓库入口，指向 KB、runtime projection、运行手册和参考材料。</p>
         </article>
 <article class="insight-card">
           <h2>权威层级</h2>
-          <p>Entry / role: entry / layer: 1</p>
+          <p>入口 / role: entry / layer: 1</p>
         </article>
         </section>
         <section class="chapter-section">
           <div class="section-heading">
-            <p class="kicker">Readable Outline</p>
-            <h2>这篇文档在讲什么</h2>
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
           </div>
           <div class="chapter-grid">
             <article class="chapter-card">
@@ -93,8 +101,8 @@
 
     <details class="source-drawer" id="source">
       <summary>
-        <span>完整 Markdown 来源</span>
-        <strong>用于核对事实、字段和原始措辞</strong>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
       </summary>
       <div class="markdown-body">
         <h1 id="rts">RTS<a class="headerlink" href="#rts" title="Permanent link">#</a></h1>

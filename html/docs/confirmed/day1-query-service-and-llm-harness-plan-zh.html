@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RTS Day1 Query Service And Controlled LLM Harness | RTS 来源解读</title>
+  <title>Day1 查询服务与 AI 辅助计划 | RTS 来源解读</title>
   <link rel="stylesheet" href="../../assets/styles.css">
 </head>
 <body>
@@ -11,29 +11,37 @@
     <a class="brand-mark" href="../../index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="../../index.html">首页</a>
-      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
-      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../start-here.html">项目概览</a>
+      <a class="nav-link" href="../../architecture.html">KB 与投影</a>
       <a class="nav-link" href="../../library.html">来源文档</a>
     </nav>
   </header>
   <main class="source-page">
     <section class="source-hero">
-      <p class="kicker">Confirmed Baseline · docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md</p>
-      <h1>RTS Day1 Query Service And Controlled LLM Harness</h1>
-      <p>compact Day1 RTS query/tool service and controlled LLM harness baseline</p>
+      <p class="kicker">已确认基线 · docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md</p>
+      <h1>Day1 查询服务与 AI 辅助计划</h1>
+      <p>Day1 查询服务、工具接口和基础 AI 辅助能力的实现计划。</p>
       <div class="hero-actions">
-        <a class="button primary" href="#readable">先读解读版</a>
-        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
         <a class="button ghost" href="../../../docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md">Markdown 源文件</a>
       </div>
     </section>
 
-    <section class="readable-layout" id="readable">
+      <section class="readable-layout" id="readable">
       <aside class="readable-aside">
         <div class="aside-card">
-          <p class="kicker">How To Read</p>
-          <h2>这不是原文搬运页</h2>
-          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
         </div>
         <div class="aside-card">
       <p class="kicker">适合阅读</p>
@@ -49,28 +57,28 @@
     </div>
         <div class="aside-card related-card">
       <p class="kicker">关联来源</p>
-      <a href="kb-to-index-projection-contract-zh.html">KB-to-Index Runtime Projection Contract</a><a href="system-constitution-v1.html">RTS Constitution v2</a>
+      <a href="kb-to-index-projection-contract-zh.html">KB 到索引的运行时投影契约</a><a href="system-constitution-v1.html">RTS 系统宪法 v2</a>
     </div>
       </aside>
       <div class="readable-main">
         <section class="insight-grid">
           <article class="insight-card">
-          <h2>这篇的作用</h2>
-          <p>compact Day1 RTS query/tool service and controlled LLM harness baseline</p>
+          <h2>文档定位</h2>
+          <p>Day1 查询服务、工具接口和基础 AI 辅助能力的实现计划。</p>
         </article>
 <article class="insight-card">
-          <h2>先抓住</h2>
-          <p>&gt; 状态：confirmed compact baseline &gt; 压缩日期：2026-05-08 &gt; 原完整长版：docs/archive/reference-proposals/day1-query-service-and-llm-harness-plan-zh.md Day1 交付的是 RTS 双核心栈中的第一版可运行 baseline： Day1 的目标不是完整 agentic RAG，也不是重型企业搜索平台，而是在同一个 truth boundary 内同时立住两件事：一是稳定的受控真相源原子能力面，二是第一版可审计的 managed LLM 分析入口。Day1 不要求所有场景都成熟，但它不能把 AI 长期写成可有可无的整理层。</p>
+          <h2>核心摘要</h2>
+          <p>Day1 查询服务、工具接口和基础 AI 辅助能力的实现计划。</p>
         </article>
 <article class="insight-card">
           <h2>权威层级</h2>
-          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+          <p>已确认基线 / role: leaf / layer: 3</p>
         </article>
         </section>
         <section class="chapter-section">
           <div class="section-heading">
-            <p class="kicker">Readable Outline</p>
-            <h2>这篇文档在讲什么</h2>
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
           </div>
           <div class="chapter-grid">
             <article class="chapter-card">
@@ -124,8 +132,8 @@
 
     <details class="source-drawer" id="source">
       <summary>
-        <span>完整 Markdown 来源</span>
-        <strong>用于核对事实、字段和原始措辞</strong>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
       </summary>
       <div class="markdown-body">
         <h1 id="rts-day1-query-service-and-controlled-llm-harness">RTS Day1 Query Service And Controlled LLM Harness<a class="headerlink" href="#rts-day1-query-service-and-controlled-llm-harness" title="Permanent link">#</a></h1>

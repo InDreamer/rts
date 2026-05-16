@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>运行与调用 | RTS</title>
+  <title>如何使用 | RTS</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -11,39 +11,53 @@
     <a class="brand-mark" href="index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="index.html">首页</a>
-<a class="nav-link" href="start-here.html">三分钟读懂</a>
-<a class="nav-link" href="architecture.html">架构边界</a>
-<a class="nav-link active" href="operations.html">运行与调用</a>
-<a class="nav-link" href="roadmap.html">路线图</a>
+<a class="nav-link" href="start-here.html">项目概览</a>
+<a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link active" href="operations.html">如何使用</a>
+<a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
     </nav>
   </header>
   <main>
     <section class="page-hero">
-      <p class="kicker">RTS Reading Experience</p>
-      <h1>运行与调用</h1>
-      <p>把启动、验证、API 调用和常见误区放在一条可执行路径里。</p>
+      <p class="kicker">RTS 项目介绍</p>
+      <h1>如何使用</h1>
+      <p>本地服务和 API 通过 runtime projection 读取已发布规则，并返回 facts、citations、trace 或 refusal。</p>
     </section>
     
+    <section class="ops-lane">
+      <div class="section-heading compact">
+        <p class="kicker">如何使用</p>
+        <h2>使用 RTS 的前提，是先有一份 runtime projection。</h2>
+        <p>稳定入口是 projection store：它定义当前 release、可用 scope、可查询对象和事实正文位置。</p>
+      </div>
+      <div class="ops-flow">
+        <article><span>1</span><strong>选择 release</strong><p>active-release 指向当前服务应该使用的规则版本。</p></article>
+        <article><span>2</span><strong>解析 scope</strong><p>channel/product/pack/domain 防止相似规则串用。</p></article>
+        <article><span>3</span><strong>读取 L2</strong><p>事实回答回到结构化规则正文和依赖关系。</p></article>
+        <article><span>4</span><strong>留下 trace</strong><p>记录这次查询读了什么，方便复盘和审计。</p></article>
+      </div>
+    </section>
+
     <section class="run-cards">
       <article>
         <span class="card-number">01</span>
-        <h2>本地启动</h2>
-        <p>默认使用 sample runtime projection store。服务不直接读取 KB/candidate pack 作为 truth。</p>
+        <h2>本地 demo 启动</h2>
+        <p>当前 demo 使用 sample runtime projection store。它展示的是“服务读取 projection”，不是直接读取 KB 草稿。</p>
         <pre><code>RTS_STORE_ROOT="$PWD/sample-projection/runtime-store" \
 JAVA_HOME=$(/usr/libexec/java_home -v 17) \
 mvn spring-boot:run</code></pre>
       </article>
       <article>
         <span class="card-number">02</span>
-        <h2>快速验证</h2>
-        <p>先看 MCP 工具清单，再用当前 active release 的 photo scope 查询。</p>
+        <h2>先验证服务面</h2>
+        <p>先查看可用工具或 API，再使用当前 active release 的 sample scope 查询。</p>
         <pre><code>curl -s http://localhost:8080/mcp/tools | jq</code></pre>
       </article>
       <article>
         <span class="card-number">03</span>
-        <h2>提交前检查</h2>
-        <p>运行测试和 diff 检查，避免把运行配置或格式问题带进提交。</p>
+        <h2>确认变更可发布</h2>
+        <p>如果修改了文档、projection 或服务代码，提交前至少要跑测试和格式检查。</p>
         <pre><code>JAVA_HOME=$(/usr/libexec/java_home -v 17) mvn verify
 git diff --check
 git status --short</code></pre>
@@ -52,15 +66,15 @@ git status --short</code></pre>
 
     <section class="example-panel refined" id="examples">
       <div>
-        <p class="kicker">Try It</p>
-        <h2>选择场景，生成可复制请求。</h2>
-        <p>这个示例生成器是为了降低调用门槛。它不会修改服务状态，也不会替代 API guide。</p>
+        <p class="kicker">调用示例</p>
+        <h2>看服务如何消费 projection。</h2>
+        <p>下面的请求只是 demo 入口。重点是：请求会带 scope，服务会从当前 projection 中找对象、读 L2、返回 facts/citations/trace。</p>
       </div>
       <div class="example-builder">
         <label>入口
           <select id="example-endpoint">
             <option value="query">/api/v1/query deterministic 查询</option>
-            <option value="ask">/api/v1/ask managed analysis</option>
+            <option value="ask">/api/v1/ask AI 辅助问答</option>
             <option value="scenario">/api/v1/scenario/analyze-failed-message</option>
             <option value="mcp">/mcp/tools 工具清单</option>
           </select>
@@ -76,13 +90,73 @@ git status --short</code></pre>
       </div>
     </section>
 
+    <section class="term-section" id="glossary">
+      <div class="section-heading compact">
+        <p class="kicker">Glossary · 术语解释</p>
+        <h2>使用时会遇到的英文词</h2>
+        <p>这些词会出现在 projection 包、API 请求、响应和 trace 中。</p>
+      </div>
+      <div class="term-grid">
+        <article class="term-card">
+          <strong>RTS</strong>
+          <span>Rule Truth Source / Transformation Rule System</span>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的规则知识基础。</p>
+        </article>
+<article class="term-card">
+          <strong>KB</strong>
+          <span>Knowledge Base，规则知识库</span>
+          <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
+        </article>
+<article class="term-card">
+          <strong>Rule Pack</strong>
+          <span>规则包</span>
+          <p>按业务范围组织的一组 rule、lookup、helper，是整理、review 和发布的基本单位。</p>
+        </article>
+<article class="term-card">
+          <strong>Runtime Projection</strong>
+          <span>运行时投影</span>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+        </article>
+<article class="term-card">
+          <strong>L2 Runtime Object</strong>
+          <span>L2 运行时规则对象</span>
+          <p>runtime projection 中最重要的事实正文，保存服务可读的结构化规则逻辑。</p>
+        </article>
+<article class="term-card">
+          <strong>Object Card</strong>
+          <span>对象卡片</span>
+          <p>用于定位、消歧和召回规则对象；它帮助找到 L2，但不能替代 L2。</p>
+        </article>
+<article class="term-card">
+          <strong>Release Manifest</strong>
+          <span>发布清单</span>
+          <p>说明当前 projection 来自哪里、包含什么、是否可用，以及出现问题时如何回滚。</p>
+        </article>
+<article class="term-card">
+          <strong>Scope</strong>
+          <span>业务范围</span>
+          <p>通常由 channel、product、pack、domain 组成，用来防止相似规则被串用。</p>
+        </article>
+<article class="term-card">
+          <strong>Dependency</strong>
+          <span>规则依赖</span>
+          <p>描述 rule、lookup、helper 之间的关系，是解释影响面和测试范围的基础。</p>
+        </article>
+<article class="term-card">
+          <strong>Governance View</strong>
+          <span>治理视图</span>
+          <p>在权限允许时展示 evidence、review、open question、risk 和 signoff 信息。</p>
+        </article>
+      </div>
+    </section>
+
     <section class="warning-panel">
-      <h2>调用时最容易踩的坑</h2>
+      <h2>介绍和使用时最容易误解的点</h2>
       <ul class="big-list compact">
-        <li><strong>scope 不完整</strong>：channel/product/pack/domain 必须属于当前 active release。</li>
-        <li><strong>字段名写错</strong>：请求 body 使用 snake_case，不要用 camelCase。</li>
-        <li><strong>LLM 不可用</strong>：/ask 会降级为结构化信息提供服务，不应被描述成等价 managed analysis。</li>
-        <li><strong>candidate 被误用</strong>：scenario 输出不是 release approval、final root cause 或 QA signoff。</li>
+        <li><strong>HTML 只是介绍层</strong>：项目核心是 KB 和 runtime projection。</li>
+        <li><strong>Projection 不是摘要</strong>：它必须保留 L2 结构化规则语义。</li>
+        <li><strong>搜索结果不是事实</strong>：card、L0/L1、index document 只负责定位对象。</li>
+        <li><strong>AI 是消费层能力</strong>：分析和表达必须基于规则知识与运行包。</li>
       </ul>
     </section>
 
@@ -90,12 +164,13 @@ git status --short</code></pre>
       <p class="kicker">主要来源</p>
       <a href="docs/java-service-runbook-zh.html">Runbook</a>
 <a href="docs/api-caller-guide-zh.html">API Guide</a>
+<a href="docs/confirmed/runtime-projection-product-guide-zh.html">Runtime Projection 产品说明</a>
 <a href="docs/day1-sample-pack-test-commands.html">Sample Commands</a>
     </section>
     
   </main>
   <footer class="site-footer">
-    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+    <p>本页根据项目文档重组表达；需要逐字核对时请进入来源文档页。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>

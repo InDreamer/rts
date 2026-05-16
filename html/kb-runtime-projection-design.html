@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTS KB 与 Runtime Projection 设计说明</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #607087;
+      --soft: #f4f7fa;
+      --paper: #ffffff;
+      --line: #d9e2ec;
+      --blue: #2457a6;
+      --green: #0f766e;
+      --amber: #b7791f;
+      --rose: #b42318;
+      --purple: #6b46c1;
+      --shadow: 0 22px 70px rgba(31, 45, 61, .11);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #eef4f8 0%, #fbfcfe 34%, #ffffff 100%);
+      line-height: 1.65;
+    }
+
+    a { color: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px clamp(20px, 4vw, 56px);
+      background: rgba(255, 255, 255, .88);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(217, 226, 236, .8);
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: .02em;
+      text-decoration: none;
+      color: var(--blue);
+      white-space: nowrap;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+
+    .nav a:hover { background: var(--soft); color: var(--ink); }
+
+    main {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 54px 0 88px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .72fr);
+      gap: 34px;
+      align-items: stretch;
+      margin-bottom: 30px;
+    }
+
+    .hero-copy,
+    .intro-card,
+    .panel,
+    .card,
+    .term-card,
+    .note,
+    .chapter-nav {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy { padding: clamp(30px, 5vw, 58px); }
+
+    .kicker {
+      margin: 0 0 12px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 14px;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .hero-text {
+      margin-bottom: 26px;
+      color: #46566d;
+      font-size: 18px;
+      max-width: 780px;
+    }
+
+    .hero-actions,
+    .source-links,
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-weight: 750;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .button.primary {
+      border-color: #214f96;
+      background: #214f96;
+      color: white;
+    }
+
+    .intro-card {
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .chapter-nav {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 1px;
+      padding: 8px;
+      margin: 24px 0 34px;
+      background: #e6edf4;
+      box-shadow: none;
+    }
+
+    .chapter-nav a {
+      display: block;
+      min-height: 74px;
+      padding: 12px;
+      background: #fff;
+      border-radius: 7px;
+      text-decoration: none;
+    }
+
+    .chapter-nav span {
+      display: block;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .chapter-nav strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+      line-height: 1.22;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 18px;
+      margin: 22px 0;
+    }
+
+    .grid-2 > *,
+    .grid-3 > * {
+      min-width: 0;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .panel {
+      padding: clamp(24px, 4vw, 38px);
+      margin: 24px 0;
+    }
+
+    .card {
+      padding: 22px;
+      box-shadow: none;
+      min-width: 0;
+    }
+
+    .card p,
+    .panel p,
+    .term-card p,
+    li {
+      color: #4f6075;
+    }
+
+    .label,
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #e8f4f1;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .label { margin-bottom: 14px; }
+    .tag.blue { background: #e9f1ff; color: var(--blue); }
+    .tag.amber { background: #fff4df; color: var(--amber); }
+    .tag.rose { background: #fff0ee; color: var(--rose); }
+    .tag.purple { background: #f3edff; color: var(--purple); }
+
+    .diagram-wrap {
+      overflow-x: auto;
+      padding: 8px 0 2px;
+      max-width: 100%;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      min-width: 860px;
+      height: auto;
+    }
+
+    .flow-box { fill: #ffffff; stroke: #c9d6e2; stroke-width: 1.4; rx: 8; }
+    .flow-box.kb { fill: #eef8f6; stroke: #0f766e; }
+    .flow-box.projection { fill: #eef3ff; stroke: #2457a6; }
+    .flow-box.service { fill: #fff7ed; stroke: #b7791f; }
+    .flow-title { fill: #172033; font-size: 16px; font-weight: 800; }
+    .flow-sub { fill: #637083; font-size: 12px; }
+    .arrow { stroke: #8190a5; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .boundary { fill: none; stroke: #b8c6d4; stroke-width: 1.2; stroke-dasharray: 8 6; rx: 12; }
+    .boundary-label { fill: #607087; font-size: 12px; font-weight: 800; }
+
+    table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f6f9fc;
+      color: #2a3850;
+      font-size: 13px;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #eef3f8;
+      color: #1f4f8f;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: .92em;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 14px 0 0;
+      width: 100%;
+      max-width: 100%;
+      padding: 16px;
+      overflow-x: auto;
+      border: 1px solid #d6e1eb;
+      border-radius: 8px;
+      background: #f7fafc;
+      color: #334155;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.62;
+    }
+
+    details {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 12px 14px;
+      color: var(--blue);
+      font-weight: 800;
+      user-select: none;
+    }
+
+    details > div { padding: 0 14px 14px; }
+
+    .term-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .term-card {
+      padding: 18px;
+      box-shadow: none;
+    }
+
+    .term-card strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .term-card span {
+      display: block;
+      margin: 4px 0 8px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .note {
+      padding: 18px 20px;
+      border-left: 5px solid var(--amber);
+      box-shadow: none;
+      background: #fffaf0;
+    }
+
+    .note.green { border-left-color: var(--green); background: #f0fdfa; }
+    .note.blue { border-left-color: var(--blue); background: #eff6ff; }
+    .note.rose { border-left-color: var(--rose); background: #fff3f1; }
+
+    .stepper {
+      position: relative;
+      margin: 20px 0 0;
+      padding-left: 32px;
+    }
+
+    .stepper::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--line);
+    }
+
+    .step {
+      position: relative;
+      margin-bottom: 18px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .step::before {
+      content: attr(data-step);
+      position: absolute;
+      left: -32px;
+      top: 16px;
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .source-links { margin-top: 16px; }
+
+    .source-links a {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--blue);
+      background: #fff;
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .chapter-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 880px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .nav { justify-content: flex-start; }
+      main { width: min(100% - 28px, 1180px); padding-top: 30px; }
+      .hero,
+      .grid-2,
+      .grid-3,
+      .term-grid,
+      .chapter-nav {
+        grid-template-columns: 1fr;
+      }
+      .hero-copy { padding: 28px 22px; }
+      h1 { font-size: 36px; }
+      .diagram-wrap svg { width: 100%; min-width: 0; }
+      th, td { padding: 12px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">RTS</a>
+    <nav class="nav" aria-label="页面导航">
+      <a href="index.html">首页</a>
+      <a href="#pack">Pack</a>
+      <a href="#objects">真实对象</a>
+      <a href="#projection">Projection</a>
+      <a href="#walkthrough">查询演练</a>
+      <a href="#glossary">术语</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="kicker">RTS KB / Runtime Projection Handbook</p>
+        <h1>用一个真实规则包，看懂 KB 和 runtime projection 为什么要这样设计。</h1>
+        <p class="hero-text">本页使用当前项目里的 <strong>Tradition -> Stella FXD.NDF cutoff-fixing</strong> 规则包说明：规则如何进入 KB，如何被治理和 signoff，如何发布成 runtime projection，最后服务如何用 L2、dependency 和 trace 给出可复盘的答案。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#pack">从真实 Pack 开始</a>
+          <a class="button" href="#objects">看 Rule / Lookup / Helper</a>
+          <a class="button" href="#walkthrough">看一次查询怎么走</a>
+        </div>
+      </div>
+      <aside class="intro-card" aria-label="当前示例">
+        <div class="metric">
+          <span>示例 Pack</span>
+          <strong>tradition-to-stella-fxd-ndf-cutoff-fixing-split</strong>
+        </div>
+        <div class="metric">
+          <span>当前 Runtime Release</span>
+          <strong>rel-2026-05-06-photo-fxd-ndf-cutoff</strong>
+        </div>
+        <div class="metric">
+          <span>这个包里有什么</span>
+          <strong>6 rules / 1 lookup / 1 helper</strong>
+        </div>
+      </aside>
+    </section>
+
+    <nav class="chapter-nav" aria-label="章节导航">
+      <a href="#flow"><span>01</span><strong>规则旅程</strong></a>
+      <a href="#pack"><span>02</span><strong>Pack 结构</strong></a>
+      <a href="#objects"><span>03</span><strong>真实对象</strong></a>
+      <a href="#projection"><span>04</span><strong>运行包</strong></a>
+      <a href="#layers"><span>05</span><strong>L0/L1/L2</strong></a>
+      <a href="#walkthrough"><span>06</span><strong>查询演练</strong></a>
+    </nav>
+
+    <section class="panel" id="flow">
+      <p class="kicker">One Rule's Journey</p>
+      <h2>一条规则从原始材料到服务回答，中间经过四个稳定边界。</h2>
+      <p>这比“把文件丢给搜索或 AI”慢一点，但好处是每个答案都能说明：来自哪个 release、属于哪个 scope、读了哪个 L2 对象、依赖了哪个 lookup/helper、是否留下 trace。</p>
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 1120 430" role="img" aria-label="RTS 规则发布与读取流程">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+              <path d="M0,0 L10,4 L0,8 Z" fill="#8190a5"></path>
+            </marker>
+          </defs>
+          <rect class="boundary" x="22" y="42" width="496" height="310"></rect>
+          <text class="boundary-label" x="42" y="36">KB / Truth Governance Surface</text>
+          <rect class="boundary" x="598" y="42" width="500" height="310"></rect>
+          <text class="boundary-label" x="620" y="36">Runtime Truth Access Boundary</text>
+
+          <rect class="flow-box" x="54" y="90" width="170" height="94"></rect>
+          <text class="flow-title" x="78" y="124">Source Materials</text>
+          <text class="flow-sub" x="78" y="151">Excel / Java / XSLT</text>
+          <text class="flow-sub" x="78" y="169">业务文档 / 测试</text>
+
+          <rect class="flow-box kb" x="306" y="82" width="184" height="110"></rect>
+          <text class="flow-title" x="332" y="118">KB Pack</text>
+          <text class="flow-sub" x="332" y="145">rules / lookups / helpers</text>
+          <text class="flow-sub" x="332" y="164">evidence / review / reports</text>
+
+          <rect class="flow-box projection" x="634" y="82" width="216" height="110"></rect>
+          <text class="flow-title" x="660" y="118">Runtime Projection</text>
+          <text class="flow-sub" x="660" y="145">release / scope / manifest</text>
+          <text class="flow-sub" x="660" y="164">cards / L2 / dependency</text>
+
+          <rect class="flow-box service" x="918" y="90" width="152" height="94"></rect>
+          <text class="flow-title" x="940" y="124">RTS Service</text>
+          <text class="flow-sub" x="940" y="151">query / API / trace</text>
+
+          <path class="arrow" d="M224 137 L306 137"></path>
+          <path class="arrow" d="M490 137 L634 137"></path>
+          <path class="arrow" d="M850 137 L918 137"></path>
+
+          <rect class="flow-box kb" x="72" y="256" width="176" height="64"></rect>
+          <text class="flow-title" x="96" y="284">治理判断</text>
+          <text class="flow-sub" x="96" y="306">demo_signoff / review</text>
+
+          <rect class="flow-box kb" x="322" y="256" width="168" height="64"></rect>
+          <text class="flow-title" x="346" y="284">发布条件</text>
+          <text class="flow-sub" x="346" y="306">schema / dependency / hash</text>
+
+          <rect class="flow-box projection" x="662" y="256" width="168" height="64"></rect>
+          <text class="flow-title" x="686" y="284">召回入口</text>
+          <text class="flow-sub" x="686" y="306">object card / L0 / L1</text>
+
+          <rect class="flow-box projection" x="906" y="256" width="164" height="64"></rect>
+          <text class="flow-title" x="930" y="284">事实落点</text>
+          <text class="flow-sub" x="930" y="306">L2 / dependency / trace</text>
+
+          <path class="arrow" d="M248 288 L322 288"></path>
+          <path class="arrow" d="M490 288 L662 288"></path>
+          <path class="arrow" d="M830 288 L906 288"></path>
+        </svg>
+      </div>
+    </section>
+
+    <section class="panel" id="pack">
+      <p class="kicker">KB Pack Structure</p>
+      <h2>KB 不是一堆长文档，而是一个带治理侧面的规则包。</h2>
+      <p>这个 FXD.NDF pack 的主对象很薄：rule、lookup、helper 只承载稳定逻辑和例子。证据、review、closure report 被放在侧面目录里，避免每条规则都塞满历史讨论。</p>
+      <div class="grid-2">
+        <article class="card">
+          <span class="label">主对象层：转换做什么</span>
+          <p><code>rules/</code> 保存 6 条 target rule，<code>lookups/</code> 保存 cutoff lookup，<code>helpers/</code> 保存 quoted currency pair 的复用逻辑。</p>
+          <div class="tag-row">
+            <span class="tag blue">rules/6</span>
+            <span class="tag">lookups/1</span>
+            <span class="tag amber">helpers/1</span>
+          </div>
+        </article>
+        <article class="card">
+          <span class="label">治理侧面：为什么可信</span>
+          <p><code>evidence/</code> 指向来源材料，<code>review/</code> 记录歧义和结论，<code>reports/</code> 保留 extraction、checklist 和 closure。</p>
+          <div class="tag-row">
+            <span class="tag purple">evidence</span>
+            <span class="tag purple">review</span>
+            <span class="tag purple">reports</span>
+          </div>
+        </article>
+      </div>
+      <details open>
+        <summary>查看这个 pack 的真实目录</summary>
+        <div>
+          <pre>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/
+├── metadata.yaml
+├── rules/
+│   ├── rule_fxd_ndf_fixing_block.yaml
+│   ├── rule_fxd_ndf_fixing_date.yaml
+│   ├── rule_fxd_ndf_fixing_quoted_currency_pair.yaml
+│   ├── rule_fxd_ndf_fixing_time.yaml
+│   ├── rule_fxd_ndf_primary_rate_source.yaml
+│   └── rule_fxd_ndf_secondary_rate_source.yaml
+├── lookups/lk_fxd_ndf_cutoff_by_pair_and_locode.yaml
+├── helpers/hlp_fxd_ndf_fixing_quoted_currency_pair.yaml
+├── evidence/evidence-index.yaml
+├── review/review-index.yaml
+└── reports/{extraction-report,review-checklist,closure-check}.md</pre>
+        </div>
+      </details>
+      <div class="note green">
+        <h3>Scope 是安全边界，不只是筛选条件。</h3>
+        <p>这个 pack 的 scope 是 <code>Tradition -> Stella / FXD.NDF / cutoff-fixing</code>。相似字段可能出现在 FXO 或其他 product 里，scope 先收窄，才能避免“看起来像但其实错”的规则被拿来回答。</p>
+      </div>
+    </section>
+
+    <section class="panel" id="objects">
+      <p class="kicker">Real Objects</p>
+      <h2>用三类真实对象看 KB 的颗粒度。</h2>
+      <p>这一部分展示 rule、lookup、helper 的真实逻辑和例子，是规则包从概念进入项目实物的关键。</p>
+      <div class="grid-3">
+        <article class="card">
+          <span class="label">Rule</span>
+          <h3>primary rate source 规则</h3>
+          <p><code>rule_fxd_ndf_primary_rate_source</code> 读取 fixing currency pair 和 cutoff code，通过 shared cutoff lookup 得到 <code>RTRS</code> 和 <code>TAIFX1</code>。</p>
+          <details>
+            <summary>查看规则片段</summary>
+            <div>
+              <pre>inputs:
+  fixing_currency1: USD
+  fixing_currency2: TWD
+  cutoff_code: TW
+logic:
+  lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+  return_field:
+    - hedge_primary_source
+    - hedge_primary_source_page
+target:
+  fixing/primaryRateSource/rateSource
+  fixing/primaryRateSource/rateSourcePage
+result:
+  RTRS / TAIFX1</pre>
+            </div>
+          </details>
+        </article>
+        <article class="card">
+          <span class="label">Lookup</span>
+          <h3>cutoff lookup</h3>
+          <p><code>lk_fxd_ndf_cutoff_by_pair_and_locode</code> 先用 forward pair 查 <code>USDTWD|TW</code>，必要时再 reverse fallback。</p>
+          <details>
+            <summary>查看 lookup 逻辑</summary>
+            <div>
+              <pre>pipeline:
+  concat(ccy1, ccy2) -> forward_pair
+  compose("{forward_pair}|{cutoff_code}")
+  lookup(forward_key) -> forward_result
+  concat(ccy2, ccy1) -> reverse_pair
+  lookup(reverse_key) -> reverse_result
+  coalesce(forward_result, reverse_result)
+
+sample:
+  USD,TWD,TW -> USDTWD|TW -> forward hit
+  TWD,USD,TW -> USDTWD|TW -> reverse fallback</pre>
+            </div>
+          </details>
+        </article>
+        <article class="card">
+          <span class="label">Helper</span>
+          <h3>quoted currency pair helper</h3>
+          <p><code>hlp_fxd_ndf_fixing_quoted_currency_pair</code> 判断 quoteBasis 是否等于 source pair，等于时交换 currency 并输出 <code>Currency1PerCurrency2</code>。</p>
+          <details>
+            <summary>查看 helper 逻辑</summary>
+            <div>
+              <pre>source_currency1: USD
+source_currency2: TWD
+source_quote_basis: USDTWD
+
+source_pair = concat(USD, TWD)
+is_inverse_quote = (quote_basis == source_pair)
+
+if true:
+  target_currency1 = TWD
+  target_currency2 = USD
+  target_quote_basis = Currency1PerCurrency2</pre>
+            </div>
+          </details>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="projection">
+      <p class="kicker">Runtime Projection</p>
+      <h2>Projection 是“已批准规则的服务运行包”，不是 KB 摘要。</h2>
+      <p>当前 sample runtime store 的 active release 指向 <code>rel-2026-05-06-photo-fxd-ndf-cutoff</code>。服务不会直接读 KB 草稿，而是从这个 release 的 manifest、scope、object manifest、navigation、L2、dependency 和 governance view 里读取。</p>
+      <div class="grid-2">
+        <article class="card">
+          <span class="label">当前服务指针</span>
+          <pre>{
+  "active_release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "rollback_target_release_id": "rel-2026-05-06",
+  "updated_at": "2026-05-07T00:00:00Z"
+}</pre>
+        </article>
+        <article class="card">
+          <span class="label">当前 scope</span>
+          <pre>{
+  "channel": "tradition",
+  "product": "stella",
+  "pack": "fxd-ndf-cutoff-fixing",
+  "domain": "cutoff-fixing",
+  "permission_boundary": "demo-signoff-photo"
+}</pre>
+        </article>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>运行包区域</th>
+            <th>它在产品上回答什么</th>
+            <th>边界</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>active-release.json</code></td><td>现在服务运行哪一版？</td><td>是指针，不是规则事实。</td></tr>
+          <tr><td><code>release-manifest.json</code></td><td>这版从哪里来，能不能用？</td><td>manifest 无效就没有 runtime truth。</td></tr>
+          <tr><td><code>scopes.jsonl</code></td><td>问题属于哪个业务范围？</td><td>scope 先行，不能全文搜索先行。</td></tr>
+          <tr><td><code>object-manifest.jsonl</code></td><td>有哪些 released 对象？</td><td>确定性查找优先从这里开始。</td></tr>
+          <tr><td><code>navigation/</code></td><td>不知道精确 id 时怎么找到对象？</td><td>card / L0 / L1 是入口，不是最终事实。</td></tr>
+          <tr><td><code>l2/</code></td><td>规则到底怎么做？</td><td>事实回答必须回到 L2。</td></tr>
+          <tr><td><code>dependencies/</code></td><td>rule 依赖哪个 lookup/helper？</td><td>用于解释、影响分析和测试规划。</td></tr>
+          <tr><td><code>governance/</code></td><td>为什么可信？哪里有风险？</td><td>按权限展开，不混进默认 operational answer。</td></tr>
+          <tr><td><code>traces/</code></td><td>这次回答读了什么？</td><td>用于复盘，不反写 truth。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel" id="layers">
+      <p class="kicker">L0 / L1 / L2</p>
+      <h2>同一个规则对象，会被投影成不同精度的读取视图。</h2>
+      <p>L0/L1 是为了低成本找到对象和消歧，L2 才是服务回答事实时必须读取的结构化规则正文。</p>
+      <div class="grid-3">
+        <article class="card">
+          <span class="label">L0</span>
+          <h3>极短候选摘要</h3>
+          <p>帮助快速判断“这个对象可能相关”。</p>
+          <pre>primary rate source
+FXD.NDF fixing
+uses cutoff lookup</pre>
+        </article>
+        <article class="card">
+          <span class="label">L1</span>
+          <h3>结构化导航卡片</h3>
+          <p>帮助确认对象、scope、target、依赖和风险。</p>
+          <pre>object_id: rule_fxd_ndf_primary_rate_source
+target_path: fxd.ndf.fixing.primaryRateSource
+dependencies:
+  - lk_fxd_ndf_cutoff_by_pair_and_locode
+state: released</pre>
+        </article>
+        <article class="card">
+          <span class="label">L2</span>
+          <h3>结构化事实正文</h3>
+          <p>保存 inputs、logic pipeline、target binding、examples、content hash。</p>
+          <pre>logic:
+  read currency1/currency2/cutoff_code
+  lookup hedge_primary_source
+  lookup hedge_primary_source_page
+example:
+  USD,TWD,TW -> RTRS / TAIFX1</pre>
+        </article>
+      </div>
+      <div class="note rose">
+        <h3>关键约束</h3>
+        <p>如果只有 L0/L1/card 命中，但没有 L2 object，查询层应该拒答或降级为“只能定位候选，不能给出规则事实”。这不是失败，这是 RTS 比普通搜索更可靠的地方。</p>
+      </div>
+    </section>
+
+    <section class="panel" id="walkthrough">
+      <p class="kicker">Query Walkthrough</p>
+      <h2>一次真实查询应该怎样穿过 RTS？</h2>
+      <p>场景：用户问 <strong>Tradition 到 Stella 的 FXD.NDF 交易，USDTWD 的 primary rate source 是什么？</strong></p>
+      <div class="stepper">
+        <article class="step" data-step="1">
+          <h3>Scope Resolution</h3>
+          <p>先把问题收敛到 <code>tradition / stella / fxd-ndf-cutoff-fixing / cutoff-fixing</code>。scope 不清时，宁可要求澄清。</p>
+        </article>
+        <article class="step" data-step="2">
+          <h3>Permission Check</h3>
+          <p>检查 caller 是否允许访问这个 pack、entrypoint 和输出模式。权限不是展示细节，而是 truth access boundary。</p>
+        </article>
+        <article class="step" data-step="3">
+          <h3>Object Discovery</h3>
+          <p>优先从 <code>object-manifest.jsonl</code> 和 object card 找到 <code>rule_fxd_ndf_primary_rate_source</code>，而不是直接全文搜索。</p>
+        </article>
+        <article class="step" data-step="4">
+          <h3>L2 Read</h3>
+          <p>读取 rule 的 L2：它说明输入是 <code>currency1/currency2/cutoff_code</code>，逻辑是调用 shared cutoff lookup，并绑定到 primary rate source 目标字段。</p>
+        </article>
+        <article class="step" data-step="5">
+          <h3>Dependency Load</h3>
+          <p>加载 lookup L2：<code>lk_fxd_ndf_cutoff_by_pair_and_locode</code>。对于 <code>USD,TWD,TW</code>，命中 <code>USDTWD|TW</code>。</p>
+        </article>
+        <article class="step" data-step="6">
+          <h3>Grounded Answer</h3>
+          <p>返回事实：<code>hedge_primary_source = RTRS</code>，<code>hedge_primary_source_page = TAIFX1</code>。同时引用 rule 和 lookup，不把搜索分数当作 truth confidence。</p>
+        </article>
+        <article class="step" data-step="7">
+          <h3>Trace Emit</h3>
+          <p>记录 query id、release、scope、selected URI、L2 read URI、dependency、grounding 和必要的 refusal/degraded reason。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <p class="kicker">Failure Is A Feature</p>
+      <h2>RTS 的可靠性，很大一部分来自“该拒答时拒答”。</h2>
+      <div class="grid-2">
+        <article class="note blue">
+          <h3>Scope 不清</h3>
+          <p>不能确定 product/pack/domain 时，应要求澄清，而不是拿相似规则猜一个。</p>
+        </article>
+        <article class="note blue">
+          <h3>L2 不可读</h3>
+          <p>只找到 card 或 L1 时，只能说“定位到候选”，不能给出规则事实。</p>
+        </article>
+        <article class="note blue">
+          <h3>依赖未发布</h3>
+          <p>rule 找到但 lookup/helper 不在同一 release 边界里，应降级或拒答。</p>
+        </article>
+        <article class="note blue">
+          <h3>治理仍有冲突</h3>
+          <p>open question 或 precedence 没有裁决时，不能让运行时临时修复。</p>
+        </article>
+      </div>
+      <div class="note green">
+        <h3>一句话原则</h3>
+        <p><strong>Unknown is safer than wrong.</strong> 对 RTS 来说，拒答、降级和要求澄清不是失败，而是避免把错误规则包装成事实。</p>
+      </div>
+    </section>
+
+    <section class="panel" id="glossary">
+      <p class="kicker">Glossary</p>
+      <h2>关键英文技术名词解释。</h2>
+      <div class="term-grid">
+        <article class="term-card">
+          <strong>KB</strong>
+          <span>Knowledge Base，规则知识库</span>
+          <p>完整保存 rule、lookup、helper 及其 source、evidence、review、adjudication、signoff 的治理层。</p>
+        </article>
+        <article class="term-card">
+          <strong>Runtime Projection</strong>
+          <span>运行时投影</span>
+          <p>从 KB 发布出来的 approved truth 服务运行包，是 query/index/service 默认读取的边界。</p>
+        </article>
+        <article class="term-card">
+          <strong>Rule Pack</strong>
+          <span>规则包</span>
+          <p>按业务范围组织的一组规则、lookup、helper、证据、review 和 report。</p>
+        </article>
+        <article class="term-card">
+          <strong>L2 Runtime Object</strong>
+          <span>L2 运行时对象</span>
+          <p>projection 中最重要的结构化事实正文。事实回答必须回到这里。</p>
+        </article>
+        <article class="term-card">
+          <strong>Object Card</strong>
+          <span>对象卡片</span>
+          <p>用于定位、消歧和初步排序的导航单元。它帮助找到 L2，但不能替代 L2。</p>
+        </article>
+        <article class="term-card">
+          <strong>Scope</strong>
+          <span>业务范围</span>
+          <p>由 channel、product、pack、domain 等组成，是防串线的 truth safety boundary。</p>
+        </article>
+        <article class="term-card">
+          <strong>Governance View</strong>
+          <span>治理视图</span>
+          <p>按权限展示 evidence、review、risk、open question 和 signoff 的解释材料。</p>
+        </article>
+        <article class="term-card">
+          <strong>Query Trace</strong>
+          <span>查询轨迹</span>
+          <p>记录一次调用的 scope、候选对象、L2 读取、dependency、grounding 和拒答原因。</p>
+        </article>
+        <article class="term-card">
+          <strong>Grounding</strong>
+          <span>事实落点</span>
+          <p>把回答中的事实声明绑定回 L2、dependency、source 或授权治理材料。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <p class="kicker">Source Notes</p>
+      <h2>来源材料</h2>
+      <p>本页是介绍型 HTML，用当前规则包说明 KB、runtime projection 和服务读取边界。字段级契约和实现约束仍以 confirmed 文档与真实 KB/projection 文件为准。</p>
+      <div class="source-links">
+        <a href="docs/confirmed/kb-to-index-projection-contract-zh.html">Projection Contract</a>
+        <a href="docs/confirmed/runtime-projection-product-guide-zh.html">Runtime Projection Product Guide</a>
+        <a href="kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.html">FXD.NDF KB Pack</a>
+        <a href="architecture.html">现有 KB 与投影页</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

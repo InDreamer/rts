@@ -11,140 +11,275 @@
     <a class="brand-mark" href="index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link active" href="index.html">首页</a>
-<a class="nav-link" href="start-here.html">三分钟读懂</a>
-<a class="nav-link" href="architecture.html">架构边界</a>
-<a class="nav-link" href="operations.html">运行与调用</a>
-<a class="nav-link" href="roadmap.html">路线图</a>
+<a class="nav-link" href="start-here.html">项目概览</a>
+<a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="operations.html">如何使用</a>
+<a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
     </nav>
   </header>
 
   <main>
-    <section class="hero-stage">
+    <section class="workbench-hero">
       <div class="hero-copy">
-        <p class="kicker">Rule Truth Source · Transformation Rule System</p>
-        <h1>读懂 RTS：<br>从规则文档到可信服务。</h1>
-        <p class="hero-text">RTS 是面向银行报文转换的双核心规则真相服务：一边提供受控真相源原子能力，一边提供托管 LLM agent 分析能力。这个 HTML 站点不再搬运 Markdown，而是把活跃文档重组为更容易进入、理解和使用的阅读体验。</p>
+        <p class="kicker">RTS · Rule Knowledge Base & Runtime Projection</p>
+        <h1>把分散的报文转换业务规则，沉淀为可发布、可查询、可复用的 KB。</h1>
+        <p class="hero-text">报文转换背后是一组可复用的业务规则逻辑，不只是字段搬运。RTS 将散落在文档、代码、mapping、lookup 和 review 记录里的规则整理成 governed KB，并发布为 runtime projection。服务、内部 LLM、外部 agent 和其他业务平台都可以在同一服务边界内查询、解释、分析和复用。</p>
         <div class="hero-actions">
-          <a class="button primary" href="start-here.html">先用三分钟读懂</a>
-          <a class="button secondary" href="architecture.html">看架构边界</a>
+          <a class="button primary" href="start-here.html">项目概览</a>
+          <a class="button secondary" href="kb-runtime-projection-design.html">看真实规则包手册</a>
+          <a class="button secondary" href="architecture.html">看 KB 与投影</a>
         </div>
       </div>
-      <div class="truth-orbit" aria-label="RTS 双核心模型">
-        <div class="orbit-card core">
-          <span>RTS</span>
-          <strong>service gates and proves</strong>
+      <div class="hero-dashboard" aria-label="RTS HTML 信息面板">
+        <div class="dashboard-heading">
+          <p class="kicker">核心结构</p>
+          <h2>三层职责</h2>
         </div>
-        <div class="orbit-card truth">
-          <span>Truth core</span>
-          <p>L2 / dependency / release / trace</p>
+        <div class="dashboard-stat">
+          <span>KB</span>
+          <p>沉淀业务规则逻辑、证据、review 和裁决</p>
         </div>
-        <div class="orbit-card agent">
-          <span>Analysis core</span>
-          <p>managed LLM / scenario / tool mode</p>
+        <div class="dashboard-stat">
+          <span>Projection</span>
+          <p>把 approved KB 发布成服务可读运行包</p>
         </div>
+        <div class="dashboard-stat">
+          <span>Service</span>
+          <p>内部 LLM 和外部 agent 通过同一服务边界读取、分析和解释</p>
+        </div>
+        <div class="dashboard-note">
+          <strong>工作边界</strong>
+          <p>KB 承载可治理的业务规则逻辑；runtime projection 提供运行时视图；RTS service 统一控制 scope、permission、grounding 和 trace。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="html-principles">
+      <div class="section-heading compact">
+        <p class="kicker">项目价值</p>
+        <h2>核心价值是让业务规则 KB 可以被服务和平台复用。</h2>
+        <p>RTS 不只是降低检索成本。它把报文转换里的业务规则逻辑整理成可治理、可发布、可迁移的 KB，使规则可以进入查询、审计、迁移、影响分析、测试规划和 LLM/Agent 分析等业务场景。</p>
+      </div>
+      <div class="principle-grid">
+        <article>
+          <strong>业务逻辑可沉淀</strong>
+          <p>规则不再停留在零散文档或代码里，而是进入结构化 KB。</p>
+        </article>
+        <article>
+          <strong>跨平台可复用</strong>
+          <p>不同服务、agent 或业务平台可以基于同一套 KB/projection 取得一致答案。</p>
+        </article>
+        <article>
+          <strong>运行边界可控制</strong>
+          <p>service 统一管理 release、scope、permission、grounding 和 trace。</p>
+        </article>
+        <article>
+          <strong>LLM/Agent 分析有依据</strong>
+          <p>内部 LLM 和外部 agent 基于 governed KB 做解释、影响分析和测试建议。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="system-map-panel">
+      <div class="section-heading compact">
+        <p class="kicker">项目主线</p>
+        <h2>从材料，到 KB，再到 runtime projection。</h2>
+        <p>RTS 先把业务规则逻辑治理成 KB，再发布为 runtime projection；搜索、API、内部 LLM 和外部 agent 都基于这份运行包工作。</p>
+      </div>
+      <div class="system-map">
+        <svg viewBox="0 0 1120 410" role="img" aria-labelledby="system-map-title system-map-desc">
+          <title id="system-map-title">RTS truth flow and service boundary</title>
+          <desc id="system-map-desc">Source material enters governed KB, becomes runtime projection, passes service gate, then supports APIs, search, trace, and assisted analysis.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L8,3 z"></path>
+            </marker>
+          </defs>
+          <g class="map-row truth">
+            <rect x="24" y="70" width="180" height="110"></rect>
+            <text x="48" y="110">源材料</text>
+            <text x="48" y="138">文档 / 代码 / mapping</text>
+            <rect x="248" y="70" width="180" height="110"></rect>
+            <text x="272" y="110">KB</text>
+            <text x="272" y="138">规则 / 证据 / review</text>
+            <rect x="472" y="70" width="210" height="110"></rect>
+            <text x="496" y="110">Runtime Projection</text>
+            <text x="496" y="138">已批准规则的运行包</text>
+            <rect x="726" y="70" width="180" height="110"></rect>
+            <text x="750" y="110">服务读取</text>
+            <text x="750" y="138">scope / L2 / trace</text>
+          </g>
+          <g class="map-arrows">
+            <line x1="204" y1="125" x2="248" y2="125"></line>
+            <line x1="428" y1="125" x2="472" y2="125"></line>
+            <line x1="682" y1="125" x2="726" y2="125"></line>
+          </g>
+          <g class="map-row consume">
+            <rect x="756" y="246" width="170" height="96"></rect>
+            <text x="780" y="284">查询与 API</text>
+            <text x="780" y="310">规则查询 / 依赖 / 审计</text>
+            <rect x="950" y="246" width="146" height="96"></rect>
+            <text x="974" y="284">LLM / Agent</text>
+            <text x="974" y="310">解释 / 分析 / 复用</text>
+          </g>
+          <g class="map-arrows">
+            <line x1="816" y1="180" x2="816" y2="246"></line>
+            <line x1="888" y1="180" x2="1023" y2="246"></line>
+          </g>
+          <g class="map-boundary">
+            <rect x="706" y="42" width="410" height="322"></rect>
+            <text x="726" y="42">运行时服务边界</text>
+          </g>
+        </svg>
       </div>
     </section>
 
     <section class="reader-paths">
       <div class="section-heading">
-        <p class="kicker">Choose Your Path</p>
-        <h2>你现在想解决什么问题？</h2>
+        <p class="kicker">阅读入口</p>
+        <h2>快速入口。</h2>
       </div>
       <div class="path-grid">
         <a class="path-card large" href="start-here.html">
           <span>01</span>
-          <h3>第一次进入项目</h3>
-          <p>先建立 RTS 不是 RAG、不是普通聊天机器人、也不是单一 SDK 包装的心智模型。</p>
+          <h3>项目概览</h3>
+          <p>业务规则 KB 和 runtime projection 的核心价值。</p>
         </a>
         <a class="path-card" href="architecture.html">
           <span>02</span>
-          <h3>我要判断边界</h3>
-          <p>看 truth owner、runtime projection、service gate、LLM 和 agent 的分工。</p>
+          <h3>核心结构</h3>
+          <p>看 KB、runtime projection、L2、object card、dependency 的分工。</p>
+        </a>
+        <a class="path-card" href="kb-runtime-projection-design.html">
+          <span>03</span>
+          <h3>真实例子</h3>
+          <p>用 FXD.NDF pack 看 Rule、Lookup、Helper、L0/L1/L2 和查询演练。</p>
         </a>
         <a class="path-card" href="operations.html">
-          <span>03</span>
-          <h3>我要跑起来或调用</h3>
-          <p>直接进入本地启动、sample scope、query/ask/scenario/MCP 调用示例。</p>
+          <span>04</span>
+          <h3>使用方式</h3>
+          <p>看服务如何读取 projection，以及调用方能拿到哪些结果。</p>
         </a>
         <a class="path-card" href="roadmap.html">
-          <span>04</span>
-          <h3>我要看实现顺序</h3>
-          <p>理解 Day1、Day2、internal agent 和最终路线图之间的关系。</p>
+          <span>05</span>
+          <h3>推进路径</h3>
+          <p>从 KB/projection 到查询、分析和 agent 接入。</p>
         </a>
       </div>
     </section>
 
     <section class="story-panel">
       <div class="section-heading">
-        <p class="kicker">The Story</p>
-        <h2>RTS 的核心不是“把规则放进 AI 问答”。</h2>
-        <p>它的目标是让规则从 source material 走到可治理、可追溯、可审查、可查询、可解释的服务真相。</p>
+        <p class="kicker">核心过程</p>
+        <h2>RTS 建立的是“业务规则 KB 发布链路”。</h2>
+        <p>规则先进入 KB，再发布成 projection，最后由服务、API、内部 LLM 和外部 agent 复用。</p>
       </div>
       <div class="flow-line">
         <article>
-          <span>Source</span>
-          <h3>多源材料</h3>
-          <p>业务文档、Java/XSLT、Excel mapping、lookup、示例和 reviewer clarification。</p>
+          <span>01</span>
+          <h3>收集材料</h3>
+          <p>业务文档、Java/XSLT、Excel mapping、lookup、样例和 review 结论。</p>
         </article>
         <article>
-          <span>Govern</span>
-          <h3>AI-first review</h3>
-          <p>AI 做结构校验、冲突发现、证据整理和问题简化；人工做最终裁决。</p>
+          <span>02</span>
+          <h3>整理成 KB</h3>
+          <p>规则、lookup、helper、证据链、歧义、人工裁决和 signoff 被结构化保存。</p>
         </article>
         <article>
-          <span>Publish</span>
-          <h3>Runtime projection</h3>
-          <p>approved truth 被发布成服务可读取的 projection，而不是直接读工作区文档。</p>
+          <span>03</span>
+          <h3>发布投影</h3>
+          <p>approved 内容被生成 release manifest、scope、object manifest、L2、dependency 等运行包。</p>
         </article>
         <article>
-          <span>Serve</span>
-          <h3>API / MCP / Ask</h3>
-          <p>所有调用都经过 release、scope、permission、L2 hash、grounding、trace gate。</p>
+          <span>04</span>
+          <h3>服务消费</h3>
+          <p>查询、API、搜索、内部 LLM 和外部 agent 都从同一份 projection 读取。</p>
         </article>
       </div>
     </section>
 
     <section class="mode-panel">
       <div class="mode-copy">
-        <p class="kicker">Dual Core</p>
-        <h2>两个核心能力，不是主次关系。</h2>
-        <p>确定性能力是第一等公民，托管 LLM 分析也是第一等公民。LLM 不拥有 truth，但它是 RTS 正常产品形态中的受控分析与表达层。</p>
+        <p class="kicker">Service / LLM / Agent</p>
+        <h2>RTS service 把 KB 能力开放给内部 LLM 和外部 agent。</h2>
+        <p>内部 LLM 走 managed analysis；外部 agent 走 REST/MCP tool mode。两种模式都由 RTS service 控制 scope、grounding、permission 和 trace。</p>
       </div>
       <div class="mode-grid">
         <article>
-          <h3>受控真相源原子能力</h3>
-          <p>query、find、read L2、dependency、trace、scope/navigation、grounding check。</p>
-          <a href="architecture.html#atomic-capabilities">看原子能力</a>
+          <h3>Managed Analysis</h3>
+          <p>RTS 内部 LLM 在服务边界内基于 KB/projection 组织解释、影响分析、测试建议和调查路径。</p>
+          <a href="start-here.html">看项目概览</a>
         </article>
         <article>
-          <h3>托管 LLM agent 分析</h3>
-          <p>/ask、PR diff、exception、failed message、test planning、governance review。</p>
-          <a href="architecture.html#managed-analysis">看 managed mode</a>
+          <h3>External Agent Tools</h3>
+          <p>外部 agent 通过 RTS API/MCP 调用规则查询、依赖和 trace 等原子能力，复用 KB 但不绕过 service gate。</p>
+          <a href="architecture.html">看 KB 与投影</a>
         </article>
       </div>
     </section>
 
-    <section class="proof-panel">
-      <div>
-        <p class="kicker">Start From Sources</p>
-        <h2>想核对原文？每个主题都能回到来源。</h2>
-        <p>体验页负责重组表达；文档页负责保留完整原文和 docmeta。你可以先读策展内容，再展开完整 Markdown 来源。</p>
+    <section class="term-section" id="glossary">
+      <div class="section-heading compact">
+        <p class="kicker">Glossary · 术语解释</p>
+        <h2>关键英文技术名词</h2>
+        <p>页面以中文为主；英文术语保留在关键位置，是为了和代码、API、文档标题保持一致。下面给出阅读时最容易混淆的词。</p>
       </div>
-      <div class="source-picks">
-        <a href="docs/confirmed/project-alignment-summary-zh.html">项目总纲</a>
-        <a href="docs/confirmed/system-constitution-v1.html">Constitution</a>
-        <a href="docs/confirmed/kb-to-index-projection-contract-zh.html">Projection Contract</a>
-        <a href="docs/api-caller-guide-zh.html">API Guide</a>
+      <div class="term-grid">
+        <article class="term-card">
+          <strong>RTS</strong>
+          <span>Rule Truth Source / Transformation Rule System</span>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的业务规则 KB。</p>
+        </article>
+<article class="term-card">
+          <strong>KB</strong>
+          <span>Knowledge Base，业务规则 KB</span>
+          <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
+        </article>
+<article class="term-card">
+          <strong>Rule Pack</strong>
+          <span>规则包</span>
+          <p>按业务范围组织的一组 rule、lookup、helper，是整理、review 和发布的基本单位。</p>
+        </article>
+<article class="term-card">
+          <strong>Runtime Projection</strong>
+          <span>运行时投影</span>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+        </article>
+<article class="term-card">
+          <strong>L2 Runtime Object</strong>
+          <span>L2 运行时规则对象</span>
+          <p>runtime projection 中最重要的事实正文，保存服务可读的结构化规则逻辑。</p>
+        </article>
+<article class="term-card">
+          <strong>Object Card</strong>
+          <span>对象卡片</span>
+          <p>用于定位、消歧和召回规则对象；它帮助找到 L2，但不能替代 L2。</p>
+        </article>
+<article class="term-card">
+          <strong>Release Manifest</strong>
+          <span>发布清单</span>
+          <p>说明当前 projection 来自哪里、包含什么、是否可用，以及出现问题时如何回滚。</p>
+        </article>
+<article class="term-card">
+          <strong>Scope</strong>
+          <span>业务范围</span>
+          <p>通常由 channel、product、pack、domain 组成，用来防止相似规则被串用。</p>
+        </article>
+<article class="term-card">
+          <strong>Dependency</strong>
+          <span>规则依赖</span>
+          <p>描述 rule、lookup、helper 之间的关系，是解释影响面和测试范围的基础。</p>
+        </article>
       </div>
     </section>
 
     <section class="library-preview" id="library">
       <div class="docs-toolbar">
         <div>
-          <p class="kicker">Source Library</p>
+          <p class="kicker">Source Library · 来源库</p>
           <h2>活跃来源文档</h2>
-          <p>这里是来源索引，不再是默认阅读入口。需要核对细节时再进入。</p>
+          <p>用于核对字段、边界和原始措辞。</p>
         </div>
         <label class="search-box">
           <span>搜索来源</span>
@@ -152,284 +287,52 @@
         </label>
       </div>
       <div class="doc-grid" data-doc-grid>
-        <article class="source-card" data-category="Entry" data-search="rts repository entry for rts dual-core baseline, operational docs, and supporting references readme.md entry">
-      <a href="README.html">
-        <span class="source-type">Entry</span>
-        <h3>RTS</h3>
-        <p>repository entry for RTS dual-core baseline, operational docs, and supporting references</p>
-        <code>README.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Agent Guide" data-search="agents coding-agent document index and active development navigation for rts agents.md agent guide">
-      <a href="AGENTS.html">
-        <span class="source-type">Agent Guide</span>
-        <h3>AGENTS</h3>
-        <p>coding-agent document index and active development navigation for RTS</p>
-        <code>AGENTS.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Navigation" data-search="rts documentation index primary rts documentation router docs/index.md navigation">
-      <a href="docs/INDEX.html">
-        <span class="source-type">Navigation</span>
-        <h3>RTS Documentation Index</h3>
-        <p>primary RTS documentation router</p>
-        <code>docs/INDEX.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="confirmed docs route confirmed rts baseline documents docs/confirmed/readme.md confirmed baseline">
-      <a href="docs/confirmed/README.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>Confirmed Docs</h3>
-        <p>route confirmed RTS baseline documents</p>
-        <code>docs/confirmed/README.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts 项目对齐总纲 中文项目总纲，统一 rts 最终服务愿景、多源真相治理、ai-first review、人工裁决和服务边界 docs/confirmed/project-alignment-summary-zh.md confirmed baseline">
+        <article class="source-card" data-category="Confirmed Baseline" data-search="rts 项目对齐总纲 中文项目总纲，统一 rts 最终服务愿景、多源真相治理、ai-first review、人工裁决和服务边界 docs/confirmed/project-alignment-summary-zh.md 已确认基线">
       <a href="docs/confirmed/project-alignment-summary-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
+        <span class="source-type">已确认基线</span>
         <h3>RTS 项目对齐总纲</h3>
         <p>中文项目总纲，统一 RTS 最终服务愿景、多源真相治理、AI-first review、人工裁决和服务边界</p>
         <code>docs/confirmed/project-alignment-summary-zh.md</code>
       </a>
     </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts constitution v2 rts constitution v2 for a rule truth service with multi-source governance, ai-first review, human final adjudication, permissioned service access, and runtime truth boundaries docs/confirmed/system-constitution-v1.md confirmed baseline">
-      <a href="docs/confirmed/system-constitution-v1.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>RTS Constitution v2</h3>
-        <p>RTS Constitution v2 for a rule truth service with multi-source governance, AI-first review, human final adjudication, permissioned service access, and runtime truth boundaries</p>
-        <code>docs/confirmed/system-constitution-v1.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="kb-to-index runtime projection contract defines the governed runtime projection contract between the rts knowledge base truth layer and the query/index layer docs/confirmed/kb-to-index-projection-contract-zh.md confirmed baseline">
+<article class="source-card" data-category="Confirmed Baseline" data-search="kb 到索引的运行时投影契约 定义 kb truth layer 到 query/index layer 的 runtime projection 契约。 docs/confirmed/kb-to-index-projection-contract-zh.md 已确认基线">
       <a href="docs/confirmed/kb-to-index-projection-contract-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>KB-to-Index Runtime Projection Contract</h3>
-        <p>Defines the governed runtime projection contract between the RTS Knowledge Base truth layer and the query/index layer</p>
+        <span class="source-type">已确认基线</span>
+        <h3>KB 到索引的运行时投影契约</h3>
+        <p>定义 KB truth layer 到 query/index layer 的 runtime projection 契约。</p>
         <code>docs/confirmed/kb-to-index-projection-contract-zh.md</code>
       </a>
     </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts llm harness and agent integration alignment align rts managed llm harness, external agent tool mode, runtime projection access boundary, and scenario integration priorities docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md confirmed baseline">
-      <a href="docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>RTS LLM Harness And Agent Integration Alignment</h3>
-        <p>align RTS managed LLM harness, external agent tool mode, runtime projection access boundary, and scenario integration priorities</p>
-        <code>docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts service 内部 llm agent 接入完整落地计划 以做出强 managed ai normal mode 为目标、保持 rts truth authority 的内部 llm agent 完整非阶段性落地总纲 docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md confirmed baseline">
-      <a href="docs/confirmed/internal-llm-agent-service-implementation-plan-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>RTS Service 内部 LLM Agent 接入完整落地计划</h3>
-        <p>以做出强 managed AI normal mode 为目标、保持 RTS truth authority 的内部 LLM agent 完整非阶段性落地总纲</p>
-        <code>docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts day1 query service and controlled llm harness compact day1 rts query/tool service and controlled llm harness baseline docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md confirmed baseline">
-      <a href="docs/confirmed/day1-query-service-and-llm-harness-plan-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>RTS Day1 Query Service And Controlled LLM Harness</h3>
-        <p>compact Day1 RTS query/tool service and controlled LLM harness baseline</p>
-        <code>docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts day2 controlled agentic retrieval roadmap compact day2 controlled agentic retrieval, mcp, rerank, impact, and test-planning evolution roadmap docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md confirmed baseline">
-      <a href="docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>RTS Day2 Controlled Agentic Retrieval Roadmap</h3>
-        <p>compact Day2 controlled agentic retrieval, MCP, rerank, impact, and test-planning evolution roadmap</p>
-        <code>docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts final llm agent service roadmap compact final rts llm-agent service roadmap and current confirmed capability boundaries docs/confirmed/final-llm-agent-service-plan-zh.md confirmed baseline">
-      <a href="docs/confirmed/final-llm-agent-service-plan-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>RTS Final LLM Agent Service Roadmap</h3>
-        <p>compact final RTS LLM-agent service roadmap and current confirmed capability boundaries</p>
-        <code>docs/confirmed/final-llm-agent-service-plan-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="rts documentation decision register active decision register for resolving outdated, ambiguous, or conflicting rts documentation directions docs/confirmed/document-decision-register-zh.md confirmed baseline">
-      <a href="docs/confirmed/document-decision-register-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>RTS Documentation Decision Register</h3>
-        <p>active decision register for resolving outdated, ambiguous, or conflicting RTS documentation directions</p>
-        <code>docs/confirmed/document-decision-register-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Confirmed Baseline" data-search="runtime projection product guide pm-facing runtime projection product guide explaining what each runtime package area does without replacing the technical projection contract docs/confirmed/runtime-projection-product-guide-zh.md confirmed baseline">
+<article class="source-card" data-category="Confirmed Baseline" data-search="runtime projection 产品说明 从产品和集成视角解释 runtime projection 运行包里每类内容解决什么问题。 docs/confirmed/runtime-projection-product-guide-zh.md 已确认基线">
       <a href="docs/confirmed/runtime-projection-product-guide-zh.html">
-        <span class="source-type">Confirmed Baseline</span>
-        <h3>Runtime Projection Product Guide</h3>
-        <p>PM-facing runtime projection product guide explaining what each runtime package area does without replacing the technical projection contract</p>
+        <span class="source-type">已确认基线</span>
+        <h3>Runtime Projection 产品说明</h3>
+        <p>从产品和集成视角解释 runtime projection 运行包里每类内容解决什么问题。</p>
         <code>docs/confirmed/runtime-projection-product-guide-zh.md</code>
       </a>
     </article>
-<article class="source-card" data-category="Operational" data-search="rts java service runbook local runbook for running, validating, configuring, and troubleshooting the rts java service docs/java-service-runbook-zh.md operational">
-      <a href="docs/java-service-runbook-zh.html">
-        <span class="source-type">Operational</span>
-        <h3>RTS Java Service Runbook</h3>
-        <p>local runbook for running, validating, configuring, and troubleshooting the RTS Java service</p>
-        <code>docs/java-service-runbook-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Operational" data-search="rts api 调用方指南 api caller guide for rts query, ask, object, dependency, and trace responses docs/api-caller-guide-zh.md operational">
+<article class="source-card" data-category="Operational" data-search="api 调用方指南 查询、/ask、object、dependency、trace 和 refusal 响应的调用方说明。 docs/api-caller-guide-zh.md 运行与调用">
       <a href="docs/api-caller-guide-zh.html">
-        <span class="source-type">Operational</span>
-        <h3>RTS API 调用方指南</h3>
-        <p>API caller guide for RTS query, ask, object, dependency, and trace responses</p>
+        <span class="source-type">运行与调用</span>
+        <h3>API 调用方指南</h3>
+        <p>查询、/ask、object、dependency、trace 和 refusal 响应的调用方说明。</p>
         <code>docs/api-caller-guide-zh.md</code>
       </a>
     </article>
-<article class="source-card" data-category="Operational" data-search="sample runtime projection test commands manual curl commands for current sample runtime projection smoke testing docs/day1-sample-pack-test-commands.md operational">
-      <a href="docs/day1-sample-pack-test-commands.html">
-        <span class="source-type">Operational</span>
-        <h3>Sample Runtime Projection Test Commands</h3>
-        <p>manual curl commands for current sample runtime projection smoke testing</p>
-        <code>docs/day1-sample-pack-test-commands.md</code>
+<article class="source-card" data-category="Operational" data-search="java 服务运行手册 本地运行、配置、验证、排错和提交前检查手册。 docs/java-service-runbook-zh.md 运行与调用">
+      <a href="docs/java-service-runbook-zh.html">
+        <span class="source-type">运行与调用</span>
+        <h3>Java 服务运行手册</h3>
+        <p>本地运行、配置、验证、排错和提交前检查手册。</p>
+        <code>docs/java-service-runbook-zh.md</code>
       </a>
     </article>
-<article class="source-card" data-category="Reference" data-search="reference docs route rts reference materials that support but do not override confirmed baseline docs/reference/readme.md reference">
-      <a href="docs/reference/README.html">
-        <span class="source-type">Reference</span>
-        <h3>Reference Docs</h3>
-        <p>route RTS reference materials that support but do not override confirmed baseline</p>
-        <code>docs/reference/README.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="external review constraints summary distilled external review constraints for projection release, lifecycle, conflict, trace, permission, and refusal docs/reference/external-review-final-2026-04-20.md reference">
-      <a href="docs/reference/external-review-final-2026-04-20.html">
-        <span class="source-type">Reference</span>
-        <h3>External Review Constraints Summary</h3>
-        <p>distilled external review constraints for projection release, lifecycle, conflict, trace, permission, and refusal</p>
-        <code>docs/reference/external-review-final-2026-04-20.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="java index layer reference summary distilled java index/query layer reference; current safe ideas without old infrastructure commitments docs/reference/java-index-layer-full-plan-zh.md reference">
-      <a href="docs/reference/java-index-layer-full-plan-zh.html">
-        <span class="source-type">Reference</span>
-        <h3>Java Index Layer Reference Summary</h3>
-        <p>distilled Java index/query layer reference; current safe ideas without old infrastructure commitments</p>
-        <code>docs/reference/java-index-layer-full-plan-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="llm-mediated query and harness reference distilled llm-mediated rts query and harness reference for scope mediation, context, memory, and controlled tool use docs/reference/llm-enhanced-index-and-harness-design-zh.md reference">
-      <a href="docs/reference/llm-enhanced-index-and-harness-design-zh.html">
-        <span class="source-type">Reference</span>
-        <h3>LLM-Mediated Query And Harness Reference</h3>
-        <p>distilled LLM-mediated RTS query and harness reference for scope mediation, context, memory, and controlled tool use</p>
-        <code>docs/reference/llm-enhanced-index-and-harness-design-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="minimal ov integration define the smallest ov integration that improves retrieval without merging systems or risking truth pollution docs/reference/minimal-ov-integration.md reference">
-      <a href="docs/reference/minimal-ov-integration.html">
-        <span class="source-type">Reference</span>
-        <h3>Minimal OV Integration</h3>
-        <p>define the smallest OV integration that improves retrieval without merging systems or risking truth pollution</p>
-        <code>docs/reference/minimal-ov-integration.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="ov boundary and adoptable surfaces define the clean boundary between the transformation rule system truth source and openviking, and list the safe surfaces to borrow docs/reference/ov-boundary-and-adoption.md reference">
-      <a href="docs/reference/ov-boundary-and-adoption.html">
-        <span class="source-type">Reference</span>
-        <h3>OV Boundary And Adoptable Surfaces</h3>
-        <p>define the clean boundary between the transformation rule system truth source and OpenViking, and list the safe surfaces to borrow</p>
-        <code>docs/reference/ov-boundary-and-adoption.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="ov retrieval lessons summary distilled openviking-inspired retrieval lessons for rts without making ov the runtime baseline docs/reference/ov-kb-retrieval-design.md reference">
-      <a href="docs/reference/ov-kb-retrieval-design.html">
-        <span class="source-type">Reference</span>
-        <h3>OV Retrieval Lessons Summary</h3>
-        <p>distilled OpenViking-inspired retrieval lessons for RTS without making OV the runtime baseline</p>
-        <code>docs/reference/ov-kb-retrieval-design.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="rts project glossary compact chinese glossary for current rts project terms and boundary concepts docs/reference/project-keywords-glossary-zh.md reference">
-      <a href="docs/reference/project-keywords-glossary-zh.html">
-        <span class="source-type">Reference</span>
-        <h3>RTS Project Glossary</h3>
-        <p>compact Chinese glossary for current RTS project terms and boundary concepts</p>
-        <code>docs/reference/project-keywords-glossary-zh.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="rts ai token review rationale consolidated historical ai token review rationale and retained rts llm risk principles docs/reference/proposals/ai-token-review/readme.md reference">
-      <a href="docs/reference/proposals/ai-token-review/README.html">
-        <span class="source-type">Reference</span>
-        <h3>RTS AI Token Review Rationale</h3>
-        <p>consolidated historical AI token review rationale and retained RTS LLM risk principles</p>
-        <code>docs/reference/proposals/ai-token-review/README.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="rts project background and pack model rts project background and pack/object model distilled from the historical handoff prompt docs/reference/rts-project-background-and-pack-model.md reference">
-      <a href="docs/reference/rts-project-background-and-pack-model.html">
-        <span class="source-type">Reference</span>
-        <h3>RTS Project Background and Pack Model</h3>
-        <p>RTS project background and pack/object model distilled from the historical handoff prompt</p>
-        <code>docs/reference/rts-project-background-and-pack-model.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="rts publication and refusal principles rts publication, refusal, trace, and release safety principles distilled from external review docs/reference/rts-publication-and-refusal-principles.md reference">
-      <a href="docs/reference/rts-publication-and-refusal-principles.html">
-        <span class="source-type">Reference</span>
-        <h3>RTS Publication and Refusal Principles</h3>
-        <p>RTS publication, refusal, trace, and release safety principles distilled from external review</p>
-        <code>docs/reference/rts-publication-and-refusal-principles.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="rts retrieval principles rts retrieval principles distilled from archived ov/kb discussions, expressed without making ov the engineering baseline docs/reference/rts-retrieval-principles.md reference">
-      <a href="docs/reference/rts-retrieval-principles.html">
-        <span class="source-type">Reference</span>
-        <h3>RTS Retrieval Principles</h3>
-        <p>RTS retrieval principles distilled from archived OV/KB discussions, expressed without making OV the engineering baseline</p>
-        <code>docs/reference/rts-retrieval-principles.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="Reference" data-search="rts service interface and output principles rts service interface and output quality principles distilled from ai service strategy materials docs/reference/rts-service-interface-and-output-principles.md reference">
-      <a href="docs/reference/rts-service-interface-and-output-principles.html">
-        <span class="source-type">Reference</span>
-        <h3>RTS Service Interface and Output Principles</h3>
-        <p>RTS service interface and output quality principles distilled from AI service strategy materials</p>
-        <code>docs/reference/rts-service-interface-and-output-principles.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="KB Pack" data-search="tradition -&gt; stella fxd.ndf cutoff-fixing split pack this pack was reconstructed from photographed vs code screenshots supplied on 2026-05-06. it captures local demo-signoff canonical rules for the tradition-to-stella fxd.ndf fixing subtree: kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/readme.md kb pack">
+<article class="source-card" data-category="KB Pack" data-search="tradition -&gt; stella fxd.ndf cutoff-fixing split pack this pack was reconstructed from photographed vs code screenshots supplied on 2026-05-06. it captures local demo-signoff canonical rules for the tradition-to-stella fxd.ndf fixing subtree: kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/readme.md kb 知识包">
       <a href="kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.html">
-        <span class="source-type">KB Pack</span>
+        <span class="source-type">KB 包</span>
         <h3>Tradition -&gt; Stella FXD.NDF cutoff-fixing split pack</h3>
         <p>This pack was reconstructed from photographed VS Code screenshots supplied on 2026-05-06. It captures local demo-signoff canonical rules for the Tradition-to-Stella FXD.NDF fixing subtree:</p>
         <code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/README.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="KB Pack" data-search="local pipeline ops reference these ops are lightweight semantic labels used inside this draft pack&#x27;s logic.pipeline sections. kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/ops-reference.md kb pack">
-      <a href="kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/ops-reference.html">
-        <span class="source-type">KB Pack</span>
-        <h3>Local Pipeline Ops Reference</h3>
-        <p>These ops are lightweight semantic labels used inside this draft pack&#x27;s logic.pipeline sections.</p>
-        <code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/ops-reference.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="KB Pack" data-search="closure check status: not closed. kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/closure-check.md kb pack">
-      <a href="kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/closure-check.html">
-        <span class="source-type">KB Pack</span>
-        <h3>Closure Check</h3>
-        <p>Status: not closed.</p>
-        <code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/closure-check.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="KB Pack" data-search="extraction report this draft pack was reconstructed from 16 photographed screenshots. macos vision ocr was used for first-pass extraction and then corrected against visible yaml fragments. kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/extraction-report.md kb pack">
-      <a href="kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/extraction-report.html">
-        <span class="source-type">KB Pack</span>
-        <h3>Extraction Report</h3>
-        <p>This draft pack was reconstructed from 16 photographed screenshots. macOS Vision OCR was used for first-pass extraction and then corrected against visible YAML fragments.</p>
-        <code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/extraction-report.md</code>
-      </a>
-    </article>
-<article class="source-card" data-category="KB Pack" data-search="review checklist  kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/review-checklist.md kb pack">
-      <a href="kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/review-checklist.html">
-        <span class="source-type">KB Pack</span>
-        <h3>Review Checklist</h3>
-        <p></p>
-        <code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/reports/review-checklist.md</code>
       </a>
     </article>
       </div>
@@ -439,7 +342,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>从 35 篇非归档 Markdown 生成。更新时间：2026-05-15 16:57。原文不被改写，阅读体验由 HTML 层重新组织。</p>
+    <p>从 36 篇非归档 Markdown 生成。更新时间：2026-05-16 13:15。原文不被改写，阅读体验由 HTML 层重新组织。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>

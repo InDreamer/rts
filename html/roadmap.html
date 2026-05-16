@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>路线图 | RTS</title>
+  <title>推进路径 | RTS</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -11,70 +11,160 @@
     <a class="brand-mark" href="index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="index.html">首页</a>
-<a class="nav-link" href="start-here.html">三分钟读懂</a>
-<a class="nav-link" href="architecture.html">架构边界</a>
-<a class="nav-link" href="operations.html">运行与调用</a>
-<a class="nav-link active" href="roadmap.html">路线图</a>
+<a class="nav-link" href="start-here.html">项目概览</a>
+<a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="operations.html">如何使用</a>
+<a class="nav-link active" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
     </nav>
   </header>
   <main>
     <section class="page-hero">
-      <p class="kicker">RTS Reading Experience</p>
-      <h1>路线图</h1>
-      <p>把 confirmed baseline、Day1、Day2、internal agent 和最终服务形态串成一条实现路径。</p>
+      <p class="kicker">RTS 项目介绍</p>
+      <h1>推进路径</h1>
+      <p>RTS 的推进顺序是先沉淀 KB 和 runtime projection，再扩展查询、分析和 AI 辅助。</p>
     </section>
     
+    <section class="roadmap-brief">
+      <div>
+        <p class="kicker">推进路径</p>
+        <h2>先把规则知识和运行投影做扎实，再扩展查询和 AI 辅助。</h2>
+        <p>路线图从规则治理开始：先整理 KB，再发布 runtime projection，最后让服务和下游场景稳定消费。</p>
+      </div>
+      <div class="roadmap-scale">
+        <span>KB 结构稳定</span>
+        <span>Projection 可发布</span>
+        <span>服务可查询和复盘</span>
+      </div>
+    </section>
+
     <section class="timeline">
       <article>
-        <span>Baseline</span>
-        <h2>Constitution + Projection Contract</h2>
-        <p>先锁住 truth ownership、runtime projection、refusal、permissioned governance view。</p>
+        <span>Step 1</span>
+        <h2>整理规则材料进入 KB</h2>
+        <p>把 rule、lookup、helper、source、evidence、review、open question 和 signoff 结构化保存。</p>
       </article>
       <article>
-        <span>Day1</span>
-        <h2>Query / Tool Service + Controlled Harness</h2>
-        <p>建立文件系统 store、Lucene、L2 read/hash、trace/refusal、REST/MCP 和第一版 /ask。</p>
+        <span>Step 2</span>
+        <h2>定义 runtime projection contract</h2>
+        <p>明确发布包必须包含 release manifest、scope、object manifest、L2、cards、dependency 和 governance views。</p>
       </article>
       <article>
-        <span>Internal Agent</span>
-        <h2>Service-owned Managed Loop</h2>
-        <p>planner、orchestrator、context snapshot、claim validation、scenario compiler、evaluation gate。</p>
+        <span>Step 3</span>
+        <h2>让服务只读取 projection</h2>
+        <p>查询、API 和索引都从 active projection 读取，不直接读取 candidate pack 或工作区草稿。</p>
       </article>
       <article>
-        <span>Day2</span>
-        <h2>Controlled Agentic Retrieval</h2>
-        <p>多步 retrieval、confusable、rerank、expanded MCP、impact/test candidate 和评估闭环。</p>
+        <span>Step 4</span>
+        <h2>扩展可用场景</h2>
+        <p>在稳定投影之上做规则查询、依赖解释、影响分析、测试建议、review 辅助和 pipeline 检查。</p>
       </article>
       <article>
-        <span>Final</span>
-        <h2>LLM-agent-ready Rule Truth Service</h2>
-        <p>managed mode 与 external tool mode 共享稳定原子能力和同一 truth access boundary。</p>
+        <span>Step 5</span>
+        <h2>接入 AI 辅助分析</h2>
+        <p>AI 消费 projection 做解释和分析，但不替代 KB、projection 和人工裁决。</p>
       </article>
+    </section>
+
+    <section class="roadmap-matrix">
+      <div class="section-heading compact">
+        <p class="kicker">判断标准</p>
+        <h2>每一步真正要证明什么？</h2>
+      </div>
+      <table>
+        <thead><tr><th>节点</th><th>要证明的价值</th><th>不要误解成</th></tr></thead>
+        <tbody>
+          <tr><td>KB</td><td>规则来源、证据、review 和裁决能被结构化追踪。</td><td>一堆给人看的 Markdown。</td></tr>
+          <tr><td>Projection</td><td>已批准规则能被发布成服务可读的稳定运行包。</td><td>自然语言摘要或搜索索引。</td></tr>
+          <tr><td>Service</td><td>查询能回到 scope、L2、dependency 和 trace。</td><td>直接问模型或直接扫工作区文件。</td></tr>
+          <tr><td>AI 辅助</td><td>在治理材料上做解释、分析和候选建议。</td><td>项目一开始就变成聊天或自动化应用。</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="decision-grid">
       <article>
-        <h2>现在不该做什么</h2>
-        <p>不要把 OpenSearch、vector、外部 agent SDK 或 memory 写成 truth core；它们最多是 adapter、检索增强或 workflow sidecar。</p>
+        <h2>表达重点</h2>
+        <p>主线是规则如何从材料进入 KB，再如何发布成 projection；模型接入、SDK、harness 和工具模式属于后续实现层。</p>
       </article>
       <article>
         <h2>下一步真正重要什么</h2>
-        <p>不是让模型更会说，而是让 managed analysis 在 /ask 和 scenario endpoint 中成为稳定正常态，同时 claim validation 和 trace 能证明它没有越界。</p>
+        <p>让 sample pack 到 runtime projection 的链路更真实、更稳定，再用 API 和可视化把“查得到、查得准、可复盘”展示出来。</p>
       </article>
+    </section>
+
+    <section class="term-section" id="glossary">
+      <div class="section-heading compact">
+        <p class="kicker">Glossary · 术语解释</p>
+        <h2>推进路径里的关键英文词</h2>
+        <p>这些词帮助同事理解项目从知识整理到服务运行的路径。AI 辅助是后续消费方式，不是唯一卖点。</p>
+      </div>
+      <div class="term-grid">
+        <article class="term-card">
+          <strong>RTS</strong>
+          <span>Rule Truth Source / Transformation Rule System</span>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的规则知识基础。</p>
+        </article>
+<article class="term-card">
+          <strong>KB</strong>
+          <span>Knowledge Base，规则知识库</span>
+          <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
+        </article>
+<article class="term-card">
+          <strong>Rule Pack</strong>
+          <span>规则包</span>
+          <p>按业务范围组织的一组 rule、lookup、helper，是整理、review 和发布的基本单位。</p>
+        </article>
+<article class="term-card">
+          <strong>Runtime Projection</strong>
+          <span>运行时投影</span>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+        </article>
+<article class="term-card">
+          <strong>L2 Runtime Object</strong>
+          <span>L2 运行时规则对象</span>
+          <p>runtime projection 中最重要的事实正文，保存服务可读的结构化规则逻辑。</p>
+        </article>
+<article class="term-card">
+          <strong>Object Card</strong>
+          <span>对象卡片</span>
+          <p>用于定位、消歧和召回规则对象；它帮助找到 L2，但不能替代 L2。</p>
+        </article>
+<article class="term-card">
+          <strong>Release Manifest</strong>
+          <span>发布清单</span>
+          <p>说明当前 projection 来自哪里、包含什么、是否可用，以及出现问题时如何回滚。</p>
+        </article>
+<article class="term-card">
+          <strong>Scope</strong>
+          <span>业务范围</span>
+          <p>通常由 channel、product、pack、domain 组成，用来防止相似规则被串用。</p>
+        </article>
+<article class="term-card">
+          <strong>Dependency</strong>
+          <span>规则依赖</span>
+          <p>描述 rule、lookup、helper 之间的关系，是解释影响面和测试范围的基础。</p>
+        </article>
+<article class="term-card">
+          <strong>Governance View</strong>
+          <span>治理视图</span>
+          <p>在权限允许时展示 evidence、review、open question、risk 和 signoff 信息。</p>
+        </article>
+      </div>
     </section>
 
     <section class="source-strip">
       <p class="kicker">主要来源</p>
-      <a href="docs/confirmed/day1-query-service-and-llm-harness-plan-zh.html">Day1</a>
+      <a href="docs/confirmed/project-alignment-summary-zh.html">项目总纲</a>
+<a href="docs/confirmed/kb-to-index-projection-contract-zh.html">Projection Contract</a>
+<a href="docs/confirmed/runtime-projection-product-guide-zh.html">Runtime Projection 产品说明</a>
+<a href="docs/confirmed/day1-query-service-and-llm-harness-plan-zh.html">Day1</a>
 <a href="docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.html">Day2</a>
-<a href="docs/confirmed/final-llm-agent-service-plan-zh.html">Final Roadmap</a>
-<a href="docs/confirmed/document-decision-register-zh.html">Decision Register</a>
     </section>
     
   </main>
   <footer class="site-footer">
-    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+    <p>本页根据项目文档重组表达；需要逐字核对时请进入来源文档页。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>

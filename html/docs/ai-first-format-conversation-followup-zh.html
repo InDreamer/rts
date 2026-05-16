@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI-first Format Follow-up Notes | RTS 来源解读</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../index.html">首页</a>
+      <a class="nav-link" href="../start-here.html">项目概览</a>
+      <a class="nav-link" href="../architecture.html">KB 与投影</a>
+      <a class="nav-link" href="../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">其他活跃文档 · docs/ai-first-format-conversation-followup-zh.md</p>
+      <h1>AI-first Format Follow-up Notes</h1>
+      <p>补充说明：AI 可读格式讨论中关于 KB、projection 和展示层的边界澄清。</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
+        <a class="button ghost" href="../../docs/ai-first-format-conversation-followup-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+      <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
+        </div>
+        <div class="aside-card">
+      <p class="kicker">适合阅读</p>
+      <ul><li>需要回顾本次关于 KB、runtime projection、LLM input context、格式边界的后续澄清</li>
+<li>需要判断 AI Context 是否是新 truth 层、何时生成、由谁生成</li>
+<li>需要评估当前 runtime projection 是否需要为了 LLM context 做调整</li></ul>
+    </div>
+<div class="aside-card">
+      <p class="kicker">可跳过</p>
+      <ul><li>只需要完整格式矩阵和视觉报告</li>
+<li>只需要 confirmed baseline authority</li></ul>
+    </div>
+        <div class="aside-card related-card">
+      <p class="kicker">关联来源</p>
+      <a href="confirmed/project-alignment-summary-zh.html">RTS 项目对齐总纲</a><a href="confirmed/kb-to-index-projection-contract-zh.html">KB 到索引的运行时投影契约</a><a href="confirmed/internal-llm-agent-service-implementation-plan-zh.html">RTS 内部 AI 辅助服务落地计划</a>
+    </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+          <h2>文档定位</h2>
+          <p>补充说明：AI 可读格式讨论中关于 KB、projection 和展示层的边界澄清。</p>
+        </article>
+<article class="insight-card">
+          <h2>核心摘要</h2>
+          <p>补充说明：AI 可读格式讨论中关于 KB、projection 和展示层的边界澄清。</p>
+        </article>
+<article class="insight-card">
+          <h2>权威层级</h2>
+          <p>其他活跃文档 / role: analysis / layer: supplemental</p>
+        </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. 术语修正</h3>
+          <p>原报告中的“运行时能力”容易被误解为： 更准确的意思是： 它关注的是服务行为，而不是模型阅读舒适度。 包括： 能否被 Java service/API/tool 稳定解析。 能否做 schema validation、必填字段检查、类型检查。 能否绑定 release_id、scope、permission、content_hash。</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 分层口径补充</h3>
+          <p>原报告里的分层可以继续保留，但需要更明确地区分“truth 层”和“运行时组装层”。 Source 是原始证据和输入材料。 例如： 业务文档 Excel XML/FpML XSLT Java 截图 OCR 样例报文 Source 的作用是证明规则从哪里来。 Source 不应该被普通 runtime query 直接当 truth 读取。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. LLM Input Context Envelope 的定位</h3>
+          <p>它不是： 新 KB。 新 runtime projection。 新 index。 新 truth source。 对 L2 的智能总结。 发布时固定生成的 artifact。 让 AI 自己决定哪些内容能当事实的机制。 它是： 它基于 runtime projection 生成，但不创造新的 truth。 它只做三件事：</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. LLM Input Context Envelope 何时生成</h3>
+          <p>它应该在运行时生成。 也就是： 每次执行时根据当前请求生成。 不建议在 projection 发布时提前生成完整 context。 原因： context 取决于用户问题。 context 取决于 intent。 context 取决于 resolved scope。 context 取决于 caller permission。</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. LLM Input Context Envelope 由谁生成</h3>
+          <p>应主要由程序生成。 不是由 AI 自己生成。 推荐流程： AI 可以提出“可能还需要什么对象”，但最终： 哪些对象可读 哪些字段可进入上下文 哪些内容可标记为 truth eligible 哪些 governance summary 可展开 哪些内容需要 redaction 都必须由 RTS service 决定。</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. LLM Input Context Envelope 的最小形态</h3>
+          <p>短期不需要复杂设计。 可以先做一个很薄的 envelope。 每个 context item 至少包含： 关键字段解释： kind：这段是什么，例如 l2_fact、dependency、object_card、governance_warning、memory。 truth_eligible：这段能不能支撑事实 claim。</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. 当前项目是否已经有这个东西</h3>
+          <p>当前项目已经有雏形，但还没有正式命名为稳定格式。 已有基础： ContextKind：已经区分 object_card、l2_fact、dependency、governance_warning、memory 等类型。 ContextItem：已经有 kind、source、truthEligible、objectUri、hash、text。</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. 和 KB 的关系</h3>
+          <p>LLM Input Context Envelope 主要不是 KB 设计问题。 它更偏： KB 不需要知道某次用户问了什么。 KB 的职责是： 管理完整 truth graph。 产出 canonical objects。 记录 evidence/review/adjudication/signoff。 发布 runtime projection。</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. 当前 runtime projection 是否需要调整</h3>
+          <p>结论： 当前 sample projection 已经有比较完整的原材料： release-manifest.json object-manifest.jsonl navigation/object-cards.jsonl navigation/l0-l1-views.jsonl l2/*/.json dependencies/dependency-edges.jsonl</p>
+        </article>
+<article class="chapter-card">
+          <h3>10. 是否应该把格式化好的内容提前放进 projection</h3>
+          <p>可以提前放一部分，但不应提前放最终 LLM context。 可以提前放： object card summary L0 text L1 JSON search text example summary warning summary field bindings dependency hints 这些是 object-level reusable views。</p>
+        </article>
+<article class="chapter-card">
+          <h3>11. 生成方式不应依赖“智能改写”</h3>
+          <p>LLM context 生成不应该是： 更安全的方式是： 程序可以做： 选对象。 选字段。 取摘要字段。 保留原始 L2 JSON 片段。 加 URI/release/hash。 标记 truth eligibility。 标记 allowed use。 控制 token budget。 AI 不应该决定： 哪些材料是 truth。</p>
+        </article>
+<article class="chapter-card">
+          <h3>12. 安全门禁</h3>
+          <p>LLM Input Context Envelope 需要几条硬规则： 只有 L2、dependency、authorized governance summary 可以 truth_eligible=true。 Object card、search hit、L0/L1 默认只能 navigation_only。 Memory、chat history、workspace notes、raw diff/log 默认 truth_elig</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="ai-first-format-follow-up-notes">AI-first Format Follow-up Notes<a class="headerlink" href="#ai-first-format-follow-up-notes" title="Permanent link">#</a></h1>
+<blockquote>
+<p>状态：conversation follow-up note
+创建日期：2026-05-15
+范围：记录本次对话中在 <code>docs/ai-readable-format-strategy-zh.html</code> 之后进一步澄清出的重点。</p>
+</blockquote>
+<p>本文不是新的 confirmed baseline，也不替代 runtime projection contract。</p>
+<p>它的作用是把本次讨论中“后来才说清楚”的点集中记录下来，避免后续继续混淆：</p>
+<ul>
+<li>AI-first 语境下，人工直接看材料不是主要权重。</li>
+<li><code>AI Context Format</code> 这个名字容易误解，更适合叫 <code>LLM Input Context Envelope</code>。</li>
+<li>这个 envelope 不是新 truth 层，不是新 projection，也不应在发布时预生成。</li>
+<li>当前 runtime projection 基本够作为 LLM context 的原材料，不需要推倒。</li>
+<li>真正需要增强的是角色标注、schema contract、运行时组装规则和上下文安全门禁。</li>
+</ul>
+<h2 id="1">1. 术语修正<a class="headerlink" href="#1" title="Permanent link">#</a></h2>
+<h3 id="11">1.1 “运行时能力”应改成“服务运行时适配度”<a class="headerlink" href="#11" title="Permanent link">#</a></h3>
+<p>原报告中的“运行时能力”容易被误解为：</p>
+<pre><code class="language-text">AI 读起来是否顺畅
+</code></pre>
+<p>更准确的意思是：</p>
+<pre><code class="language-text">某种格式是否适合作为 RTS service 在运行时安全读取、校验、过滤、追踪、返回事实的载体。
+</code></pre>
+<p>它关注的是服务行为，而不是模型阅读舒适度。</p>
+<p>包括：</p>
+<ul>
+<li>能否被 Java service/API/tool 稳定解析。</li>
+<li>能否做 schema validation、必填字段检查、类型检查。</li>
+<li>能否绑定 <code>release_id</code>、<code>scope</code>、<code>permission</code>、<code>content_hash</code>。</li>
+<li>能否按 URI、object id、target path、dependency 快速查找。</li>
+<li>能否支持 grounding、trace、refusal、审计复盘。</li>
+<li>能否避免 AI 把展示文字、注释、样式或历史讨论误当 truth。</li>
+</ul>
+<p>推荐列名：</p>
+<pre><code class="language-text">服务运行时适配度
+</code></pre>
+<p>英文可以叫：</p>
+<pre><code class="language-text">Service runtime suitability
+</code></pre>
+<h2 id="2">2. 分层口径补充<a class="headerlink" href="#2" title="Permanent link">#</a></h2>
+<p>原报告里的分层可以继续保留，但需要更明确地区分“truth 层”和“运行时组装层”。</p>
+<h3 id="21-source">2.1 Source<a class="headerlink" href="#21-source" title="Permanent link">#</a></h3>
+<p>Source 是原始证据和输入材料。</p>
+<p>例如：</p>
+<ul>
+<li>业务文档</li>
+<li>Excel</li>
+<li>XML/FpML</li>
+<li>XSLT</li>
+<li>Java</li>
+<li>截图 OCR</li>
+<li>样例报文</li>
+</ul>
+<p>Source 的作用是证明规则从哪里来。</p>
+<p>Source 不应该被普通 runtime query 直接当 truth 读取。</p>
+<h3 id="22-kb-authoring">2.2 KB Authoring<a class="headerlink" href="#22-kb-authoring" title="Permanent link">#</a></h3>
+<p>KB 是治理和整理层。</p>
+<p>它负责：</p>
+<ul>
+<li>从 source 中抽取 rule / lookup / helper。</li>
+<li>记录 evidence。</li>
+<li>暴露 ambiguity 和 conflict。</li>
+<li>支持 AI-first review。</li>
+<li>支持少量人工裁决和 signoff。</li>
+</ul>
+<p>AI 可以大量阅读和维护 KB，但 KB 里的 candidate、review notes、open questions 不能自动成为 runtime truth。</p>
+<h3 id="23-runtime-projection">2.3 Runtime Projection<a class="headerlink" href="#23-runtime-projection" title="Permanent link">#</a></h3>
+<p>Runtime projection 是发布后的服务运行视图。</p>
+<p>它负责：</p>
+<ul>
+<li>把 approved truth 变成 service 可读取对象。</li>
+<li>提供 manifest、scope、object manifest、L2、dependency、governance summary。</li>
+<li>支撑 release、scope、permission、hash、grounding、trace。</li>
+</ul>
+<p>Runtime projection 是 LLM context 的主要原材料来源。</p>
+<h3 id="24-index-query">2.4 Index / Query<a class="headerlink" href="#24-index-query" title="Permanent link">#</a></h3>
+<p>Index/query 层负责找对象和规划读取。</p>
+<p>它使用：</p>
+<ul>
+<li>object card</li>
+<li>L0/L1</li>
+<li>alias</li>
+<li>confusable</li>
+<li>search text</li>
+<li>dependency edges</li>
+<li>field bindings</li>
+</ul>
+<p>Index hit 不拥有 truth。</p>
+<p>命中后必须回到 L2 runtime object 或授权 governance summary。</p>
+<h3 id="25-llm-input-context-envelope">2.5 LLM Input Context Envelope<a class="headerlink" href="#25-llm-input-context-envelope" title="Permanent link">#</a></h3>
+<p>这是本次对话中重点澄清的层。</p>
+<p>它不是新的 truth 层。</p>
+<p>它只是每次调用 LLM 前，由 runtime service 从 projection 中挑选、裁剪、标注出来的一包材料。</p>
+<p>更准确的名字不建议叫 <code>AI Context Format</code>，而建议叫：</p>
+<pre><code class="language-text">LLM Input Context Envelope
+</code></pre>
+<p>中文：</p>
+<pre><code class="language-text">模型输入上下文信封
+</code></pre>
+<h3 id="26-presentation">2.6 Presentation<a class="headerlink" href="#26-presentation" title="Permanent link">#</a></h3>
+<p>Presentation 是展示层。</p>
+<p>例如：</p>
+<ul>
+<li>HTML</li>
+<li>dashboard</li>
+<li>PDF</li>
+<li>report</li>
+</ul>
+<p>它可以展示 AI 分析和少量人工抽查视图。</p>
+<p>它不应该回流成 truth source。</p>
+<h2 id="3-llm-input-context-envelope">3. LLM Input Context Envelope 的定位<a class="headerlink" href="#3-llm-input-context-envelope" title="Permanent link">#</a></h2>
+<h3 id="31">3.1 它不是什么<a class="headerlink" href="#31" title="Permanent link">#</a></h3>
+<p>它不是：</p>
+<ul>
+<li>新 KB。</li>
+<li>新 runtime projection。</li>
+<li>新 index。</li>
+<li>新 truth source。</li>
+<li>对 L2 的智能总结。</li>
+<li>发布时固定生成的 artifact。</li>
+<li>让 AI 自己决定哪些内容能当事实的机制。</li>
+</ul>
+<h3 id="32">3.2 它是什么<a class="headerlink" href="#32" title="Permanent link">#</a></h3>
+<p>它是：</p>
+<pre><code class="language-text">某一次 ask/scenario/tool run 中，RTS service 准备喂给 LLM 的受控材料包。
+</code></pre>
+<p>它基于 runtime projection 生成，但不创造新的 truth。</p>
+<p>它只做三件事：</p>
+<ol>
+<li>选择：这次问题需要哪些 L2、dependency、governance summary。</li>
+<li>裁剪：不一定把整个 L2 都给 AI，只给本次问题相关字段。</li>
+<li>标注：告诉 AI 每段材料能不能当事实、来自哪里、属于哪个 release、hash 是什么。</li>
+</ol>
+<h3 id="33-runtime-projection-llm-context">3.3 为什么 runtime projection 本身还不等于 LLM context<a class="headerlink" href="#33-runtime-projection-llm-context" title="Permanent link">#</a></h3>
+<p>Runtime projection 是完整服务材料库。</p>
+<p>它包含：</p>
+<ul>
+<li>release manifest</li>
+<li>scope registry</li>
+<li>object manifest</li>
+<li>object cards</li>
+<li>L2 objects</li>
+<li>dependency edges</li>
+<li>field bindings</li>
+<li>governance summaries</li>
+<li>navigation views</li>
+<li>caller profiles</li>
+<li>index artifacts</li>
+</ul>
+<p>但每次 LLM 调用通常只需要其中一小部分。</p>
+<p>例如：</p>
+<pre><code class="language-text">用户问 fixingDate
+</code></pre>
+<p>需要的可能只是：</p>
+<ul>
+<li>fixingDate rule 的 L2</li>
+<li>相关 warning</li>
+<li>URI</li>
+<li>release id</li>
+<li>L2 hash</li>
+</ul>
+<p>不需要整个 pack、所有 lookup、所有 helper、所有 governance summaries。</p>
+<p>所以 runtime projection 是材料库，LLM input context envelope 是本次调用的装箱结果。</p>
+<h2 id="4-llm-input-context-envelope">4. LLM Input Context Envelope 何时生成<a class="headerlink" href="#4-llm-input-context-envelope" title="Permanent link">#</a></h2>
+<p>它应该在运行时生成。</p>
+<p>也就是：</p>
+<pre><code class="language-text">/ask
+scenario endpoint
+external tool mode wrapper
+MCP managed wrapper
+</code></pre>
+<p>每次执行时根据当前请求生成。</p>
+<p>不建议在 projection 发布时提前生成完整 context。</p>
+<p>原因：</p>
+<ul>
+<li>context 取决于用户问题。</li>
+<li>context 取决于 intent。</li>
+<li>context 取决于 resolved scope。</li>
+<li>context 取决于 caller permission。</li>
+<li>context 取决于 token budget。</li>
+<li>context 取决于是否需要 governance view。</li>
+<li>context 取决于 dependency traversal depth。</li>
+</ul>
+<p>同一份 projection 可以被不同问题组装成不同 context。</p>
+<h2 id="5-llm-input-context-envelope">5. LLM Input Context Envelope 由谁生成<a class="headerlink" href="#5-llm-input-context-envelope" title="Permanent link">#</a></h2>
+<p>应主要由程序生成。</p>
+<p>不是由 AI 自己生成。</p>
+<p>推荐流程：</p>
+<pre><code class="language-text">用户问题
+  -&gt; RTS resolve scope
+  -&gt; RTS find object
+  -&gt; RTS read L2 / dependency / governance summary
+  -&gt; 程序按模板生成 context envelope
+  -&gt; LLM 基于 envelope 生成分析草稿
+  -&gt; RTS 做 claim/grounding validation
+</code></pre>
+<p>AI 可以提出“可能还需要什么对象”，但最终：</p>
+<ul>
+<li>哪些对象可读</li>
+<li>哪些字段可进入上下文</li>
+<li>哪些内容可标记为 truth eligible</li>
+<li>哪些 governance summary 可展开</li>
+<li>哪些内容需要 redaction</li>
+</ul>
+<p>都必须由 RTS service 决定。</p>
+<h2 id="6-llm-input-context-envelope">6. LLM Input Context Envelope 的最小形态<a class="headerlink" href="#6-llm-input-context-envelope" title="Permanent link">#</a></h2>
+<p>短期不需要复杂设计。</p>
+<p>可以先做一个很薄的 envelope。</p>
+<p>每个 context item 至少包含：</p>
+<pre><code class="language-yaml">kind: l2_fact
+truth_eligible: true
+uri: rts://...
+release_id: rel-2026-05-06
+hash: sha256:...
+allowed_use: answer_fact
+content: ...
+</code></pre>
+<p>关键字段解释：</p>
+<ul>
+<li><code>kind</code>：这段是什么，例如 <code>l2_fact</code>、<code>dependency</code>、<code>object_card</code>、<code>governance_warning</code>、<code>memory</code>。</li>
+<li><code>truth_eligible</code>：这段能不能支撑事实 claim。</li>
+<li><code>uri</code>：对应哪个 RTS object。</li>
+<li><code>release_id</code>：来自哪个 release。</li>
+<li><code>hash</code>：对应 L2 或 summary 的 hash。</li>
+<li><code>allowed_use</code>：这段允许怎么用，例如 <code>answer_fact</code>、<code>navigation_only</code>、<code>warning_only</code>、<code>candidate_only</code>。</li>
+<li><code>content</code>：给模型看的实际内容。</li>
+</ul>
+<h3 id="61-l2-fact-context-item">6.1 示例：L2 fact context item<a class="headerlink" href="#61-l2-fact-context-item" title="Permanent link">#</a></h3>
+<pre><code class="language-yaml">kind: l2_fact
+truth_eligible: true
+uri: rts://tradition/stella/.../rules/rule_fxd_ndf_fixing_date
+release_id: rel-2026-05-06-photo-fxd-ndf-cutoff
+hash: sha256:338bd616...
+allowed_use: answer_fact
+content:
+  summary: Fixing date copies source fixingDate directly to Stella fixingDate.
+  source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/fixingDate/text()
+  target_path: /scb:SCBML/.../conf:fixingDate
+  dependencies: []
+</code></pre>
+<h3 id="62-navigation-only-context-item">6.2 示例：navigation-only context item<a class="headerlink" href="#62-navigation-only-context-item" title="Permanent link">#</a></h3>
+<pre><code class="language-yaml">kind: object_card
+truth_eligible: false
+uri: rts://tradition/stella/.../rules/rule_fxd_ndf_fixing_date
+release_id: rel-2026-05-06-photo-fxd-ndf-cutoff
+hash: sha256:2c0054...
+allowed_use: navigation_only
+content:
+  summary: Fixing date copies source fixingDate directly to Stella fixingDate.
+</code></pre>
+<p>这里的重点是：</p>
+<pre><code class="language-text">object_card 可以帮助找到对象，但不能单独支撑最终事实。
+</code></pre>
+<h2 id="7">7. 当前项目是否已经有这个东西<a class="headerlink" href="#7" title="Permanent link">#</a></h2>
+<p>当前项目已经有雏形，但还没有正式命名为稳定格式。</p>
+<p>已有基础：</p>
+<ul>
+<li><code>ContextKind</code>：已经区分 <code>object_card</code>、<code>l2_fact</code>、<code>dependency</code>、<code>governance_warning</code>、<code>memory</code> 等类型。</li>
+<li><code>ContextItem</code>：已经有 <code>kind</code>、<code>source</code>、<code>truthEligible</code>、<code>objectUri</code>、<code>hash</code>、<code>text</code>。</li>
+<li><code>ContextSnapshot</code>：已经记录 context items、hash、token estimate、truthEligible count。</li>
+<li><code>OpenAiCompatibleLlmClient</code>：已经会先读取 grounded service result，再传给模型。</li>
+</ul>
+<p>不足：</p>
+<ul>
+<li>还没有稳定的 <code>llm-input-context-envelope-v1</code> schema。</li>
+<li>现在更像运行时对象和 prompt 拼装逻辑，而不是一份明确的格式契约。</li>
+<li>当前 context 更偏 URI/hash preservation，尚未形成清晰的 per-item <code>allowed_use</code>、<code>redaction_state</code>、<code>field_path</code>、<code>source_role</code> 约定。</li>
+</ul>
+<h2 id="8-kb">8. 和 KB 的关系<a class="headerlink" href="#8-kb" title="Permanent link">#</a></h2>
+<p>LLM Input Context Envelope 主要不是 KB 设计问题。</p>
+<p>它更偏：</p>
+<pre><code class="language-text">query layer / LLM harness / tool orchestration
+</code></pre>
+<p>KB 不需要知道某次用户问了什么。</p>
+<p>KB 的职责是：</p>
+<ul>
+<li>管理完整 truth graph。</li>
+<li>产出 canonical objects。</li>
+<li>记录 evidence/review/adjudication/signoff。</li>
+<li>发布 runtime projection。</li>
+</ul>
+<p>LLM context 的职责是：</p>
+<ul>
+<li>在某次运行时，从 projection 中挑选材料。</li>
+<li>给模型一个受控、低噪声、可引用的材料包。</li>
+</ul>
+<p>因此：</p>
+<pre><code class="language-text">KB 负责 truth formation。
+Projection 负责 truth publication。
+LLM context envelope 负责 per-request truth packaging。
+</code></pre>
+<h2 id="9-runtime-projection">9. 当前 runtime projection 是否需要调整<a class="headerlink" href="#9-runtime-projection" title="Permanent link">#</a></h2>
+<p>结论：</p>
+<pre><code class="language-text">不需要为了 LLM context 大改当前 runtime projection。
+</code></pre>
+<p>当前 sample projection 已经有比较完整的原材料：</p>
+<ul>
+<li><code>release-manifest.json</code></li>
+<li><code>object-manifest.jsonl</code></li>
+<li><code>navigation/object-cards.jsonl</code></li>
+<li><code>navigation/l0-l1-views.jsonl</code></li>
+<li><code>l2/**/*.json</code></li>
+<li><code>dependencies/dependency-edges.jsonl</code></li>
+<li><code>dependencies/field-bindings.jsonl</code></li>
+<li><code>governance/governance-access-refs.jsonl</code></li>
+<li><code>governance/*-summaries/*.json</code></li>
+</ul>
+<p>这些已经可以支持运行时组装 LLM context。</p>
+<p>建议做小增强，而不是大改。</p>
+<h3 id="91-truth_role-view_role">9.1 建议增强：统一 <code>truth_role</code> / <code>view_role</code><a class="headerlink" href="#91-truth_role-view_role" title="Permanent link">#</a></h3>
+<p>当前 L0/L1 里已经出现：</p>
+<pre><code class="language-json">&quot;view_role&quot;: &quot;navigation_not_truth&quot;
+</code></pre>
+<p>这是好的。</p>
+<p>建议推广到更多 projection artifact。</p>
+<p>例如：</p>
+<pre><code class="language-json">&quot;truth_role&quot;: &quot;l2_fact&quot;
+</code></pre>
+<pre><code class="language-json">&quot;truth_role&quot;: &quot;navigation_only&quot;
+</code></pre>
+<pre><code class="language-json">&quot;truth_role&quot;: &quot;authorized_governance_summary&quot;
+</code></pre>
+<p>这样 context builder 不需要猜某个对象能不能支撑 fact。</p>
+<h3 id="92-object-card-navigation-only">9.2 建议增强：object card 明确 navigation-only<a class="headerlink" href="#92-object-card-navigation-only" title="Permanent link">#</a></h3>
+<p>Object card 很适合定位、消歧和初步排序。</p>
+<p>但它不应该被当作最终事实。</p>
+<p>建议 object card 也明确：</p>
+<pre><code class="language-json">&quot;truth_role&quot;: &quot;navigation_only&quot;
+</code></pre>
+<p>或者：</p>
+<pre><code class="language-json">&quot;view_role&quot;: &quot;navigation_not_truth&quot;
+</code></pre>
+<h3 id="93-l2">9.3 建议增强：L2 字段用途约定<a class="headerlink" href="#93-l2" title="Permanent link">#</a></h3>
+<p>L2 中有些字段适合进入事实 context：</p>
+<ul>
+<li><code>logic</code></li>
+<li><code>inputs</code></li>
+<li><code>target</code></li>
+<li><code>dependencies</code></li>
+<li><code>examples</code></li>
+</ul>
+<p>有些字段更像 caution：</p>
+<ul>
+<li><code>operational_warnings</code></li>
+<li><code>production_gate</code></li>
+<li><code>review_state.open_questions</code></li>
+</ul>
+<p>有些字段只是指针：</p>
+<ul>
+<li><code>governance_summary_refs</code></li>
+<li><code>source_lineage</code></li>
+</ul>
+<p>建议在 schema 文档中约定这些字段的默认用途。</p>
+<p>不一定要改所有 JSON 文件。</p>
+<p>更重要的是让 context builder 有明确规则。</p>
+<h3 id="94-governance-summary">9.4 建议增强：governance summary 标明用途<a class="headerlink" href="#94-governance-summary" title="Permanent link">#</a></h3>
+<p>Governance summary 应该明确：</p>
+<ul>
+<li>是否可进入默认 answer context。</li>
+<li>是否只用于 warning。</li>
+<li>是否需要 governance permission。</li>
+<li>是否可支撑 fact。</li>
+<li>是否只是 evidence locator。</li>
+</ul>
+<p>建议加类似：</p>
+<pre><code class="language-json">&quot;truth_role&quot;: &quot;authorized_governance_summary&quot;,
+&quot;allowed_use&quot;: [&quot;warning&quot;, &quot;evidence_explanation&quot;],
+&quot;requires_permission&quot;: &quot;governance_tools&quot;
+</code></pre>
+<h3 id="95-lookup-metadata">9.5 建议增强：lookup 大表 metadata<a class="headerlink" href="#95-lookup-metadata" title="Permanent link">#</a></h3>
+<p>当前 lookup L2 中已经有：</p>
+<ul>
+<li>inputs</li>
+<li>logic pipeline</li>
+<li>output fields</li>
+<li>examples</li>
+<li>reverse fallback</li>
+</ul>
+<p>这对 demo 和小 lookup 已经够用。</p>
+<p>如果未来有真正大表，并使用 CSV/TSV 存储，需要补 companion metadata：</p>
+<ul>
+<li>key columns</li>
+<li>output columns</li>
+<li>blank semantics</li>
+<li>reverse fallback</li>
+<li>coalesce behavior</li>
+<li>source hash</li>
+<li>row-level hash 或 table hash</li>
+</ul>
+<h2 id="10-projection">10. 是否应该把格式化好的内容提前放进 projection<a class="headerlink" href="#10-projection" title="Permanent link">#</a></h2>
+<p>可以提前放一部分，但不应提前放最终 LLM context。</p>
+<p>可以提前放：</p>
+<ul>
+<li>object card summary</li>
+<li>L0 text</li>
+<li>L1 JSON</li>
+<li>search text</li>
+<li>example summary</li>
+<li>warning summary</li>
+<li>field bindings</li>
+<li>dependency hints</li>
+</ul>
+<p>这些是 object-level reusable views。</p>
+<p>不应提前放：</p>
+<ul>
+<li>某次问题的 final context packet</li>
+<li>某个 caller 权限下的 context</li>
+<li>某个 token budget 下的裁剪结果</li>
+<li>某个 scenario intent 下的组合结果</li>
+</ul>
+<p>原因：</p>
+<pre><code class="language-text">最终 context 是 query-specific / caller-specific / budget-specific / intent-specific。
+</code></pre>
+<p>所以合理分工是：</p>
+<pre><code class="language-text">projection 预生成可复用的对象级视图；
+运行时按请求组装最终 LLM input envelope。
+</code></pre>
+<h2 id="11_1">11. 生成方式不应依赖“智能改写”<a class="headerlink" href="#11_1" title="Permanent link">#</a></h2>
+<p>LLM context 生成不应该是：</p>
+<pre><code class="language-text">让 AI 看 L2，然后 AI 自己总结一份 context。
+</code></pre>
+<p>更安全的方式是：</p>
+<pre><code class="language-text">程序模板 + 固定字段选择 + 权限检查 + hash preservation。
+</code></pre>
+<p>程序可以做：</p>
+<ul>
+<li>选对象。</li>
+<li>选字段。</li>
+<li>取摘要字段。</li>
+<li>保留原始 L2 JSON 片段。</li>
+<li>加 URI/release/hash。</li>
+<li>标记 truth eligibility。</li>
+<li>标记 allowed use。</li>
+<li>控制 token budget。</li>
+</ul>
+<p>AI 不应该决定：</p>
+<ul>
+<li>哪些材料是 truth。</li>
+<li>哪些 hash 有效。</li>
+<li>哪些权限允许。</li>
+<li>哪些 governance 内容可见。</li>
+</ul>
+<h2 id="12">12. 安全门禁<a class="headerlink" href="#12" title="Permanent link">#</a></h2>
+<p>LLM Input Context Envelope 需要几条硬规则：</p>
+<ul>
+<li>只有 L2、dependency、authorized governance summary 可以 <code>truth_eligible=true</code>。</li>
+<li>Object card、search hit、L0/L1 默认只能 <code>navigation_only</code>。</li>
+<li>Memory、chat history、workspace notes、raw diff/log 默认 <code>truth_eligible=false</code>。</li>
+<li>没有 URI/hash 的内容不能支撑 fact。</li>
+<li>没有权限的 governance material 不能进入 context。</li>
+<li>Context 为空或无 truth eligible item 时，应 clarification、partial 或 refusal。</li>
+<li>最终 answer 仍要做 grounding validation。</li>
+</ul>
+<h2 id="13-enhancement">13. 本次讨论中形成的 enhancement 清单<a class="headerlink" href="#13-enhancement" title="Permanent link">#</a></h2>
+<h3 id="131">13.1 文档表达修复<a class="headerlink" href="#131" title="Permanent link">#</a></h3>
+<ul>
+<li>把“运行时能力”改成“服务运行时适配度”。</li>
+<li>把 “AI Context Format” 改成 “LLM Input Context Envelope / 模型输入上下文信封”。</li>
+<li>明确 AI-first 权重：AI/agent 直接阅读、审核、维护是主场；人工直接查看只是少量抽查。</li>
+<li>明确 Presentation 是派生展示层，不是 truth 层。</li>
+</ul>
+<h3 id="132-kb">13.2 KB 侧增强<a class="headerlink" href="#132-kb" title="Permanent link">#</a></h3>
+<ul>
+<li>定义受限 YAML subset。</li>
+<li>禁止复杂 anchors、隐式 boolean/date、重复 key、自由字段漂移。</li>
+<li>发布前对 KB YAML/Markdown 做 schema/governance validation。</li>
+<li>治理叙述可以是 Markdown，但关键裁决、open questions、evidence refs 需要结构化同步。</li>
+</ul>
+<h3 id="133-runtime-projection">13.3 Runtime projection 侧增强<a class="headerlink" href="#133-runtime-projection" title="Permanent link">#</a></h3>
+<ul>
+<li>不需要大改。</li>
+<li>统一 <code>truth_role</code> / <code>view_role</code>。</li>
+<li>object card 明确 navigation-only。</li>
+<li>L2 字段按 fact / caution / governance ref 做用途约定。</li>
+<li>projection schema 更细分版本化。</li>
+</ul>
+<h3 id="134-query-llm-harness">13.4 Query / LLM harness 侧增强<a class="headerlink" href="#134-query-llm-harness" title="Permanent link">#</a></h3>
+<ul>
+<li>定义薄的 <code>llm-input-context-envelope-v1</code>。</li>
+<li>运行时生成 context envelope。</li>
+<li>程序模板生成，不由 AI 自己生成。</li>
+<li>每个 context item 带 <code>kind</code>、<code>truth_eligible</code>、<code>uri</code>、<code>release_id</code>、<code>hash</code>、<code>allowed_use</code>。</li>
+<li>最终回答继续走 grounding validation。</li>
+</ul>
+<h3 id="135-csv-tsv">13.5 CSV / TSV 侧增强<a class="headerlink" href="#135-csv-tsv" title="Permanent link">#</a></h3>
+<ul>
+<li>大 lookup 表可以用 CSV/TSV。</li>
+<li>必须配 companion metadata。</li>
+<li>metadata 至少包含 key columns、output columns、blank semantics、fallback/reverse/coalesce、source hash。</li>
+</ul>
+<h3 id="136-html">13.6 HTML 侧定位<a class="headerlink" href="#136-html" title="Permanent link">#</a></h3>
+<ul>
+<li>HTML 继续用于报告、dashboard、AI-mediated review、少量人工抽查。</li>
+<li>runtime/query/tool 不应解析 HTML 取 truth。</li>
+<li>HTML 应由 projection 或 analysis output 派生，不回流成 truth source。</li>
+</ul>
+<h2 id="14">14. 最终建议<a class="headerlink" href="#14" title="Permanent link">#</a></h2>
+<p>当前项目格式路线是对的：</p>
+<pre><code class="language-text">KB YAML/Markdown
+  -&gt; runtime projection JSON/JSONL
+  -&gt; query/index/service gate
+  -&gt; per-request LLM input context envelope
+  -&gt; managed answer / scenario report / HTML presentation
+</code></pre>
+<p>后续不建议大规模改格式。</p>
+<p>更应该做的是：</p>
+<ol>
+<li>把 projection artifact 的 truth role 标清楚。</li>
+<li>把 LLM input envelope 当作运行时装箱契约，而不是新 truth 层。</li>
+<li>把 KB YAML 和 projection JSON/JSONL 的 schema contract 补强。</li>
+<li>让程序负责 context 组装，让 AI 负责受控分析和表达。</li>
+</ol>
+<p>一句话：</p>
+<pre><code class="language-text">Projection 提供可信材料；LLM Input Context Envelope 只是本次调用的安全装箱。
+</code></pre>
+      </div>
+    </details>
+  </main>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

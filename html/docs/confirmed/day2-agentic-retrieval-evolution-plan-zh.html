@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RTS Day2 Controlled Agentic Retrieval Roadmap | RTS 来源解读</title>
+  <title>Day2 受控检索演进路线图 | RTS 来源解读</title>
   <link rel="stylesheet" href="../../assets/styles.css">
 </head>
 <body>
@@ -11,29 +11,37 @@
     <a class="brand-mark" href="../../index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="../../index.html">首页</a>
-      <a class="nav-link" href="../../start-here.html">三分钟读懂</a>
-      <a class="nav-link" href="../../architecture.html">架构边界</a>
+      <a class="nav-link" href="../../start-here.html">项目概览</a>
+      <a class="nav-link" href="../../architecture.html">KB 与投影</a>
       <a class="nav-link" href="../../library.html">来源文档</a>
     </nav>
   </header>
   <main class="source-page">
     <section class="source-hero">
-      <p class="kicker">Confirmed Baseline · docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md</p>
-      <h1>RTS Day2 Controlled Agentic Retrieval Roadmap</h1>
-      <p>compact Day2 controlled agentic retrieval, MCP, rerank, impact, and test-planning evolution roadmap</p>
+      <p class="kicker">已确认基线 · docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md</p>
+      <h1>Day2 受控检索演进路线图</h1>
+      <p>Day2 在受控 projection 上扩展检索、排序、影响分析和测试建议。</p>
       <div class="hero-actions">
-        <a class="button primary" href="#readable">先读解读版</a>
-        <a class="button secondary" href="#source">展开完整原文</a>
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
         <a class="button ghost" href="../../../docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md">Markdown 源文件</a>
       </div>
     </section>
 
-    <section class="readable-layout" id="readable">
+      <section class="readable-layout" id="readable">
       <aside class="readable-aside">
         <div class="aside-card">
-          <p class="kicker">How To Read</p>
-          <h2>这不是原文搬运页</h2>
-          <p>先读下面的摘要、关键章节和使用场景；需要严格核对时再打开完整原文。</p>
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
         </div>
         <div class="aside-card">
       <p class="kicker">适合阅读</p>
@@ -48,28 +56,28 @@
     </div>
         <div class="aside-card related-card">
       <p class="kicker">关联来源</p>
-      <a href="day1-query-service-and-llm-harness-plan-zh.html">RTS Day1 Query Service And Controlled LLM Harness</a><a href="final-llm-agent-service-plan-zh.html">RTS Final LLM Agent Service Roadmap</a>
+      <a href="day1-query-service-and-llm-harness-plan-zh.html">Day1 查询服务与 AI 辅助计划</a><a href="final-llm-agent-service-plan-zh.html">长期服务能力路线图</a>
     </div>
       </aside>
       <div class="readable-main">
         <section class="insight-grid">
           <article class="insight-card">
-          <h2>这篇的作用</h2>
-          <p>compact Day2 controlled agentic retrieval, MCP, rerank, impact, and test-planning evolution roadmap</p>
+          <h2>文档定位</h2>
+          <p>Day2 在受控 projection 上扩展检索、排序、影响分析和测试建议。</p>
         </article>
 <article class="insight-card">
-          <h2>先抓住</h2>
-          <p>&gt; 状态：confirmed compact roadmap &gt; 压缩日期：2026-05-08 &gt; 原完整长版：docs/archive/reference-proposals/day2-agentic-retrieval-evolution-plan-zh.md Day2 把 Day1 的受控工具调用扩展成 controlled agentic retrieval，并把双核心栈中的托管分析服务从第一版入口推进到更稳定的场景产品能力。 核心变化：</p>
+          <h2>核心摘要</h2>
+          <p>Day2 在受控 projection 上扩展检索、排序、影响分析和测试建议。</p>
         </article>
 <article class="insight-card">
           <h2>权威层级</h2>
-          <p>Confirmed Baseline / role: leaf / layer: 3</p>
+          <p>已确认基线 / role: leaf / layer: 3</p>
         </article>
         </section>
         <section class="chapter-section">
           <div class="section-heading">
-            <p class="kicker">Readable Outline</p>
-            <h2>这篇文档在讲什么</h2>
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
           </div>
           <div class="chapter-grid">
             <article class="chapter-card">
@@ -123,8 +131,8 @@
 
     <details class="source-drawer" id="source">
       <summary>
-        <span>完整 Markdown 来源</span>
-        <strong>用于核对事实、字段和原始措辞</strong>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
       </summary>
       <div class="markdown-body">
         <h1 id="rts-day2-controlled-agentic-retrieval-roadmap">RTS Day2 Controlled Agentic Retrieval Roadmap<a class="headerlink" href="#rts-day2-controlled-agentic-retrieval-roadmap" title="Permanent link">#</a></h1>

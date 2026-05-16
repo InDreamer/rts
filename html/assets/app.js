@@ -18,6 +18,39 @@
   }
   if (searchInput) searchInput.addEventListener("input", filterCards);
 
+  document.querySelectorAll("[data-copy-value]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const original = button.textContent;
+      try {
+        await copyText(button.dataset.copyValue || "");
+        button.textContent = "已复制";
+        setTimeout(() => (button.textContent = original), 1200);
+      } catch (error) {
+        button.textContent = "复制失败";
+        setTimeout(() => (button.textContent = original), 1200);
+      }
+    });
+  });
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+    const ok = document.execCommand("copy");
+    textarea.remove();
+    if (!ok) throw new Error("copy failed");
+  }
+
   document.querySelectorAll("[data-tabs]").forEach((root) => {
     const buttons = Array.from(root.querySelectorAll("[data-tab]"));
     const panels = Array.from(root.querySelectorAll("[data-tab-panel]"));
@@ -39,7 +72,7 @@
     button.addEventListener("click", async () => {
       const text = pre.innerText.replace(/^复制\s*/, "");
       try {
-        await navigator.clipboard.writeText(text);
+        await copyText(text);
         button.textContent = "已复制";
         setTimeout(() => (button.textContent = "复制"), 1200);
       } catch (error) {
@@ -129,7 +162,7 @@
   if (copyExample && output) {
     copyExample.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(output.textContent || "");
+        await copyText(output.textContent || "");
         copyExample.textContent = "已复制";
         setTimeout(() => (copyExample.textContent = "复制示例"), 1200);
       } catch (error) {

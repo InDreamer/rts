@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>架构边界 | RTS</title>
+  <title>KB 与 Runtime Projection | RTS</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -11,91 +11,202 @@
     <a class="brand-mark" href="index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="index.html">首页</a>
-<a class="nav-link" href="start-here.html">三分钟读懂</a>
-<a class="nav-link active" href="architecture.html">架构边界</a>
-<a class="nav-link" href="operations.html">运行与调用</a>
-<a class="nav-link" href="roadmap.html">路线图</a>
+<a class="nav-link" href="start-here.html">项目概览</a>
+<a class="nav-link active" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="operations.html">如何使用</a>
+<a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
     </nav>
   </header>
   <main>
     <section class="page-hero">
-      <p class="kicker">RTS Reading Experience</p>
-      <h1>架构边界</h1>
-      <p>把 KB、projection、index、service、LLM 和 agent 的责任分清楚。</p>
+      <p class="kicker">RTS 项目介绍</p>
+      <h1>KB 与 Runtime Projection</h1>
+      <p>KB 负责治理完整规则知识，runtime projection 负责把已批准内容发布成服务可读取的运行包。</p>
     </section>
     
+    <section class="architecture-legend">
+      <div>
+        <p class="kicker">KB 与投影的分工</p>
+        <h2>KB 保留完整治理，runtime projection 提供运行时视图。</h2>
+        <p>这是 RTS 里最重要的边界：KB 不是给人看的长文档集合，projection 也不是简单摘要。两者都是机器优先结构，只是承担的职责不同。</p>
+      </div>
+      <div class="legend-grid">
+        <article class="ok">
+          <strong>KB 关注“规则为什么可信”</strong>
+          <p>source、evidence、review、ambiguity、adjudication、signoff 和 lineage。</p>
+        </article>
+        <article class="warn">
+          <strong>Projection 关注“服务如何读取”</strong>
+          <p>release、scope、object manifest、L2、cards、dependency、governance summary 和 trace。</p>
+        </article>
+      </div>
+    </section>
+
     <section class="architecture-map">
       <div class="layer source">
         <span>01</span>
-        <h2>Source Material</h2>
-        <p>业务文档、代码、mapping、lookup、示例、clarification。</p>
+        <h2>源材料 <small>Source Material</small></h2>
+        <p>业务文档、Java/XSLT、Excel mapping、lookup table、样例和澄清记录。</p>
       </div>
       <div class="layer govern">
         <span>02</span>
-        <h2>Governed KB</h2>
-        <p>Rule、Rule pack、Evidence chain、review、adjudication、signoff。</p>
+        <h2>KB <small>Knowledge Base</small></h2>
+        <p>完整规则知识图：rule、lookup、helper、evidence、review、adjudication、signoff。</p>
       </div>
       <div class="layer projection">
         <span>03</span>
-        <h2>Runtime Projection</h2>
-        <p>release manifest、scope registry、object manifest、cards、L2、dependency。</p>
+        <h2>运行时投影 <small>Runtime Projection</small></h2>
+        <p>已批准内容的运行包：release manifest、scope registry、object manifest、cards、L2、dependency。</p>
       </div>
       <div class="layer service">
         <span>04</span>
-        <h2>RTS Service Gate</h2>
-        <p>release、scope、permission、hash、grounding、refusal、trace。</p>
+        <h2>服务读取 <small>Service Read</small></h2>
+        <p>查询、索引、API、影响分析和 AI 辅助都通过 projection 读取规则。</p>
       </div>
       <div class="layer consume">
         <span>05</span>
-        <h2>Consumption</h2>
-        <p>query、ask、scenario、MCP、pipeline、external agent。</p>
+        <h2>复盘与演进 <small>Trace / Feedback</small></h2>
+        <p>调用 trace、review feedback 和新裁决回到治理流程，再发布新 projection。</p>
       </div>
     </section>
 
     <section class="split-explain">
-      <article id="atomic-capabilities">
-        <p class="kicker">Core A</p>
-        <h2>受控真相源原子能力</h2>
-        <p>这些能力回答“能不能安全地找到和读取 truth material”。它们是 deterministic information service，不是 AI 不可用时才存在的 fallback。</p>
+      <article id="kb-layer">
+        <p class="kicker">KB Layer</p>
+        <h2>KB 里应该保留什么？</h2>
+        <p>KB 是完整 governed truth graph，不只是规则正文。它需要保存规则本身，也要保存规则为什么可信、哪里还有歧义、谁做了裁决。</p>
         <ul class="tag-list">
-          <li>resolve scope</li>
-          <li>find objects</li>
-          <li>read object card</li>
-          <li>read L2</li>
-          <li>dependency traversal</li>
-          <li>trace and grounding</li>
+          <li>rule / lookup / helper</li>
+          <li>source material</li>
+          <li>evidence chain</li>
+          <li>review notes</li>
+          <li>ambiguity / open question</li>
+          <li>human adjudication / signoff</li>
         </ul>
       </article>
-      <article id="managed-analysis">
-        <p class="kicker">Core B</p>
-        <h2>托管 LLM agent 分析</h2>
-        <p>这些能力回答“如何把 truth material 变成可用分析”。AI 可以规划、取证、表达 unknown 和 candidate，但不能拥有 truth authority。</p>
+      <article id="projection-layer">
+        <p class="kicker">Runtime Projection</p>
+        <h2>Projection 里应该发布什么？</h2>
+        <p>Projection 是 approved truth 的服务运行视图。它应该降低运行时噪声，但不能把规则事实压成只有自然语言摘要。</p>
         <ul class="tag-list">
-          <li>/ask</li>
-          <li>PR diff impact</li>
-          <li>exception investigation</li>
-          <li>failed message analysis</li>
-          <li>test planning</li>
-          <li>governance review</li>
+          <li>release manifest</li>
+          <li>scope registry</li>
+          <li>object manifest</li>
+          <li>object cards</li>
+          <li>L2 runtime objects</li>
+          <li>dependency edges</li>
+          <li>governance summaries</li>
+          <li>caller profiles</li>
         </ul>
       </article>
     </section>
 
+    <section class="context-envelope">
+      <div>
+        <p class="kicker">为什么不直接用搜索索引？</p>
+        <h2>索引能帮忙找到对象，但不能成为规则事实。</h2>
+        <p>Object card、L0/L1、alias、confusable 和全文索引适合召回和消歧。真正回答“规则怎么生成”时，服务必须回到 L2 runtime object、dependency 和授权 governance view。</p>
+      </div>
+      <div class="envelope-steps">
+        <span>先确定 scope</span>
+        <span>用 card 找对象</span>
+        <span>读取 L2 规则正文</span>
+        <span>展开 dependency</span>
+        <span>记录 trace</span>
+      </div>
+    </section>
+
+    <section class="term-section" id="glossary">
+      <div class="section-heading compact">
+        <p class="kicker">Glossary · 术语解释</p>
+        <h2>KB 与投影里的关键英文词</h2>
+        <p>这些词对应 runtime projection 包里的真实区域或字段。</p>
+      </div>
+      <div class="term-grid">
+        <article class="term-card">
+          <strong>RTS</strong>
+          <span>Rule Truth Source / Transformation Rule System</span>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的规则知识基础。</p>
+        </article>
+<article class="term-card">
+          <strong>KB</strong>
+          <span>Knowledge Base，规则知识库</span>
+          <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
+        </article>
+<article class="term-card">
+          <strong>Rule Pack</strong>
+          <span>规则包</span>
+          <p>按业务范围组织的一组 rule、lookup、helper，是整理、review 和发布的基本单位。</p>
+        </article>
+<article class="term-card">
+          <strong>Runtime Projection</strong>
+          <span>运行时投影</span>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+        </article>
+<article class="term-card">
+          <strong>L2 Runtime Object</strong>
+          <span>L2 运行时规则对象</span>
+          <p>runtime projection 中最重要的事实正文，保存服务可读的结构化规则逻辑。</p>
+        </article>
+<article class="term-card">
+          <strong>Object Card</strong>
+          <span>对象卡片</span>
+          <p>用于定位、消歧和召回规则对象；它帮助找到 L2，但不能替代 L2。</p>
+        </article>
+<article class="term-card">
+          <strong>Release Manifest</strong>
+          <span>发布清单</span>
+          <p>说明当前 projection 来自哪里、包含什么、是否可用，以及出现问题时如何回滚。</p>
+        </article>
+<article class="term-card">
+          <strong>Scope</strong>
+          <span>业务范围</span>
+          <p>通常由 channel、product、pack、domain 组成，用来防止相似规则被串用。</p>
+        </article>
+<article class="term-card">
+          <strong>Dependency</strong>
+          <span>规则依赖</span>
+          <p>描述 rule、lookup、helper 之间的关系，是解释影响面和测试范围的基础。</p>
+        </article>
+<article class="term-card">
+          <strong>Governance View</strong>
+          <span>治理视图</span>
+          <p>在权限允许时展示 evidence、review、open question、risk 和 signoff 信息。</p>
+        </article>
+<article class="term-card">
+          <strong>Trace</strong>
+          <span>审计轨迹</span>
+          <p>记录一次查询或调用读了哪些对象、如何命中、如何拒答，便于复盘和审计。</p>
+        </article>
+<article class="term-card">
+          <strong>Index Document</strong>
+          <span>索引文档</span>
+          <p>从 projection 派生出的搜索和导航视图，只负责召回，不拥有最终规则真相。</p>
+        </article>
+<article class="term-card">
+          <strong>AI-assisted Consumer</strong>
+          <span>AI 辅助消费方</span>
+          <p>可以基于 projection 做解释、影响分析或辅助 review，但基础仍是 KB 和 runtime projection。</p>
+        </article>
+      </div>
+    </section>
+
     <section class="boundary-table">
       <div>
-        <p class="kicker">Boundary Checks</p>
-        <h2>什么能支撑事实，什么不能。</h2>
+        <p class="kicker">边界表</p>
+        <h2>哪些内容负责治理，哪些内容负责运行？</h2>
       </div>
       <div class="table-card">
         <table>
-          <thead><tr><th>材料</th><th>用途</th><th>是否拥有 truth</th></tr></thead>
+          <thead><tr><th>内容</th><th>主要用途</th><th>介绍时怎么说</th></tr></thead>
           <tbody>
-            <tr><td>L2 runtime object</td><td>事实回答、诊断、测试规划 grounding</td><td>可以支撑事实</td></tr>
-            <tr><td>dependency edge</td><td>解释、影响候选、必要上下文加载</td><td>可以支撑依赖事实</td></tr>
-            <tr><td>object card / L0 / L1</td><td>导航、消歧、召回</td><td>不能替代 L2</td></tr>
-            <tr><td>LLM draft</td><td>分析草稿、表达、候选</td><td>不能自行成为 truth</td></tr>
-            <tr><td>memory / trace feedback</td><td>体验和检索辅助</td><td>不能参与 truth validation</td></tr>
+            <tr><td>KB canonical objects</td><td>保存完整规则和治理上下文</td><td>这是规则知识资产本体</td></tr>
+            <tr><td>Runtime projection</td><td>发布给服务读取的运行包</td><td>这是已批准规则的服务视图</td></tr>
+            <tr><td>L2 runtime object</td><td>保存服务可读的结构化规则事实</td><td>回答事实时要回到这里</td></tr>
+            <tr><td>Object card / L0 / L1</td><td>帮助搜索、导航和消歧</td><td>它是入口，不是最终规则正文</td></tr>
+            <tr><td>Governance summary</td><td>解释可信度、风险和 open question</td><td>需要权限和场景控制</td></tr>
+            <tr><td>Trace</td><td>复盘一次服务调用读了什么</td><td>它证明过程，不反写规则真相</td></tr>
           </tbody>
         </table>
       </div>
@@ -104,13 +215,13 @@
     <section class="source-strip">
       <p class="kicker">主要来源</p>
       <a href="docs/confirmed/kb-to-index-projection-contract-zh.html">Projection Contract</a>
-<a href="docs/confirmed/llm-harness-and-agent-integration-alignment-zh.html">LLM Alignment</a>
-<a href="docs/confirmed/internal-llm-agent-service-implementation-plan-zh.html">Internal Agent Plan</a>
+<a href="docs/confirmed/runtime-projection-product-guide-zh.html">Runtime Projection 产品说明</a>
+<a href="docs/confirmed/project-alignment-summary-zh.html">项目总纲</a>
     </section>
     
   </main>
   <footer class="site-footer">
-    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+    <p>本页根据项目文档重组表达；需要逐字核对时请进入来源文档页。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>

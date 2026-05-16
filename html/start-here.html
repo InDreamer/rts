@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>三分钟读懂 RTS | RTS</title>
+  <title>项目概览 | RTS</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
@@ -11,78 +11,150 @@
     <a class="brand-mark" href="index.html">RTS</a>
     <nav class="site-nav" aria-label="主导航">
       <a class="nav-link" href="index.html">首页</a>
-<a class="nav-link active" href="start-here.html">三分钟读懂</a>
-<a class="nav-link" href="architecture.html">架构边界</a>
-<a class="nav-link" href="operations.html">运行与调用</a>
-<a class="nav-link" href="roadmap.html">路线图</a>
+<a class="nav-link active" href="start-here.html">项目概览</a>
+<a class="nav-link" href="architecture.html">KB 与投影</a>
+<a class="nav-link" href="operations.html">如何使用</a>
+<a class="nav-link" href="roadmap.html">推进路径</a>
 <a class="nav-link" href="library.html">来源文档</a>
     </nav>
   </header>
   <main>
     <section class="page-hero">
-      <p class="kicker">RTS Reading Experience</p>
-      <h1>三分钟读懂 RTS</h1>
-      <p>先不读长文档，用一条清楚的故事建立 RTS 的核心心智模型。</p>
+      <p class="kicker">RTS 项目介绍</p>
+      <h1>项目概览</h1>
+      <p>RTS 将分散的转换规则整理成可治理的 KB，并发布为 runtime projection，支撑查询、审计和后续分析。</p>
     </section>
     
+    <section class="orientation-panel">
+      <div>
+        <p class="kicker">项目概览</p>
+        <h2>RTS 先解决“规则散落且难以证明”的问题。</h2>
+        <p>在报文转换场景里，同一条规则可能散在业务文档、Java/XSLT、Excel mapping、lookup table、样例和 review 记录里。RTS 的第一目标不是做聊天机器人，而是把这些材料整理成可治理的 KB，再发布成 runtime projection，供运行时服务读取。</p>
+      </div>
+      <div class="mini-matrix">
+        <article>
+          <span>现状</span>
+          <strong>规则分散，靠人翻找和解释</strong>
+        </article>
+        <article>
+          <span>建设</span>
+          <strong>KB 沉淀规则、证据和 review</strong>
+        </article>
+        <article>
+          <span>交付</span>
+          <strong>Runtime projection 支撑服务查询</strong>
+        </article>
+      </div>
+    </section>
+
     <section class="briefing-grid">
       <article class="briefing-card highlight">
         <span class="card-number">01</span>
-        <h2>RTS 是规则真相服务，不是普通 RAG。</h2>
-        <p>RTS 的核心职责是从多源材料形成 governed truth，再以 API、MCP、/ask 和 scenario endpoint 对外提供可追溯能力。</p>
+        <h2>KB 是规则知识的治理层。</h2>
+        <p>它保存 rule、lookup、helper、source、evidence、review、ambiguity、adjudication 和 signoff。这里关心的是规则为什么可信。</p>
       </article>
       <article class="briefing-card">
         <span class="card-number">02</span>
-        <h2>LLM 是核心能力，但不是 truth owner。</h2>
-        <p>LLM 做受控分析、冲突发现、影响候选、测试候选和表达；事实必须回到 L2、dependency、授权治理视图或 trace。</p>
+        <h2>Runtime projection 是运行时交付层。</h2>
+        <p>它把 approved truth 生成 release、scope、object manifest、L2 runtime object、dependency 和 governance summary，供服务稳定读取。</p>
       </article>
       <article class="briefing-card">
         <span class="card-number">03</span>
-        <h2>candidate 边界不是能力上限。</h2>
-        <p>场景服务可以做深入分析，但 impact/test/root cause 等输出必须区分 facts、inferences、unknowns、candidates 和 human decisions。</p>
+        <h2>API/AI 是消费层，不是事实源。</h2>
+        <p>查询、索引、影响分析和 AI 辅助都应该基于 projection 读取规则，而不是直接猜测、搜索草稿或读取未批准材料。</p>
       </article>
     </section>
 
     <section class="reading-lane">
       <div>
-        <p class="kicker">Mental Model</p>
-        <h2>先记住这五句话。</h2>
+        <p class="kicker">核心表述</p>
+        <h2>五句话概括。</h2>
       </div>
       <ol class="big-list">
-        <li><strong>KB owns truth</strong>：完整治理图在 KB，而不是搜索索引或聊天记录。</li>
-        <li><strong>Projection serves truth</strong>：runtime projection 是 approved truth 的服务运行视图。</li>
-        <li><strong>Service gates truth</strong>：RTS service 负责 release、scope、permission、hash、grounding、refusal、trace。</li>
-        <li><strong>LLM analyzes truth</strong>：AI 可以分析和表达，但不能偷偷裁决事实。</li>
-        <li><strong>Human decides conflict</strong>：材料冲突和关键歧义最终由人工 review/adjudication 记录。</li>
+        <li>RTS 不是把规则文档简单丢进搜索，而是整理一套可治理的规则知识库。</li>
+        <li>KB 保存完整治理上下文：规则逻辑、来源证据、review、歧义、裁决和 signoff。</li>
+        <li>Runtime projection 把已批准内容发布成运行时服务可以读取的稳定包。</li>
+        <li>服务回答必须能回到 L2 规则对象、依赖关系、授权治理视图或 trace。</li>
+        <li>AI 可以帮助解释和分析，但它消费的是这套已治理材料，不替代规则事实。</li>
       </ol>
+    </section>
+
+    <section class="term-section" id="glossary">
+      <div class="section-heading compact">
+        <p class="kicker">Glossary · 术语解释</p>
+        <h2>核心术语</h2>
+        <p>这些词会在介绍、文档和接口里反复出现；英文保留是为了和真实文件名、字段名和接口一致。</p>
+      </div>
+      <div class="term-grid">
+        <article class="term-card">
+          <strong>RTS</strong>
+          <span>Rule Truth Source / Transformation Rule System</span>
+          <p>RTS 将分散的转换规则整理成可治理、可发布、可查询的规则知识基础。</p>
+        </article>
+<article class="term-card">
+          <strong>KB</strong>
+          <span>Knowledge Base，规则知识库</span>
+          <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整治理层。</p>
+        </article>
+<article class="term-card">
+          <strong>Rule Pack</strong>
+          <span>规则包</span>
+          <p>按业务范围组织的一组 rule、lookup、helper，是整理、review 和发布的基本单位。</p>
+        </article>
+<article class="term-card">
+          <strong>Runtime Projection</strong>
+          <span>运行时投影</span>
+          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+        </article>
+<article class="term-card">
+          <strong>L2 Runtime Object</strong>
+          <span>L2 运行时规则对象</span>
+          <p>runtime projection 中最重要的事实正文，保存服务可读的结构化规则逻辑。</p>
+        </article>
+<article class="term-card">
+          <strong>Object Card</strong>
+          <span>对象卡片</span>
+          <p>用于定位、消歧和召回规则对象；它帮助找到 L2，但不能替代 L2。</p>
+        </article>
+<article class="term-card">
+          <strong>Release Manifest</strong>
+          <span>发布清单</span>
+          <p>说明当前 projection 来自哪里、包含什么、是否可用，以及出现问题时如何回滚。</p>
+        </article>
+<article class="term-card">
+          <strong>Scope</strong>
+          <span>业务范围</span>
+          <p>通常由 channel、product、pack、domain 组成，用来防止相似规则被串用。</p>
+        </article>
+      </div>
     </section>
 
     <section class="choice-panel" data-tabs>
       <div class="section-heading">
-        <p class="kicker">Reader Modes</p>
-        <h2>按你的角色进入。</h2>
+        <p class="kicker">视角</p>
+        <h2>不同场景的关注点。</h2>
       </div>
       <div class="tab-buttons" role="tablist">
-        <button class="tab-button active" type="button" data-tab="business">业务/BA</button>
-        <button class="tab-button" type="button" data-tab="developer">开发</button>
-        <button class="tab-button" type="button" data-tab="agent">Agent 集成</button>
-        <button class="tab-button" type="button" data-tab="reviewer">治理/Review</button>
+        <button class="tab-button active" type="button" data-tab="business">领导/PM</button>
+        <button class="tab-button" type="button" data-tab="developer">技术同事</button>
+        <button class="tab-button" type="button" data-tab="agent">AI 辅助</button>
+        <button class="tab-button" type="button" data-tab="reviewer">Review/治理</button>
       </div>
       <div class="tab-panel active" data-tab-panel="business">
-        <h3>你要关心：答案是否有证据、scope 是否正确、unknown 是否被说清楚。</h3>
-        <p>优先读项目总纲、Constitution 和 API guide。不要把 candidate 当 final business decision。</p>
+        <h3>价值是把规则资产沉淀下来，而不是只做一个问答入口。</h3>
+        <p>可以关注：规则来源能否追溯、发布版本是否清楚、后续是否能支撑查询、审计、影响分析和自动化。</p>
       </div>
       <div class="tab-panel" data-tab-panel="developer">
-        <h3>你要关心：projection、L2、dependency、trace 和 refusal 是否稳定。</h3>
-        <p>优先读 projection contract、Day1 baseline、runbook 和 internal agent implementation plan。</p>
+        <h3>关键结构是 KB 到 runtime projection 的边界。</h3>
+        <p>可以关注：manifest、scope、object manifest、L2 runtime object、object card、dependency、governance summary 和 trace。</p>
       </div>
       <div class="tab-panel" data-tab-panel="agent">
-        <h3>你要关心：managed mode 与 tool mode 共享同一个 truth access boundary。</h3>
-        <p>外部 agent 可以规划工作流，但每个 RTS tool call 仍要走 service gate。</p>
+        <h3>AI 辅助不是第一叙事，但它会受益于这套结构。</h3>
+        <p>当规则被整理成 projection 后，AI 可以更稳定地做解释、影响候选、测试建议和 review 辅助。</p>
       </div>
       <div class="tab-panel" data-tab-panel="reviewer">
-        <h3>你要关心：AI-first review 不是 AI-final decision。</h3>
-        <p>AI 简化冲突、找证据、提问题；人工裁决和 signoff 才能进入 approved truth。</p>
+        <h3>治理重点是证据、歧义和裁决能不能留下来。</h3>
+        <p>KB 里要记录 source、evidence、review、open question、adjudication 和 signoff；projection 只发布运行时需要的视图。</p>
       </div>
     </section>
 
@@ -95,7 +167,7 @@
     
   </main>
   <footer class="site-footer">
-    <p>策展页根据 confirmed / operational 文档重组表达；需要逐字核对时请进入来源文档页。</p>
+    <p>本页根据项目文档重组表达；需要逐字核对时请进入来源文档页。</p>
   </footer>
   <script src="assets/search-index.js"></script>
   <script src="assets/app.js"></script>

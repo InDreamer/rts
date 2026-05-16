@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RTS Knowledge Base & Runtime Projection 设计概览</title>
+<style>
+:root,[data-theme="dark"]{--bg:#0f1419;--surface:#1a2332;--surface-2:#243447;--border:#2d4a5e;--text:#e8edf3;--text-muted:#8899aa;--text-dim:#5a6a7a;--accent:#4fc3f7;--accent-2:#81c784;--accent-3:#ffb74d;--accent-4:#ce93d8;--danger:#ef5350;--r:10px}
+[data-theme="light"]{--bg:#f8f9fa;--surface:#fff;--surface-2:#f0f2f5;--border:#d0d7de;--text:#1f2328;--text-muted:#57606a;--text-dim:#8b949e;--accent:#0969da;--accent-2:#1a7f37;--accent-3:#bf8700;--accent-4:#8250df;--danger:#cf222e;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;transition:background .3s,color .3s}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;transition:background .3s}
+.sidebar-hd{padding:16px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-hd h2{font-size:.85rem;color:var(--accent);font-weight:700}
+.theme-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
+.theme-btn:hover{border-color:var(--accent)}
+.nav-g{padding:6px 0}
+.nav-gt{padding:5px 14px;font-size:.6rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);font-weight:600}
+.nav-i{display:block;padding:7px 14px;color:var(--text-muted);text-decoration:none;font-size:.8rem;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.nav-i:hover{background:var(--surface-2);color:var(--text)}
+.nav-i.active{background:rgba(79,195,247,.06);color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.main{margin-left:220px;flex:1}
+.page{display:none;padding:36px 44px 70px;max-width:840px;animation:fi .25s ease}
+.page.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+h1{font-size:1.7rem;font-weight:700;margin-bottom:6px}
+h2{font-size:1.25rem;font-weight:600;margin:32px 0 12px;color:var(--accent)}
+h3{font-size:1rem;font-weight:600;margin:18px 0 6px}
+p{margin-bottom:10px}
+.sub{color:var(--text-muted);font-size:.92rem;margin-bottom:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px;transition:border-color .2s,background .3s}
+.card:hover{border-color:var(--accent)}
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0}
+.box{background:var(--surface-2);border-left:4px solid var(--accent-3);padding:12px 16px;border-radius:0 var(--r) var(--r) 0;margin:14px 0;transition:background .3s}
+.box.g{border-left-color:var(--accent-2)}.box.b{border-left-color:var(--accent)}.box.p{border-left-color:var(--accent-4)}.box.r{border-left-color:var(--danger)}
+code{background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:.83em;color:var(--accent-3);font-family:'SF Mono','Fira Code',monospace}
+pre{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;overflow-x:auto;margin:10px 0;font-family:'SF Mono','Fira Code',monospace;font-size:.76rem;line-height:1.6;color:var(--text-muted);transition:background .3s}
+.tag{display:inline-block;padding:2px 7px;border-radius:8px;font-size:.68rem;font-weight:600;margin-right:3px}
+.tb{background:rgba(79,195,247,.15);color:var(--accent)}.tg{background:rgba(129,199,132,.15);color:var(--accent-2)}.to{background:rgba(255,183,77,.15);color:var(--accent-3)}.tp{background:rgba(206,147,216,.15);color:var(--accent-4)}.tr{background:rgba(239,83,80,.15);color:var(--danger)}
+.dia{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin:14px 0;overflow-x:auto;transition:background .3s}
+.col{border:1px solid var(--border);border-radius:var(--r);margin:8px 0;overflow:hidden}
+.col-h{padding:9px 14px;background:var(--surface);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s;user-select:none;font-size:.85rem}
+.col-h:hover{background:var(--surface-2)}
+.col-h::after{content:'▸';color:var(--text-muted);transition:transform .2s}
+.col.open .col-h::after{transform:rotate(90deg)}
+.col-b{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.col.open .col-b{max-height:4000px}
+.col-i{padding:10px 14px;border-top:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.83rem;margin:12px 0}
+th{padding:9px 12px;text-align:left;background:var(--surface-2);color:var(--accent);border-bottom:1px solid var(--border)}
+td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.stepper{position:relative;padding-left:26px;margin:14px 0}
+.stepper::before{content:'';position:absolute;left:8px;top:5px;bottom:5px;width:2px;background:var(--border)}
+.step{position:relative;margin-bottom:14px}
+.step-dot{position:absolute;left:-26px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--surface-2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.5rem;color:var(--text-muted);font-weight:700}
+.step.a .step-dot{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.step-t{font-weight:600;font-size:.87rem}
+.step-d{font-size:.82rem;color:var(--text-muted)}
+.flow-node{cursor:pointer;transition:opacity .3s}.flow-node:hover{opacity:.8}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.page{padding:20px 14px 50px}.cg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+<div class="sidebar-hd"><h2>RTS 设计概览</h2><button class="theme-btn" onclick="toggleTheme()" title="切换明亮/暗黑模式">☀</button></div>
+<div class="nav-g"><div class="nav-gt">概述</div><a class="nav-i active" data-page="overview">项目全景</a></div>
+<div class="nav-g"><div class="nav-gt">Knowledge Base</div><a class="nav-i" data-page="kb-design">KB 设计理念</a><a class="nav-i" data-page="kb-pack">Pack 结构</a></div>
+<div class="nav-g"><div class="nav-gt">Runtime Projection</div><a class="nav-i" data-page="projection">投影概念</a><a class="nav-i" data-page="layers">L0/L1/L2 分层</a><a class="nav-i" data-page="areas">运行包区域</a></div>
+<div class="nav-g"><div class="nav-gt">实战</div><a class="nav-i" data-page="examples">真实用例</a><a class="nav-i" data-page="query-walk">查询演练</a><a class="nav-i" data-page="principles">原则速查</a></div>
+</nav>
+<main class="main">
+
+<!-- PAGE: overview -->
+<div class="page active" id="page-overview">
+<h1>RTS 是什么</h1>
+<p class="sub">面向银行报文转换场景的双核心规则真相服务</p>
+<div class="box g"><p style="margin:0"><strong>一句话定义：</strong>RTS 从多种 source（Excel、Java、XSLT、业务文档等）中整理 transformation rules，经过 AI-first review 和人工裁决，形成可治理、可追溯、可查询的规则真相，并以两种核心能力对外提供服务。</p></div>
+<div class="cg">
+<div class="card"><span class="tag tb">Core 1</span><h3>真相源原子能力服务</h3><p>稳定提供事实查询、对象读取、依赖遍历、scope 导航、trace 审计等结构化能力。</p><p style="margin:0;color:var(--text-muted);font-size:.83em">像一个精确的图书馆管理员 —— 你问什么，它精确地找到并交给你，同时记录谁看了什么。</p></div>
+<div class="card"><span class="tag tp">Core 2</span><h3>托管 LLM 分析服务</h3><p>在同一 truth boundary 内提供规则解释、影响分析、测试规划、冲突简化等 AI 驱动的高价值分析。</p><p style="margin:0;color:var(--text-muted);font-size:.83em">像一个有专业知识的分析师 —— 它能解释规则、发现冲突、建议测试方案，但最终决定权在人。</p></div>
+</div>
+<h2>RTS 不是什么</h2>
+<div class="cg"><div class="card" style="border-color:var(--danger)"><span class="tag tr">✗</span> 不是静态文档库</div><div class="card" style="border-color:var(--danger)"><span class="tag tr">✗</span> 不是普通 RAG 问答</div><div class="card" style="border-color:var(--danger)"><span class="tag tr">✗</span> 不是聊天机器人</div><div class="card" style="border-color:var(--danger)"><span class="tag tr">✗</span> 不是 Agent SDK 包装</div></div>
+
+<h2>数据流全景</h2>
+<p>一条规则从"原始材料"到"被服务消费"的完整旅程：</p>
+<div class="dia">
+<svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+<defs><marker id="a1" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="var(--accent)"/></marker></defs>
+<g class="flow-node" onclick="this.style.opacity=this.style.opacity=='.5'?'1':'.5'">
+<rect x="10" y="10" width="740" height="50" rx="7" fill="var(--surface-2)" stroke="var(--accent-3)" stroke-width="1.5"/>
+<text x="30" y="40" fill="var(--accent-3)" font-size="11" font-weight="700">SOURCE MATERIALS</text><text x="220" y="40" fill="var(--text-muted)" font-size="10">Excel · Java · XSLT · 业务文档 · 测试用例 · Lookup 表</text>
+</g>
+<line x1="380" y1="60" x2="380" y2="80" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#a1)"/><text x="395" y="74" fill="var(--text-dim)" font-size="8">AI 提取 + 人工整理</text>
+<g class="flow-node" onclick="this.style.opacity=this.style.opacity=='.5'?'1':'.5'">
+<rect x="10" y="85" width="740" height="80" rx="7" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+<text x="30" y="110" fill="var(--accent)" font-size="12" font-weight="700">KNOWLEDGE BASE</text><text x="200" y="110" fill="var(--text-muted)" font-size="10">完整受治理真相图谱</text>
+<rect x="30" y="120" width="85" height="24" rx="4" fill="var(--surface-2)"/><text x="45" y="136" fill="var(--accent)" font-size="9">Rules</text>
+<rect x="125" y="120" width="85" height="24" rx="4" fill="var(--surface-2)"/><text x="140" y="136" fill="var(--accent-2)" font-size="9">Lookups</text>
+<rect x="220" y="120" width="85" height="24" rx="4" fill="var(--surface-2)"/><text x="235" y="136" fill="var(--accent-3)" font-size="9">Helpers</text>
+<rect x="315" y="120" width="85" height="24" rx="4" fill="var(--surface-2)"/><text x="330" y="136" fill="var(--accent-4)" font-size="9">Evidence</text>
+<rect x="410" y="120" width="85" height="24" rx="4" fill="var(--surface-2)"/><text x="425" y="136" fill="var(--accent-4)" font-size="9">Review</text>
+<rect x="505" y="120" width="85" height="24" rx="4" fill="var(--surface-2)"/><text x="520" y="136" fill="var(--accent-4)" font-size="9">Signoff</text>
+</g>
+<line x1="380" y1="165" x2="380" y2="185" stroke="var(--accent-2)" stroke-width="1.5" marker-end="url(#a1)"/><text x="395" y="179" fill="var(--text-dim)" font-size="8">Projection Publisher 发布</text>
+<g class="flow-node" onclick="this.style.opacity=this.style.opacity=='.5'?'1':'.5'">
+<rect x="10" y="190" width="740" height="80" rx="7" fill="var(--surface)" stroke="var(--accent-2)" stroke-width="2"/>
+<text x="30" y="215" fill="var(--accent-2)" font-size="12" font-weight="700">RUNTIME PROJECTION</text><text x="230" y="215" fill="var(--text-muted)" font-size="10">不可变服务运行包</text>
+<rect x="30" y="228" width="70" height="22" rx="4" fill="var(--surface-2)"/><text x="40" y="243" fill="var(--accent-2)" font-size="8">Release</text>
+<rect x="108" y="228" width="65" height="22" rx="4" fill="var(--surface-2)"/><text x="118" y="243" fill="var(--accent-2)" font-size="8">Scope</text>
+<rect x="181" y="228" width="75" height="22" rx="4" fill="var(--surface-2)"/><text x="191" y="243" fill="var(--accent-2)" font-size="8">Manifest</text>
+<rect x="264" y="228" width="45" height="22" rx="4" fill="var(--surface-2)" stroke="var(--accent-2)"/><text x="276" y="243" fill="var(--accent-2)" font-size="8" font-weight="700">L2</text>
+<rect x="317" y="228" width="75" height="22" rx="4" fill="var(--surface-2)"/><text x="327" y="243" fill="var(--accent-2)" font-size="8">Navigation</text>
+<rect x="400" y="228" width="85" height="22" rx="4" fill="var(--surface-2)"/><text x="410" y="243" fill="var(--accent-2)" font-size="8">Dependencies</text>
+<rect x="493" y="228" width="85" height="22" rx="4" fill="var(--surface-2)"/><text x="503" y="243" fill="var(--accent-2)" font-size="8">Governance</text>
+<rect x="586" y="228" width="65" height="22" rx="4" fill="var(--surface-2)"/><text x="596" y="243" fill="var(--accent-2)" font-size="8">Traces</text>
+</g>
+<line x1="380" y1="270" x2="380" y2="290" stroke="var(--accent-4)" stroke-width="1.5" marker-end="url(#a1)"/><text x="395" y="284" fill="var(--text-dim)" font-size="8">RTS Service 受控读取</text>
+<g class="flow-node" onclick="this.style.opacity=this.style.opacity=='.5'?'1':'.5'">
+<rect x="10" y="295" width="740" height="60" rx="7" fill="var(--surface)" stroke="var(--accent-4)" stroke-width="2"/>
+<text x="30" y="322" fill="var(--accent-4)" font-size="12" font-weight="700">RTS SERVICE</text><text x="150" y="322" fill="var(--text-muted)" font-size="10">API · MCP · /ask · Scenario Endpoints · Agent Tools · Pipeline</text>
+</g>
+</svg>
+</div>
+<table><thead><tr><th>层级</th><th>职责</th><th>关键约束</th></tr></thead><tbody>
+<tr><td><span class="tag to">Source</span></td><td>提供原始材料</td><td>不直接进入运行时</td></tr>
+<tr><td><span class="tag tb">KB</span></td><td>形成和治理真相</td><td>是 truth 的唯一 owner</td></tr>
+<tr><td><span class="tag tg">Projection</span></td><td>发布可服务运行包</td><td>不可变，每次发布新版本</td></tr>
+<tr><td><span class="tag tp">Service</span></td><td>受控读取和追踪</td><td>不拥有 truth，只拥有 access boundary</td></tr>
+</tbody></table>
+</div>
+
+<!-- PAGE: kb-design -->
+<div class="page" id="page-kb-design">
+<h1>KB 设计理念</h1>
+<p class="sub">KB 是 RTS 的完整 governed truth graph（受治理真相图谱）</p>
+<h2>KB 管理的完整生命周期</h2>
+<div class="dia">
+<svg viewBox="0 0 720 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+<defs><marker id="la" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5" fill="var(--accent)"/></marker></defs>
+<rect x="5" y="10" width="88" height="42" rx="5" fill="var(--surface-2)" stroke="var(--accent-3)"/><text x="15" y="28" fill="var(--accent-3)" font-size="8" font-weight="600">Source</text><text x="15" y="42" fill="var(--text-dim)" font-size="7">Excel/Java/XSLT</text>
+<line x1="93" y1="31" x2="103" y2="31" stroke="var(--accent)" stroke-width="1" marker-end="url(#la)"/>
+<rect x="105" y="10" width="88" height="42" rx="5" fill="var(--surface-2)" stroke="var(--accent)"/><text x="115" y="28" fill="var(--accent)" font-size="8" font-weight="600">Candidate</text><text x="115" y="42" fill="var(--text-dim)" font-size="7">AI 提取草稿</text>
+<line x1="193" y1="31" x2="203" y2="31" stroke="var(--accent)" stroke-width="1" marker-end="url(#la)"/>
+<rect x="205" y="10" width="88" height="42" rx="5" fill="var(--surface-2)" stroke="var(--accent)"/><text x="215" y="28" fill="var(--accent)" font-size="8" font-weight="600">Canonical</text><text x="215" y="42" fill="var(--text-dim)" font-size="7">结构校验通过</text>
+<line x1="293" y1="31" x2="303" y2="31" stroke="var(--accent)" stroke-width="1" marker-end="url(#la)"/>
+<rect x="305" y="10" width="88" height="42" rx="5" fill="var(--surface-2)" stroke="var(--accent-4)"/><text x="315" y="28" fill="var(--accent-4)" font-size="8" font-weight="600">AI Review</text><text x="315" y="42" fill="var(--text-dim)" font-size="7">冲突/缺失标注</text>
+<line x1="393" y1="31" x2="403" y2="31" stroke="var(--accent)" stroke-width="1" marker-end="url(#la)"/>
+<rect x="405" y="10" width="88" height="42" rx="5" fill="var(--surface-2)" stroke="var(--accent-4)"/><text x="415" y="28" fill="var(--accent-4)" font-size="8" font-weight="600">Human 裁决</text><text x="415" y="42" fill="var(--text-dim)" font-size="7">最终决定权在人</text>
+<line x1="493" y1="31" x2="503" y2="31" stroke="var(--accent)" stroke-width="1" marker-end="url(#la)"/>
+<rect x="505" y="10" width="88" height="42" rx="5" fill="var(--surface-2)" stroke="var(--accent-2)"/><text x="515" y="28" fill="var(--accent-2)" font-size="8" font-weight="600">Signoff</text><text x="515" y="42" fill="var(--text-dim)" font-size="7">确认可发布</text>
+<line x1="593" y1="31" x2="603" y2="31" stroke="var(--accent-2)" stroke-width="1" marker-end="url(#la)"/>
+<rect x="605" y="10" width="105" height="42" rx="5" fill="var(--surface-2)" stroke="var(--accent-2)" stroke-width="1.5"/><text x="615" y="28" fill="var(--accent-2)" font-size="8" font-weight="700">Release</text><text x="615" y="42" fill="var(--text-dim)" font-size="7">→ Projection</text>
+<text x="5" y="75" fill="var(--text-muted)" font-size="8">AI-first governance：AI 尽可能完成机械工作，人工聚焦在最终裁决</text>
+<text x="5" y="90" fill="var(--text-dim)" font-size="7">如果 AI 找不到 evidence，它只能形成 hypothesis，不能进入 approved truth</text>
+</svg>
+</div>
+<h2>三类核心对象</h2>
+<p>KB 中的规则真相由三类对象共同构成：</p>
+<div class="cg">
+<div class="card"><span class="tag tb">Rule</span><h3>规则对象</h3><p>描述具体的 transformation logic。</p><p><strong>包含：</strong>inputs、logic pipeline、target path、dependencies、examples</p>
+<div class="col"><div class="col-h">查看代码示例</div><div class="col-b"><div class="col-i"><pre style="margin:0;font-size:.72rem">id: rule_fxd_ndf_primary_rate_source
+status: demo_signoff
+inputs:
+  - fixing_currency1  (XPath)
+  - fixing_currency2  (XPath)
+  - cutoff_code       (XPath)
+logic.pipeline:
+  - read_xpath → fixing_currency1
+  - read_xpath → fixing_currency2
+  - read_xpath → cutoff_code
+  - lookup_value → hedge_primary_source
+  - lookup_value → hedge_primary_source_page
+target: .../conf:primaryRateSource
+dependencies: [lk_fxd_ndf_cutoff_by_pair_and_locode]
+examples: {USD,TWD,TW} → {RTRS, TAIFX1}</pre></div></div></div>
+</div>
+<div class="card"><span class="tag tg">Lookup</span><h3>查找表对象</h3><p>定义 key → value 映射，支持 fallback。</p><p><strong>包含：</strong>key composition、return fields、fallback behavior</p>
+<div class="col"><div class="col-h">查看代码示例</div><div class="col-b"><div class="col-i"><pre style="margin:0;font-size:.72rem">id: lk_fxd_ndf_cutoff_by_pair_and_locode
+source: "TraditionStella Cutoff" 映射表
+logic:
+  - concat(ccy1, ccy2) → forward_pair
+  - compose_key("{pair}|{code}")
+  - lookup(forward_key) → result
+  - coalesce(forward, reverse)  ← fallback
+output: cutoff_name, fixing_time,
+  fixing_business_center,
+  hedge_primary_source
+examples:
+  {USD,TWD,TW} → key="USDTWD|TW" → 命中
+  {TWD,USD,TW} → 反向 fallback 命中</pre></div></div></div>
+</div>
+<div class="card"><span class="tag to">Helper</span><h3>辅助逻辑对象</h3><p>封装可复用的中间计算逻辑。</p><p><strong>包含：</strong>inputs、logic pipeline、output fields</p>
+<div class="col"><div class="col-h">查看代码示例</div><div class="col-b"><div class="col-i"><pre style="margin:0;font-size:.72rem">id: hlp_fxd_ndf_fixing_quoted_currency_pair
+inputs: source_currency1, source_currency2,
+        source_quote_basis
+logic:
+  - concat(ccy1, ccy2) → source_pair
+  - equals(quote_basis, source_pair) → is_inverse
+  - branch(is_inverse):
+      then: swap → Currency1PerCurrency2
+      else: keep → Currency2PerCurrency1
+outputs: target_currency1, target_currency2,
+         target_quote_basis
+examples:
+  {USD,TWD,"USDTWD"} → inverse → {TWD,USD}</pre></div></div></div>
+</div>
+</div>
+<h2>AI-first Governance</h2>
+<p>不是"AI 做决定"，而是"AI 尽可能完成机械工作，人工聚焦在最终裁决"：</p>
+<div class="cg">
+<div class="card"><h3 style="color:var(--accent-2)">AI 可以做</h3><p style="margin:0;font-size:.85rem">提取候选规则 · 结构校验 · 跨源验证 · 发现冲突和缺失 · 简化 reviewer 问题 · 解释依赖和影响</p></div>
+<div class="card"><h3 style="color:var(--danger)">AI 不能做</h3><p style="margin:0;font-size:.85rem">发明缺失逻辑 · 静默解决冲突 · 覆盖人工裁决 · 未经签核发布 · 把候选当已批准真相</p></div>
+</div>
+</div>
+
+<!-- PAGE: kb-pack -->
+<div class="page" id="page-kb-pack">
+<h1>Pack 结构</h1>
+<p class="sub">Rule Pack 是 KB 中规则整理、治理、review 和 signoff 的基本组织单元</p>
+<h2>Pack 的两层结构</h2>
+<div class="dia">
+<svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+<rect x="10" y="5" width="680" height="105" rx="7" fill="var(--surface)" stroke="var(--accent)"/>
+<text x="30" y="28" fill="var(--accent)" font-size="11" font-weight="700">主对象层 — 描述"转换做什么"</text>
+<rect x="30" y="40" width="190" height="50" rx="5" fill="var(--surface-2)"/><text x="45" y="60" fill="var(--accent)" font-size="10" font-weight="600">rules/</text><text x="45" y="78" fill="var(--text-muted)" font-size="9">每条规则的结构化逻辑</text>
+<rect x="235" y="40" width="190" height="50" rx="5" fill="var(--surface-2)"/><text x="250" y="60" fill="var(--accent-2)" font-size="10" font-weight="600">lookups/</text><text x="250" y="78" fill="var(--text-muted)" font-size="9">查找表定义和映射</text>
+<rect x="440" y="40" width="190" height="50" rx="5" fill="var(--surface-2)"/><text x="455" y="60" fill="var(--accent-3)" font-size="10" font-weight="600">helpers/</text><text x="455" y="78" fill="var(--text-muted)" font-size="9">可复用中间逻辑</text>
+<rect x="10" y="125" width="680" height="105" rx="7" fill="var(--surface)" stroke="var(--accent-4)"/>
+<text x="30" y="148" fill="var(--accent-4)" font-size="11" font-weight="700">治理侧横切层 — 解释"为什么可信"</text>
+<rect x="30" y="160" width="190" height="50" rx="5" fill="var(--surface-2)"/><text x="45" y="180" fill="var(--accent-4)" font-size="10" font-weight="600">evidence/</text><text x="45" y="198" fill="var(--text-muted)" font-size="9">来源证据和诊断追踪</text>
+<rect x="235" y="160" width="190" height="50" rx="5" fill="var(--surface-2)"/><text x="250" y="180" fill="var(--accent-4)" font-size="10" font-weight="600">review/</text><text x="250" y="198" fill="var(--text-muted)" font-size="9">审阅记录、歧义、裁决</text>
+<rect x="440" y="160" width="190" height="50" rx="5" fill="var(--surface-2)"/><text x="455" y="180" fill="var(--accent-4)" font-size="10" font-weight="600">reports/</text><text x="455" y="198" fill="var(--text-muted)" font-size="9">提取报告、闭环检查</text>
+</svg>
+</div>
+<div class="box g"><p style="margin:0"><strong>设计原则：</strong>主对象保持精简，治理信息分离。长 evidence、review 历史不混入 rule body。主对象层描述"做什么"，治理层解释"为什么可信"。</p></div>
+<h2>Pack 的 Scope</h2>
+<p>每个 pack 都有明确的 scope 定义。Scope 是 <strong>truth safety boundary</strong>：</p>
+<pre>source_system:   Tradition          ← 来源系统
+target_system:   Stella             ← 目标系统
+rule_domain:     cutoff-fixing      ← 规则领域
+product_scope:   FXD.NDF            ← 产品范围
+status:          demo_signoff       ← 当前状态</pre>
+<div class="box r"><p style="margin:0"><strong>为什么 scope 如此重要？</strong>FXD 和 FXO 有相似字段名但不同逻辑。没有 scope 隔离，系统可能把 FXO 的规则当成 FXD 的答案返回 —— 这比"找不到"更危险。</p></div>
+<h2>真实 Pack 目录</h2>
+<div class="col open"><div class="col-h"><strong>tradition-to-stella-fxd-ndf-cutoff-fixing-split/</strong></div><div class="col-b"><div class="col-i">
+<pre style="margin:0;font-size:.74rem">├── metadata.yaml                    ← Pack 元数据和 scope
+├── rules/                           ← 6 条规则
+│   ├── rule_fxd_ndf_fixing_block.yaml
+│   ├── rule_fxd_ndf_fixing_date.yaml
+│   ├── rule_fxd_ndf_fixing_quoted_currency_pair.yaml
+│   ├── rule_fxd_ndf_fixing_time.yaml
+│   ├── rule_fxd_ndf_primary_rate_source.yaml
+│   └── rule_fxd_ndf_secondary_rate_source.yaml
+├── lookups/                         ← 1 个共享查找表
+│   └── lk_fxd_ndf_cutoff_by_pair_and_locode.yaml
+├── helpers/                         ← 1 个辅助逻辑
+│   └── hlp_fxd_ndf_fixing_quoted_currency_pair.yaml
+├── evidence/evidence-index.yaml
+├── review/review-index.yaml
+└── reports/{extraction,review-checklist,closure-check}.md</pre>
+</div></div></div>
+</div>
+
+<!-- PAGE: projection -->
+<div class="page" id="page-projection">
+<h1>Runtime Projection：运行时投影</h1>
+<p class="sub">把已批准的规则真相发布给运行时服务使用的产品化运行包</p>
+<div class="box g"><p style="margin:0"><strong>类比：</strong>如果 KB 是一本完整的法律全书（包含立法过程、辩论记录），那么 Runtime Projection 就是法院使用的<strong>现行有效法规汇编</strong> —— 只包含已生效的条文，但保留了足够的结构让法官能准确引用。</p></div>
+<h2>Projection 解决的产品问题</h2>
+<table><thead><tr><th>问题</th><th>Projection 如何解决</th></tr></thead><tbody>
+<tr><td>当前线上应该用哪个规则版本？</td><td><code>active-release.json</code> 指向当前版本 + rollback target</td></tr>
+<tr><td>用户的问题属于哪个业务范围？</td><td><code>scopes.jsonl</code> 定义 channel/product/pack 边界</td></tr>
+<tr><td>哪些规则已 released？</td><td><code>object-manifest.jsonl</code> 列出所有可服务对象</td></tr>
+<tr><td>最终事实从哪里读取？</td><td><code>l2/</code> 目录下的结构化 runtime objects</td></tr>
+<tr><td>如何低噪声找到正确规则？</td><td><code>navigation/</code> 提供 cards、aliases、confusables</td></tr>
+<tr><td>规则之间有什么依赖？</td><td><code>dependencies/</code> 记录 edges 和 field bindings</td></tr>
+<tr><td>每次回答读了什么？</td><td><code>traces/</code> 记录完整审计轨迹</td></tr>
+</tbody></table>
+<h2>Projection 与 KB 的关系</h2>
+<div class="cg">
+<div class="card"><h3 style="color:var(--accent)">KB</h3><p style="margin:0;font-size:.85rem">完整 governed truth graph · 包含所有 evidence/review/冲突 · 是 truth 的唯一 owner · 修改规则必须回到这里</p></div>
+<div class="card"><h3 style="color:var(--accent-2)">Runtime Projection</h3><p style="margin:0;font-size:.85rem">KB 发布出来的 approved truth 服务视图 · 裁剪了治理噪声 · 不可变 · 是 RTS Service 的唯一默认输入</p></div>
+</div>
+<div class="box r"><p style="margin:0"><strong>不可逆向写入：</strong>任何人或 AI 都不能通过 query trace、agent memory 或搜索结果反向写回 truth。修改规则必须回到 KB 的 governance → signoff → release 流程。</p></div>
+</div>
+
+<!-- PAGE: layers -->
+<div class="page" id="page-layers">
+<h1>L0 / L1 / L2 分层精度视图</h1>
+<p class="sub">同一个资源的不同精度视图 —— 不是目录层级，而是 precision views</p>
+<div class="dia">
+<svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+<rect x="20" y="10" width="660" height="75" rx="7" fill="var(--surface)" stroke="var(--accent-3)" stroke-width="1.5"/>
+<text x="45" y="35" fill="var(--accent-3)" font-size="13" font-weight="700">L0 — 低成本候选过滤</text>
+<text x="45" y="55" fill="var(--text-muted)" font-size="10">极短摘要，用于快速召回和 scope 过滤。成本最低，信息最少。</text>
+<text x="45" y="72" fill="var(--text-dim)" font-size="9">不能作为最终答案</text>
+<rect x="20" y="100" width="660" height="75" rx="7" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"/>
+<text x="45" y="125" fill="var(--accent)" font-size="13" font-weight="700">L1 — 结构化导航与消歧</text>
+<text x="45" y="145" fill="var(--text-muted)" font-size="10">结构化概览，用于重排、消歧和导航。帮助判断相关性。</text>
+<text x="45" y="162" fill="var(--text-dim)" font-size="9">仍不是最终事实</text>
+<rect x="20" y="190" width="660" height="75" rx="7" fill="var(--surface)" stroke="var(--accent-2)" stroke-width="2.5"/>
+<text x="45" y="215" fill="var(--accent-2)" font-size="13" font-weight="700">L2 — 结构化运行时事实对象 ★</text>
+<text x="45" y="235" fill="var(--text-muted)" font-size="10">完整的结构化规则内容，服务回答事实时必须回到这里。</text>
+<text x="45" y="252" fill="var(--text-dim)" font-size="9">包含逻辑、依赖、示例、警告、content hash</text>
+</svg>
+</div>
+<h2>真实示例：同一条规则的三层视图</h2>
+<p>以 <code>rule_fxd_ndf_primary_rate_source</code> 为例：</p>
+<div class="col open"><div class="col-h"><span class="tag to">L0</span> <strong>极短摘要</strong></div><div class="col-b"><div class="col-i">
+<pre style="margin:0;font-size:.74rem">{
+  "uri": "rts://tradition-stella/fxd-ndf/rule/primary-rate-source",
+  "type": "rule",
+  "scope": "Tradition→Stella / FXD.NDF / cutoff-fixing",
+  "summary": "Resolve hedge primary rate source from cutoff lookup by currency pair"
+}</pre>
+<p style="margin:6px 0 0;color:var(--text-muted);font-size:.8em">只有 4 个字段。足够判断"是否可能相关"，但不能回答事实问题。</p>
+</div></div></div>
+<div class="col open"><div class="col-h"><span class="tag tb">L1</span> <strong>结构化卡片</strong></div><div class="col-b"><div class="col-i">
+<pre style="margin:0;font-size:.74rem">{
+  "uri": "rts://tradition-stella/fxd-ndf/rule/primary-rate-source",
+  "type": "rule", "target_kind": "block",
+  "target_path": ".../conf:primaryRateSource",
+  "source_anchors": ["quotedCurrencyPair/currency1","currency2","fixingTime"],
+  "logic_ops": ["read_xpath", "lookup_value"],
+  "dependencies": {"lookups": ["lk_fxd_ndf_cutoff_by_pair_and_locode"]},
+  "applicability": "FXD.NDF trades with nonDeliverableForward node",
+  "confusables": ["rule_fxo_vanilla_primary_rate_source (wrong product)"],
+  "status": "demo_signoff"
+}</pre>
+<p style="margin:6px 0 0;color:var(--text-muted);font-size:.8em">足够判断"确实是我要找的，不是 FXO 那条"。但不包含完整逻辑。</p>
+</div></div></div>
+<div class="col open"><div class="col-h"><span class="tag tg">L2</span> <strong>完整结构化事实 ★</strong></div><div class="col-b"><div class="col-i">
+<pre style="margin:0;font-size:.74rem">{
+  "id": "rule_fxd_ndf_primary_rate_source",
+  "status": "demo_signoff",
+  "inputs": [
+    {"name":"fixing_currency1","source_path":".../currency1/text()"},
+    {"name":"fixing_currency2","source_path":".../currency2/text()"},
+    {"name":"cutoff_code","source_path":".../hourMinuteTime/text()"}
+  ],
+  "logic": {"pipeline": [
+    {"op":"read_xpath","out":"fixing_currency1"},
+    {"op":"read_xpath","out":"fixing_currency2"},
+    {"op":"read_xpath","out":"cutoff_code"},
+    {"op":"lookup_value","lookup":"lk_fxd_ndf_cutoff...","return_field":"hedge_primary_source"},
+    {"op":"lookup_value","lookup":"lk_fxd_ndf_cutoff...","return_field":"hedge_primary_source_page"}
+  ]},
+  "target": {"kind":"block","path":".../conf:primaryRateSource",
+    "emits": [{"rateSource":"from_lookup:hedge_primary_source"},
+              {"rateSourcePage":"from_lookup:hedge_primary_source_page"}]},
+  "dependencies": {"lookups":["lk_fxd_ndf_cutoff_by_pair_and_locode"]},
+  "examples": [{"input":["USD","TWD","TW"],"result":["RTRS","TAIFX1"]},
+               {"input":["AUD","GBP","NY"],"result":["",""]}],
+  "content_hash": "sha256:a3f7..."
+}</pre>
+<p style="margin:6px 0 0;color:var(--accent-2);font-size:.8em;font-weight:600">这才是服务回答事实时必须读取的内容。</p>
+</div></div></div>
+<div class="box r"><p style="margin:0"><strong>核心约束：</strong>如果只有 L0/L1 命中但没有 L2 对象，查询层应该拒答或降级。搜索命中、card、LLM summary 都不能替代 L2。</p></div>
+</div>
+
+<!-- PAGE: areas -->
+<div class="page" id="page-areas">
+<h1>运行包的 11 个区域</h1>
+<p class="sub">Runtime Projection 像一个 release package，每类文件承担一个产品角色</p>
+<div class="col open"><div class="col-h"><span class="tag tg">1</span> <strong>active-release.json — 当前服务指针</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">回答：现在运行哪一版？回滚到哪一版？包含 active release id、rollback target。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag tg">2</span> <strong>release-manifest.json — 发布身份证</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">回答：这版从哪里来？能不能用？包含 release id、schema version、blocking issues count。没有有效 manifest 就没有可用 runtime truth。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag tb">3</span> <strong>scopes.jsonl — 业务范围注册表</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">防串线机制。Query resolver 必须先解析 scope 再执行召回。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag tb">4</span> <strong>object-manifest.jsonl — 对象目录</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">列出每个可服务对象的 stable URI、type、scope、content hash。确定性查找应优先从这里开始。</p></div></div></div>
+<div class="col open"><div class="col-h"><span class="tag tg" style="background:rgba(129,199,132,.3)">5</span> <strong>l2/ — 事实正文 ★ 最重要</strong></div><div class="col-b"><div class="col-i"><p>保存服务可读的结构化规则事实：inputs、logic pipeline、target path、dependencies、examples、warnings、content hash。</p><p style="margin:0;color:var(--accent-2);font-weight:600">搜索命中、card、HTML 展示、LLM summary 都不能替代 L2。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag to">6</span> <strong>navigation/ — 查找和消歧</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">object-cards · l0-l1-views · aliases · confusables。让调用方不用知道精确 id 也能找到正确对象。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag to">7</span> <strong>dependencies/ — 关系和影响</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">dependency-edges · field-bindings。影响分析、解释链和测试规划的基础。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag tp">8</span> <strong>governance/ — 可信度和风险</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">受权限控制的治理视图。普通查询不混入治理噪声；授权场景可展开。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag tp">9</span> <strong>caller-profiles.jsonl — 权限边界</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">定义谁能看哪些 pack、调用哪些入口。不同用户/pipeline/agent 不应天然拥有同样的权限。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag to">10</span> <strong>index-artifacts/ — 检索加速</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">Projection 派生出的索引副本。帮助更快召回候选，但不能成为 final truth source。</p></div></div></div>
+<div class="col"><div class="col-h"><span class="tag tr">11</span> <strong>traces/ — 审计复盘</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">记录 query plan、resolved scope、L2 read URIs、refusal reason、grounding map。可解释、可复盘、可审计。</p></div></div></div>
+</div>
+
+<!-- PAGE: examples -->
+<div class="page" id="page-examples">
+<h1>真实用例</h1>
+<p class="sub">用 FXD.NDF Fixing 规则包中的真实对象来理解 KB 设计</p>
+<h2>用例 1：Block Rule — 门控规则</h2>
+<div class="card"><p><code>rule_fxd_ndf_fixing_block</code> 决定 fixing 整个子树是否应该出现在目标报文中。</p>
+<pre style="font-size:.74rem">id: rule_fxd_ndf_fixing_block
+logic:
+  1. exists(/FpML/.../nonDeliverableForward) → 检查源报文是否有 NDF 节点
+  2. emit_block(when: exists) → 如果有，渲染整个 fixing 块
+target: .../conf:nonDeliverableSettlement/conf:fixing
+children: [quotedCurrencyPair, fixingDate, primaryRateSource, secondaryRateSource, fixingTime]
+dependencies.rules: [5 条子规则]
+examples:
+  ✓ NDF 存在 → block emitted
+  ✗ NDF 不存在 → block not_emitted</pre></div>
+<h2>用例 2：Helper — 可复用中间逻辑</h2>
+<div class="card"><p><code>hlp_fxd_ndf_fixing_quoted_currency_pair</code> 封装货币对标准化逻辑，多条 rule 共享。</p>
+<pre style="font-size:.74rem">id: hlp_fxd_ndf_fixing_quoted_currency_pair
+inputs: source_currency1, source_currency2, source_quote_basis
+logic: "quoteBasis 等于拼接的货币对时，需要反转顺序"
+  1. concat(currency1, currency2) → source_pair ("USDTWD")
+  2. equals(quote_basis, source_pair) → is_inverse
+  3. branch(is_inverse):
+     then: swap currencies → Currency1PerCurrency2
+     else: keep order → Currency2PerCurrency1
+outputs: target_currency1, target_currency2, target_quote_basis
+examples:
+  {USD, TWD, "USDTWD"} → is_inverse=true → {TWD, USD, Currency1PerCurrency2}
+  {USD, TWD, "Currency2PerCurrency1"} → is_inverse=false → {USD, TWD, Currency2PerCurrency1}</pre></div>
+<h2>用例 3：Lookup — 共享查找表</h2>
+<div class="card"><p><code>lk_fxd_ndf_cutoff_by_pair_and_locode</code> 被多条 rule 复用，核心特性是 reverse-pair fallback。</p>
+<pre style="font-size:.74rem">id: lk_fxd_ndf_cutoff_by_pair_and_locode
+source: "TraditionStella Cutoff" Excel 映射表
+logic: "先正向查，查不到再反向查"
+  1. concat(ccy1, ccy2) → "USDTWD"
+  2. compose_key("USDTWD|TW")
+  3. lookup(forward_key) → forward_result
+  4. concat(ccy2, ccy1) → "TWDUSD"
+  5. compose_key("TWDUSD|TW")
+  6. lookup(reverse_key) → reverse_result
+  7. coalesce(forward, reverse)
+output: cutoff_name, fixing_time, fixing_business_center, hedge_primary_source
+examples:
+  {USD,TWD,TW} → key="USDTWD|TW" → 正向命中 → {TPE,"11:00:00","TW TPE",RTRS,TAIFX1}
+  {TWD,USD,TW} → 正向未命中 → 反向"USDTWD|TW"命中 → 同上
+  {AUD,GBP,NY} → 正向命中但 hedge 为空 → {NY,"10:00:00","US NYC","",""}</pre></div>
+<h2>用例 4：Rule 调用 Lookup</h2>
+<div class="card"><p><code>rule_fxd_ndf_primary_rate_source</code> 展示 rule 如何调用 lookup 并绑定到目标字段。</p>
+<pre style="font-size:.74rem">id: rule_fxd_ndf_primary_rate_source
+inputs: fixing_currency1, fixing_currency2, cutoff_code (from FpML XPath)
+logic:
+  1-3. read_xpath → 读取三个输入
+  4. lookup_value(lk_fxd_ndf_cutoff..., "hedge_primary_source") → out
+  5. lookup_value(lk_fxd_ndf_cutoff..., "hedge_primary_source_page") → out
+target:
+  .../conf:primaryRateSource/conf:rateSource       ← from_lookup
+  .../conf:primaryRateSource/conf:rateSourcePage   ← from_lookup
+dependencies: [lk_fxd_ndf_cutoff_by_pair_and_locode]</pre></div>
+<h2>对象间依赖关系</h2>
+<div class="dia">
+<svg viewBox="0 0 650 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+<defs><marker id="da" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5" fill="var(--accent)"/></marker></defs>
+<rect x="200" y="5" width="250" height="30" rx="5" fill="var(--surface-2)" stroke="var(--accent)"/><text x="250" y="25" fill="var(--accent)" font-size="9" font-weight="600">rule_fxd_ndf_fixing_block (门控)</text>
+<rect x="10" y="70" width="180" height="26" rx="5" fill="var(--surface-2)" stroke="var(--accent)" stroke-opacity=".6"/><text x="20" y="88" fill="var(--accent)" font-size="8">rule_fixing_quoted_ccy_pair</text>
+<rect x="210" y="70" width="180" height="26" rx="5" fill="var(--surface-2)" stroke="var(--accent)" stroke-opacity=".6"/><text x="220" y="88" fill="var(--accent)" font-size="8">rule_primary_rate_source</text>
+<rect x="410" y="70" width="180" height="26" rx="5" fill="var(--surface-2)" stroke="var(--accent)" stroke-opacity=".6"/><text x="420" y="88" fill="var(--accent)" font-size="8">rule_fixing_time</text>
+<line x1="280" y1="35" x2="100" y2="68" stroke="var(--accent)" stroke-width="1" stroke-opacity=".5" marker-end="url(#da)"/>
+<line x1="325" y1="35" x2="300" y2="68" stroke="var(--accent)" stroke-width="1" stroke-opacity=".5" marker-end="url(#da)"/>
+<line x1="370" y1="35" x2="500" y2="68" stroke="var(--accent)" stroke-width="1" stroke-opacity=".5" marker-end="url(#da)"/>
+<rect x="10" y="135" width="230" height="26" rx="5" fill="var(--surface-2)" stroke="var(--accent-3)" stroke-opacity=".6"/><text x="20" y="153" fill="var(--accent-3)" font-size="8">hlp_fxd_ndf_fixing_quoted_currency_pair</text>
+<rect x="310" y="135" width="250" height="26" rx="5" fill="var(--surface-2)" stroke="var(--accent-2)" stroke-opacity=".6"/><text x="320" y="153" fill="var(--accent-2)" font-size="8">lk_fxd_ndf_cutoff_by_pair_and_locode</text>
+<line x1="100" y1="96" x2="125" y2="133" stroke="var(--accent-3)" stroke-width="1" stroke-opacity=".5" marker-end="url(#da)"/>
+<line x1="300" y1="96" x2="435" y2="133" stroke="var(--accent-2)" stroke-width="1" stroke-opacity=".5" marker-end="url(#da)"/>
+<line x1="500" y1="96" x2="435" y2="133" stroke="var(--accent-2)" stroke-width="1" stroke-opacity=".5" marker-end="url(#da)"/>
+<text x="10" y="185" fill="var(--text-dim)" font-size="8">蓝=Rule · 橙=Helper · 绿=Lookup · 箭头=依赖方向</text>
+</svg>
+</div>
+</div>
+
+<!-- PAGE: query-walk -->
+<div class="page" id="page-query-walk">
+<h1>查询演练</h1>
+<p class="sub">模拟一个真实查询从进入系统到返回答案的完整路径</p>
+<div class="box b"><p style="margin:0"><strong>场景：</strong>用户问 "Tradition 到 Stella 的 FXD.NDF 交易，USDTWD 的 primary rate source 是什么？"</p></div>
+<div class="stepper">
+<div class="step a"><div class="step-dot">1</div><div class="step-t">Scope Resolution</div><div class="step-d">解析 scope：<code>Tradition→Stella | FXD.NDF | cutoff-fixing</code> ✓ 明确</div></div>
+<div class="step a"><div class="step-dot">2</div><div class="step-t">Permission Check</div><div class="step-d">检查 caller 权限：<code>allowed_packs: [fxd-ndf-cutoff-fixing-split]</code> ✓</div></div>
+<div class="step a"><div class="step-dot">3</div><div class="step-t">Object Discovery</div><div class="step-d">通过 manifest 确定性查找：<code>rule_fxd_ndf_primary_rate_source</code><br>排除 confusable：<code>rule_fxo_vanilla_primary_rate_source (wrong product)</code></div></div>
+<div class="step a"><div class="step-dot">4</div><div class="step-t">L2 Read</div><div class="step-d">读取完整结构化规则：logic pipeline + target binding + examples<br><code>example: {USD,TWD,TW} → {RTRS, TAIFX1}</code></div></div>
+<div class="step a"><div class="step-dot">5</div><div class="step-t">Dependency Load</div><div class="step-d">加载 lookup L2：<code>lk_fxd_ndf_cutoff_by_pair_and_locode</code> (reverse-pair fallback)</div></div>
+<div class="step a"><div class="step-dot">6</div><div class="step-t">Grounded Answer</div><div class="step-d"><strong>Facts:</strong> USDTWD primary rate source = RTRS, page = TAIFX1<br><strong>Citations:</strong> rule → lookup<br><strong>Warnings:</strong> pack 状态为 demo_signoff</div></div>
+<div class="step a"><div class="step-dot">7</div><div class="step-t">Trace Emit</div><div class="step-d">记录 query_id、scope、resolved_objects、l2_reads、grounding、release</div></div>
+</div>
+<h2>失败场景</h2>
+<div class="col"><div class="col-h"><strong>Scope 不清</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">用户没指定产品 → 系统拒答，要求澄清</p></div></div></div>
+<div class="col"><div class="col-h"><strong>只有 L0/L1 命中，没有 L2</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">L2 不可读 → 降级："只能定位候选，不能给出规则事实"</p></div></div></div>
+<div class="col"><div class="col-h"><strong>依赖未发布</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">Rule 找到但 lookup 未 release → 降级："依赖未发布，无法提供完整事实"</p></div></div></div>
+<div class="col"><div class="col-h"><strong>Precedence 冲突</strong></div><div class="col-b"><div class="col-i"><p style="margin:0">COMMON 与 product-specific 冲突未解决 → 拒答："需要人工裁决"</p></div></div></div>
+<div class="box g"><p style="margin:0"><strong>核心理念：Unknown is safer than wrong.</strong> 拒答或降级是正确的服务行为，不是失败。</p></div>
+</div>
+
+<!-- PAGE: principles -->
+<div class="page" id="page-principles">
+<h1>核心原则速查</h1>
+<p class="sub">RTS KB 和 Runtime Projection 设计中最重要的原则</p>
+<h2>所有权边界</h2>
+<table><thead><tr><th>原则</th><th>含义</th></tr></thead><tbody>
+<tr><td style="font-weight:600;color:var(--accent)">KB owns truth</td><td>KB 是真相的唯一拥有者，修改必须回到 KB</td></tr>
+<tr><td style="font-weight:600;color:var(--accent)">Release owns admissibility</td><td>Release 决定哪些对象可以进入运行时</td></tr>
+<tr><td style="font-weight:600;color:var(--accent)">Projection owns shape</td><td>Projection 决定索引层可以读取的结构</td></tr>
+<tr><td style="font-weight:600;color:var(--accent)">L2 owns rule content</td><td>L2 是事实来源，回答必须回到这里</td></tr>
+<tr><td style="font-weight:600;color:var(--accent)">LLM answer never owns truth</td><td>LLM 输出是分析和表达，不是新的真相</td></tr>
+</tbody></table>
+<h2>安全原则</h2>
+<table><thead><tr><th>原则</th><th>含义</th></tr></thead><tbody>
+<tr><td style="font-weight:600;color:var(--accent-2)">Unknown is safer than wrong</td><td>证据不足时拒答或降级</td></tr>
+<tr><td style="font-weight:600;color:var(--accent-2)">Scope first, content later</td><td>先收窄范围再读取内容</td></tr>
+<tr><td style="font-weight:600;color:var(--accent-2)">Context must be precise</td><td>精确上下文比更多上下文更安全</td></tr>
+<tr><td style="font-weight:600;color:var(--accent-2)">Evidence outranks narrative</td><td>证据优先于叙述</td></tr>
+</tbody></table>
+<h2>AI 输出的五类区分</h2>
+<div class="cg">
+<div class="card"><span class="tag tg">Facts</span><p style="margin:0">能引用 L2/dependency/evidence</p></div>
+<div class="card"><span class="tag tb">Inferences</span><p style="margin:0">基于 facts 的分析推断</p></div>
+<div class="card"><span class="tag to">Unknowns</span><p style="margin:0">证据不足或存在冲突</p></div>
+<div class="card"><span class="tag tp">Candidates</span><p style="margin:0">AI 生成、等待人确认</p></div>
+<div class="card"><span class="tag tr">Human Decisions</span><p style="margin:0">reviewer 已裁决的结果</p></div>
+</div>
+<h2>判断标准</h2>
+<div class="col open"><div class="col-h"><strong>设计选择时的决策规则</strong></div><div class="col-b"><div class="col-i">
+<p style="margin:0;font-size:.85rem">"如何读取和证明 RTS truth" → 放在 RTS service<br>"如何理解外部场景输入" → 交给 LLM harness 或外部 agent<br>"如何把结果写成报告" → 交给 LLM<br>"这个 claim 是否可以作为事实" → 必须回到 L2 / dependency / governance<br>"该输出能否驱动自动化动作" → 只有 deterministic contract 或 recorded human decision 可以</p>
+</div></div></div>
+<div class="box g" style="margin-top:24px"><p><strong>总结：</strong>RTS 的核心不是"把规则文档放进 AI 问答"，而是建设一个以多源 evidence、AI-first governance、人工最终裁决和权限化服务发布为基础的规则真相服务。</p><p style="margin:0">KB 负责形成和治理真相，Runtime Projection 负责把 approved truth 安全地交付给服务层，L0/L1/L2 分层确保检索精确且高效，而 AI 在这些明确边界内提供高价值的分析和表达能力。</p></div>
+</div>
+
+</main>
+<script>
+function toggleTheme(){var h=document.documentElement,b=document.querySelector('.theme-btn');if(h.dataset.theme==='dark'){h.dataset.theme='light';b.textContent='☾'}else{h.dataset.theme='dark';b.textContent='☀'}}
+document.querySelectorAll('.nav-i').forEach(function(item){item.addEventListener('click',function(){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});document.querySelectorAll('.nav-i').forEach(function(n){n.classList.remove('active')});document.getElementById('page-'+this.dataset.page).classList.add('active');this.classList.add('active');window.scrollTo(0,0)})});
+document.addEventListener('click',function(e){var h=e.target.closest('.col-h');if(h){h.parentElement.classList.toggle('open')}});
+document.addEventListener('keydown',function(e){var pages=['overview','kb-design','kb-pack','projection','layers','areas','examples','query-walk','principles'];var cur=document.querySelector('.nav-i.active');var idx=pages.indexOf(cur?cur.dataset.page:'');var next=idx;if(e.key==='ArrowRight'||e.key==='ArrowDown'){next=Math.min(idx+1,pages.length-1);e.preventDefault()}if(e.key==='ArrowLeft'||e.key==='ArrowUp'){next=Math.max(idx-1,0);e.preventDefault()}if(next!==idx){document.querySelector('.nav-i[data-page="'+pages[next]+'"]').click()}});
+</script>
+</body>
+</html>
