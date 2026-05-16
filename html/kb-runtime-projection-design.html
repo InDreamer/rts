@@ -212,7 +212,8 @@
       margin-top: 4px;
       font-size: 15px;
       line-height: 1.2;
-      overflow-wrap: anywhere;
+      overflow-wrap: break-word;
+      word-break: normal;
     }
 
     .metric-desc {
@@ -239,7 +240,7 @@
     .hero-side .hero-meta {
       flex: 1;
       align-content: stretch;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1fr;
     }
 
     .hero-side .metric {
