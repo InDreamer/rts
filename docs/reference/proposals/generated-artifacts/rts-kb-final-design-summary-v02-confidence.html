@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RTS KB 最终设计摘要 v0.2（含 Confidence 与待确认项）</title>
+<style>
+:root{--bg:#07101f;--panel:#111b31;--text:#edf4ff;--muted:#9fb0d0;--line:#2a3b63;--cyan:#68e1fd;--green:#7ee787;--amber:#ffd166;--red:#ff7b72;--blue:#8ab4ff;--code:#0b1427}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,#1b2b54 0,#07101f 46%,#050912 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","PingFang SC",Arial,sans-serif;line-height:1.58}.wrap{max-width:1240px;margin:auto;padding:38px 22px 86px}h1{font-size:34px;margin:0 0 10px}h2{font-size:24px;margin:34px 0 14px}h3{font-size:18px;margin:0 0 8px}.hero,.card{border:1px solid var(--line);border-radius:22px;background:rgba(17,27,49,.92);box-shadow:0 18px 50px rgba(0,0,0,.25)}.hero{padding:32px;background:linear-gradient(135deg,rgba(104,225,253,.14),rgba(126,231,135,.07))}.sub,.muted{color:var(--muted)}.tag,.pill,.conf{display:inline-block;border-radius:999px;padding:4px 10px;font-size:12px;margin:0 6px 6px 0}.tag{color:var(--cyan);background:#162846}.pill{border:1px solid var(--line);background:#12213b;color:#dce8ff}.conf.high{background:rgba(126,231,135,.14);color:var(--green);border:1px solid rgba(126,231,135,.35)}.conf.mid{background:rgba(255,209,102,.14);color:var(--amber);border:1px solid rgba(255,209,102,.35)}.conf.low{background:rgba(255,123,114,.14);color:var(--red);border:1px solid rgba(255,123,114,.35)}.grid{display:grid;gap:16px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.card{padding:18px}.decision{border-left:4px solid var(--cyan)}.ok{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(17,27,49,.9)}th,td{border-bottom:1px solid var(--line);padding:12px;text-align:left;vertical-align:top}th{background:#172744;color:#fff}pre{background:var(--code);border:1px solid #253759;border-radius:16px;padding:14px;overflow:auto;color:#dce8ff;font-size:13px}code{font-family:"JetBrains Mono","SFMono-Regular",Consolas,monospace}.flow{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}.node{flex:1;min-width:145px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#101a30;text-align:center}.node b{display:block}.node span{font-size:13px;color:var(--muted)}.arrow{align-self:center;color:var(--cyan);font-size:24px}.callout{background:linear-gradient(135deg,rgba(104,225,253,.08),rgba(255,209,102,.05));border:1px solid var(--line);border-radius:18px;padding:16px}.footer{margin-top:34px;color:var(--muted);font-size:13px}@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.arrow{display:none}.wrap{padding:24px 14px 60px}h1{font-size:28px}}
+</style>
+</head>
+<body><div class="wrap">
+<section class="hero">
+  <span class="tag">RTS</span><span class="tag">KB v0.2</span><span class="tag">Confidence marked</span><span class="tag">Human review ready</span>
+  <h1>RTS KB 最终设计摘要 v0.2</h1>
+  <p class="sub">本版在 v0.1 基础上增加：待确认项、逐项 confidence 标记，以及对原 HTML 内容的自我复核。Confidence 表示当前证据/共识强度，不等于最终 signoff。</p>
+</section>
+
+<h2>0. Confidence 图例</h2>
+<div class="grid g3">
+  <div class="card"><span class="conf high">High</span><p class="muted">已被 confirmed docs、当前样例、Codex 审核共同支撑；除非产品方向变化，否则可作为默认。</p></div>
+  <div class="card"><span class="conf mid">Medium</span><p class="muted">方向合理，但依赖你的确认、规模阈值或后续 schema 细化。</p></div>
+  <div class="card"><span class="conf low">Low</span><p class="muted">只是候选设计或示例表达，不能直接冻结。</p></div>
+</div>
+
+<h2>1. 需要你确认的点</h2>
+<table>
+<tr><th>确认项</th><th>当前建议</th><th>为什么需要你定</th><th>Confidence</th></tr>
+<tr><td>Canonical KB 文件格式</td><td>JSON</td><td>Codex 支持，但这是会影响工具链的顶层决策。</td><td><span class="conf mid">Medium</span></td></tr>
+<tr><td>人的确认方式</td><td>人通过 AI 对话确认，不直接编辑 KB 文件。</td><td>这是选择 JSON 而非 YAML 的核心前提。</td><td><span class="conf mid">Medium</span></td></tr>
+<tr><td>Evidence 默认位置</td><td>小 pack 可嵌入 object；大 pack 抽 evidence-index.jsonl。</td><td>需要按 pack 规模和复用情况定阈值。</td><td><span class="conf mid">Medium</span></td></tr>
+<tr><td>Human confirmation 粒度</td><td>建议逐条确认 AI findings / open questions / changes。</td><td>影响 human-confirmation-log 的 schema。</td><td><span class="conf low">Low</span></td></tr>
+<tr><td>Revision 是否保留</td><td>保留轻量 revision + content_hash。</td><td>Codex 建议保留；但可极简为 hash + snapshot。</td><td><span class="conf mid">Medium</span></td></tr>
+<tr><td>Signoff 主体</td><td>先支持 role/process，后续接真实账号。</td><td>影响 signoff 字段：人名、账号、role 还是 process id。</td><td><span class="conf low">Low</span></td></tr>
+</table>
+
+<h2>2. 最终前提</h2>
+<div class="card decision">
+  <h3>人不直接维护 KB 文件；人通过 AI 的解释和问题确认参与审核。 <span class="conf mid">Medium</span></h3>
+  <p class="muted">这是本轮讨论的关键修正。它支撑“canonical KB 用 JSON”的判断；如果以后改成人直接编辑 KB，则文件格式需要重新评估。</p>
+</div>
+<div class="flow" style="margin-top:16px">
+  <div class="node"><b>AI 读取 Source</b><span>code / mapping / message</span></div><div class="arrow">→</div>
+  <div class="node"><b>AI 生成 KB</b><span>rule / lookup / helper</span></div><div class="arrow">→</div>
+  <div class="node"><b>AI 审核解释</b><span>schema / evidence / conflict</span></div><div class="arrow">→</div>
+  <div class="node"><b>人对话确认</b><span>确认 / 拒绝 / 补充</span></div><div class="arrow">→</div>
+  <div class="node"><b>AI 修改复审</b><span>change log + hash</span></div><div class="arrow">→</div>
+  <div class="node"><b>Signoff</b><span>freeze snapshot</span></div>
+</div>
+
+<h2>3. 文件格式最终判断</h2>
+<table>
+<tr><th>格式</th><th>定位</th><th>Confidence</th><th>复核备注</th></tr>
+<tr><td>JSON</td><td>Canonical KB truth：pack/object/signoff。</td><td><span class="conf high">High</span></td><td>在 AI-mediated review 前提下成立；schema/hash/export 最稳定。</td></tr>
+<tr><td>JSONL</td><td>Append-only 辅助层：edges/evidence-index/change-log/confirmation-log。</td><td><span class="conf high">High</span></td><td>不面向人工手写；应配套 HTML/MD pretty view。</td></tr>
+<tr><td>Markdown</td><td>报告、解释、README、closure note。</td><td><span class="conf high">High</span></td><td>不适合作 canonical truth；可作为人类说明层。</td></tr>
+<tr><td>HTML</td><td>视觉审核、问题解释、结构展示。</td><td><span class="conf high">High</span></td><td>只能是派生 view，不进入 truth。</td></tr>
+<tr><td>YAML</td><td>人直接维护 KB 时可重新考虑。</td><td><span class="conf mid">Medium</span></td><td>当前不选 canonical；如果人工裸眼编辑成为主流程，需重审。</td></tr>
+<tr><td>DB</td><td>后续 derived store / query backend。</td><td><span class="conf high">High</span></td><td>不作为 v0.1 canonical truth。</td></tr>
+</table>
+
+<h2>4. 推荐 KB v0.1 目录</h2>
+<pre><code>kb/&lt;pack_id&gt;/
+  pack.json
+  objects/
+    rules/&lt;rule_id&gt;.json
+    lookups/&lt;lookup_id&gt;.json
+    helpers/&lt;helper_id&gt;.json
+  relations/
+    dependency-edges.jsonl
+  evidence/
+    evidence-index.jsonl        # 可选：小 pack 可先嵌入 object
+  governance/
+    ai-review.json
+    human-confirmation-log.jsonl
+    change-log.jsonl
+    signoff.json
+  views/
+    review.html                 # 派生视图，不是 canonical truth
+    issue-explanations.html
+  reports/
+    extraction-report.md
+    closure-check.md</code></pre>
+<div class="callout"><span class="conf mid">Medium</span> 目录结构合理，但 evidence 默认内嵌还是独立，需要你确认。</div>
+
+<h2>5. 完整版 KB vs 简化版 KB</h2>
+<table>
+<tr><th>设计点</th><th>完整版</th><th>当前简化版</th><th>Confidence</th></tr>
+<tr><td>Source 层</td><td>source registry + source message record。</td><td>默认不建 source message；source metadata 在 evidence locator 中保留。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>Candidate / Canonical</td><td>两套对象目录。</td><td>单一 KB Object + lifecycle state。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>Evidence</td><td>全部独立 evidence item。</td><td>小 pack 可嵌入；复用/大量/权限/脱敏时抽 evidence-index。</td><td><span class="conf mid">Medium</span></td></tr>
+<tr><td>Workflow</td><td>完整审批系统。</td><td>AI review + human confirmation log + signoff snapshot。</td><td><span class="conf mid">Medium</span></td></tr>
+<tr><td>Human view</td><td>文档/页面/对话记录。</td><td>views/*.html / reports/*.md。</td><td><span class="conf high">High</span></td></tr>
+</table>
+
+<h2>6. Source / Evidence 边界</h2>
+<div class="grid g2">
+  <div class="card"><h3>不默认保存 source_message_record <span class="conf high">High</span></h3><p class="muted">KB 不复制 codebase、文档库或聊天历史。source 通过 evidence locator 被引用。</p></div>
+  <div class="card"><h3>Evidence 必须有 source locator <span class="conf high">High</span></h3><p class="muted">至少包含 source_type、稳定 locator、source revision/snapshot、quote/summary、redaction/permission 状态。</p></div>
+</div>
+<pre><code>{
+  "evidence_id": "ev_001",
+  "source_type": "codebase",
+  "locator": {
+    "repo": "tradition-transformer",
+    "commit": "abc123",
+    "path": "src/.../StaticMappingLookupCore.java",
+    "symbol": "getCutoffWithFallback",
+    "line_range": [120, 168]
+  },
+  "quote_or_summary": "Reverse pair fallback is used when forward lookup is blank.",
+  "redaction_state": "not_required"
+}</code></pre>
+
+<h2>7. Lifecycle 与治理边界</h2>
+<div class="flow">
+  <div class="node"><b>draft</b><span>AI 初稿</span></div><div class="arrow">→</div>
+  <div class="node"><b>ai_reviewed</b><span>AI 审核</span></div><div class="arrow">→</div>
+  <div class="node"><b>human_confirmed</b><span>人对话确认</span></div><div class="arrow">→</div>
+  <div class="node"><b>signed_off</b><span>冻结 revision/hash</span></div><div class="arrow">→</div>
+  <div class="node"><b>runtime eligible</b><span>仍需 release gate</span></div>
+</div>
+<div class="callout" style="margin-top:16px"><span class="conf high">High</span> 用 state 代替 candidate/canonical 双目录成立；前提是 signed_off 对象不可原地覆盖。</div>
+
+<h2>8. Git 与 revision / content_hash / signoff snapshot</h2>
+<table>
+<tr><th>结论</th><th>Confidence</th><th>说明</th></tr>
+<tr><td>Git 不能替代 signoff snapshot。</td><td><span class="conf high">High</span></td><td>Git 是 repo-level；signoff 是 domain-level，冻结 object_id + revision + content_hash 集合。</td></tr>
+<tr><td>revision 可以轻量保留。</td><td><span class="conf mid">Medium</span></td><td>如果要极简，可讨论只保留 content_hash + snapshot，但 Codex 建议 revision 能提升对象级审计。</td></tr>
+<tr><td>content_hash 必须保留。</td><td><span class="conf high">High</span></td><td>用于证明 signoff 后对象内容没有漂移。</td></tr>
+</table>
+
+<h2>9. 最小必需字段</h2>
+<div class="grid g2">
+<div class="card"><h3>pack.json <span class="conf high">High</span></h3><pre><code>pack_id
+name/title
+schema_version
+scope.channel/product/pack/domain
+pack_version 或 canonical_revision
+status/lifecycle
+content_hash
+object_refs
+signoff_ref / signoff_status
+source_lineage
+release_eligibility / blockers</code></pre></div>
+<div class="card"><h3>object.json <span class="conf high">High</span></h3><pre><code>schema_version
+object_id
+uri
+object_type: rule | lookup | helper
+pack_id 或 pack scope ref
+scope
+lifecycle.state
+lifecycle.revision
+lifecycle.signoff_status
+content_hash
+evidence_refs 或 source_anchors
+logic / semantic pipeline
+dependencies</code></pre></div>
+</div>
+
+<h2>10. 类型特定字段</h2>
+<table>
+<tr><th>对象类型</th><th>必须包含</th><th>Confidence</th></tr>
+<tr><td>rule</td><td>target.path、输出绑定 / emitted children、inputs、examples。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>lookup</td><td>key composition / key columns、return fields、fallback / reverse semantics。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>helper</td><td>inputs、outputs、branch / logic pipeline、consumers。</td><td><span class="conf high">High</span></td></tr>
+</table>
+
+<h2>11. Signoff Snapshot 示例</h2>
+<pre><code>{
+  "signoff_id": "signoff_2026_05_19_001",
+  "status": "signed_off",
+  "canonical_snapshot_id": "canonical_2026_05_19_001",
+  "signed_off_by": "human_reviewer_or_process",
+  "signed_off_at": "2026-05-19T00:00:00Z",
+  "included_objects": [
+    {
+      "object_id": "rule_fxd_ndf_fixing_time",
+      "object_type": "rule",
+      "revision": 2,
+      "content_hash": "sha256:..."
+    }
+  ],
+  "release_eligibility": {
+    "eligible_for_runtime_projection": true,
+    "blocking_issues_count": 0
+  }
+}</code></pre>
+<div class="callout"><span class="conf mid">Medium</span> 示例结构可用；signoff 主体字段还需确认是真实账号、role 还是 process。</div>
+
+<h2>12. 必须禁止的做法</h2>
+<table>
+<tr><th>禁止项</th><th>Confidence</th></tr>
+<tr><td>禁止把 L0/L1/search hit/HTML/LLM summary 当 final truth。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>禁止 DB、索引、缓存、presentation 层成为 canonical truth。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>禁止 signed_off 或已发布对象原地覆盖。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>禁止 evidence 没有 stable locator、source revision、redaction state。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>禁止 Markdown/HTML 视图反向覆盖 KB truth。</td><td><span class="conf high">High</span></td></tr>
+</table>
+
+<h2>13. 自我复核结果</h2>
+<table>
+<tr><th>原 HTML 内容</th><th>复核结果</th><th>Confidence</th></tr>
+<tr><td>JSON canonical KB</td><td>保留；前提是 AI-mediated review 成立。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>JSONL 用于 append-only 记录</td><td>保留；补充“不面向人工手写，需 pretty view”。</td><td><span class="conf high">High</span></td></tr>
+<tr><td>Evidence 小 pack 嵌入、大 pack 独立</td><td>保留，但标为需确认阈值。</td><td><span class="conf mid">Medium</span></td></tr>
+<tr><td>Human confirmation log</td><td>保留，但粒度未定。</td><td><span class="conf low">Low</span></td></tr>
+<tr><td>Signoff 主体</td><td>原文示例过泛，已标为待确认。</td><td><span class="conf low">Low</span></td></tr>
+<tr><td>Runtime Projection</td><td>只保留为后续导出目标，不在本页展开。</td><td><span class="conf high">High</span></td></tr>
+</table>
+
+<h2>14. 下一步</h2>
+<div class="card decision">
+  <h3>人工审核这份 HTML 后，进入 KB v0.1 Schema 冻结。</h3>
+  <p class="muted">优先确认：JSON 是否定稿、Evidence 默认嵌入还是独立、Human confirmation 粒度、Signoff 主体字段。确认后再定义 JSON Schema 和 hash/signoff 规则。</p>
+</div>
+
+<div class="footer">Includes discussion corrections + Codex xhigh audit + controller self-review. Source Codex report: /home/ubuntu/repos/rts/.hermes/reports/2026-05-19-rts-kb-plan-file-format-codex-xhigh-audit.md</div>
+</div></body></html>
