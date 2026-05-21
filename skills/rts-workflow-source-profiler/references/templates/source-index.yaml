@@ -1,0 +1,34 @@
+schema_version: source-index-v1
+source_bundle_id: "{source_bundle_id}"
+items:
+  - source_id: "src-grpc-entrypoint-example"
+    source_type: java
+    status: found
+    locator:
+      repo: "{repo_name}"
+      revision: "{git_commit_or_revision}"
+      path: "src/main/java/..."
+      symbol: "GrpcServiceOrHandler"
+      line_range: [0, 0]
+    content_hash: "sha256:..."
+    permission_state: allowed
+    redaction_state: not_required
+    summary: "Receives inbound gRPC message and starts the workflow."
+    used_by:
+      - "workflow_step:receive_grpc"
+  - source_id: "src-xslt-template-example"
+    source_type: xslt
+    status: found
+    locator:
+      repo: "{repo_name}"
+      revision: "{git_commit_or_revision}"
+      path: "src/main/resources/..."
+      symbol: "xsl:template name or match"
+      line_range: [0, 0]
+    content_hash: "sha256:..."
+    permission_state: allowed
+    redaction_state: not_required
+    summary: "Builds downstream XML target structure."
+    used_by:
+      - "workflow_step:apply_xslt"
+unavailable_sources: []

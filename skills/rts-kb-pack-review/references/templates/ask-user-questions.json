@@ -1,0 +1,32 @@
+{
+  "schema_version": "ask-user-questions-v1",
+  "pack_id": "{pack_id}",
+  "generated_at": "{iso_timestamp}",
+  "blocking_count": 1,
+  "questions": [
+    {
+      "question_id": "q-example-001",
+      "severity": "blocking",
+      "object_refs": [
+        "{object_id}"
+      ],
+      "question": "Which source should be treated as authoritative for this target field?",
+      "why_needed": "The KB has conflicting evidence and cannot proceed to snapshot skeleton without a truth decision.",
+      "options": [
+        {
+          "label": "Java transformation wins",
+          "effect": "Use Java source refs as primary evidence for the object."
+        },
+        {
+          "label": "XSLT template wins",
+          "effect": "Use XSLT source refs as primary evidence for the object."
+        }
+      ],
+      "freeform_allowed": true,
+      "blocks": [
+        "snapshot",
+        "runtime_projection"
+      ]
+    }
+  ]
+}

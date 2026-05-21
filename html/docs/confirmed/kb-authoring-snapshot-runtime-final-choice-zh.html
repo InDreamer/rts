@@ -1,0 +1,1383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KB Authoring / Snapshot / Runtime Projection Final Contract | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">项目概览</a>
+      <a class="nav-link" href="../../architecture.html">KB 与投影</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">已确认基线 · docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md</p>
+      <h1>KB Authoring / Snapshot / Runtime Projection Final Contract</h1>
+      <p>final executable contract for RTS source intake, structured KB authoring, canonical signoff snapshot, runtime projection, and derived views</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">适合阅读</p>
+          <ul><li>需要固定 source 到结构化 KB 再到 runtime projection 的落地契约</li><li>需要判断新生成器下次必须产出哪些目录、文件和字段</li><li>需要最终决定 RTS KB 应该用 JSON 还是 YAML</li><li>需要冻结 KB authoring、canonical signoff snapshot、runtime projection、index/view/context 的分层选择</li><li>需要设计 signoff、content hash、human confirmation、publisher 或 schema freeze</li></ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">可跳过</p>
+          <ul><li>只需要调用已经运行的 API</li><li>只需要 PM 视角解释 runtime projection 目录</li><li>只需要历史方案或外部检索参考</li></ul>
+        </div>
+        <div class="aside-card related-card">
+          <p class="kicker">关联来源</p>
+          <a href="project-alignment-summary-zh.html">project-alignment-summary-zh.md</a><a href="system-constitution-v1.html">system-constitution-v1.md</a><a href="kb-to-index-projection-contract-zh.html">kb-to-index-projection-contract-zh.md</a><a href="kb-runtime-index-layer-standard-zh.html">kb-runtime-index-layer-standard-zh.md</a><a href="README.html">Confirmed Docs</a>
+        </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+            <h2>文档定位</h2>
+            <p>final executable contract for RTS source intake, structured KB authoring, canonical signoff snapshot, runtime projection, and derived views</p>
+          </article>
+          <article class="insight-card">
+            <h2>权威层级</h2>
+            <p>已确认基线 / role: leaf / layer: 3</p>
+          </article>
+          <article class="insight-card">
+            <h2>源文件</h2>
+            <p><code>docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md</code></p>
+          </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>0. 最终固定结论</h3>
+          <p>RTS 不采用“纯 JSON KB”或“纯 YAML KB”二选一。最终固定为五层链路： Layer 0 Source intake bundle -&gt; Layer 1 Structured KB authoring package -&gt; Layer 1.5 Canonical signoff snapshot -&gt; Layer 2 Runtime projection release package -&gt; Layer 3 Derived index / view / LLM context envelope</p>
+        </article>
+<article class="chapter-card">
+          <h3>1. 生成顺序</h3>
+          <p>任何新的规则包，必须按这个顺序生成和验收： 0. 选择 identity 和 scope 1. 建 source intake bundle 2. 生成 structured KB authoring package 3. 校验 KB package 4. 生成 canonical signoff snapshot 5. 完成 signoff 6. 生成 immutable runtime projection release 7. 生成 index / HTML / LLM c...</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 固定目录总览</h3>
+          <p>推荐 repo 形状： sources/ {source_bundle_id}/ source-manifest.yaml source-index.yaml extraction-notes.md raw/ # optional; raw files or local copies when allowed normalized/ # optional; extracted CSV/JSON/text when allowed attachments/ #...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. Layer 0：Source Intake Bundle</h3>
+          <p>Source intake 是生成链路的证据入口。它不直接成为规则 truth，也不允许 runtime service 读取。 目录固定为： sources/{source_bundle_id}/ source-manifest.yaml source-index.yaml extraction-notes.md raw/ # optional normalized/ # optional attachments/ # optional</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.1 source-manifest.yaml</h3>
+          <p>必须字段： schema_version: source-bundle-v1 source_bundle: id: src-tradition-stella-fxd-ndf-2026-05-21 name: Tradition Stella FXD.NDF source bundle status: captured captured_at: 2026-05-21T00:00:00Z captured_by: extractor-or-approv...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.2 source-index.yaml</h3>
+          <p>每个 source item 必须有稳定 locator： schema_version: source-index-v1 items: - source_id: src-code-static-mapping-lookup-core source_type: codebase locator: repo: tradition-transformer commit: abc123 path: src/main/java/.../StaticMappingLookupCore.java symbo...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.3 extraction-notes.md</h3>
+          <p>只写抽取过程和限制，不写最终规则 truth。必须包含： source scope what was extracted what was excluded known gaps normalization decisions review questions raised</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Layer 1：Structured KB Authoring Package</h3>
+          <p>KB 是可维护、可 review 的 governed working truth。默认格式是 YAML + Markdown。 目录固定为： kb/{pack_id}/ metadata.yaml README.md rules/{rule_id}.yaml lookups/{lookup_id}.yaml helpers/{helper_id}.yaml evidence/evidence-index.yaml review/review-index.yaml reports/extraction-report.md reports/review-checklist.md...</p>
+        </article>
+<article class="chapter-card">
+          <h3>4.1 metadata.yaml</h3>
+          <p>必须字段： schema_version: kb-pack-v1 pack: id: tradition-to-stella-fxd-ndf-cutoff-fixing-split name: Tradition -&gt; Stella FXD.NDF cutoff-fixing split status: demo_signoff version: 0.2.0-photo-reconstructed canonical_revision: photo...</p>
+        </article>
+<article class="chapter-card">
+          <h3>4.2 rules/{rule_id}.yaml</h3>
+          <p>Rule 表示一个目标规则对象。必须字段： schema_version: kb-object-v1 id: rule_fxd_ndf_primary_rate_source object_type: rule status: demo_signoff signoff_status: demo_signoff revision: 2 scope: inherits: pack source_anchors: - source_id: src-code-static-mapping...</p>
+        </article>
+<article class="chapter-card">
+          <h3>4.3 lookups/{lookup_id}.yaml</h3>
+          <p>Lookup 表示可复用表或枚举映射。必须字段： schema_version: kb-object-v1 id: lk_fxd_ndf_cutoff_by_pair_and_locode object_type: lookup status: demo_signoff signoff_status: demo_signoff revision: 1 scope: inherits: pack source_anchors: - source_id: src-sheet-traditi...</p>
+        </article>
+<article class="chapter-card">
+          <h3>4.4 helpers/{helper_id}.yaml</h3>
+          <p>Helper 表示可复用计算、解析或选择逻辑。必须字段： schema_version: kb-object-v1 id: hlp_fxd_ndf_fixing_quoted_currency_pair object_type: helper status: demo_signoff signoff_status: demo_signoff revision: 1 scope: inherits: pack inputs: - name: currency1 - name: currency2...</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="kb-authoring-snapshot-runtime-projection-final-contract">KB Authoring / Snapshot / Runtime Projection Final Contract</h1>
+<blockquote>
+<p>状态：confirmed final contract<br/>
+日期：2026-05-21<br/>
+范围：固定 RTS 从 source intake 到结构化 KB、canonical signoff snapshot、runtime projection、derived index/view/context 的落地方案<br/>
+关系：本文固定“下次生成器必须长什么样”；更细的 KB/runtime/index 字段参考 <code>docs/confirmed/kb-runtime-index-layer-standard-zh.md</code><br/>
+实现状态：当前 repo 已有 KB authoring 样例和 runtime projection 样例；canonical signoff snapshot publisher、production provenance gate、write-once release gate 仍需实现。</p>
+</blockquote>
+<h2 id="0">0. 最终固定结论</h2>
+<p>RTS 不采用“纯 JSON KB”或“纯 YAML KB”二选一。最终固定为五层链路：</p>
+<pre><code class="language-text">Layer 0  Source intake bundle
+  -&gt; Layer 1  Structured KB authoring package
+  -&gt; Layer 1.5  Canonical signoff snapshot
+  -&gt; Layer 2  Runtime projection release package
+  -&gt; Layer 3  Derived index / view / LLM context envelope
+</code></pre>
+<p>格式固定如下：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>默认格式</th>
+<th>是否拥有 truth</th>
+<th>允许谁直接读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source intake</td>
+<td>YAML manifest + raw/normalized source refs</td>
+<td>否；它是证据入口，不是规则 truth</td>
+<td>extractor、KB generator、review agent、publisher</td>
+</tr>
+<tr>
+<td>Structured KB authoring</td>
+<td>YAML + Markdown，必要时 CSV/TSV attachments</td>
+<td>是，作为 governed working truth</td>
+<td>KB authoring agent、review agent、publisher、少量人工 reviewer</td>
+</tr>
+<tr>
+<td>Canonical signoff snapshot</td>
+<td>JSON + JSONL</td>
+<td>是，作为 immutable signoff truth</td>
+<td>publisher、release audit、governance tooling</td>
+</tr>
+<tr>
+<td>Runtime projection</td>
+<td>JSON + JSONL + L2 JSON</td>
+<td>是，作为 service truth</td>
+<td>RTS service、query/index、managed LLM harness、tool surface</td>
+</tr>
+<tr>
+<td>Derived outputs</td>
+<td>Lucene/OpenSearch/JSONL/HTML/Markdown/request JSON</td>
+<td>否</td>
+<td>search、HTML/doc generator、LLM context assembler</td>
+</tr>
+</tbody>
+</table>
+<p>一句话：</p>
+<pre><code class="language-text">Source 负责可追溯。
+KB 负责可维护。
+Snapshot 负责可签核。
+Runtime projection 负责可服务。
+Index、HTML、LLM context 只负责派生使用，不能拥有 truth。
+</code></pre>
+<h2 id="1">1. 生成顺序</h2>
+<p>任何新的规则包，必须按这个顺序生成和验收：</p>
+<pre><code class="language-text">0. 选择 identity 和 scope
+1. 建 source intake bundle
+2. 生成 structured KB authoring package
+3. 校验 KB package
+4. 生成 canonical signoff snapshot
+5. 完成 signoff
+6. 生成 immutable runtime projection release
+7. 生成 index / HTML / LLM context views
+8. 运行 service smoke tests
+</code></pre>
+<p>每一步的输入、输出和拒绝条件如下：</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>输入</th>
+<th>必须输出</th>
+<th>拒绝条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identity / scope</td>
+<td>source request、业务范围、目标系统</td>
+<td><code>pack_id</code>、<code>source_bundle_id</code>、<code>scope</code>、<code>canonical_revision</code></td>
+<td>scope 不唯一；pack id 与已有 pack 冲突</td>
+</tr>
+<tr>
+<td>Source intake</td>
+<td>原始文档、代码、表格、截图、对话确认或外部 locator</td>
+<td><code>sources/{source_bundle_id}/source-manifest.yaml</code>、<code>source-index.yaml</code>、<code>extraction-notes.md</code></td>
+<td>没有 stable locator、source revision、hash 或权限状态</td>
+</tr>
+<tr>
+<td>Structured KB</td>
+<td>source bundle、抽取结果、review 意见</td>
+<td><code>kb/{pack_id}/metadata.yaml</code>、<code>rules/*.yaml</code>、<code>lookups/*.yaml</code>、<code>helpers/*.yaml</code>、<code>evidence/</code>、<code>review/</code>、<code>reports/</code></td>
+<td>object id 不稳定；evidence/ref 无法解析；scope 不兼容</td>
+</tr>
+<tr>
+<td>KB validation</td>
+<td>KB package</td>
+<td>validation report、blocking issue count</td>
+<td>schema 错、引用断、open blocker 未关闭</td>
+</tr>
+<tr>
+<td>Snapshot</td>
+<td>validated KB</td>
+<td><code>kb/{pack_id}/snapshots/{snapshot_id}/...</code></td>
+<td>canonical hash 不可复现；snapshot 覆盖旧 id</td>
+</tr>
+<tr>
+<td>Signoff</td>
+<td>snapshot、review decision、human confirmation</td>
+<td><code>signoff.json</code></td>
+<td>signoff 未覆盖所有 projected objects；production actor 不可识别</td>
+</tr>
+<tr>
+<td>Runtime projection</td>
+<td>signed snapshot</td>
+<td><code>runtime-store/releases/{release_id}/...</code></td>
+<td>缺 snapshot id/hash/signoff id；L2 hash 不匹配；release id 已存在</td>
+</tr>
+<tr>
+<td>Derived views</td>
+<td>runtime projection</td>
+<td><code>index-artifacts/</code>、HTML/Markdown review views、LLM context envelope templates</td>
+<td>派生层新增业务断言；未保留 source uri/hash/role/trace</td>
+</tr>
+<tr>
+<td>Smoke tests</td>
+<td>active release</td>
+<td>query/read/hash/dependency/trace test result</td>
+<td>service 绕过 projection 读 KB；trace 缺 release/object/hash</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2">2. 固定目录总览</h2>
+<p>推荐 repo 形状：</p>
+<pre><code class="language-text">sources/
+  {source_bundle_id}/
+    source-manifest.yaml
+    source-index.yaml
+    extraction-notes.md
+    raw/                         # optional; raw files or local copies when allowed
+    normalized/                  # optional; extracted CSV/JSON/text when allowed
+    attachments/                 # optional; screenshots, exported tables, temporary parse outputs
+
+kb/
+  {pack_id}/
+    metadata.yaml
+    README.md
+    rules/{rule_id}.yaml
+    lookups/{lookup_id}.yaml
+    helpers/{helper_id}.yaml
+    evidence/evidence-index.yaml
+    review/review-index.yaml
+    reports/extraction-report.md
+    reports/review-checklist.md
+    reports/closure-check.md
+    attachments/                 # optional; CSV/TSV or normalized tables used by KB objects
+    snapshots/{snapshot_id}/
+      snapshot-manifest.json
+      objects.jsonl
+      dependency-edges.jsonl
+      evidence-refs.jsonl
+      review-decisions.jsonl
+      human-confirmation-log.jsonl
+      change-log.jsonl
+      signoff.json
+      projection-map.jsonl
+
+runtime-store/
+  active-release.json
+  releases/{release_id}/
+    release-manifest.json
+    scopes.jsonl
+    object-manifest.jsonl
+    caller-profiles.jsonl
+    l2/rules/{rule_id}.json
+    l2/lookups/{lookup_id}.json
+    l2/helpers/{helper_id}.json
+    navigation/object-cards.jsonl
+    navigation/l0-l1-views.jsonl
+    navigation/aliases.jsonl
+    navigation/confusables.jsonl
+    dependencies/dependency-edges.jsonl
+    dependencies/field-bindings.jsonl
+    governance/governance-access-refs.jsonl
+    governance/evidence-summaries/{object_or_pack_id}.json
+    governance/review-summaries/{object_or_pack_id}.json
+    governance/report-summaries/{pack_or_release_id}.json
+    index-artifacts/opensearch-docs.jsonl
+    index-artifacts/lucene/       # generated binary index; rebuildable
+  traces/query-trace.jsonl
+  traces/llm-run-trace.jsonl
+</code></pre>
+<p>当前 repo 已有 <code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/</code> 和 <code>runtime-store/releases/rel-2026-05-06/</code> 样例。它们用于兼容和验证方向；后续新生产包必须补齐 <code>sources/</code> 和 <code>snapshots/</code>。</p>
+<h2 id="3-layer-0source-intake-bundle">3. Layer 0：Source Intake Bundle</h2>
+<p>Source intake 是生成链路的证据入口。它不直接成为规则 truth，也不允许 runtime service 读取。</p>
+<p>目录固定为：</p>
+<pre><code class="language-text">sources/{source_bundle_id}/
+  source-manifest.yaml
+  source-index.yaml
+  extraction-notes.md
+  raw/                         # optional
+  normalized/                  # optional
+  attachments/                 # optional
+</code></pre>
+<h3 id="31-source-manifestyaml">3.1 <code>source-manifest.yaml</code></h3>
+<p>必须字段：</p>
+<pre><code class="language-yaml">schema_version: source-bundle-v1
+source_bundle:
+  id: src-tradition-stella-fxd-ndf-2026-05-21
+  name: Tradition Stella FXD.NDF source bundle
+  status: captured
+  captured_at: 2026-05-21T00:00:00Z
+  captured_by: extractor-or-approved-workflow
+scope:
+  source_system: Tradition
+  target_system: Stella
+  product_scope: FXD.NDF
+  domain: cutoff-fixing
+source_revision:
+  repo_ref: git:abc123
+  external_revision: vendor-export-2026-05-21
+  capture_time: 2026-05-21T00:00:00Z
+hash_profile:
+  algorithm: sha256
+  normalization: raw-bytes-or-declared-normalization
+permissions:
+  classification: internal
+  allowed_purposes: [authoring, review, publisher]
+  redaction_required: false
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li>如果 raw 文件允许入库，放入 <code>raw/</code> 并记录 hash。</li>
+<li>如果 raw 文件不能入库，<code>source-index.yaml</code> 必须记录外部 stable locator、revision、hash 或不可 hash 的理由。</li>
+<li>Source bundle 不能被 runtime service 当 truth 读取。</li>
+</ul>
+<h3 id="32-source-indexyaml">3.2 <code>source-index.yaml</code></h3>
+<p>每个 source item 必须有稳定 locator：</p>
+<pre><code class="language-yaml">schema_version: source-index-v1
+items:
+  - source_id: src-code-static-mapping-lookup-core
+    source_type: codebase
+    locator:
+      repo: tradition-transformer
+      commit: abc123
+      path: src/main/java/.../StaticMappingLookupCore.java
+      symbol: getCutoffWithFallback
+      line_range: [120, 168]
+    content_hash: sha256:...
+    permission_state: allowed
+    redaction_state: not_required
+    used_by:
+      - rule_fxd_ndf_primary_rate_source
+      - lk_fxd_ndf_cutoff_by_pair_and_locode
+</code></pre>
+<h3 id="33-extraction-notesmd">3.3 <code>extraction-notes.md</code></h3>
+<p>只写抽取过程和限制，不写最终规则 truth。必须包含：</p>
+<pre><code class="language-text">source scope
+what was extracted
+what was excluded
+known gaps
+normalization decisions
+review questions raised
+</code></pre>
+<h2 id="4-layer-1structured-kb-authoring-package">4. Layer 1：Structured KB Authoring Package</h2>
+<p>KB 是可维护、可 review 的 governed working truth。默认格式是 YAML + Markdown。</p>
+<p>目录固定为：</p>
+<pre><code class="language-text">kb/{pack_id}/
+  metadata.yaml
+  README.md
+  rules/{rule_id}.yaml
+  lookups/{lookup_id}.yaml
+  helpers/{helper_id}.yaml
+  evidence/evidence-index.yaml
+  review/review-index.yaml
+  reports/extraction-report.md
+  reports/review-checklist.md
+  reports/closure-check.md
+  attachments/                 # optional
+  snapshots/                   # generated after validation and signoff
+</code></pre>
+<h3 id="41-metadatayaml">4.1 <code>metadata.yaml</code></h3>
+<p>必须字段：</p>
+<pre><code class="language-yaml">schema_version: kb-pack-v1
+pack:
+  id: tradition-to-stella-fxd-ndf-cutoff-fixing-split
+  name: Tradition -&gt; Stella FXD.NDF cutoff-fixing split
+  status: demo_signoff
+  version: 0.2.0-photo-reconstructed
+  canonical_revision: photo-reconstructed-2026-05-06
+source_bundle:
+  id: src-tradition-stella-fxd-ndf-2026-05-21
+  manifest: ../../sources/src-tradition-stella-fxd-ndf-2026-05-21/source-manifest.yaml
+scope:
+  source_system: Tradition
+  target_system: Stella
+  product_scope: FXD.NDF
+  domain: cutoff-fixing
+  target_area:
+    - /scb:SCBML/.../conf:fixing
+objects:
+  rules: 6
+  lookups: 1
+  helpers: 1
+indexes:
+  evidence_index: evidence/evidence-index.yaml
+  review_index: review/review-index.yaml
+  extraction_report: reports/extraction-report.md
+  review_checklist: reports/review-checklist.md
+  closure_check: reports/closure-check.md
+release_eligibility:
+  intended_tier: demo
+  blocking_issues_count: 0
+  open_questions_count: 0
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li><code>pack.id</code> 必须等于目录名 <code>{pack_id}</code>。</li>
+<li><code>canonical_revision</code> 必须能被 snapshot 和 runtime manifest 引用。</li>
+<li><code>scope</code> 是 object 默认 scope；object 局部 scope 只能收窄，不能冲突。</li>
+<li><code>status</code> 必须是枚举，不能用自然语言替代。</li>
+</ul>
+<p>推荐状态枚举：</p>
+<pre><code class="language-text">candidate
+ai_reviewed
+human_review_required
+demo_signoff
+production_signoff
+deprecated
+superseded
+</code></pre>
+<h3 id="42-rulesrule_idyaml">4.2 <code>rules/{rule_id}.yaml</code></h3>
+<p>Rule 表示一个目标规则对象。必须字段：</p>
+<pre><code class="language-yaml">schema_version: kb-object-v1
+id: rule_fxd_ndf_primary_rate_source
+object_type: rule
+status: demo_signoff
+signoff_status: demo_signoff
+revision: 2
+scope:
+  inherits: pack
+source_anchors:
+  - source_id: src-code-static-mapping-lookup-core
+    locator_ref: source-index.yaml#src-code-static-mapping-lookup-core
+evidence_refs:
+  - ev-primary-rate-source-lookup
+review_refs:
+  - rv-primary-rate-source-closure
+inputs:
+  - name: fixing_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+logic:
+  summary: Resolve the hedge primary rate source from the cutoff lookup.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/.../currency1/text()
+      out: fixing_currency1
+    - op: lookup_value
+      lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+      return_field: hedge_primary_source
+      using_inputs:
+        fixing_currency1: fixing_currency1
+      out: hedge_primary_source
+target:
+  kind: block
+  path: /scb:SCBML/.../conf:primaryRateSource
+  emits:
+    - path: /scb:SCBML/.../conf:rateSource
+      from: hedge_primary_source
+dependencies:
+  lookups:
+    - lk_fxd_ndf_cutoff_by_pair_and_locode
+  helpers: []
+  rules: []
+examples:
+  - name: sample_usdtwd_primary_rate_source
+    inputs:
+      fixing_currency1: USD
+    expected:
+      hedge_primary_source: TAIFX1
+warnings: []
+</code></pre>
+<h3 id="43-lookupslookup_idyaml">4.3 <code>lookups/{lookup_id}.yaml</code></h3>
+<p>Lookup 表示可复用表或枚举映射。必须字段：</p>
+<pre><code class="language-yaml">schema_version: kb-object-v1
+id: lk_fxd_ndf_cutoff_by_pair_and_locode
+object_type: lookup
+status: demo_signoff
+signoff_status: demo_signoff
+revision: 1
+scope:
+  inherits: pack
+source_anchors:
+  - source_id: src-sheet-tradition-stella-cutoff
+evidence_refs:
+  - ev-cutoff-table
+key:
+  columns:
+    - pair
+    - locode
+  normalization:
+    pair: uppercase-no-separator
+    locode: uppercase
+return_fields:
+  - hedge_primary_source
+  - hedge_secondary_source
+  - fixing_time
+fallback:
+  reverse_pair_allowed: true
+  missing_value_policy: unresolved
+data:
+  inline_rows: []
+  attachment_ref: attachments/cutoff-table.tsv
+dependencies: {}
+warnings: []
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li>小表可以 <code>inline_rows</code>。</li>
+<li>大表必须放 <code>attachments/*.csv|*.tsv</code>，并记录 hash、schema 和 normalization。</li>
+<li>fallback/reverse/missing policy 必须显式写出，不能靠 report prose 补充。</li>
+</ul>
+<h3 id="44-helpershelper_idyaml">4.4 <code>helpers/{helper_id}.yaml</code></h3>
+<p>Helper 表示可复用计算、解析或选择逻辑。必须字段：</p>
+<pre><code class="language-yaml">schema_version: kb-object-v1
+id: hlp_fxd_ndf_fixing_quoted_currency_pair
+object_type: helper
+status: demo_signoff
+signoff_status: demo_signoff
+revision: 1
+scope:
+  inherits: pack
+inputs:
+  - name: currency1
+  - name: currency2
+outputs:
+  - name: normalized_pair
+logic:
+  summary: Build the normalized fixing quoted currency pair.
+  pipeline:
+    - op: concat
+      args: [currency1, currency2]
+      out: normalized_pair
+consumers:
+  rules:
+    - rule_fxd_ndf_fixing_quoted_currency_pair
+dependencies: {}
+evidence_refs:
+  - ev-quoted-currency-pair-helper
+warnings: []
+</code></pre>
+<h3 id="45-evidenceevidence-indexyaml">4.5 <code>evidence/evidence-index.yaml</code></h3>
+<p>Evidence index 保存证据引用，不复制整个 source。必须字段：</p>
+<pre><code class="language-yaml">schema_version: evidence-index-v1
+evidence:
+  - evidence_id: ev-primary-rate-source-lookup
+    evidence_type: code_and_table
+    object_refs:
+      - rule_fxd_ndf_primary_rate_source
+      - lk_fxd_ndf_cutoff_by_pair_and_locode
+    source_refs:
+      - source_id: src-code-static-mapping-lookup-core
+      - source_id: src-sheet-tradition-stella-cutoff
+    locator_summary: Static mapping lookup plus cutoff sheet rows.
+    quote_or_summary: Primary rate source is resolved through the cutoff lookup.
+    confidence: high
+    permission_state: allowed
+    redaction_state: not_required
+</code></pre>
+<h3 id="46-reviewreview-indexyaml">4.6 <code>review/review-index.yaml</code></h3>
+<p>Review index 保存结构化审核结论。必须字段：</p>
+<pre><code class="language-yaml">schema_version: review-index-v1
+decisions:
+  - decision_id: rv-primary-rate-source-closure
+    object_refs:
+      - rule_fxd_ndf_primary_rate_source
+    decision_type: ambiguity_closure
+    status: accepted
+    question_or_conflict: Which source should drive primaryRateSource?
+    decision: Use cutoff lookup hedge_primary_source.
+    decided_by: ai-review-plus-human-confirmation
+    decided_at: 2026-05-21T00:00:00Z
+    evidence_refs:
+      - ev-primary-rate-source-lookup
+    remaining_risk: []
+    production_gate: passed
+</code></pre>
+<h3 id="47-reportsmd">4.7 <code>reports/*.md</code></h3>
+<p>Reports 是 review/presentation material，不是 canonical truth。固定三个报告：</p>
+<pre><code class="language-text">reports/extraction-report.md     # 抽取了什么、排除了什么、source 限制
+reports/review-checklist.md      # 每个 object 的 schema/evidence/scope/dependency 检查
+reports/closure-check.md         # open question、blocker、remaining risk 关闭情况
+</code></pre>
+<p>Reports 不能成为唯一保存规则逻辑、lookup fallback、权限结论或 signoff 的位置。</p>
+<h2 id="5-layer-15canonical-signoff-snapshot">5. Layer 1.5：Canonical Signoff Snapshot</h2>
+<p>Snapshot 是 KB 和 runtime projection 之间的签核冻结物。它必须 write-once。</p>
+<p>目录固定为：</p>
+<pre><code class="language-text">kb/{pack_id}/snapshots/{snapshot_id}/
+  snapshot-manifest.json
+  objects.jsonl
+  dependency-edges.jsonl
+  evidence-refs.jsonl
+  review-decisions.jsonl
+  human-confirmation-log.jsonl
+  change-log.jsonl
+  signoff.json
+  projection-map.jsonl
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li><code>{snapshot_id}</code> 一旦签核，不允许原地覆盖。</li>
+<li>Snapshot 冻结对象语义，不冻结 YAML 空白、注释或编辑器格式。</li>
+<li>Runtime projection 必须能从 snapshot 证明每个 L2 object 的来源。</li>
+<li>Demo snapshot 可以使用 role/process identity；production snapshot 必须支持真实 actor 或批准 workflow identity。</li>
+</ul>
+<h3 id="51-snapshot-manifestjson">5.1 <code>snapshot-manifest.json</code></h3>
+<p>必须字段：</p>
+<pre><code class="language-json">{
+  "snapshot_id": "snap-2026-05-21-fxd-ndf-v1",
+  "schema_version": "canonical-snapshot-v1",
+  "release_tier": "production",
+  "pack_id": "tradition-to-stella-fxd-ndf-cutoff-fixing-split",
+  "source_bundle_id": "src-tradition-stella-fxd-ndf-2026-05-21",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
+  "generated_at": "2026-05-21T00:00:00Z",
+  "generated_by": "publisher",
+  "normalization_profile": "rts-canonical-json-v1",
+  "normalization_version": "1.0.0",
+  "hash_algorithm": "sha256",
+  "source_repo_ref": "git:abc123",
+  "source_authoring_refs": [
+    {
+      "path": "rules/rule_fxd_ndf_primary_rate_source.yaml",
+      "content_hash": "sha256:..."
+    }
+  ],
+  "object_count": 8,
+  "blocking_issues_count": 0,
+  "snapshot_hash": "sha256:...",
+  "content_hash_summary": "sha256:..."
+}
+</code></pre>
+<h3 id="52-objectsjsonl">5.2 <code>objects.jsonl</code></h3>
+<p>每行一个规范化后的 rule、lookup 或 helper object。必须字段：</p>
+<pre><code class="language-text">snapshot_id
+schema_version
+object_id
+object_type
+scope
+lifecycle_state
+revision
+signoff_status
+content_hash
+source_bundle_id
+source_authoring_ref
+source_anchors
+evidence_refs
+review_decision_refs
+logic / lookup / helper structured body
+dependencies
+release_eligibility
+</code></pre>
+<p><code>content_hash</code> 基于 canonical normalized JSON 计算，不基于 YAML 源文本。</p>
+<h3 id="53-dependency-edgesjsonl">5.3 <code>dependency-edges.jsonl</code></h3>
+<p>每行一条对象依赖。必须字段：</p>
+<pre><code class="language-text">edge_id
+snapshot_id
+from_object_id
+from_object_type
+to_object_id
+to_object_type
+dependency_type
+field_path
+required_for_runtime
+content_hash
+</code></pre>
+<h3 id="54-evidence-refsjsonl">5.4 <code>evidence-refs.jsonl</code></h3>
+<p>每行一个规范化证据引用。必须字段：</p>
+<pre><code class="language-text">evidence_id
+snapshot_id
+object_ids
+source_bundle_id
+source_ids
+locator
+quote_or_summary
+permission_state
+redaction_state
+confidence
+content_hash
+</code></pre>
+<h3 id="55-review-decisionsjsonl">5.5 <code>review-decisions.jsonl</code></h3>
+<p>每行一个 review/adjudication decision。必须字段：</p>
+<pre><code class="language-text">decision_id
+snapshot_id
+object_ids
+decision_type
+status
+question_or_conflict
+decision
+decided_by
+decided_at
+evidence_refs
+review_gate_id
+policy_version
+validation_run_id
+remaining_risk
+production_gate
+supersession_or_revocation
+</code></pre>
+<h3 id="56-human-confirmation-logjsonl">5.6 <code>human-confirmation-log.jsonl</code></h3>
+<p>这不是聊天历史，而是影响 truth 的结构化确认日志。必须字段：</p>
+<pre><code class="language-text">confirmation_id
+snapshot_id
+object_ids
+prompt_or_question
+prompt_hash
+confirmed_value
+confirmation_type
+confirmed_by
+confirmed_at
+evidence_refs
+applies_to_revision
+applies_to_snapshot_id
+allowed_confirmation_type
+</code></pre>
+<h3 id="57-change-logjsonl">5.7 <code>change-log.jsonl</code></h3>
+<p>每行一个从上一 revision 或上一 snapshot 到当前 snapshot 的变化。必须字段：</p>
+<pre><code class="language-text">change_id
+snapshot_id
+object_id
+previous_revision
+new_revision
+previous_content_hash
+new_content_hash
+change_type
+change_summary
+changed_by
+changed_at
+review_decision_refs
+</code></pre>
+<h3 id="58-signoffjson">5.8 <code>signoff.json</code></h3>
+<p>必须字段：</p>
+<pre><code class="language-json">{
+  "signoff_id": "signoff-2026-05-21-fxd-ndf-v1",
+  "snapshot_id": "snap-2026-05-21-fxd-ndf-v1",
+  "snapshot_hash": "sha256:...",
+  "status": "signed_off",
+  "release_tier": "production",
+  "policy_version": "signoff-policy-v1",
+  "validation_run_id": "validation-2026-05-21-001",
+  "signed_off_by": {
+    "actor_type": "human",
+    "actor_id": "reviewer-or-approved-workflow",
+    "role": "domain_reviewer"
+  },
+  "signed_off_at": "2026-05-21T00:00:00Z",
+  "signature_ref": "sigstore-or-local-signature-ref",
+  "included_object_hashes": [
+    {
+      "object_id": "rule_fxd_ndf_primary_rate_source",
+      "revision": 2,
+      "content_hash": "sha256:..."
+    }
+  ],
+  "release_eligibility": {
+    "eligible_for_runtime_projection": true,
+    "blocking_issues_count": 0,
+    "remaining_risk": [],
+    "reopened_ambiguities": [],
+    "production_gate": "passed"
+  }
+}
+</code></pre>
+<h3 id="59-projection-mapjsonl">5.9 <code>projection-map.jsonl</code></h3>
+<p>这是 snapshot 到 runtime projection 的证明链。每行一个 projected object。必须字段：</p>
+<pre><code class="language-text">release_id
+snapshot_id
+snapshot_object_id
+snapshot_object_hash
+runtime_uri
+runtime_l2_storage_ref
+runtime_l2_hash
+projection_transform_profile
+field_mapping_version
+</code></pre>
+<p>Auditor 必须能回答：</p>
+<ul>
+<li>哪个 signed snapshot object 生成了这个 L2 object。</li>
+<li>signoff 中记录的 object hash 是否仍匹配。</li>
+<li>用了哪个 transform profile。</li>
+<li>runtime L2 hash 是否与 object manifest 和 content ref 匹配。</li>
+</ul>
+<h2 id="6-canonicalization-hash-profile">6. Canonicalization 和 hash profile</h2>
+<p>Snapshot hash 使用 <code>rts-canonical-json-v1</code>：</p>
+<ul>
+<li>JSON canonicalization 优先遵循 RFC 8785 JSON Canonicalization Scheme。</li>
+<li>所有 JSON/JSONL 必须是 UTF-8。</li>
+<li>Object keys 按 Unicode code point 词典序排序。</li>
+<li>canonical hash input 不包含无意义空白。</li>
+<li>字符串不被 publisher 悄悄改写业务含义。</li>
+<li>业务代码、货币对、XPath、account-like 值必须保持 string。</li>
+<li>omitted、null、空数组、空对象不等价，除非 schema 明确。</li>
+<li>数组保留语义顺序；set-like 字段必须定义排序 key。</li>
+<li>JSONL 文件 hash 基于逐行 canonical object，按文件稳定 key 排序，LF 连接并带 trailing LF。</li>
+<li>CSV/TSV attachment 按声明的 normalization profile hash；没有 profile 时按 raw UTF-8 bytes hash。</li>
+<li>Hash domain 必须显式：<code>snapshot_object</code>、<code>snapshot_manifest</code>、<code>signoff</code>、<code>runtime_l2</code>、<code>runtime_manifest</code>、<code>index_export</code>。</li>
+</ul>
+<p>当前 Java runtime 已验证 L2 UTF-8 文件 hash；production publisher 还需要补 canonical JSON hashing 和 golden tests。</p>
+<h2 id="7-layer-2runtime-projection-release-package">7. Layer 2：Runtime Projection Release Package</h2>
+<p>Runtime projection 是 RTS service truth。运行时查询、managed LLM、MCP/tools、index builder 默认只读这一层。</p>
+<p>目录固定为：</p>
+<pre><code class="language-text">runtime-store/
+  active-release.json
+  releases/{release_id}/
+    release-manifest.json
+    scopes.jsonl
+    object-manifest.jsonl
+    caller-profiles.jsonl
+    l2/rules/{rule_id}.json
+    l2/lookups/{lookup_id}.json
+    l2/helpers/{helper_id}.json
+    navigation/object-cards.jsonl
+    navigation/l0-l1-views.jsonl
+    navigation/aliases.jsonl
+    navigation/confusables.jsonl
+    dependencies/dependency-edges.jsonl
+    dependencies/field-bindings.jsonl
+    governance/governance-access-refs.jsonl
+    governance/evidence-summaries/{object_or_pack_id}.json
+    governance/review-summaries/{object_or_pack_id}.json
+    governance/report-summaries/{pack_or_release_id}.json
+    index-artifacts/opensearch-docs.jsonl
+    index-artifacts/lucene/
+</code></pre>
+<h3 id="71-release-manifestjson">7.1 <code>release-manifest.json</code></h3>
+<p>新 production release 必须包含 snapshot provenance：</p>
+<pre><code class="language-json">{
+  "release_id": "rel-2026-05-21-fxd-ndf-v1",
+  "projection_schema_version": "runtime-multiview-v1",
+  "activation_state": "active",
+  "release_tier": "production",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
+  "canonical_snapshot_id": "snap-2026-05-21-fxd-ndf-v1",
+  "canonical_snapshot_hash": "sha256:...",
+  "signoff_id": "signoff-2026-05-21-fxd-ndf-v1",
+  "generated_at": "2026-05-21T00:00:00Z",
+  "released_at": "2026-05-21T00:01:00Z",
+  "content_hash_summary": "sha256:...",
+  "blocking_issues_count": 0,
+  "rollback_target_release_id": null
+}
+</code></pre>
+<p>Compatibility:</p>
+<ul>
+<li>Existing demo releases may keep <code>canonical_revision</code> only.</li>
+<li>New demo releases should include snapshot metadata when available.</li>
+<li>New production releases must include <code>canonical_snapshot_id</code>、<code>canonical_snapshot_hash</code>、<code>signoff_id</code>。</li>
+</ul>
+<h3 id="72-scopesjsonl">7.2 <code>scopes.jsonl</code></h3>
+<p>每行一个 scope。必须字段：</p>
+<pre><code class="language-text">release_id
+scope_id
+source_system
+target_system
+product_scope
+domain
+target_area
+activation_state
+permission_profile
+</code></pre>
+<h3 id="73-object-manifestjsonl">7.3 <code>object-manifest.jsonl</code></h3>
+<p>每行一个 runtime object。必须字段：</p>
+<pre><code class="language-text">release_id
+uri
+object_id
+object_type
+scope_id
+l2_storage_ref
+l2_content_hash
+snapshot_id
+snapshot_object_id
+snapshot_object_hash
+activation_state
+truth_role
+view_role
+governance_ref
+dependency_refs
+</code></pre>
+<h3 id="74-l2json">7.4 <code>l2/**/*.json</code></h3>
+<p>L2 是服务读取的事实对象。必须字段：</p>
+<pre><code class="language-text">schema_version
+release_id
+uri
+object_id
+object_type
+scope
+truth_role
+snapshot_id
+snapshot_object_id
+snapshot_object_hash
+content_hash
+logic / lookup / helper body
+dependencies
+evidence_summary_refs
+review_summary_refs
+warnings
+</code></pre>
+<p>L2 可以为了服务读取重排结构，但不能新增 snapshot 没有的业务断言，除非 <code>projection_transform_profile</code> 和 <code>projection-map.jsonl</code> 明确说明。</p>
+<h3 id="75-navigationdependencygovernance">7.5 Navigation、dependency、governance</h3>
+<p>这些文件是 projection 内的受控视图：</p>
+<pre><code class="language-text">navigation/object-cards.jsonl         # object 摘要卡，给搜索和 UI 定位
+navigation/l0-l1-views.jsonl          # L0/L1 聚合视图，不能单独当 truth
+navigation/aliases.jsonl              # alias 和同义定位
+navigation/confusables.jsonl          # 易混淆对象和拒答提示
+dependencies/dependency-edges.jsonl   # runtime dependency graph
+dependencies/field-bindings.jsonl     # source/target 字段绑定
+governance/governance-access-refs.jsonl
+governance/*-summaries/*.json         # release-bound, permission-filtered summaries
+</code></pre>
+<p>Governance summary 必须 release-bound、permission-filtered、traceable。它不能从 <code>kb/evidence</code>、<code>kb/review</code>、raw reports 或 chat logs 旁路读取。</p>
+<h3 id="76-runtime-immutability">7.6 Runtime immutability</h3>
+<p>Production publisher 必须拒绝覆盖已有 <code>runtime-store/releases/{release_id}/</code>。修正任何规则事实都必须生成新 release id，再切换 <code>active-release.json</code>。</p>
+<p>Lucene 这类二进制索引可以重建；它不是 truth。</p>
+<h2 id="8-layer-3derived-index-view-llm-context">8. Layer 3：Derived Index / View / LLM Context</h2>
+<p>Layer 3 只能从 runtime projection 或 release-bound governance summaries 派生。</p>
+<h3 id="81-index-layer">8.1 Index layer</h3>
+<p>固定输出：</p>
+<pre><code class="language-text">runtime-store/releases/{release_id}/index-artifacts/
+  opensearch-docs.jsonl
+  lucene/
+</code></pre>
+<p>Index 可以包含：</p>
+<pre><code class="language-text">uri
+object_id
+object_type
+scope
+title
+summary
+aliases
+target_paths
+source_anchors
+dependency_refs
+release_id
+content_hash
+truth_role
+view_role
+</code></pre>
+<p>Index 禁止包含 projection 中不存在的业务断言。</p>
+<h3 id="82-html-markdown-views">8.2 HTML / Markdown views</h3>
+<p>HTML 和 Markdown 是 presentation/review view。允许展示：</p>
+<ul>
+<li>file tree</li>
+<li>object cards</li>
+<li>warnings</li>
+<li>evidence summary</li>
+<li>review summary</li>
+<li>rejection gate result</li>
+<li>query walkthrough</li>
+</ul>
+<p>禁止：</p>
+<ul>
+<li>被 runtime service 当 truth 读取</li>
+<li>反向覆盖 KB object</li>
+<li>保存唯一一份规则逻辑</li>
+</ul>
+<h3 id="83-llm-input-context-envelope">8.3 LLM Input Context Envelope</h3>
+<p>LLM context envelope 是请求时由 service 装箱的输入，不是 stored truth layer。</p>
+<p>每个 context item 必须包含：</p>
+<pre><code class="language-text">context_item_id
+source_uri
+content_hash
+truth_role or view_role
+truth_eligible
+redaction_state
+permission_purpose
+tool_call_id or trace_id
+release_id
+scope
+</code></pre>
+<p>Allowed default truth inputs:</p>
+<ul>
+<li>active runtime projection manifest</li>
+<li>scopes</li>
+<li>object manifest</li>
+<li>L2 objects</li>
+<li>dependency and field binding views</li>
+<li>permissioned governance summaries</li>
+</ul>
+<p>Disallowed as truth:</p>
+<ul>
+<li>search hit alone</li>
+<li>L0/L1 alone</li>
+<li>HTML</li>
+<li>report prose alone</li>
+<li>LLM memory</li>
+<li>raw chat transcript</li>
+<li>Git working tree</li>
+<li>unsigned snapshot</li>
+<li>unsigned KB authoring file</li>
+</ul>
+<h2 id="9-reader-matrix">9. Reader Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Reader</th>
+<th>可直接读取</th>
+<th>不可直接读取为 truth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source extractor</td>
+<td>source bundle、raw/normalized material</td>
+<td>runtime projection as authoring truth</td>
+</tr>
+<tr>
+<td>KB authoring agent</td>
+<td>source bundle、KB YAML/Markdown、evidence/review/report</td>
+<td>active service trace as KB truth</td>
+</tr>
+<tr>
+<td>Review agent</td>
+<td>KB、evidence、review、reports、snapshot staging</td>
+<td>raw chat transcript as final truth</td>
+</tr>
+<tr>
+<td>Publisher</td>
+<td>source bundle、validated KB、snapshot staging、signed snapshot</td>
+<td>unstructured conversation-only signoff</td>
+</tr>
+<tr>
+<td>Release audit</td>
+<td>signed snapshot、release manifest、projection-map、authorized governance summaries</td>
+<td>unsigned snapshot、raw evidence without permission</td>
+</tr>
+<tr>
+<td>RTS runtime service</td>
+<td>active runtime projection</td>
+<td>KB authoring、snapshot、source bundle</td>
+</tr>
+<tr>
+<td>Managed LLM harness</td>
+<td>service tools returned facts、L2 fields、dependency facts、authorized governance summaries</td>
+<td>raw KB、raw snapshot、raw evidence</td>
+</tr>
+<tr>
+<td>External agent/tool mode</td>
+<td>REST/MCP/tool responses</td>
+<td>local projection files、KB files、snapshot files</td>
+</tr>
+<tr>
+<td>Index builder</td>
+<td>projection manifest、object manifest、cards、L0/L1、aliases、dependency views</td>
+<td>raw KB、snapshot、source bundle</td>
+</tr>
+<tr>
+<td>HTML/doc generator</td>
+<td>projection summaries、authorized governance summaries、presentation reports</td>
+<td>HTML itself as truth</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-publisher-contract">10. Publisher Contract</h2>
+<p>Publisher 是唯一允许从 KB 进入 snapshot、再进入 runtime projection 的流程。</p>
+<p>Publisher input:</p>
+<pre><code class="language-text">sources/{source_bundle_id}/source-manifest.yaml
+sources/{source_bundle_id}/source-index.yaml
+kb/{pack_id}/metadata.yaml
+kb/{pack_id}/rules/*.yaml
+kb/{pack_id}/lookups/*.yaml
+kb/{pack_id}/helpers/*.yaml
+kb/{pack_id}/evidence/evidence-index.yaml
+kb/{pack_id}/review/review-index.yaml
+kb/{pack_id}/reports/*.md
+</code></pre>
+<p>Publisher output:</p>
+<pre><code class="language-text">kb/{pack_id}/snapshots/{snapshot_id}/snapshot-manifest.json
+kb/{pack_id}/snapshots/{snapshot_id}/objects.jsonl
+kb/{pack_id}/snapshots/{snapshot_id}/dependency-edges.jsonl
+kb/{pack_id}/snapshots/{snapshot_id}/evidence-refs.jsonl
+kb/{pack_id}/snapshots/{snapshot_id}/review-decisions.jsonl
+kb/{pack_id}/snapshots/{snapshot_id}/human-confirmation-log.jsonl
+kb/{pack_id}/snapshots/{snapshot_id}/change-log.jsonl
+kb/{pack_id}/snapshots/{snapshot_id}/signoff.json
+kb/{pack_id}/snapshots/{snapshot_id}/projection-map.jsonl
+runtime-store/releases/{release_id}/...
+runtime-store/releases/{release_id}/index-artifacts/...
+</code></pre>
+<p>Publisher 必须执行：</p>
+<ol>
+<li>schema validation</li>
+<li>source locator resolution</li>
+<li>evidence/ref resolution</li>
+<li>dependency graph validation</li>
+<li>canonical normalization</li>
+<li>canonical hash generation</li>
+<li>signoff coverage check</li>
+<li>production gate check</li>
+<li>runtime projection generation</li>
+<li>L2 hash validation</li>
+<li>projection-map validation</li>
+<li>service smoke tests</li>
+</ol>
+<h2 id="11-acceptance-rejection-gates">11. Acceptance / Rejection Gates</h2>
+<p>Production runtime release 只有满足以下条件才可接受：</p>
+<ol>
+<li>Source bundle 有 stable locator、revision、hash 或明确的 hash exception。</li>
+<li>KB authoring validation passes。</li>
+<li>Evidence refs、review refs、source anchors 全部可解析。</li>
+<li>Canonical signoff snapshot validation passes。</li>
+<li>Snapshot canonical hash 可复现。</li>
+<li><code>signoff.json</code> 存在、已签核、覆盖所有 projected objects。</li>
+<li><code>release_tier</code> 是 production，production gate passed。</li>
+<li><code>blocking_issues_count</code> 是 0。</li>
+<li>每个 released object 有 deterministic content hash。</li>
+<li>Runtime projection 引用 source snapshot id、snapshot hash、signoff id。</li>
+<li><code>projection-map.jsonl</code> 存在且覆盖所有 projected L2 objects。</li>
+<li>Projection validation passes。</li>
+<li>Query smoke test 证明 L2 read、hash validation、dependency traversal、answer assembly、trace。</li>
+</ol>
+<p>Production 必须拒绝：</p>
+<ul>
+<li>process-only signoff</li>
+<li>missing <code>source_bundle_id</code></li>
+<li>missing <code>canonical_snapshot_id</code></li>
+<li>missing <code>canonical_snapshot_hash</code></li>
+<li>missing <code>signoff_id</code></li>
+<li>unsigned or mutable snapshot</li>
+<li>object projected without snapshot object hash</li>
+<li>runtime L2 content diverges without transform profile</li>
+<li>human confirmation without actor identity and object revision</li>
+<li>authorized governance material accessed through a non-release-bound side path</li>
+<li>service reads KB/snapshot/source bundle as default query truth</li>
+</ul>
+<p>Demo packs may relax actor identity completeness, but不能放松 content hash、scope、L2、projection validation 和 trace。Demo artifacts 必须携带 <code>release_tier: "demo"</code>，不能通过 production release gate。</p>
+<h2 id="12">12. 文件格式选择</h2>
+<table>
+<thead>
+<tr>
+<th>文件/目录</th>
+<th>固定格式</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sources/**/source-manifest.yaml</code></td>
+<td>YAML</td>
+<td>source capture 和权限字段需要易读、易 review</td>
+</tr>
+<tr>
+<td><code>sources/**/source-index.yaml</code></td>
+<td>YAML</td>
+<td>locator 需要人工和 agent 都好改</td>
+</tr>
+<tr>
+<td><code>sources/**/raw</code></td>
+<td>原格式</td>
+<td>source 证据不强行转码</td>
+</tr>
+<tr>
+<td><code>sources/**/normalized</code></td>
+<td>CSV/TSV/JSON/text</td>
+<td>为 extraction 和 hash 服务</td>
+</tr>
+<tr>
+<td><code>kb/**/metadata.yaml</code></td>
+<td>YAML</td>
+<td>pack 入口、scope 和索引适合 authoring</td>
+</tr>
+<tr>
+<td><code>kb/**/rules/*.yaml</code></td>
+<td>YAML</td>
+<td>规则逻辑需要 readable diff 和 review 注释</td>
+</tr>
+<tr>
+<td><code>kb/**/lookups/*.yaml</code></td>
+<td>YAML + CSV/TSV attachments</td>
+<td>小表可内嵌，大表独立</td>
+</tr>
+<tr>
+<td><code>kb/**/helpers/*.yaml</code></td>
+<td>YAML</td>
+<td>helper 逻辑需要结构化但可读</td>
+</tr>
+<tr>
+<td><code>kb/**/evidence/*.yaml</code></td>
+<td>YAML</td>
+<td>证据 locator 和 summary 需要 review</td>
+</tr>
+<tr>
+<td><code>kb/**/review/*.yaml</code></td>
+<td>YAML</td>
+<td>审核结论需要可读且可结构化</td>
+</tr>
+<tr>
+<td><code>kb/**/reports/*.md</code></td>
+<td>Markdown</td>
+<td>报告和 checklist 是说明层</td>
+</tr>
+<tr>
+<td><code>kb/**/snapshots/*.json</code></td>
+<td>JSON</td>
+<td>签核 manifest/signoff 需要 deterministic schema/hash</td>
+</tr>
+<tr>
+<td><code>kb/**/snapshots/*.jsonl</code></td>
+<td>JSONL</td>
+<td>对象、边、证据、review、change log 是 line records</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/release-manifest.json</code></td>
+<td>JSON</td>
+<td>service manifest</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/object-manifest.jsonl</code></td>
+<td>JSONL</td>
+<td>object registry</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/l2/**/*.json</code></td>
+<td>JSON</td>
+<td>service truth object</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/navigation/*.jsonl</code></td>
+<td>JSONL</td>
+<td>rebuildable navigation views</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/dependencies/*.jsonl</code></td>
+<td>JSONL</td>
+<td>graph/index friendly</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/governance/*.json(l)</code></td>
+<td>JSON/JSONL</td>
+<td>release-bound permissioned summaries</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/index-artifacts/opensearch-docs.jsonl</code></td>
+<td>JSONL</td>
+<td>portable search export</td>
+</tr>
+<tr>
+<td><code>runtime-store/**/index-artifacts/lucene/</code></td>
+<td>Lucene binary</td>
+<td>rebuildable service index</td>
+</tr>
+<tr>
+<td><code>html/*.html</code></td>
+<td>HTML</td>
+<td>presentation only</td>
+</tr>
+</tbody>
+</table>
+<h2 id="13">13. 与当前代码的差距</h2>
+<p>当前实现已经支持：</p>
+<ul>
+<li><code>FileSystemProjectionStore</code> 从 <code>runtime-store/active-release.json</code> 读取 active release。</li>
+<li>读取和验证 <code>release-manifest.json</code>、<code>scopes.jsonl</code>、<code>object-manifest.jsonl</code>、<code>l2/**/*.json</code>、navigation、dependencies、governance refs。</li>
+<li>校验 L2 文件 hash 和 projection 基本状态。</li>
+<li>QueryService 通过 runtime projection 提供受控读取。</li>
+</ul>
+<p>当前仍需补齐：</p>
+<ul>
+<li><code>sources/{source_bundle_id}/</code> 生成器模板和 validator。</li>
+<li><code>kb/**/snapshots/**</code> canonical publisher。</li>
+<li>Canonical JSON hash golden tests。</li>
+<li><code>ReleaseManifest</code> 增加 <code>releaseTier</code>、<code>canonicalSnapshotId</code>、<code>canonicalSnapshotHash</code>、<code>signoffId</code>。</li>
+<li><code>FileSystemProjectionStore</code> 增加 production provenance validation。</li>
+<li>Production write-once publish gate。</li>
+<li>Snapshot-to-projection <code>projection-map.jsonl</code> validator。</li>
+<li>LLM context item role/hash/permission contract enforcement。</li>
+</ul>
+<p>Migration rule:</p>
+<ol>
+<li>Existing demo releases may remain compatible with <code>canonical_revision</code> only.</li>
+<li>New demo releases should include source bundle and snapshot metadata when available.</li>
+<li>New production releases must include source bundle, canonical signoff snapshot, signoff proof and snapshot-to-projection proof chain.</li>
+<li>Code changes must add schema validation、canonical hash tests、manifest provenance fields、immutable publish gate before production enforcement.</li>
+</ol>
+<h2 id="14-rejected-alternatives">14. Rejected Alternatives</h2>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pure JSON KB authoring</td>
+<td>Rejected。JSON 用于 snapshot/runtime/index export，不作为默认 authoring surface。</td>
+</tr>
+<tr>
+<td>YAML-only canonical truth</td>
+<td>Rejected。YAML 用于 authoring，signoff freeze 必须 canonical JSON/JSONL。</td>
+</tr>
+<tr>
+<td>DB as canonical truth</td>
+<td>Rejected for v1。DB 可作为 derived query backend，必须可从 signed snapshot/projection 重建。</td>
+</tr>
+<tr>
+<td>HTML/report as truth</td>
+<td>Rejected。HTML/report 只能展示、review、解释。</td>
+</tr>
+<tr>
+<td>Human confirmation only in conversation</td>
+<td>Rejected。影响 truth 的确认必须进入 structured decision/confirmation records。</td>
+</tr>
+<tr>
+<td>Runtime reads KB directly</td>
+<td>Rejected。service truth 是 active runtime projection。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="15">15. 最短版</h2>
+<p>未来生成器只要记住这一版：</p>
+<pre><code class="language-text">1. 把 source 固定成 sources/{source_bundle_id}/，只做证据入口和 locator。
+2. 把规则写成 kb/{pack_id}/ 的 YAML/Markdown authoring package。
+3. 发布前生成 kb/{pack_id}/snapshots/{snapshot_id}/ 的 canonical JSON/JSONL signoff snapshot。
+4. 从 signed snapshot 生成 runtime-store/releases/{release_id}/ 的 immutable JSON/JSONL runtime projection。
+5. Index、HTML、LLM context 只能从 runtime projection 或 release-bound governance summaries 派生，不能拥有 truth。
+</code></pre>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

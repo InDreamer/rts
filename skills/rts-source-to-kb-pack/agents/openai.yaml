@@ -1,0 +1,4 @@
+interface:
+  display_name: "RTS Source To KB Pack"
+  short_description: "Generate RTS KB pack from a source profile"
+  default_prompt: "Generate an RTS kb/{pack_id}/ package from an existing sources/{source_bundle_id}/ workflow profile, preserving evidence and unresolved questions."

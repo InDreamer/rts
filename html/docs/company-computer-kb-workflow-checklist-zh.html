@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>公司电脑 Source-to-KB Workflow 执行清单 | RTS 来源解读</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../index.html">首页</a>
+      <a class="nav-link" href="../start-here.html">项目概览</a>
+      <a class="nav-link" href="../architecture.html">KB 与投影</a>
+      <a class="nav-link" href="../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">运行与调用 · docs/company-computer-kb-workflow-checklist-zh.md</p>
+      <h1>公司电脑 Source-to-KB Workflow 执行清单</h1>
+      <p>company-computer checklist for running the RTS source-to-KB workflow against restricted corporate source assets</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
+        <a class="button ghost" href="../../docs/company-computer-kb-workflow-checklist-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">适合阅读</p>
+          <ul><li>准备把 RTS repo 上传到公司电脑处理公司代码库</li><li>需要在公司电脑上从 gRPC/FpML 到 Solace/SCBML workflow 生成 source profile 和 KB pack</li><li>需要区分本地已准备事项和公司电脑上才能做的事项</li></ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">可跳过</p>
+          <ul><li>只需要查看 confirmed 架构结论</li><li>只需要运行本地 sample projection</li></ul>
+        </div>
+        <div class="aside-card related-card">
+          <p class="kicker">关联来源</p>
+          <a href="confirmed/source-to-kb-skill-pipeline-plan-zh.html">source-to-kb-skill-pipeline-plan-zh.md</a><a href="confirmed/kb-authoring-snapshot-runtime-final-choice-zh.html">kb-authoring-snapshot-runtime-final-choice-zh.md</a><a href="confirmed/kb-runtime-index-layer-standard-zh.html">kb-runtime-index-layer-standard-zh.md</a><a href="INDEX.html">Docs Index</a>
+        </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+            <h2>文档定位</h2>
+            <p>company-computer checklist for running the RTS source-to-KB workflow against restricted corporate source assets</p>
+          </article>
+          <article class="insight-card">
+            <h2>权威层级</h2>
+            <p>运行与调用 / role: leaf / layer: 2</p>
+          </article>
+          <article class="insight-card">
+            <h2>源文件</h2>
+            <p><code>docs/company-computer-kb-workflow-checklist-zh.md</code></p>
+          </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>0. 公司电脑前置准备</h3>
+          <p>在公司电脑上先确认： RTS repo 已复制到本机。 公司 source repo 可只读访问。 允许 agent 读取相关代码、XSLT、DB metadata、Excel、测试和样例 XML。 不修改公司源码。 不复制长源码片段到 RTS 文档，只保存 locator、hash、summary 和必要的短摘要。 如果不能读取 DB 真实数据，至少确认能读取 schema、mapping table definition 或脱敏样例。 如果不能运行测试，...</p>
+        </article>
+<article class="chapter-card">
+          <h3>1. 输入信息收集</h3>
+          <p>运行 agent 前，先准备这些值： workflow_name: gRPC FpML to Solace SCBML transformation inbound: protocol: gRPC payload: FpML or specific upstream XML known service/proto/handler: TBD outbound: protocol: Solace payload: SCBML or specific downstream XML...</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 第一步：Source profiling</h3>
+          <p>目标：生成 source bundle，不生成 KB。 期望使用 skill： skills/rts-workflow-source-profiler 如果公司 Codex 没有自动发现 repo 内 skill，就把下面这段作为 agent 任务，并明确 skill 路径： Use the skill at rts/skills/rts-workflow-source-profiler. Read the company source repo as read-only. Build an RTS source profile for the full workflow from gRPC inbound FpML/XML to Solace outbound SCBML/XML. Do not modif...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. 第二步：生成 KB pack</h3>
+          <p>目标：从 source profile 生成结构化 KB。 期望使用 skill： skills/rts-source-to-kb-pack 如果公司 Codex 没有自动发现 repo 内 skill，就把下面这段作为 agent 任务，并明确 skill 路径： Use the skill at rts/skills/rts-source-to-kb-pack. Use rts/sources/{source_bundle_id}/source-index.yaml and workflow-map.yaml as the required input. Generate an RTS KB pack for the full gRPC FpML to Solace SCBML workflow...</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. 第三步：KB review</h3>
+          <p>目标：独立 review KB，生成必须问用户的问题。 期望使用 skill： skills/rts-kb-pack-review 如果公司 Codex 没有自动发现 repo 内 skill，就把下面这段作为 agent 任务，并明确 skill 路径： Use the skill at rts/skills/rts-kb-pack-review. Review rts/kb/{pack_id}/ as an independent RTS KB reviewer. Check format, completeness, evidence coverage, workflow closure, source locators, dependencies, field bindings,...</p>
+        </article>
+<article class="chapter-card">
+          <h3>5. 第四步：用户确认</h3>
+          <p>读取： kb/{pack_id}/review/ask-user-questions.json 只优先确认： severity = blocking 每个问题确认后，要求 agent 更新： kb/{pack_id}/review/review-index.yaml kb/{pack_id}/reports/closure-check.md 相关 rules/lookups/helpers 不要让 agent 把“用户口头确认”只留在聊天里。影响 truth 的确认必须结构化落入 review decision 或 future human-confirmation-log.jsonl 。</p>
+        </article>
+<article class="chapter-card">
+          <h3>6. 第五步：再次 review</h3>
+          <p>重新运行 KB review，直到： blocking issues = 0 all required refs resolve workflow closure accepted source evidence coverage accepted 如果仍有 non-blocking risk，可以保留在 closure-check.md ，但必须明确不阻塞 demo snapshot。</p>
+        </article>
+<article class="chapter-card">
+          <h3>7. 第六步：Snapshot skeleton</h3>
+          <p>当前建议只生成 skeleton，不做 production signoff。Skeleton 只用于检查目录、字段、引用和 publisher 设计，不代表 signed snapshot。进入条件： KB review blocking 为 0。 所有 projected objects 有 evidence refs。 用户确认的问题已经结构化记录。 没有 unresolved source conflict。 输出目标： kb/{pack_id}/snapshots/{snapshot_id}/ snapshot-manifest.json objects.jsonl dependency-edges.jsonl evidence-refs.jsonl review-decisions.jsonl human-confirmation-log.jsonl change-log.jsonl signoff.json projection-map.jsonl</p>
+        </article>
+<article class="chapter-card">
+          <h3>8. 第七步：Runtime projection skeleton</h3>
+          <p>只有 snapshot skeleton 稳定后再做。Runtime projection skeleton 可以验证 release 形状和服务读取路径，但在 deterministic publisher、canonical hash、signoff 和 smoke test 完成前，不得作为 production service truth。输出目标： runtime-store/releases/{release_id}/ release-manifest.json scopes.jsonl object-manifest.jsonl caller-profiles.jsonl l2/rules/*.json l2/lookups/*.json l2/helpers/*.json navigation/*.jsonl dependencies/*.jsonl governance/*...</p>
+        </article>
+<article class="chapter-card">
+          <h3>9. 禁止事项</h3>
+          <p>公司电脑执行时禁止： 修改公司源码。 把公司源码长片段复制进 RTS repo。 跳过 source profile 直接生成 KB。 只抽局部字段就声明覆盖完整 workflow。 把 report prose 当唯一 truth。 把 unresolved question 当已确认。 第一轮直接 production signoff。 第一轮直接把 runtime projection skeleton 当 production service truth。</p>
+        </article>
+<article class="chapter-card">
+          <h3>10. 完成标准</h3>
+          <p>第一阶段完成标准： sources/{source_bundle_id}/ workflow profile complete kb/{pack_id}/ structured KB generated kb review completed ask-user-questions.json produced blocking questions answered or explicitly deferred closure-check.md says wh...</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="source-to-kb-workflow">公司电脑 Source-to-KB Workflow 执行清单</h1>
+<blockquote>
+<p>状态：company-computer run checklist<br/>
+日期：2026-05-21<br/>
+用途：把 RTS repo 上传到公司电脑后，按步骤处理受限公司 source 资产<br/>
+原则：先 profile source，再生成 KB，再 review 和问用户；不要第一轮直接生产 runtime projection。</p>
+</blockquote>
+<p>Repo 已带 portable skills：</p>
+<pre><code class="language-text">skills/rts-workflow-source-profiler/
+skills/rts-source-to-kb-pack/
+skills/rts-kb-pack-review/
+</code></pre>
+<p>在公司电脑上可以直接让 agent 使用这些路径，例如：</p>
+<pre><code class="language-text">Use the skill at rts/skills/rts-workflow-source-profiler to profile the read-only company source repo...
+</code></pre>
+<h2 id="0">0. 公司电脑前置准备</h2>
+<p>在公司电脑上先确认：</p>
+<ul>
+<li>RTS repo 已复制到本机。</li>
+<li>公司 source repo 可只读访问。</li>
+<li>允许 agent 读取相关代码、XSLT、DB metadata、Excel、测试和样例 XML。</li>
+<li>不修改公司源码。</li>
+<li>不复制长源码片段到 RTS 文档，只保存 locator、hash、summary 和必要的短摘要。</li>
+<li>如果不能读取 DB 真实数据，至少确认能读取 schema、mapping table definition 或脱敏样例。</li>
+<li>如果不能运行测试，记录原因。</li>
+</ul>
+<p>建议目录：</p>
+<pre><code class="language-text">workspace/
+  rts/
+  company-source/
+</code></pre>
+<h2 id="1">1. 输入信息收集</h2>
+<p>运行 agent 前，先准备这些值：</p>
+<pre><code class="language-text">workflow_name:
+  gRPC FpML to Solace SCBML transformation
+
+inbound:
+  protocol: gRPC
+  payload: FpML or specific upstream XML
+  known service/proto/handler: TBD
+
+outbound:
+  protocol: Solace
+  payload: SCBML or specific downstream XML
+  known producer/topic/queue: TBD
+
+source_types:
+  Java
+  enum
+  XSLT
+  Camel
+  PostgreSQL
+  unit tests / integration tests
+  Excel / CSV mapping
+  sample XML
+
+read_paths:
+  company-source/src
+  company-source/resources
+  company-source/test
+  company-source/mappings
+  company-source/xslt
+  company-source/db
+
+write_paths:
+  rts/sources/{source_bundle_id}
+  rts/kb/{pack_id}
+</code></pre>
+<h2 id="2-source-profiling">2. 第一步：Source profiling</h2>
+<p>目标：生成 source bundle，不生成 KB。</p>
+<p>期望使用 skill：</p>
+<pre><code class="language-text">skills/rts-workflow-source-profiler
+</code></pre>
+<p>如果公司 Codex 没有自动发现 repo 内 skill，就把下面这段作为 agent 任务，并明确 skill 路径：</p>
+<pre><code class="language-text">Use the skill at rts/skills/rts-workflow-source-profiler.
+
+Read the company source repo as read-only. Build an RTS source profile for the full workflow from gRPC inbound FpML/XML to Solace outbound SCBML/XML.
+
+Do not modify source code. Do not copy long source excerpts. Produce only locators, hashes, summaries, workflow map, evidence candidates, and unresolved questions.
+
+Output under rts/sources/{source_bundle_id}/:
+- source-manifest.yaml
+- source-index.yaml
+- workflow-map.yaml
+- extraction-notes.md
+- unresolved-questions.yaml
+</code></pre>
+<p>检查输出：</p>
+<pre><code class="language-text">sources/{source_bundle_id}/source-manifest.yaml
+sources/{source_bundle_id}/source-index.yaml
+sources/{source_bundle_id}/workflow-map.yaml
+sources/{source_bundle_id}/extraction-notes.md
+sources/{source_bundle_id}/unresolved-questions.yaml
+</code></pre>
+<p>人工快速看：</p>
+<ul>
+<li>gRPC entrypoint 是否找到。</li>
+<li>FpML/XML parse path 是否找到。</li>
+<li>Java/Camel/XSLT/DB/Excel/enum 是否都有位置。</li>
+<li>SCBML output assembly 是否找到。</li>
+<li>Solace outbound 是否找到。</li>
+<li>UT/IT 是否被定位。</li>
+<li>open questions 是否真实，不是 agent 偷懒。</li>
+</ul>
+<p>如果 workflow-map 只覆盖局部字段，不要进入 KB 生成。</p>
+<h2 id="3-kb-pack">3. 第二步：生成 KB pack</h2>
+<p>目标：从 source profile 生成结构化 KB。</p>
+<p>期望使用 skill：</p>
+<pre><code class="language-text">skills/rts-source-to-kb-pack
+</code></pre>
+<p>如果公司 Codex 没有自动发现 repo 内 skill，就把下面这段作为 agent 任务，并明确 skill 路径：</p>
+<pre><code class="language-text">Use the skill at rts/skills/rts-source-to-kb-pack.
+
+Use rts/sources/{source_bundle_id}/source-index.yaml and workflow-map.yaml as the required input. Generate an RTS KB pack for the full gRPC FpML to Solace SCBML workflow.
+
+Do not bypass the source profile. Do not mark inferred behavior as confirmed truth. Put ambiguities and weak evidence into review/review-index.yaml and reports/closure-check.md.
+
+Output under rts/kb/{pack_id}/:
+- metadata.yaml
+- README.md
+- rules/*.yaml
+- lookups/*.yaml
+- helpers/*.yaml
+- evidence/evidence-index.yaml
+- review/review-index.yaml
+- reports/extraction-report.md
+- reports/review-checklist.md
+- reports/closure-check.md
+</code></pre>
+<p>检查输出：</p>
+<pre><code class="language-text">kb/{pack_id}/metadata.yaml
+kb/{pack_id}/rules/
+kb/{pack_id}/lookups/
+kb/{pack_id}/helpers/
+kb/{pack_id}/evidence/evidence-index.yaml
+kb/{pack_id}/review/review-index.yaml
+kb/{pack_id}/reports/
+</code></pre>
+<p>必须覆盖：</p>
+<ul>
+<li>inbound gRPC handling</li>
+<li>message classification</li>
+<li>input FpML/XML semantic fields</li>
+<li>output SCBML/XML target paths</li>
+<li>Java rules</li>
+<li>XSLT rules</li>
+<li>DB / Excel / enum lookups</li>
+<li>helper logic</li>
+<li>fallback/default/error path</li>
+<li>tests as evidence</li>
+<li>field bindings</li>
+</ul>
+<h2 id="4-kb-review">4. 第三步：KB review</h2>
+<p>目标：独立 review KB，生成必须问用户的问题。</p>
+<p>期望使用 skill：</p>
+<pre><code class="language-text">skills/rts-kb-pack-review
+</code></pre>
+<p>如果公司 Codex 没有自动发现 repo 内 skill，就把下面这段作为 agent 任务，并明确 skill 路径：</p>
+<pre><code class="language-text">Use the skill at rts/skills/rts-kb-pack-review.
+
+Review rts/kb/{pack_id}/ as an independent RTS KB reviewer.
+
+Check format, completeness, evidence coverage, workflow closure, source locators, dependencies, field bindings, ambiguity handling, and whether the pack can move toward snapshot.
+
+Do not silently rewrite truth. Produce review results and ask-user questions.
+
+Output/update:
+- kb/{pack_id}/reports/review-checklist.md
+- kb/{pack_id}/reports/closure-check.md
+- kb/{pack_id}/review/review-index.yaml
+- kb/{pack_id}/review/ask-user-questions.json
+</code></pre>
+<p>Review 必须回答：</p>
+<ul>
+<li>是否覆盖了 gRPC -&gt; transform -&gt; Solace 全链路。</li>
+<li>是否每个 rule/lookup/helper 都能追到 source。</li>
+<li>是否 DB/Excel/enum/XSLT/Java 冲突。</li>
+<li>是否有 test evidence。</li>
+<li>是否有 blocking uncertainty。</li>
+<li>是否能进入 snapshot skeleton。</li>
+</ul>
+<h2 id="5">5. 第四步：用户确认</h2>
+<p>读取：</p>
+<pre><code class="language-text">kb/{pack_id}/review/ask-user-questions.json
+</code></pre>
+<p>只优先确认：</p>
+<pre><code class="language-text">severity = blocking
+</code></pre>
+<p>每个问题确认后，要求 agent 更新：</p>
+<pre><code class="language-text">kb/{pack_id}/review/review-index.yaml
+kb/{pack_id}/reports/closure-check.md
+相关 rules/lookups/helpers
+</code></pre>
+<p>不要让 agent 把“用户口头确认”只留在聊天里。影响 truth 的确认必须结构化落入 review decision 或 future <code>human-confirmation-log.jsonl</code>。</p>
+<h2 id="6-review">6. 第五步：再次 review</h2>
+<p>重新运行 KB review，直到：</p>
+<pre><code class="language-text">blocking issues = 0
+all required refs resolve
+workflow closure accepted
+source evidence coverage accepted
+</code></pre>
+<p>如果仍有 non-blocking risk，可以保留在 <code>closure-check.md</code>，但必须明确不阻塞 demo snapshot。</p>
+<h2 id="7-snapshot-skeleton">7. 第六步：Snapshot skeleton</h2>
+<p>当前建议只生成 skeleton，不做 production signoff。</p>
+<p>进入条件：</p>
+<ul>
+<li>KB review blocking 为 0。</li>
+<li>所有 projected objects 有 evidence refs。</li>
+<li>用户确认的问题已经结构化记录。</li>
+<li>没有 unresolved source conflict。</li>
+</ul>
+<p>输出目标：</p>
+<pre><code class="language-text">kb/{pack_id}/snapshots/{snapshot_id}/
+  snapshot-manifest.json
+  objects.jsonl
+  dependency-edges.jsonl
+  evidence-refs.jsonl
+  review-decisions.jsonl
+  human-confirmation-log.jsonl
+  change-log.jsonl
+  signoff.json
+  projection-map.jsonl
+</code></pre>
+<p>注意：</p>
+<ul>
+<li>没有 deterministic canonical hash publisher 前，不要宣称 production signoff。</li>
+<li>可以标记 <code>release_tier: demo</code> 或 <code>snapshot_status: skeleton</code>。</li>
+</ul>
+<h2 id="8-runtime-projection-skeleton">8. 第七步：Runtime projection skeleton</h2>
+<p>只有 snapshot skeleton 稳定后再做。</p>
+<p>输出目标：</p>
+<pre><code class="language-text">runtime-store/releases/{release_id}/
+  release-manifest.json
+  scopes.jsonl
+  object-manifest.jsonl
+  caller-profiles.jsonl
+  l2/rules/*.json
+  l2/lookups/*.json
+  l2/helpers/*.json
+  navigation/*.jsonl
+  dependencies/*.jsonl
+  governance/*
+  index-artifacts/opensearch-docs.jsonl
+</code></pre>
+<p>第一轮可以不生成 Lucene binary index。Lucene 是 rebuildable index，不是 truth。</p>
+<h2 id="9">9. 禁止事项</h2>
+<p>公司电脑执行时禁止：</p>
+<ul>
+<li>修改公司源码。</li>
+<li>把公司源码长片段复制进 RTS repo。</li>
+<li>跳过 source profile 直接生成 KB。</li>
+<li>只抽局部字段就声明覆盖完整 workflow。</li>
+<li>把 report prose 当唯一 truth。</li>
+<li>把 unresolved question 当已确认。</li>
+<li>第一轮直接 production signoff。</li>
+<li>第一轮直接把 runtime projection skeleton 当 production service truth。</li>
+</ul>
+<h2 id="10">10. 完成标准</h2>
+<p>第一阶段完成标准：</p>
+<pre><code class="language-text">sources/{source_bundle_id}/ workflow profile complete
+kb/{pack_id}/ structured KB generated
+kb review completed
+ask-user-questions.json produced
+blocking questions answered or explicitly deferred
+closure-check.md says whether snapshot skeleton may proceed
+</code></pre>
+<p>第二阶段完成标准：</p>
+<pre><code class="language-text">snapshot skeleton generated
+all snapshot refs resolve
+all projected objects have source/evidence/review lineage
+release tier clearly marked demo/skeleton unless production publisher exists
+</code></pre>
+<p>第三阶段完成标准：</p>
+<pre><code class="language-text">runtime projection skeleton generated
+release manifest references snapshot id/hash/signoff id where available
+object manifest covers all L2 objects
+L2 content hashes validate
+query smoke test passes against local RTS service
+</code></pre>
+      </div>
+    </details>
+  </main>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

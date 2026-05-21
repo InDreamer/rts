@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skills AGENTS | RTS 来源解读</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../index.html">首页</a>
+      <a class="nav-link" href="../start-here.html">项目概览</a>
+      <a class="nav-link" href="../architecture.html">KB 与投影</a>
+      <a class="nav-link" href="../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">Agent 路由 · skills/AGENTS.md</p>
+      <h1>Skills AGENTS</h1>
+      <p>local navigation and safety rules for portable RTS skills bundled with this repository</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
+        <a class="button ghost" href="../../skills/AGENTS.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">适合阅读</p>
+          <ul><li>coding agent needs to use or modify repo-bundled RTS skills</li><li>preparing to copy RTS to a company computer and run source-to-KB workflows</li><li>validating portable skills before installation</li></ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">可跳过</p>
+          <ul><li>task does not involve skills or source-to-KB workflow preparation</li></ul>
+        </div>
+        <div class="aside-card related-card">
+          <p class="kicker">关联来源</p>
+          <a href="../docs/confirmed/source-to-kb-skill-pipeline-plan-zh.html">source-to-kb-skill-pipeline-plan-zh.md</a><a href="../docs/INDEX.html">Docs Index</a>
+        </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+            <h2>文档定位</h2>
+            <p>local navigation and safety rules for portable RTS skills bundled with this repository</p>
+          </article>
+          <article class="insight-card">
+            <h2>权威层级</h2>
+            <p>Agent 路由 / role: agent / layer: 2</p>
+          </article>
+          <article class="insight-card">
+            <h2>源文件</h2>
+            <p><code>skills/AGENTS.md</code></p>
+          </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>Purpose</h3>
+          <p>This directory bundles portable RTS skills with the repository. They are meant to travel with the repo to a company computer before corporate source assets are available.</p>
+        </article>
+<article class="chapter-card">
+          <h3>Local Map</h3>
+          <p>rts-workflow-source-profiler/ — profile read-only workflow source into sources/{source_bundle_id}/ . rts-source-to-kb-pack/ — generate kb/{pack_id}/ from an existing source profile. rts-kb-pack-review/ — review generated...</p>
+        </article>
+<article class="chapter-card">
+          <h3>Safety</h3>
+          <p>These skills do not assume a company code structure. They must not modify company source. They must not copy long proprietary source excerpts into RTS. Snapshot/runtime publisher skills are intentionally not implemented...</p>
+        </article>
+<article class="chapter-card">
+          <h3>Search Order</h3>
+          <p>When using a bundled skill directly, read: The skill&#x27;s SKILL.md . The specific references/*.md named by the skill. The exact template files needed for the output. docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md only when broader pipeline context is needed.</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="skills-agents">Skills AGENTS</h1>
+<h2 id="purpose">Purpose</h2>
+<p>This directory bundles portable RTS skills with the repository. They are meant to travel with the repo to a company computer before corporate source assets are available.</p>
+<h2 id="local-map">Local Map</h2>
+<ul>
+<li><code>rts-workflow-source-profiler/</code> — profile read-only workflow source into <code>sources/{source_bundle_id}/</code>.</li>
+<li><code>rts-source-to-kb-pack/</code> — generate <code>kb/{pack_id}/</code> from an existing source profile.</li>
+<li><code>rts-kb-pack-review/</code> — review generated KB and produce <code>ask-user-questions.json</code>.</li>
+</ul>
+<h2 id="safety">Safety</h2>
+<ul>
+<li>These skills do not assume a company code structure.</li>
+<li>They must not modify company source.</li>
+<li>They must not copy long proprietary source excerpts into RTS.</li>
+<li>Snapshot/runtime publisher skills are intentionally not implemented yet; production publisher requires deterministic validator/hash/signoff/projection scripts.</li>
+</ul>
+<h2 id="search-order">Search Order</h2>
+<p>When using a bundled skill directly, read:</p>
+<ol>
+<li>The skill's <code>SKILL.md</code>.</li>
+<li>The specific <code>references/*.md</code> named by the skill.</li>
+<li>The exact template files needed for the output.</li>
+<li><code>docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md</code> only when broader pipeline context is needed.</li>
+</ol>
+      </div>
+    </details>
+  </main>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

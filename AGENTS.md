@@ -2,7 +2,8 @@
 role: agent
 layer: 1
 parent: null
-children: []
+children:
+  - skills/AGENTS.md
 summary: coding-agent document index and active development navigation for RTS
 read_when:
   - coding agent starts work in this repository
@@ -34,13 +35,16 @@ Read these in order:
 1. [docs/confirmed/project-alignment-summary-zh.md](docs/confirmed/project-alignment-summary-zh.md)
 2. [docs/confirmed/system-constitution-v1.md](docs/confirmed/system-constitution-v1.md)
 3. [docs/confirmed/kb-to-index-projection-contract-zh.md](docs/confirmed/kb-to-index-projection-contract-zh.md)
-4. [docs/confirmed/runtime-projection-product-guide-zh.md](docs/confirmed/runtime-projection-product-guide-zh.md)
-5. [docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md](docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md)
-6. [docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md](docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md)
-7. [docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md](docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md)
-8. [docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md](docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md)
-9. [docs/confirmed/final-llm-agent-service-plan-zh.md](docs/confirmed/final-llm-agent-service-plan-zh.md)
-10. [docs/confirmed/document-decision-register-zh.md](docs/confirmed/document-decision-register-zh.md)
+4. [docs/confirmed/kb-runtime-index-layer-standard-zh.md](docs/confirmed/kb-runtime-index-layer-standard-zh.md)
+5. [docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md](docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md)
+6. [docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md](docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md)
+7. [docs/confirmed/runtime-projection-product-guide-zh.md](docs/confirmed/runtime-projection-product-guide-zh.md)
+8. [docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md](docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md)
+9. [docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md](docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md)
+10. [docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md](docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md)
+11. [docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md](docs/confirmed/day2-agentic-retrieval-evolution-plan-zh.md)
+12. [docs/confirmed/final-llm-agent-service-plan-zh.md](docs/confirmed/final-llm-agent-service-plan-zh.md)
+13. [docs/confirmed/document-decision-register-zh.md](docs/confirmed/document-decision-register-zh.md)
 
 These documents are the active development baseline.
 
@@ -52,7 +56,7 @@ Read them with this mental model:
 - when LLM is unavailable, scenario behavior degrades to structured information provision; that degraded mode does not redefine the product identity.
 - candidate-only and human decision boundaries are authority boundaries, not ceilings on analysis depth.
 
-For first implementation work, understand the dual-core positioning and truth boundaries before reading Day1/Day2 execution details. Read the runtime projection product guide when explaining the runtime package to PMs, product owners, integrators, or agents without needing exact field contracts. Read the LLM harness and agent integration alignment note when deciding whether capability belongs in managed mode, tool mode, or both. Read the internal LLM agent implementation plan when changing service contracts, tool orchestration, scenario endpoints, memory/context, evaluation, or rollout controls. Read Day1 and Day2 when deciding phased implementation order. Read the final roadmap when checking long-range direction rather than current authority. Read the decision register when continuing documentation cleanup or deciding what historical material to retain, compress, archive, or delete.
+For first implementation work, understand the dual-core positioning and truth boundaries before reading Day1/Day2 execution details. Read the KB/runtime/index layer standard when generating new KB packs, runtime projections, or index artifacts and when deciding exact file shapes or formats. Read the KB authoring/snapshot/runtime final choice when deciding JSON vs YAML, canonical snapshot, signoff, or derived-view truth status. Read the source-to-KB skill pipeline plan when preparing agents to process full company workflow source, generate source profiles, generate KB packs, review KB packs, or produce user-question handoff files. Read the runtime projection product guide when explaining the runtime package to PMs, product owners, integrators, or agents without needing exact field contracts. Read the LLM harness and agent integration alignment note when deciding whether capability belongs in managed mode, tool mode, or both. Read the internal LLM agent implementation plan when changing service contracts, tool orchestration, scenario endpoints, memory/context, evaluation, or rollout controls. Read Day1 and Day2 when deciding phased implementation order. Read the final roadmap when checking long-range direction rather than current authority. Read the decision register when continuing documentation cleanup or deciding what historical material to retain, compress, archive, or delete.
 
 For conflicts inside confirmed docs, use the topic-specific authority table in [docs/confirmed/README.md](docs/confirmed/README.md); dates and wording emphasis do not set precedence.
 
@@ -79,6 +83,12 @@ Open these when the task is about running or calling the local service rather th
   Use for local startup, config, testing, troubleshooting, and admin/runtime operations.
 - [docs/api-caller-guide-zh.md](docs/api-caller-guide-zh.md)
   Use for REST API requests, response fields, scope, warnings, refusal handling, deterministic truth/information queries, and managed analysis requests.
+- [docs/company-computer-kb-workflow-checklist-zh.md](docs/company-computer-kb-workflow-checklist-zh.md)
+  Use after copying RTS to a company computer to run the source profile -> KB pack -> KB review -> user questions workflow against restricted corporate source assets.
+
+## Portable Skills
+
+Open [skills/AGENTS.md](skills/AGENTS.md) when the task is to use, validate, or modify the repo-bundled portable RTS skills. These skills travel with the repo for company-computer execution and do not assume a company code structure.
 
 ## Archived Material
 
@@ -101,6 +111,7 @@ They are not part of the active implementation path.
 The active implementation path is:
 
 - JDK 17 Java query/index service
+- source intake -> structured KB -> canonical signoff snapshot -> runtime projection -> derived outputs as the current truth publication chain
 - RTS-controlled truth layer and stable atomic capability surface
 - managed LLM harness inside RTS plus external tool mode for outside agents
 - deterministic capability as first-class substrate

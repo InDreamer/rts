@@ -1,0 +1,17 @@
+schema_version: unresolved-questions-v1
+source_bundle_id: "{source_bundle_id}"
+questions:
+  - question_id: "uq-example-001"
+    severity: blocking
+    area: workflow_closure
+    source_refs: []
+    question: "Which source owns this transformation when Java and XSLT appear to overlap?"
+    why_needed: "KB generation cannot choose the authoritative rule source without this."
+    suggested_next_step: "Inspect tests or ask domain owner."
+    blocks:
+      - kb_generation
+      - snapshot
+status_summary:
+  blocking_count: 1
+  important_count: 0
+  clarifying_count: 0

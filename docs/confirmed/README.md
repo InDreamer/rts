@@ -6,6 +6,9 @@ children:
   - docs/confirmed/project-alignment-summary-zh.md
   - docs/confirmed/system-constitution-v1.md
   - docs/confirmed/kb-to-index-projection-contract-zh.md
+  - docs/confirmed/kb-runtime-index-layer-standard-zh.md
+  - docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md
+  - docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md
   - docs/confirmed/runtime-projection-product-guide-zh.md
   - docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md
   - docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md
@@ -38,25 +41,31 @@ This directory contains the current internal alignment baseline for RTS.
 1. `project-alignment-summary-zh.md` — 双核心总纲，定义 RTS 是规则真相服务 + 托管 LLM agent 分析服务，而不是静态文档库、普通 RAG 或单一实现方案。
 2. `system-constitution-v1.md` — RTS Constitution v2，定义多源真相治理、受控分析与表达、人工最终裁决、权限化服务访问和运行时边界。
 3. `kb-to-index-projection-contract-zh.md` — KB 到查询/索引层的运行时投影契约，定义 KB 必须产出什么、索引层只能读取什么、稳定原子能力面如何解释 projection。
-4. `runtime-projection-product-guide-zh.md` — runtime projection 的产品/PM 视角说明，解释运行包中 active release、manifest、scope、L2、navigation、dependency、governance、permission、index 和 trace 各自做什么，不替代字段契约。
-5. `llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 managed mode、外部 tool mode、runtime projection access boundary 和 PR diff / exception 等场景接入的当前对齐结论。
-6. `internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划，覆盖 agent runtime、多轮工具调用、工具参数权威、managed harness、tool orchestration、scenario endpoints、MCP/tool mode、memory/context、grounding、evaluation 和运维控制。
-7. `day1-query-service-and-llm-harness-plan-zh.md` — Day1：建立受控真相源原子能力面和第一版 managed LLM harness 的 confirmed baseline。
-8. `day2-agentic-retrieval-evolution-plan-zh.md` — Day2：在同一边界内扩展 controlled agentic retrieval、rerank、MCP、影响分析和测试规划演进方向。
-9. `final-llm-agent-service-plan-zh.md` — RTS 最终面向 LLM agent 的服务路线图摘要，定义双核心栈、消费模式、能力地图、阶段路线和不可越界边界。
-10. `document-decision-register-zh.md` — 文档审核中的关键抉择点、冻结口径和下一轮删减规则。
+4. `kb-runtime-index-layer-standard-zh.md` — 在最终五层链路中固定 KB、runtime projection、index layer 子链路的生成标准，包括文件长相、格式、生成顺序、层间契约和拒收条件。
+5. `kb-authoring-snapshot-runtime-final-choice-zh.md` — source intake、KB authoring、canonical signoff snapshot、runtime projection、derived views 的最终落地契约，固定生成顺序、目录长相、必填字段、publisher 输出和拒收门槛。
+6. `source-to-kb-skill-pipeline-plan-zh.md` — 从完整公司 workflow source 到 source profile、KB pack、KB review、用户问题、snapshot/runtime skeleton 的 skill 体系和执行边界。
+7. `runtime-projection-product-guide-zh.md` — runtime projection 的产品/PM 视角说明，解释运行包中 active release、manifest、scope、L2、navigation、dependency、governance、permission、index 和 trace 各自做什么，不替代字段契约。
+8. `llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 managed mode、外部 tool mode、runtime projection access boundary 和 PR diff / exception 等场景接入的当前对齐结论。
+9. `internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划，覆盖 agent runtime、多轮工具调用、工具参数权威、managed harness、tool orchestration、scenario endpoints、MCP/tool mode、memory/context、grounding、evaluation 和运维控制。
+10. `day1-query-service-and-llm-harness-plan-zh.md` — Day1：建立受控真相源原子能力面和第一版 managed LLM harness 的 confirmed baseline。
+11. `day2-agentic-retrieval-evolution-plan-zh.md` — Day2：在同一边界内扩展 controlled agentic retrieval、rerank、MCP、影响分析和测试规划演进方向。
+12. `final-llm-agent-service-plan-zh.md` — RTS 最终面向 LLM agent 的服务路线图摘要，定义双核心栈、消费模式、能力地图、阶段路线和不可越界边界。
+13. `document-decision-register-zh.md` — 文档审核中的关键抉择点、冻结口径和下一轮删减规则。
 
 ## Read triggers
 
 - 只需要统一 RTS 总体方向：读 1 和 2。
 - 需要开发 KB 和索引层之间的边界：读 1、2、3。
-- 需要向 PM、产品 owner、集成方或 AI agent 解释 runtime projection 运行包各目录/内容的产品含义：读 1、3、4。
-- 需要判断 managed mode、tool mode、场景正常态和降级态：读 1、2、5、6。
-- 需要落地第一版服务：读 1、2、3、5、6、7。
-- 需要规划 Day1 后的检索/LLM/MCP 增强：读 1、2、3、5、6、7、8。
-- 需要规划最终 LLM agent 服务形态、harness、MCP/API/Q&A/pipeline 统一入口：读 1、2、3、5、6、9。
-- 需要判断长期路线与当前 phased implementation 的关系：读 1、5、6、7、8、9。
-- 需要判断历史文档哪些保留、压缩、归档或删除：读 10。
+- 需要生成新的 KB pack、runtime projection 或 index artifacts：读 1、2、3、4、5。
+- 需要决定 KB 用 JSON 还是 YAML、如何 signoff、如何做 snapshot：读 1、2、3、4、5。
+- 需要把公司完整 workflow source 生成 source profile、KB pack、KB review 或用户问题清单：读 1、2、3、4、5、6。
+- 需要向 PM、产品 owner、集成方或 AI agent 解释 runtime projection 运行包各目录/内容的产品含义：读 1、3、7。
+- 需要判断 managed mode、tool mode、场景正常态和降级态：读 1、2、8、9。
+- 需要落地第一版服务：读 1、2、3、8、9、10。
+- 需要规划 Day1 后的检索/LLM/MCP 增强：读 1、2、3、8、9、10、11。
+- 需要规划最终 LLM agent 服务形态、harness、MCP/API/Q&A/pipeline 统一入口：读 1、2、3、8、9、12。
+- 需要判断长期路线与当前 phased implementation 的关系：读 1、8、9、10、11、12。
+- 需要判断历史文档哪些保留、压缩、归档或删除：读 13。
 
 ## Conflict rule
 
@@ -67,6 +76,9 @@ Confirmed docs use topic-specific authority. Resolve conflicts with this table b
 | RTS identity, dual-core positioning, truth ownership, source/evidence/review/human adjudication/signoff, scenario normal mode vs degraded mode, and document zone meaning | `project-alignment-summary-zh.md` |
 | Non-negotiable system principles, safety boundaries, permissioned access, controlled analysis-and-expression, AI-first review, human final decision, and AI value guardrails | `system-constitution-v1.md` |
 | KB/runtime projection/index boundary, release artifact shape, L0/L1/L2 meaning, schema/release/read constraints, and stable truth-source atomic capability surface | `kb-to-index-projection-contract-zh.md` |
+| Concrete KB/runtime projection/index layer generation standard inside the final source/snapshot/runtime chain, file shapes, file formats, publication order, role labels, and rejection checks | `kb-runtime-index-layer-standard-zh.md` |
+| Final source-to-KB-to-runtime projection contract, JSON-vs-YAML decision, signoff snapshot role, required file trees, publisher outputs, and derived view truth status | `kb-authoring-snapshot-runtime-final-choice-zh.md` |
+| Skill and agent pipeline for turning full workflow source assets into source profiles, KB packs, KB review questions, snapshot skeletons, and runtime projection skeletons | `source-to-kb-skill-pipeline-plan-zh.md` |
 | PM/product explanation of runtime projection package roles, including active release, manifest, scope, L2, navigation, dependencies, governance, permissions, index artifacts, and traces | `runtime-projection-product-guide-zh.md` |
 | LLM placement, managed mode vs tool mode, framework/SDK boundary, shared atomic capability reuse, and PR diff / exception / failed-message scenario integration | `llm-harness-and-agent-integration-alignment-zh.md` |
 | Complete internal LLM agent implementation work packages, current shipped state, runtime defaults, agent runtime, multi-step tool loop, tool parameter authority, scenario endpoint availability, service contracts, validation gates, memory/context, evaluation, rollout controls, and degraded-mode semantics | `internal-llm-agent-service-implementation-plan-zh.md` |

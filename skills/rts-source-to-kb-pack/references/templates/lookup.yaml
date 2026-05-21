@@ -1,0 +1,24 @@
+schema_version: kb-object-v1
+id: "{lookup_id}"
+object_type: lookup
+status: candidate
+signoff_status: unsigned
+revision: 1
+scope:
+  inherits: pack
+source_anchors:
+  - source_id: "{source_id}"
+evidence_refs:
+  - "{evidence_id}"
+key:
+  columns: []
+  normalization: {}
+return_fields: []
+fallback:
+  reverse_pair_allowed: false
+  missing_value_policy: unresolved
+data:
+  inline_rows: []
+  attachment_ref: null
+dependencies: {}
+warnings: []

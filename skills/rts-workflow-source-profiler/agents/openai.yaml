@@ -1,0 +1,4 @@
+interface:
+  display_name: "RTS Workflow Source Profiler"
+  short_description: "Profile full workflow source into RTS source bundle"
+  default_prompt: "Profile a read-only company workflow source repo into an RTS sources/{source_bundle_id}/ bundle with workflow-map and unresolved questions."

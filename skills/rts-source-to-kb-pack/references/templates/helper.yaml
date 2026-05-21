@@ -1,0 +1,19 @@
+schema_version: kb-object-v1
+id: "{helper_id}"
+object_type: helper
+status: candidate
+signoff_status: unsigned
+revision: 1
+scope:
+  inherits: pack
+inputs: []
+outputs: []
+logic:
+  summary: "{plain_summary}"
+  pipeline: []
+consumers:
+  rules: []
+dependencies: {}
+evidence_refs:
+  - "{evidence_id}"
+warnings: []

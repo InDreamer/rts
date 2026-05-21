@@ -1,0 +1,35 @@
+schema_version: kb-object-v1
+id: "{rule_id}"
+object_type: rule
+status: candidate
+signoff_status: unsigned
+revision: 1
+scope:
+  inherits: pack
+source_anchors:
+  - source_id: "{source_id}"
+    locator_ref: "../../sources/{source_bundle_id}/source-index.yaml#{source_id}"
+evidence_refs:
+  - "{evidence_id}"
+review_refs: []
+inputs:
+  - name: "{input_name}"
+    source_path: "{upstream_xml_path_or_semantic_field}"
+logic:
+  summary: "{plain_summary}"
+  pipeline:
+    - op: "{operation}"
+      source: "{source_or_input}"
+      out: "{output_name}"
+target:
+  kind: field
+  path: "{downstream_xml_path_or_semantic_field}"
+  emits:
+    - path: "{downstream_xml_path_or_semantic_field}"
+      from: "{output_name}"
+dependencies:
+  lookups: []
+  helpers: []
+  rules: []
+examples: []
+warnings: []

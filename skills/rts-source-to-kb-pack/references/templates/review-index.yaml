@@ -1,0 +1,18 @@
+schema_version: review-index-v1
+pack_id: "{pack_id}"
+decisions:
+  - decision_id: "{decision_id}"
+    object_refs:
+      - "{object_id}"
+    decision_type: requires_user_confirmation
+    status: open
+    question_or_conflict: "{question_or_conflict}"
+    decision: null
+    decided_by: null
+    decided_at: null
+    evidence_refs:
+      - "{evidence_id}"
+    remaining_risk:
+      - "{risk}"
+    production_gate: blocked
+findings: []

@@ -14,6 +14,8 @@ skip_when:
 source_of_truth:
   - docs/confirmed/project-alignment-summary-zh.md
   - docs/confirmed/kb-to-index-projection-contract-zh.md
+  - docs/confirmed/kb-runtime-index-layer-standard-zh.md
+  - docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md
   - docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md
 -->
 
@@ -24,6 +26,18 @@ source_of_truth:
 > 范围：记录本次对话中在 `docs/ai-readable-format-strategy-zh.html` 之后进一步澄清出的重点。
 
 本文不是新的 confirmed baseline，也不替代 runtime projection contract。
+
+截至 2026-05-21，正式生成链路已由 `docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md` 固定为：
+
+```text
+Source intake bundle
+  -> Structured KB authoring package
+  -> Canonical signoff snapshot
+  -> Runtime projection release package
+  -> Derived index / HTML / LLM context outputs
+```
+
+本文只保留对 `LLM Input Context Envelope` 的澄清。凡是本文早期三层表达与 final contract 不一致时，以 confirmed final contract 为准。
 
 它的作用是把本次讨论中“后来才说清楚”的点集中记录下来，避免后续继续混淆：
 
@@ -76,6 +90,8 @@ Service runtime suitability
 
 原报告里的分层可以继续保留，但需要更明确地区分“truth 层”和“运行时组装层”。
 
+当前正式口径不是“KB -> projection -> index”三层结束，而是五层链路。下面的 Source、KB、Runtime Projection、Index/Query 解释只用于理解职责；正式文件形状、signoff 和拒收条件以 final contract 为准。
+
 ### 2.1 Source
 
 Source 是原始证据和输入材料。
@@ -107,6 +123,18 @@ KB 是治理和整理层。
 - 支持少量人工裁决和 signoff。
 
 AI 可以大量阅读和维护 KB，但 KB 里的 candidate、review notes、open questions 不能自动成为 runtime truth。
+
+### 2.2.5 Canonical Signoff Snapshot
+
+Snapshot 是 KB 和 runtime projection 之间的签核冻结物。
+
+它负责：
+
+- 把 YAML/Markdown KB 规范化成 deterministic JSON/JSONL。
+- 冻结 object semantics、content hash、review decision 和 human confirmation。
+- 为 runtime projection 提供 source/snapshot/signoff provenance。
+
+Snapshot 拥有 signoff truth，但 unsigned 或 skeleton snapshot 不能被 runtime service 当默认 query truth 读取。
 
 ### 2.3 Runtime Projection
 
@@ -677,11 +705,12 @@ LLM Input Context Envelope 需要几条硬规则：
 当前项目格式路线是对的：
 
 ```text
-KB YAML/Markdown
-  -> runtime projection JSON/JSONL
-  -> query/index/service gate
-  -> per-request LLM input context envelope
-  -> managed answer / scenario report / HTML presentation
+Source intake YAML manifest + source refs
+  -> KB YAML/Markdown authoring package
+  -> canonical JSON/JSONL signoff snapshot
+  -> runtime projection JSON/JSONL service release
+  -> derived index / HTML / per-request LLM input context envelope
+  -> managed answer / scenario report / presentation output
 ```
 
 后续不建议大规模改格式。

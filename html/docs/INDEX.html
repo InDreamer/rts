@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RTS 文档总路由 | RTS 来源解读</title>
+  <title>RTS Documentation Index | RTS 来源解读</title>
   <link rel="stylesheet" href="../assets/styles.css">
 </head>
 <body>
@@ -19,8 +19,8 @@
   <main class="source-page">
     <section class="source-hero">
       <p class="kicker">文档导航 · docs/INDEX.md</p>
-      <h1>RTS 文档总路由</h1>
-      <p>RTS 文档的主路由，帮助读者进入 confirmed、operational 或 reference 区域。</p>
+      <h1>RTS Documentation Index</h1>
+      <p>primary RTS documentation router</p>
       <div class="hero-actions">
         <a class="button primary" href="#readable">查看概要</a>
         <a class="button secondary" href="#source">查看原文</a>
@@ -28,7 +28,7 @@
       </div>
     </section>
 
-      <section class="readable-layout" id="readable">
+    <section class="readable-layout" id="readable">
       <aside class="readable-aside">
         <div class="aside-card">
           <p class="kicker">文档说明</p>
@@ -44,34 +44,32 @@
           </ul>
         </div>
         <div class="aside-card">
-      <p class="kicker">适合阅读</p>
-      <ul><li>需要选择 RTS 文档阅读路径</li>
-<li>需要区分 confirmed baseline、reference materials 和 archive</li>
-<li>第一次进入 docs 目录</li></ul>
-    </div>
-<div class="aside-card">
-      <p class="kicker">可跳过</p>
-      <ul><li>已经明确要读取某一篇 leaf 文档</li></ul>
-    </div>
+          <p class="kicker">适合阅读</p>
+          <ul><li>需要选择 RTS 文档阅读路径</li><li>需要区分 confirmed baseline、reference materials 和 archive</li><li>第一次进入 docs 目录</li></ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">可跳过</p>
+          <ul><li>已经明确要读取某一篇 leaf 文档</li></ul>
+        </div>
         <div class="aside-card related-card">
-      <p class="kicker">关联来源</p>
-      <a href="../README.html">RTS 仓库入口</a><a href="confirmed/README.html">已确认基线阅读顺序</a><a href="reference/README.html">Reference 文档索引</a>
-    </div>
+          <p class="kicker">关联来源</p>
+          <a href="../README.html">README.md</a><a href="confirmed/README.html">README.md</a><a href="reference/README.html">README.md</a>
+        </div>
       </aside>
       <div class="readable-main">
         <section class="insight-grid">
           <article class="insight-card">
-          <h2>文档定位</h2>
-          <p>RTS 文档的主路由，帮助读者进入 confirmed、operational 或 reference 区域。</p>
-        </article>
-<article class="insight-card">
-          <h2>核心摘要</h2>
-          <p>RTS 文档的主路由，帮助读者进入 confirmed、operational 或 reference 区域。</p>
-        </article>
-<article class="insight-card">
-          <h2>权威层级</h2>
-          <p>文档导航 / role: entry / layer: 1</p>
-        </article>
+            <h2>文档定位</h2>
+            <p>primary RTS documentation router</p>
+          </article>
+          <article class="insight-card">
+            <h2>权威层级</h2>
+            <p>文档导航 / role: entry / layer: 1</p>
+          </article>
+          <article class="insight-card">
+            <h2>源文件</h2>
+            <p><code>docs/INDEX.md</code></p>
+          </article>
         </section>
         <section class="chapter-section">
           <div class="section-heading">
@@ -81,7 +79,7 @@
           <div class="chapter-grid">
             <article class="chapter-card">
           <h3>Open One Path</h3>
-          <p>docs/confirmed/README.md — 当前 active baseline。先在这里建立 RTS 的双核心定位、truth boundary、managed mode / tool mode 和阶段路线。 docs/reference/README.md — 参考材料。需要历史 rationale、OV 背景、检索原则、术语表、早期 Java 参考方案或旧评审背景时打开；它只做支撑，不覆盖 confirmed basel</p>
+          <p>docs/confirmed/README.md — 当前 active baseline。先在这里建立 RTS 的双核心定位、truth boundary、managed mode / tool mode 和阶段路线。 docs/reference/README.md — 参考材料。需要历史 rationale、OV 背景、检索原则、术语表、早期 Java 参考方案或旧评审背景时打开；它只做支撑，不覆盖 confirmed basel...</p>
         </article>
 <article class="chapter-card">
           <h3>Default Rule</h3>
@@ -89,7 +87,11 @@
         </article>
 <article class="chapter-card">
           <h3>Operational Docs</h3>
-          <p>面向运行、维护和集成人员，按角色选择： 应该写入 java-service-runbook-zh.md 的内容： 启动命令、环境变量配置（RTS_STORE_ROOT、RTS_LLM_*、RTS_ADMIN_API_KEY_HASH 等） Active release 切换步骤（文件方式或 ingest API 方式） 端口占用、依赖下载等部署排障</p>
+          <p>面向运行、维护和集成人员，按角色选择： 文档 受众 记录什么 docs/java-service-runbook-zh.md 运维 / 部署人员 启动服务、切换 release、配置环境变量、排查常见问题、提交前检查，以及 LLM disabled 时的降级运行语义 docs/api-caller-guide-zh.md 业务集成方 / 查询调用者 / agent 集成方 如何发起 truth/information 查询、managed analysis 请求、scope...</p>
+        </article>
+<article class="chapter-card">
+          <h3>写入选择指引</h3>
+          <p>应该写入 java-service-runbook-zh.md 的内容： - 启动命令、环境变量配置（ RTS_STORE_ROOT 、 RTS_LLM_* 、 RTS_ADMIN_API_KEY_HASH 等） - Active release 切换步骤（文件方式或 ingest API 方式） - 端口占用、依赖下载等部署排障 - Admin 权限配置和 ingest API 操作步骤 - 测试执行和提交前检查 - LLM / or...</p>
         </article>
           </div>
         </section>
@@ -102,22 +104,24 @@
         <strong>字段、边界和原始措辞以此为准</strong>
       </summary>
       <div class="markdown-body">
-        <h1 id="rts-documentation-index">RTS Documentation Index<a class="headerlink" href="#rts-documentation-index" title="Permanent link">#</a></h1>
+        <h1 id="rts-documentation-index">RTS Documentation Index</h1>
 <p>This is the primary documentation router for RTS.</p>
-<h2 id="open-one-path">Open One Path<a class="headerlink" href="#open-one-path" title="Permanent link">#</a></h2>
+<h2 id="open-one-path">Open One Path</h2>
 <ul>
 <li><code>docs/confirmed/README.md</code> — 当前 active baseline。先在这里建立 RTS 的双核心定位、truth boundary、managed mode / tool mode 和阶段路线。</li>
 <li><code>docs/reference/README.md</code> — 参考材料。需要历史 rationale、OV 背景、检索原则、术语表、早期 Java 参考方案或旧评审背景时打开；它只做支撑，不覆盖 confirmed baseline。</li>
 <li><code>docs/java-service-runbook-zh.md</code> — 本地运行、配置、测试、排障和服务维护。</li>
 <li><code>docs/api-caller-guide-zh.md</code> — API 调用方如何发起 deterministic truth/information 查询、managed analysis 请求、场景分析请求，并理解降级语义。</li>
 <li><code>docs/day1-sample-pack-test-commands.md</code> — 当前 sample runtime projection 的手工 curl 验证命令。</li>
-<li><code>docs/ai-first-format-conversation-followup-zh.md</code> — 展示型 HTML 格式讨论的补充澄清；只用于理解 KB/projection/LLM input context 的格式边界，不覆盖 confirmed baseline。</li>
+<li><code>docs/ai-first-format-conversation-followup-zh.md</code> — 展示型 HTML 格式讨论的补充澄清；只用于理解 KB/projection/LLM input context 的格式边界，正式生成链路以 confirmed final contract 为准。</li>
+<li><code>docs/company-computer-kb-workflow-checklist-zh.md</code> — 把 RTS repo 上传到公司电脑后，从受限公司 source 生成 source profile、KB pack、KB review 和用户问题的执行清单。</li>
+<li><code>skills/AGENTS.md</code> — repo-bundled portable skills 的使用和安全边界；上传到公司电脑后处理受限 source 前阅读。</li>
 <li><code>docs/archive/README.md</code> — 历史材料。只在明确需要追溯旧讨论、旧产物或 archived prototype 时打开。</li>
 </ul>
-<h2 id="default-rule">Default Rule<a class="headerlink" href="#default-rule" title="Permanent link">#</a></h2>
+<h2 id="default-rule">Default Rule</h2>
 <p>For active design and implementation, use confirmed docs first. Reference docs may explain why a decision exists, but they do not override confirmed baseline. Archived docs never override active baseline.</p>
-<hr>
-<h2 id="operational-docs">Operational Docs<a class="headerlink" href="#operational-docs" title="Permanent link">#</a></h2>
+<hr/>
+<h2 id="operational-docs">Operational Docs</h2>
 <p>面向运行、维护和集成人员，按角色选择：</p>
 <table>
 <thead>
@@ -140,7 +144,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="_1">写入选择指引<a class="headerlink" href="#_1" title="Permanent link">#</a></h3>
+<h3 id="_1">写入选择指引</h3>
 <p><strong>应该写入 <code>java-service-runbook-zh.md</code> 的内容：</strong>
 - 启动命令、环境变量配置（<code>RTS_STORE_ROOT</code>、<code>RTS_LLM_*</code>、<code>RTS_ADMIN_API_KEY_HASH</code> 等）
 - Active release 切换步骤（文件方式或 ingest API 方式）

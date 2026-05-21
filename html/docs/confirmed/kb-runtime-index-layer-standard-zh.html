@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KB / Runtime Projection / Index Layer Standard | RTS 来源解读</title>
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+  <header class="site-header doc-local">
+    <a class="brand-mark" href="../../index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="../../index.html">首页</a>
+      <a class="nav-link" href="../../start-here.html">项目概览</a>
+      <a class="nav-link" href="../../architecture.html">KB 与投影</a>
+      <a class="nav-link" href="../../library.html">来源文档</a>
+    </nav>
+  </header>
+  <main class="source-page">
+    <section class="source-hero">
+      <p class="kicker">已确认基线 · docs/confirmed/kb-runtime-index-layer-standard-zh.md</p>
+      <h1>KB / Runtime Projection / Index Layer Standard</h1>
+      <p>standardize the concrete KB, runtime projection, and index layer shapes, file formats, generation order, and layer contracts</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#readable">查看概要</a>
+        <a class="button secondary" href="#source">查看原文</a>
+        <a class="button ghost" href="../../../docs/confirmed/kb-runtime-index-layer-standard-zh.md">Markdown 源文件</a>
+      </div>
+    </section>
+
+    <section class="readable-layout" id="readable">
+      <aside class="readable-aside">
+        <div class="aside-card">
+          <p class="kicker">文档说明</p>
+          <h2>概要与原文</h2>
+          <p>页面保留原始 Markdown 内容，并提供目录、摘要和关联来源。字段、边界和原始措辞以 Markdown 原文为准。</p>
+        </div>
+        <div class="aside-card term-aside">
+          <p class="kicker">常见术语</p>
+          <ul>
+            <li><strong>KB</strong>：完整规则知识和治理上下文。</li>
+            <li><strong>Runtime Projection</strong>：已批准规则的服务运行包。</li>
+            <li><strong>L2</strong>：服务回答事实时要读取的结构化规则对象。</li>
+          </ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">适合阅读</p>
+          <ul><li>需要生成新的 KB pack</li><li>需要发布新的 runtime projection</li><li>需要定义 index layer 应该索引什么、不能索引什么</li><li>需要固定 KB、runtime projection、index layer 的文件格式和生成标准</li><li>需要判断下次生成器或 agent 应该产出哪些文件</li></ul>
+        </div>
+        <div class="aside-card">
+          <p class="kicker">可跳过</p>
+          <ul><li>只需要理解 RTS 总体愿景</li><li>只需要 PM 视角解释 runtime projection 每个目录的作用</li><li>只需要调用已经运行的 API</li></ul>
+        </div>
+        <div class="aside-card related-card">
+          <p class="kicker">关联来源</p>
+          <a href="project-alignment-summary-zh.html">project-alignment-summary-zh.md</a><a href="system-constitution-v1.html">system-constitution-v1.md</a><a href="kb-to-index-projection-contract-zh.html">kb-to-index-projection-contract-zh.md</a><a href="README.html">Confirmed Docs</a><a href="../INDEX.html">Docs Index</a>
+        </div>
+      </aside>
+      <div class="readable-main">
+        <section class="insight-grid">
+          <article class="insight-card">
+            <h2>文档定位</h2>
+            <p>standardize the concrete KB, runtime projection, and index layer shapes, file formats, generation order, and layer contracts</p>
+          </article>
+          <article class="insight-card">
+            <h2>权威层级</h2>
+            <p>已确认基线 / role: leaf / layer: 3</p>
+          </article>
+          <article class="insight-card">
+            <h2>源文件</h2>
+            <p><code>docs/confirmed/kb-runtime-index-layer-standard-zh.md</code></p>
+          </article>
+        </section>
+        <section class="chapter-section">
+          <div class="section-heading">
+            <p class="kicker">章节</p>
+            <h2>主要章节</h2>
+          </div>
+          <div class="chapter-grid">
+            <article class="chapter-card">
+          <h3>1. 固定结论</h3>
+          <p>RTS 的规则材料必须固定成三层，而不是混成一个“可读文档库”： KB authoring layer -&gt; runtime projection layer -&gt; index/query layer 三层职责必须这样切： 层 拥有什么 默认格式 主要读者 是否拥有 truth KB governed truth graph：rule / lookup / helper、evidence、review、report、signoff、lineage YAML + Markdown，必要时 CSV/TSV 附件 生成器、review agent、publisher、少量人工 reviewer 是，形成 truth runtime projection appr...</p>
+        </article>
+<article class="chapter-card">
+          <h3>2. 标准目录长相</h3>
+          <p>查看原文获取完整字段和边界。</p>
+        </article>
+<article class="chapter-card">
+          <h3>2.1 KB authoring layer</h3>
+          <p>新的 KB pack 必须写成： kb/{canonical_pack_id}/ metadata.yaml README.md rules/ {rule_id}.yaml lookups/ {lookup_id}.yaml helpers/ {helper_id}.yaml evidence/ evidence-index.yaml review/ review-index.yaml reports/ extraction-report.md review-check...</p>
+        </article>
+<article class="chapter-card">
+          <h3>2.2 Runtime projection layer</h3>
+          <p>新的 projection 必须发布成： runtime-store/ active-release.json releases/ {release_id}/ release-manifest.json scopes.jsonl object-manifest.jsonl caller-profiles.jsonl l2/ rules/{rule_id}.json lookups/{lookup_id}.json helpers/{helper_id}.json navigat...</p>
+        </article>
+<article class="chapter-card">
+          <h3>2.3 Index layer</h3>
+          <p>Index layer 不新增人工 authoring 目录。它只能从 active projection 或指定 release projection 派生： runtime-store/releases/{release_id}/index-artifacts/ opensearch-docs.jsonl # portable search document export lucene/ # local Java service index files</p>
+        </article>
+<article class="chapter-card">
+          <h3>3. KB 文件格式标准</h3>
+          <p>查看原文获取完整字段和边界。</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.1 metadata.yaml</h3>
+          <p>metadata.yaml 是 pack 级入口，必须使用 YAML。 必须包含： schema_version: kb-pack-v1 pack: id: tradition-to-stella-fxd-ndf-cutoff-fixing-split name: Tradition -&gt; Stella FXD.NDF cutoff-fixing split status: demo_signoff version: 0.2.0-photo-reconstructed created_on: 2026-04-02 ca...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.2 rules/{rule_id}.yaml</h3>
+          <p>Rule 文件必须描述一个 target 规则对象。格式使用 YAML。 标准形状： schema_version: kb-object-v1 id: rule_fxd_ndf_primary_rate_source object_type: rule status: demo_signoff signoff_status: demo_signoff source: reconstructed_from_photos: - IMG_9619.JPG inputs: - name: fixing_currency1 sou...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.3 lookups/{lookup_id}.yaml</h3>
+          <p>Lookup 文件描述可复用查表逻辑，不应该只写表名。 标准形状： schema_version: kb-object-v1 id: lk_fxd_ndf_cutoff_by_pair_and_locode object_type: lookup status: demo_signoff signoff_status: demo_signoff source: mapping_table: TraditionStella Cutoff inputs: - name: fixing_currency1 s...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.4 helpers/{helper_id}.yaml</h3>
+          <p>Helper 文件描述中间语义或复用逻辑。 标准形状： schema_version: kb-object-v1 id: hlp_fxd_ndf_fixing_quoted_currency_pair object_type: helper status: demo_signoff signoff_status: demo_signoff source: reconstructed_from_photos: - IMG_9611.JPG inputs: - name: source_curr...</p>
+        </article>
+<article class="chapter-card">
+          <h3>3.5 Governance side files</h3>
+          <p>evidence/evidence-index.yaml 记录 source-backed evidence，不直接成为默认 runtime answer。 标准形状： schema_version: evidence-index-v1 evidence: - evidence_id: ev_rule_fxd_ndf_primary_rate_source_photo object_ids: - rule_fxd_ndf_primary_rate_source source_type: photo locator: file: IMG_9619.JPG region: visible VS Code e...</p>
+        </article>
+<article class="chapter-card">
+          <h3>4. Runtime projection 文件格式标准</h3>
+          <p>Runtime projection 使用 JSON/JSONL。所有 JSONL 文件必须是一行一个完整 JSON object，UTF-8，无 markdown fence，无注释。</p>
+        </article>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <details class="source-drawer" id="source">
+      <summary>
+        <span>Markdown 原文</span>
+        <strong>字段、边界和原始措辞以此为准</strong>
+      </summary>
+      <div class="markdown-body">
+        <h1 id="kb-runtime-projection-index-layer-standard">KB / Runtime Projection / Index Layer Standard</h1>
+<blockquote>
+<p>状态：confirmed generation standard<br/>
+创建日期：2026-05-19<br/>
+范围：固定 KB、runtime projection、index layer 三层的职责、文件长相、文件格式、生成顺序和层间契约<br/>
+非目标：不定义 source ingestion 全流程，不定义 LLM input context envelope 细节，不把 HTML/report 变成 truth 格式</p>
+</blockquote>
+<h2 id="1">1. 固定结论</h2>
+<p>RTS 的规则材料必须固定成三层，而不是混成一个“可读文档库”：</p>
+<pre><code class="language-text">KB authoring layer
+  -&gt; runtime projection layer
+  -&gt; index/query layer
+</code></pre>
+<p>三层职责必须这样切：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>拥有什么</th>
+<th>默认格式</th>
+<th>主要读者</th>
+<th>是否拥有 truth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KB</td>
+<td>governed truth graph：rule / lookup / helper、evidence、review、report、signoff、lineage</td>
+<td>YAML + Markdown，必要时 CSV/TSV 附件</td>
+<td>生成器、review agent、publisher、少量人工 reviewer</td>
+<td>是，形成 truth</td>
+</tr>
+<tr>
+<td>runtime projection</td>
+<td>approved truth 的不可变服务运行包：release、scope、manifest、L2、navigation、dependency、governance、permission、trace 边界</td>
+<td>JSON + JSONL + UTF-8 L2 JSON</td>
+<td>RTS service、agent tool、publisher、index builder</td>
+<td>是，发布 truth</td>
+</tr>
+<tr>
+<td>index layer</td>
+<td>从 projection 派生的定位、召回、消歧和查询计划材料</td>
+<td>Lucene/OpenSearch index、JSONL search docs、内存 map/table</td>
+<td>resolver、search、query planner</td>
+<td>否，只定位 truth</td>
+</tr>
+</tbody>
+</table>
+<p>禁止的混层行为：</p>
+<ul>
+<li>index layer 不能直接读取 <code>kb/</code> 当默认 service truth。</li>
+<li>runtime query 不能读取 candidate、raw review notes、raw evidence 或 Git working tree 当默认 truth。</li>
+<li>object card、L0/L1、search hit、LLM answer、trace、HTML、report 都不能替代 L2 runtime object。</li>
+<li>LLM input context envelope 不是第四个 stored truth layer；它只是在运行时从 projection 中装箱。</li>
+</ul>
+<h2 id="2">2. 标准目录长相</h2>
+<h3 id="21-kb-authoring-layer">2.1 KB authoring layer</h3>
+<p>新的 KB pack 必须写成：</p>
+<pre><code class="language-text">kb/{canonical_pack_id}/
+  metadata.yaml
+  README.md
+  rules/
+    {rule_id}.yaml
+  lookups/
+    {lookup_id}.yaml
+  helpers/
+    {helper_id}.yaml
+  evidence/
+    evidence-index.yaml
+  review/
+    review-index.yaml
+  reports/
+    extraction-report.md
+    review-checklist.md
+    closure-check.md
+  attachments/            # optional; large tables, source snippets, normalized CSV/TSV
+</code></pre>
+<p>当前样本 <code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/</code> 已经接近此标准；后续新 pack 应补齐更明确的 object type、scope inheritance 和 schema version。</p>
+<h3 id="22-runtime-projection-layer">2.2 Runtime projection layer</h3>
+<p>新的 projection 必须发布成：</p>
+<pre><code class="language-text">runtime-store/
+  active-release.json
+  releases/
+    {release_id}/
+      release-manifest.json
+      scopes.jsonl
+      object-manifest.jsonl
+      caller-profiles.jsonl
+      l2/
+        rules/{rule_id}.json
+        lookups/{lookup_id}.json
+        helpers/{helper_id}.json
+      navigation/
+        object-cards.jsonl
+        l0-l1-views.jsonl
+        aliases.jsonl
+        confusables.jsonl
+      dependencies/
+        dependency-edges.jsonl
+        field-bindings.jsonl
+      governance/
+        governance-access-refs.jsonl
+        evidence-summaries/{object_or_pack_id}.json
+        review-summaries/{object_or_pack_id}.json
+        report-summaries/{pack_or_release_id}.json
+      index-artifacts/
+        opensearch-docs.jsonl
+        lucene/              # generated binary index; may be absent before rebuild
+  traces/
+    query-trace.jsonl
+    llm-run-trace.jsonl
+</code></pre>
+<p><code>runtime-store/releases/{release_id}/</code> 是不可变 release package。修改规则事实必须生成新 release，不允许原地修当前 release。</p>
+<h3 id="23-index-layer">2.3 Index layer</h3>
+<p>Index layer 不新增人工 authoring 目录。它只能从 active projection 或指定 release projection 派生：</p>
+<pre><code class="language-text">runtime-store/releases/{release_id}/index-artifacts/
+  opensearch-docs.jsonl      # portable search document export
+  lucene/                    # local Java service index files
+</code></pre>
+<p>服务内还可以建立内存 map 或数据库表，但它们都必须等价于 projection 派生视图：</p>
+<pre><code class="language-text">by_uri
+by_scope_object_id
+by_scope_target_path
+by_scope_source_anchor
+dependency_adjacency
+field_binding_index
+</code></pre>
+<p>这些索引可以丢弃重建；不能成为 canonical truth，也不能包含 projection 中不存在的业务断言。</p>
+<h2 id="3-kb">3. KB 文件格式标准</h2>
+<h3 id="31-metadatayaml">3.1 <code>metadata.yaml</code></h3>
+<p><code>metadata.yaml</code> 是 pack 级入口，必须使用 YAML。</p>
+<p>必须包含：</p>
+<pre><code class="language-yaml">schema_version: kb-pack-v1
+pack:
+  id: tradition-to-stella-fxd-ndf-cutoff-fixing-split
+  name: Tradition -&gt; Stella FXD.NDF cutoff-fixing split
+  status: demo_signoff
+  version: 0.2.0-photo-reconstructed
+  created_on: 2026-04-02
+  canonical_revision: photo-reconstructed-2026-05-06
+scope:
+  channel: tradition
+  product: stella
+  pack: fxd-ndf-cutoff-fixing
+  domain: cutoff-fixing
+  source_system: Tradition
+  target_system: Stella
+  product_scope: FXD.NDF
+  target_area:
+    - /scb:SCBML/.../conf:fixing
+objects:
+  rules: 6
+  lookups: 1
+  helpers: 1
+indexes:
+  evidence_index: evidence/evidence-index.yaml
+  review_index: review/review-index.yaml
+  extraction_report: reports/extraction-report.md
+  review_checklist: reports/review-checklist.md
+  closure_check: reports/closure-check.md
+sources:
+  pointer_file: Tradition_SCBML_mapping-ai-bundle.json
+  sheets: []
+  java: []
+  xslt: []
+  tests: []
+modeling_decisions:
+  - Main objects are kept thin.
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li><code>scope.channel/product/pack/domain</code> 是发布到 projection 的默认 scope。</li>
+<li>object 文件可以继承 pack scope；如果 object 自己声明 scope，必须与 pack scope 兼容。</li>
+<li><code>status</code> 不能靠自然语言表达，必须是机器可读枚举。</li>
+<li><code>canonical_revision</code> 必须能被 projection manifest 引用。</li>
+</ul>
+<p>推荐状态枚举：</p>
+<pre><code class="language-text">candidate
+ai_reviewed
+human_review_required
+demo_signoff
+production_signoff
+deprecated
+superseded
+</code></pre>
+<h3 id="32-rulesrule_idyaml">3.2 <code>rules/{rule_id}.yaml</code></h3>
+<p>Rule 文件必须描述一个 target 规则对象。格式使用 YAML。</p>
+<p>标准形状：</p>
+<pre><code class="language-yaml">schema_version: kb-object-v1
+id: rule_fxd_ndf_primary_rate_source
+object_type: rule
+status: demo_signoff
+signoff_status: demo_signoff
+source:
+  reconstructed_from_photos:
+    - IMG_9619.JPG
+inputs:
+  - name: fixing_currency1
+    source_path: /FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()
+logic:
+  summary: &gt;
+    Resolve the hedge primary rate source from the shared cutoff lookup.
+  pipeline:
+    - op: read_xpath
+      source: /FpML/.../currency1/text()
+      out: fixing_currency1
+    - op: lookup_value
+      lookup: lk_fxd_ndf_cutoff_by_pair_and_locode
+      return_field: hedge_primary_source
+      using_inputs:
+        fixing_currency1: fixing_currency1
+      out: hedge_primary_source
+target:
+  kind: block
+  path: /scb:SCBML/.../conf:primaryRateSource
+  emits:
+    - path: /scb:SCBML/.../conf:rateSource
+      from_lookup: hedge_primary_source
+dependencies:
+  lookups:
+    - lk_fxd_ndf_cutoff_by_pair_and_locode
+  helpers: []
+  rules: []
+examples:
+  - name: sample_usdtwd_primary_rate_source
+    input:
+      fixing_currency1: USD
+    key_decision:
+      matched_key: USDTWD|TW
+    result:
+      hedge_primary_source: RTRS
+warnings:
+  - Photo-reconstructed source accepted for local demo signoff.
+</code></pre>
+<p>Required rule fields:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>object_type: rule</code></li>
+<li><code>status</code></li>
+<li><code>signoff_status</code></li>
+<li><code>source</code></li>
+<li><code>inputs</code></li>
+<li><code>logic.summary</code></li>
+<li><code>logic.pipeline</code></li>
+<li><code>target.kind</code></li>
+<li><code>target.path</code></li>
+<li><code>dependencies</code></li>
+<li><code>examples</code></li>
+</ul>
+<p>Rule 文件不应该包含长 evidence 原文、长 review 过程、chat history 或 HTML 展示内容。那些内容放到 <code>evidence/</code>、<code>review/</code>、<code>reports/</code>。</p>
+<h3 id="33-lookupslookup_idyaml">3.3 <code>lookups/{lookup_id}.yaml</code></h3>
+<p>Lookup 文件描述可复用查表逻辑，不应该只写表名。</p>
+<p>标准形状：</p>
+<pre><code class="language-yaml">schema_version: kb-object-v1
+id: lk_fxd_ndf_cutoff_by_pair_and_locode
+object_type: lookup
+status: demo_signoff
+signoff_status: demo_signoff
+source:
+  mapping_table: TraditionStella Cutoff
+inputs:
+  - name: fixing_currency1
+    source_path: /FpML/.../currency1/text()
+logic:
+  summary: &gt;
+    Query by forward pair first, then reverse pair fallback.
+  pipeline:
+    - op: concat
+      args: [fixing_currency1, fixing_currency2]
+      out: forward_pair
+    - op: compose_key
+      template: "{forward_pair}|{cutoff_code}"
+      out: forward_key
+    - op: lookup_value
+      key: "{forward_key}"
+      return_field: requested_field
+      out: forward_result
+output:
+  fields:
+    - name: cutoff_name
+      return_field: CUTOFF
+    - name: hedge_primary_source
+      return_field: PRIMARY_SOUCE_FOR_HEDGE
+dependencies: []
+examples: []
+</code></pre>
+<p>If the lookup table is large, keep the table itself in <code>attachments/</code> as CSV/TSV and reference it from <code>source</code> or <code>table_ref</code>; do not inline large tables into the lookup object.</p>
+<h3 id="34-helpershelper_idyaml">3.4 <code>helpers/{helper_id}.yaml</code></h3>
+<p>Helper 文件描述中间语义或复用逻辑。</p>
+<p>标准形状：</p>
+<pre><code class="language-yaml">schema_version: kb-object-v1
+id: hlp_fxd_ndf_fixing_quoted_currency_pair
+object_type: helper
+status: demo_signoff
+signoff_status: demo_signoff
+source:
+  reconstructed_from_photos:
+    - IMG_9611.JPG
+inputs:
+  - name: source_currency1
+    source_path: /FpML/.../currency1/text()
+logic:
+  summary: &gt;
+    Detect inverse quoteBasis and swap currencies.
+  pipeline:
+    - op: concat
+      args: [source_currency1, source_currency2]
+      out: source_pair
+    - op: equals
+      left: source_quote_basis
+      right: "{source_pair}"
+      out: is_inverse_quote
+output:
+  fields:
+    - target_currency1
+    - target_currency2
+    - target_quote_basis
+dependencies: []
+examples: []
+</code></pre>
+<p>Helper 的输出必须能被 rule 的 <code>logic.pipeline</code> 或 <code>target.emits</code> 引用。</p>
+<h3 id="35-governance-side-files">3.5 Governance side files</h3>
+<p><code>evidence/evidence-index.yaml</code> 记录 source-backed evidence，不直接成为默认 runtime answer。</p>
+<p>标准形状：</p>
+<pre><code class="language-yaml">schema_version: evidence-index-v1
+evidence:
+  - evidence_id: ev_rule_fxd_ndf_primary_rate_source_photo
+    object_ids:
+      - rule_fxd_ndf_primary_rate_source
+    source_type: photo
+    locator:
+      file: IMG_9619.JPG
+      region: visible VS Code editor
+    claims:
+      - hedge primary source is read from shared cutoff lookup
+    limitations:
+      - photo reconstruction requires production recheck
+</code></pre>
+<p><code>review/review-index.yaml</code> 记录 review、open question、human decision 和 signoff gate。</p>
+<p>标准形状：</p>
+<pre><code class="language-yaml">schema_version: review-index-v1
+reviews:
+  - review_id: rv_rule_fxd_ndf_primary_rate_source
+    object_ids:
+      - rule_fxd_ndf_primary_rate_source
+    status: demo_signoff
+    open_questions:
+      - cutoff_code_semantics
+    human_decisions:
+      - accepted for local demo signoff
+    production_gate: recheck source-photo reconstruction before production signoff
+</code></pre>
+<p><code>reports/*.md</code> 可以解释提取、review、closure，但 report body 不是默认 runtime truth。Publisher 只能把允许暴露的摘要投影到 governance summary。</p>
+<h2 id="4-runtime-projection">4. Runtime projection 文件格式标准</h2>
+<p>Runtime projection 使用 JSON/JSONL。所有 JSONL 文件必须是一行一个完整 JSON object，UTF-8，无 markdown fence，无注释。</p>
+<h3 id="41-active-releasejson">4.1 <code>active-release.json</code></h3>
+<pre><code class="language-json">{
+  "active_release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "rollback_target_release_id": "rel-2026-05-06",
+  "updated_at": "2026-05-07T00:00:00Z",
+  "updated_by": "publisher"
+}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li>service 默认只读取 <code>active_release_id</code> 指向的 release。</li>
+<li>切换 active release 是服务运行态操作，不修改 release package 内容。</li>
+<li>rollback target 必须指向一个已存在、可加载的旧 release。</li>
+</ul>
+<h3 id="42-release-manifestjson">4.2 <code>release-manifest.json</code></h3>
+<pre><code class="language-json">{
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
+  "projection_schema_version": "runtime-multiview-v1",
+  "card_schema_version": "card-v1",
+  "summary_schema_version": "summary-v1",
+  "activation_state": "released",
+  "generated_at": "2026-05-06T13:30:00Z",
+  "released_at": "2026-05-06T13:31:00Z",
+  "rollback_target_release_id": "rel-2026-05-06",
+  "content_hash_summary": "sha256-or-release-hash-summary",
+  "blocking_issues_count": 0,
+  "created_at": "2026-05-06T13:30:00Z"
+}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li><code>projection_schema_version</code> 当前固定为 <code>runtime-multiview-v1</code>。</li>
+<li><code>activation_state</code> 只允许默认服务读取 <code>active</code> 或 <code>released</code>。</li>
+<li><code>blocking_issues_count</code> 必须为 <code>0</code> 才能进入默认服务面。</li>
+<li>manifest 是 projection admission 的第一道门；没有有效 manifest，就没有 runtime truth。</li>
+</ul>
+<h3 id="43-scopesjsonl">4.3 <code>scopes.jsonl</code></h3>
+<p>每行一个 scope：</p>
+<pre><code class="language-json">{"release_id":"rel-2026-05-06-photo-fxd-ndf-cutoff","channel":"tradition","product":"stella","pack":"fxd-ndf-cutoff-fixing","domain":"cutoff-fixing","active_flag":true,"permission_boundary":"demo-signoff-photo","precedence_policy":"product-specific","deprecated_flag":false,"superseded_by":null}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li>Query resolver 必须先解析 scope，再召回对象。</li>
+<li>Scope 是 truth safety boundary，不是普通搜索 filter。</li>
+<li>Object manifest 中每个对象必须匹配一个 active scope。</li>
+</ul>
+<h3 id="44-object-manifestjsonl">4.4 <code>object-manifest.jsonl</code></h3>
+<p>每行一个 released object：</p>
+<pre><code class="language-json">{
+  "uri": "rts://tradition/stella/fxd-ndf-cutoff-fixing/photo-reconstructed/rules/rule_fxd_ndf_primary_rate_source",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "object_id": "rule_fxd_ndf_primary_rate_source",
+  "object_type": "rule",
+  "channel": "tradition",
+  "product": "stella",
+  "pack": "fxd-ndf-cutoff-fixing",
+  "domain": "cutoff-fixing",
+  "target_path": "fxd.ndf.fixing.primaryRateSource",
+  "source_anchors": [
+    "/FpML/trade/fxSingleLeg/nonDeliverableForward/fixing/quotedCurrencyPair/currency1/text()"
+  ],
+  "content_hash": "sha256:...",
+  "card_ref": "rts://.../rule_fxd_ndf_primary_rate_source#card",
+  "content_ref": "rts://.../rule_fxd_ndf_primary_rate_source#l2",
+  "schema_version": "object-v1",
+  "state": "released",
+  "l2_storage_ref": "rules/rule_fxd_ndf_primary_rate_source.json"
+}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li><code>uri</code> must be globally stable for a release.</li>
+<li><code>(release_id, channel, product, pack, domain, target_path)</code> must not produce duplicate active rules unless explicit precedence/supersession is modeled.</li>
+<li><code>content_hash</code> must equal the exact L2 file hash.</li>
+<li><code>l2_storage_ref</code> must stay under <code>l2/</code>; arbitrary path reads are forbidden.</li>
+</ul>
+<h3 id="45-l2-runtime-objects">4.5 L2 runtime objects</h3>
+<p>L2 is the service-readable fact body. It must be JSON and must not be reduced to a prose summary.</p>
+<p>Common envelope:</p>
+<pre><code class="language-json">{
+  "schema_version": "l2-runtime-v1",
+  "truth_role": "l2_fact",
+  "uri": "rts://...",
+  "id": "rule_fxd_ndf_primary_rate_source",
+  "object_type": "rule",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "canonical_revision": "photo-reconstructed-2026-05-06",
+  "status": "demo-signoff-photo-reconstructed",
+  "signoff_status": "demo_signoff",
+  "runtime_state": "released",
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "visibility": "runtime_operational",
+  "source_lineage": {},
+  "review_state": {},
+  "inputs": [],
+  "logic": {},
+  "dependencies": [],
+  "examples": [],
+  "operational_warnings": [],
+  "governance_summary_refs": [],
+  "content_hash": "sha256:..."
+}
+</code></pre>
+<p>Rule L2 must also contain <code>target</code>. Lookup L2 must also contain <code>output</code>. Helper L2 must also contain <code>output</code>.</p>
+<p>Allowed L2 truth fields:</p>
+<ul>
+<li><code>inputs</code></li>
+<li><code>logic.pipeline</code></li>
+<li><code>target</code></li>
+<li><code>output</code></li>
+<li><code>dependencies</code></li>
+<li><code>examples</code></li>
+<li><code>operational_warnings</code></li>
+<li><code>review_state.status</code></li>
+<li><code>governance_summary_refs</code></li>
+<li><code>source_lineage</code></li>
+</ul>
+<p>Disallowed L2 content:</p>
+<ul>
+<li>raw chat transcript</li>
+<li>raw review history that is not authorized for operational view</li>
+<li>long evidence body</li>
+<li>HTML/dashboard text</li>
+<li>generated LLM explanation that has not been accepted into governed object fields</li>
+</ul>
+<h3 id="46-navigationobject-cardsjsonl">4.6 <code>navigation/object-cards.jsonl</code></h3>
+<p>Object card is navigation and resolver material, not final truth.</p>
+<pre><code class="language-json">{
+  "uri": "rts://...",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "object_type": "rule",
+  "card_json": {
+    "object_id": "rule_fxd_ndf_primary_rate_source",
+    "summary": "Primary rate source comes from shared cutoff lookup.",
+    "target_path": "fxd.ndf.fixing.primaryRateSource",
+    "logic_operation_types": ["read_xpath", "lookup_value", "emit_value"],
+    "lookup_dependencies": ["lk_fxd_ndf_cutoff_by_pair_and_locode"],
+    "l2_content_ref": "rts://...#l2",
+    "l2_content_hash": "sha256:...",
+    "view_role": "navigation_not_truth"
+  },
+  "search_text": "Primary rate source lookup reverse pair fallback ...",
+  "risk_flags": [],
+  "applicability": [],
+  "not_applicable": [],
+  "override_refs": [],
+  "supersession_refs": []
+}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li>Card can summarize and flatten for search.</li>
+<li>Card must point to L2.</li>
+<li>Card cannot add business logic that is absent from L2/KB.</li>
+</ul>
+<h3 id="47-navigationl0-l1-viewsjsonl">4.7 <code>navigation/l0-l1-views.jsonl</code></h3>
+<p>L0/L1 are deterministic, regenerable navigation views.</p>
+<pre><code class="language-json">{
+  "uri": "rts://...",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "view_type": "l0_l1",
+  "scope": {
+    "channel": "tradition",
+    "product": "stella",
+    "pack": "fxd-ndf-cutoff-fixing",
+    "domain": "cutoff-fixing"
+  },
+  "l0_text": "Primary rate source and source page come from shared cutoff lookup.",
+  "l1_json": {
+    "object_id": "rule_fxd_ndf_primary_rate_source",
+    "target_path": "fxd.ndf.fixing.primaryRateSource",
+    "lookup_dependencies": ["lk_fxd_ndf_cutoff_by_pair_and_locode"],
+    "view_role": "navigation_not_truth"
+  },
+  "search_text": "Primary rate source lookup ...",
+  "content_hash": "sha256:...",
+  "schema_version": "navigation-v1"
+}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li><code>view_role</code> must be <code>navigation_not_truth</code> or equivalent.</li>
+<li>L0/L1 must be release-bound and hashable.</li>
+<li>L0/L1 can guide selection, but final answer must read L2.</li>
+</ul>
+<h3 id="48-navigationaliasesjsonl">4.8 <code>navigation/aliases.jsonl</code></h3>
+<p>Alias records are optional but recommended:</p>
+<pre><code class="language-json">{"release_id":"rel-2026-05-06-photo-fxd-ndf-cutoff","uri":"rts://.../rules/rule_fxd_ndf_primary_rate_source","alias":"primary source page","alias_type":"business_term","weight":0.8}
+</code></pre>
+<p>Aliases help recall; they do not create truth.</p>
+<h3 id="49-navigationconfusablesjsonl">4.9 <code>navigation/confusables.jsonl</code></h3>
+<p>Confusable records prevent similar-but-wrong matches:</p>
+<pre><code class="language-json">{"release_id":"rel-2026-05-06-photo-fxd-ndf-cutoff","uri":"rts://.../rules/rule_fxd_ndf_primary_rate_source","confusable_with_uri":"rts://.../rules/rule_fxo_primary_rate_source","reason":"FXO option source columns are outside FXD.NDF cutoff-fixing scope."}
+</code></pre>
+<p>Confusable records are resolver safety material. They must not broaden query scope.</p>
+<h3 id="410-dependenciesdependency-edgesjsonl">4.10 <code>dependencies/dependency-edges.jsonl</code></h3>
+<pre><code class="language-json">{"release_id":"rel-2026-05-06-photo-fxd-ndf-cutoff","from_uri":"rts://.../rules/rule_fxd_ndf_primary_rate_source","to_uri":"rts://.../lookups/lk_fxd_ndf_cutoff_by_pair_and_locode","edge_type":"rule_to_lookup","required_flag":true,"direction":"forward","traversal_purpose":"explain_rule"}
+</code></pre>
+<p>Allowed edge types:</p>
+<pre><code class="language-text">rule_to_lookup
+rule_to_helper
+helper_to_lookup
+helper_to_helper
+rule_to_rule
+rule_to_source_anchor
+rule_to_target_path
+lookup_to_consumer
+helper_to_consumer
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li>Required object dependencies must point to released objects in the same release.</li>
+<li>Dependencies can support explanation, impact, test planning and context loading.</li>
+<li>Dependencies cannot silently widen scope or bypass permission.</li>
+</ul>
+<h3 id="411-dependenciesfield-bindingsjsonl">4.11 <code>dependencies/field-bindings.jsonl</code></h3>
+<pre><code class="language-json">{"release_id":"rel-2026-05-06-photo-fxd-ndf-cutoff","object_uri":"rts://.../rules/rule_fxd_ndf_primary_rate_source","binding_type":"target_output","source_field":"fixing_currency1","target_field":"fxd.ndf.fixing.primaryRateSource.rateSource","output_field":"hedge_primary_source","via_uri":"rts://.../lookups/lk_fxd_ndf_cutoff_by_pair_and_locode","purpose":"explain_rule"}
+</code></pre>
+<p>Field bindings make source/target/output relationships queryable without parsing L2 every time.</p>
+<h3 id="412-governancegovernance-access-refsjsonl">4.12 <code>governance/governance-access-refs.jsonl</code></h3>
+<pre><code class="language-json">{
+  "uri": "rts://...",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "access_level": "governance_tools",
+  "redaction_state": "summary_only",
+  "evidence_summary_refs": ["evidence-summary-rule_fxd_ndf_primary_rate_source"],
+  "review_summary_refs": ["review-summary-rule_fxd_ndf_primary_rate_source"],
+  "report_summary_refs": ["report-summary-photo-pack-closure"],
+  "open_questions": ["cutoff_code_semantics"],
+  "production_gate": "recheck before production signoff",
+  "source_locator_summary": "Photo reconstruction plus workbook/code locators."
+}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li>Governance access refs only point to published summaries, not raw evidence.</li>
+<li>Governance material requires permission and must be traced when used.</li>
+</ul>
+<h3 id="413-governance-summaries">4.13 Governance summaries</h3>
+<p><code>governance/*-summaries/*.json</code> must use the same summary shape:</p>
+<pre><code class="language-json">{
+  "summary_id": "review-summary-rule_fxd_ndf_primary_rate_source",
+  "uri": "rts://...",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "summary_type": "review",
+  "truth_role": "authorized_governance_summary",
+  "title": "Review summary",
+  "summary": "Accepted for local demo signoff; production recheck required.",
+  "source_locator": {},
+  "warnings": []
+}
+</code></pre>
+<p>Allowed <code>summary_type</code> values:</p>
+<pre><code class="language-text">evidence
+review
+report
+</code></pre>
+<h3 id="414-caller-profilesjsonl">4.14 <code>caller-profiles.jsonl</code></h3>
+<pre><code class="language-json">{"caller_id":"tester","api_key_hash":"sha256:...","allowed_channels":["tradition"],"allowed_products":["stella"],"allowed_packs":["fxd-ndf-cutoff-fixing"],"allowed_entrypoints":["find","query","ask","objects_get","objects_content","objects_dependencies","trace"],"allowed_output_modes":["*"],"active_flag":true}
+</code></pre>
+<p>Caller profiles are runtime access control, not KB authoring content.</p>
+<h3 id="415-tracesjsonl">4.15 <code>traces/*.jsonl</code></h3>
+<p>Trace files are append-only runtime audit logs. They do not live under a release because traces are produced by runtime use of the active or requested release.</p>
+<p>Trace may include:</p>
+<ul>
+<li><code>trace_id</code></li>
+<li><code>entrypoint</code></li>
+<li><code>query_plan</code></li>
+<li><code>resolved_scope</code></li>
+<li><code>candidate_uris</code></li>
+<li><code>selected_uris</code></li>
+<li><code>l2_read_uris</code></li>
+<li><code>refusal_reason</code></li>
+<li><code>release_id</code></li>
+<li><code>tool_steps</code></li>
+<li><code>grounding_map</code></li>
+<li><code>context_hash</code></li>
+<li><code>status</code></li>
+</ul>
+<p>Trace is proof of service behavior, not new truth.</p>
+<h2 id="5-index-layer-standard">5. Index layer standard</h2>
+<h3 id="51-what-the-index-may-read">5.1 What the index may read</h3>
+<p>Index builder may read only:</p>
+<ul>
+<li><code>release-manifest.json</code></li>
+<li><code>scopes.jsonl</code></li>
+<li><code>object-manifest.jsonl</code></li>
+<li><code>navigation/object-cards.jsonl</code></li>
+<li><code>navigation/l0-l1-views.jsonl</code></li>
+<li><code>navigation/aliases.jsonl</code></li>
+<li><code>navigation/confusables.jsonl</code></li>
+<li><code>dependencies/*.jsonl</code> when building graph-aware indexes</li>
+</ul>
+<p>Index builder must not read:</p>
+<ul>
+<li>raw <code>kb/</code> files</li>
+<li>candidate packs</li>
+<li>raw evidence</li>
+<li>raw review notes</li>
+<li>report body as truth</li>
+<li>LLM output as truth</li>
+<li>traces as truth</li>
+</ul>
+<h3 id="52-index-artifactsopensearch-docsjsonl">5.2 <code>index-artifacts/opensearch-docs.jsonl</code></h3>
+<p>Portable search docs should be JSONL with one document per object:</p>
+<pre><code class="language-json">{
+  "uri": "rts://...",
+  "release_id": "rel-2026-05-06-photo-fxd-ndf-cutoff",
+  "channel": "tradition",
+  "product": "stella",
+  "pack": "fxd-ndf-cutoff-fixing",
+  "domain": "cutoff-fixing",
+  "object_type": "rule",
+  "object_id": "rule_fxd_ndf_primary_rate_source",
+  "target_path": "fxd.ndf.fixing.primaryRateSource",
+  "source_anchors": [],
+  "searchable_text": "Primary rate source lookup reverse pair fallback ...",
+  "card_text": "Primary rate source comes from shared cutoff lookup.",
+  "l0_text": "Primary rate source and source page come from shared cutoff lookup.",
+  "l1_text": "Primary rate source lookup ...",
+  "view_role": "navigation_not_truth",
+  "content_hash": "sha256:..."
+}
+</code></pre>
+<p>Contract:</p>
+<ul>
+<li>Every search doc must point back to an object manifest entry.</li>
+<li>Search score is never truth confidence.</li>
+<li>Search doc may repeat text from card/L0/L1, but may not add new rule assertions.</li>
+</ul>
+<h3 id="53-lucene-index">5.3 Lucene index</h3>
+<p>Local Lucene files under <code>index-artifacts/lucene/</code> are generated binary artifacts. They may be absent, stale, or rebuilt.</p>
+<p>The current Java index uses fields equivalent to:</p>
+<pre><code class="language-text">uri
+release_id
+channel
+product
+pack
+domain
+object_type
+object_id
+target_path
+source_anchor
+business_terms
+searchable_text
+card_text
+l0_text
+l1_text
+</code></pre>
+<p>Lucene search must filter by <code>release_id</code>, <code>channel</code>, <code>product</code>, <code>pack</code>, and <code>domain</code> before returning candidates.</p>
+<h2 id="6-layer-contracts">6. Layer contracts</h2>
+<h3 id="61-kb-runtime-projection">6.1 KB -&gt; Runtime Projection</h3>
+<p>Publisher input:</p>
+<ul>
+<li>signed or explicitly accepted KB pack</li>
+<li>pack metadata</li>
+<li>rule / lookup / helper YAML</li>
+<li>evidence index</li>
+<li>review index</li>
+<li>allowed report summaries</li>
+</ul>
+<p>Publisher output:</p>
+<ul>
+<li>immutable release package</li>
+<li>L2 runtime JSON objects</li>
+<li>object manifest and content refs</li>
+<li>navigation views</li>
+<li>dependency and field binding views</li>
+<li>governance access refs and summaries</li>
+<li>caller profiles or permission seed</li>
+<li>optional index export</li>
+</ul>
+<p>Publisher must:</p>
+<ol>
+<li>Reject pack if required object files are missing.</li>
+<li>Reject pack if required dependency objects are absent.</li>
+<li>Reject pack if target coverage conflict is unresolved.</li>
+<li>Reject pack if signoff state is insufficient for default service truth.</li>
+<li>Generate stable URIs.</li>
+<li>Generate release id and manifest.</li>
+<li>Write L2 JSON first.</li>
+<li>Compute <code>sha256:</code> hash over exact UTF-8 L2 JSON content.</li>
+<li>Write object manifest with matching content hashes.</li>
+<li>Write navigation, dependency, governance and permission files.</li>
+<li>Validate projection before activation.</li>
+</ol>
+<h3 id="62-runtime-projection-index-layer">6.2 Runtime Projection -&gt; Index Layer</h3>
+<p>Index builder input:</p>
+<ul>
+<li>projection manifest</li>
+<li>object manifest</li>
+<li>object cards</li>
+<li>L0/L1 views</li>
+<li>aliases and confusables</li>
+<li>dependency edges and field bindings when needed</li>
+</ul>
+<p>Index builder output:</p>
+<ul>
+<li>Lucene or OpenSearch documents</li>
+<li>deterministic lookup maps</li>
+<li>dependency adjacency maps</li>
+</ul>
+<p>Index builder must:</p>
+<ul>
+<li>preserve release and scope filters</li>
+<li>keep navigation-only role labels</li>
+<li>keep object URI back pointers</li>
+<li>remain rebuildable from projection</li>
+<li>avoid direct KB reads</li>
+</ul>
+<h3 id="63-index-layer-query-service">6.3 Index Layer -&gt; Query Service</h3>
+<p>Query service flow:</p>
+<pre><code class="language-text">load active release
+  -&gt; validate manifest
+  -&gt; parse or receive scope
+  -&gt; check caller permission
+  -&gt; deterministic lookup by URI/object id/target path/source anchor
+  -&gt; scoped search over card/L0/L1/index docs
+  -&gt; select candidate
+  -&gt; read object manifest entry
+  -&gt; read L2 content and verify hash
+  -&gt; traverse allowed dependencies
+  -&gt; assemble answer
+  -&gt; validate grounding
+  -&gt; append trace
+</code></pre>
+<p>Query service must refuse or degrade when:</p>
+<ul>
+<li>scope is unclear</li>
+<li>caller is unauthorized</li>
+<li>active release is missing</li>
+<li>manifest is invalid</li>
+<li>schema version is unsupported</li>
+<li>only card/L0/L1/search hit exists but L2 is missing</li>
+<li>dependency points to unreleased object</li>
+<li>governance material is requested without permission</li>
+<li>only semantic similarity exists without structured object match</li>
+</ul>
+<h2 id="7-generation-standard-for-next-packs">7. Generation standard for next packs</h2>
+<p>When generating a new KB and projection, follow this order exactly.</p>
+<h3 id="step-1-choose-identity-and-scope">Step 1: choose identity and scope</h3>
+<p>Decide:</p>
+<pre><code class="language-text">canonical_pack_id
+channel
+product
+pack
+domain
+canonical_revision
+release_id
+</code></pre>
+<p>Use these identifiers consistently across KB, projection and index.</p>
+<h3 id="step-2-generate-kb-pack">Step 2: generate KB pack</h3>
+<p>Produce:</p>
+<pre><code class="language-text">metadata.yaml
+README.md
+rules/*.yaml
+lookups/*.yaml
+helpers/*.yaml
+evidence/evidence-index.yaml
+review/review-index.yaml
+reports/extraction-report.md
+reports/review-checklist.md
+reports/closure-check.md
+</code></pre>
+<p>Minimum quality gate:</p>
+<ul>
+<li>all object IDs are stable and unique inside the pack</li>
+<li>every rule has inputs, logic, target, dependencies and examples</li>
+<li>every lookup has inputs, logic, outputs and examples</li>
+<li>every helper has inputs, logic, outputs and examples</li>
+<li>evidence index references object IDs</li>
+<li>review index records status, open questions and production gate</li>
+<li>reports do not carry the only copy of rule truth</li>
+</ul>
+<h3 id="step-3-run-kb-validation">Step 3: run KB validation</h3>
+<p>Validation should check:</p>
+<ul>
+<li>YAML parse success</li>
+<li>required fields by object type</li>
+<li>dependency IDs exist</li>
+<li>target path duplicates</li>
+<li>source anchors present</li>
+<li>status and signoff state are allowed</li>
+<li>evidence/review references point to existing object IDs</li>
+</ul>
+<h3 id="step-4-publish-runtime-projection">Step 4: publish runtime projection</h3>
+<p>Generate:</p>
+<pre><code class="language-text">active-release.json
+release-manifest.json
+scopes.jsonl
+object-manifest.jsonl
+l2/rules/*.json
+l2/lookups/*.json
+l2/helpers/*.json
+navigation/object-cards.jsonl
+navigation/l0-l1-views.jsonl
+navigation/aliases.jsonl
+navigation/confusables.jsonl
+dependencies/dependency-edges.jsonl
+dependencies/field-bindings.jsonl
+governance/governance-access-refs.jsonl
+governance/evidence-summaries/*.json
+governance/review-summaries/*.json
+governance/report-summaries/*.json
+caller-profiles.jsonl
+</code></pre>
+<p>Projection generation rules:</p>
+<ul>
+<li>L2 objects keep structured logic, not only prose.</li>
+<li>Object cards and L0/L1 are generated from L2/KB and marked navigation-only.</li>
+<li>Governance summaries are permissioned summaries, not raw evidence dumps.</li>
+<li>Dependencies are explicit graph edges, not inferred at query time.</li>
+<li>Field bindings are generated when source/target/output explanation is needed.</li>
+<li>Content hashes are computed after final JSON serialization and stored in manifest/content refs.</li>
+</ul>
+<h3 id="step-5-validate-runtime-projection">Step 5: validate runtime projection</h3>
+<p>Projection validation must reject:</p>
+<ul>
+<li>unsupported <code>projection_schema_version</code></li>
+<li>activation state not <code>active</code> or <code>released</code></li>
+<li>nonzero <code>blocking_issues_count</code></li>
+<li>duplicate object URI</li>
+<li>object not <code>released</code></li>
+<li>object scope not active</li>
+<li>duplicate target rule in same scope</li>
+<li>missing content ref</li>
+<li>content hash mismatch</li>
+<li>missing L2 file</li>
+<li>L2 path outside <code>l2/</code></li>
+<li>missing object card</li>
+<li>missing navigation view</li>
+<li>missing governance access ref</li>
+<li>governance summary ref without summary file</li>
+<li>required dependency to unreleased object</li>
+<li>field binding to unreleased object</li>
+</ul>
+<h3 id="step-6-build-index-layer">Step 6: build index layer</h3>
+<p>Generate or rebuild:</p>
+<pre><code class="language-text">index-artifacts/opensearch-docs.jsonl
+index-artifacts/lucene/
+</code></pre>
+<p>Index quality gate:</p>
+<ul>
+<li>every index doc points to a released object URI</li>
+<li>every index doc carries release and scope fields</li>
+<li>search text comes from card/L0/L1/object identity only</li>
+<li>target path and object id are boosted or deterministically searchable</li>
+<li>no index document includes raw KB-only notes or unauthorized governance details</li>
+</ul>
+<h3 id="step-7-smoke-test-service-reads">Step 7: smoke test service reads</h3>
+<p>Minimum smoke tests:</p>
+<pre><code class="language-text">load active release
+find object by business query
+get object envelope
+read object L2
+read dependencies
+run query
+read trace
+</code></pre>
+<p>The success condition is not merely "search returns something"; success requires L2 read, hash validation and trace.</p>
+<h2 id="8-format-decisions">8. Format decisions</h2>
+<p>Use these formats unless a confirmed doc changes the standard:</p>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Format</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KB metadata</td>
+<td>YAML</td>
+<td>authorable, structured, diffable</td>
+</tr>
+<tr>
+<td>KB rule / lookup / helper</td>
+<td>YAML</td>
+<td>structured but easy for AI/reviewer maintenance</td>
+</tr>
+<tr>
+<td>KB evidence/review indexes</td>
+<td>YAML</td>
+<td>governance relationships and source locators</td>
+</tr>
+<tr>
+<td>KB reports</td>
+<td>Markdown</td>
+<td>narrative review and closure notes</td>
+</tr>
+<tr>
+<td>Large lookup/source tables</td>
+<td>CSV/TSV under <code>attachments/</code></td>
+<td>table-native and diffable</td>
+</tr>
+<tr>
+<td>runtime manifest/scope/object/navigation/dependency/governance</td>
+<td>JSON/JSONL</td>
+<td>service-parseable, schema-validatable, streamable</td>
+</tr>
+<tr>
+<td>L2 runtime objects</td>
+<td>JSON</td>
+<td>exact hash, stable service parse, structured truth</td>
+</tr>
+<tr>
+<td>index export</td>
+<td>JSONL</td>
+<td>portable search-document export</td>
+</tr>
+<tr>
+<td>local Lucene</td>
+<td>binary generated files</td>
+<td>implementation artifact, rebuildable</td>
+</tr>
+<tr>
+<td>HTML/PDF/dashboard</td>
+<td>presentation only</td>
+<td>never truth source</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-role-labels">9. Role labels</h2>
+<p>New projection artifacts should standardize role labels:</p>
+<pre><code class="language-text">truth_role: l2_fact
+truth_role: authorized_governance_summary
+truth_role: dependency_fact
+view_role: navigation_not_truth
+view_role: search_only
+view_role: presentation_only
+</code></pre>
+<p>Default interpretation:</p>
+<ul>
+<li><code>l2_fact</code> can support factual claims.</li>
+<li><code>dependency_fact</code> can support relationship and impact claims, subject to traversal purpose and permission.</li>
+<li><code>authorized_governance_summary</code> can support evidence/review/risk claims when caller is authorized.</li>
+<li><code>navigation_not_truth</code> can locate candidates but cannot support final factual claims alone.</li>
+<li><code>search_only</code> can rank candidates but cannot support final factual claims alone.</li>
+<li><code>presentation_only</code> is never consumed as service truth.</li>
+</ul>
+<h2 id="10-compatibility-with-current-repository">10. Compatibility with current repository</h2>
+<p>Current files already implement most of this standard:</p>
+<ul>
+<li><code>kb/tradition-to-stella-fxd-ndf-cutoff-fixing-split/</code> demonstrates the KB pack shape.</li>
+<li><code>sample-projection/runtime-store/releases/rel-2026-05-06-photo-fxd-ndf-cutoff/</code> demonstrates the runtime projection shape.</li>
+<li><code>src/main/java/com/rts/store/FileSystemProjectionStore.java</code> is the current admission and load boundary.</li>
+<li><code>src/main/java/com/rts/store/LocalFileContentStore.java</code> enforces local L2 path and hash checks.</li>
+<li><code>src/main/java/com/rts/index/LuceneIndexService.java</code> demonstrates index derivation from object manifest, object card and L0/L1.</li>
+<li><code>src/main/java/com/rts/query/QueryService.java</code> demonstrates active release, scope, permission, candidate, L2, dependency and trace flow.</li>
+</ul>
+<p>Known compatibility note:</p>
+<ul>
+<li>Some existing KB YAML files do not yet declare <code>schema_version</code> or <code>object_type</code>. They remain valid historical samples, but new generated KB packs should include those fields.</li>
+<li>Some existing L2 JSON files may not yet declare <code>truth_role</code>. New projection releases should add it.</li>
+</ul>
+<h2 id="11-the-shortest-standard">11. The shortest standard</h2>
+<p>If a future agent only remembers one version, use this:</p>
+<pre><code class="language-text">KB:
+  YAML/Markdown authoring pack.
+  Owns full governed truth formation.
+  Main objects are rules/lookups/helpers; governance side files are evidence/review/reports.
+
+Runtime projection:
+  JSON/JSONL immutable release package.
+  Owns approved truth publication.
+  L2 is fact body; manifest/scope/object manifest gate access; navigation finds; dependency explains; governance is permissioned.
+
+Index layer:
+  Generated, rebuildable, navigation-only.
+  Reads projection, never raw KB.
+  Helps find objects, then query must return to L2 and trace the read.
+</code></pre>
+      </div>
+    </details>
+  </main>
+  <script src="../../assets/app.js"></script>
+</body>
+</html>

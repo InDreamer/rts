@@ -13,22 +13,25 @@
       <a class="nav-link" href="index.html">首页</a>
 <a class="nav-link active" href="start-here.html">项目概览</a>
 <a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
+<a class="nav-link" href="kb-authoring-snapshot-runtime-final-choice.html">落地契约</a>
+<a class="nav-link" href="company-migration-workbench.html">迁移工作包</a>
 <a class="nav-link" href="library.html">来源文档</a>
 <a class="nav-link" href="glossary.html">术语表</a>
+<a class="nav-link" href="implementation-notes.html">实现备注</a>
     </nav>
   </header>
   <main>
     <section class="page-hero">
       <p class="kicker">RTS 项目介绍</p>
       <h1>项目概览</h1>
-      <p>RTS 将分散的转换规则整理成结构化 KB，发布为 runtime projection，并借助内置 AI 分析，为服务、平台和外部 agent 提供可查询、可解释的规则能力。</p>
+      <p>RTS 将分散的转换规则整理成结构化 KB，经 canonical snapshot 签核冻结后发布为 runtime projection，并借助内置 AI 分析，为服务、平台和外部 agent 提供可查询、可解释的规则能力。</p>
     </section>
 
     <section class="orientation-panel">
       <div>
         <p class="kicker">解决什么问题</p>
         <h2>规则散落、难以证明、难以安全消费。</h2>
-        <p>在报文转换场景里，同一条规则可能散在业务文档、Java/XSLT、Excel mapping、lookup table、样例和 review 记录里。RTS 将这些材料整理成 KB，发布为 runtime projection，并在同一服务边界内提供确定性查询和内置 LLM 分析。</p>
+        <p>在报文转换场景里，同一条规则可能散在业务文档、Java/XSLT、Excel mapping、lookup table、样例和 review 记录里。RTS 将这些材料先收进 source intake，再整理成 KB、冻结成 snapshot、发布成 runtime projection，并在同一服务边界内提供确定性查询和内置 LLM 分析。</p>
       </div>
       <div class="mini-matrix">
         <article>
@@ -37,7 +40,7 @@
         </article>
         <article>
           <span>建设</span>
-          <strong>KB 沉淀规则、证据和 review</strong>
+          <strong>KB 沉淀规则、证据和 review，snapshot 冻结签核语义</strong>
         </article>
         <article>
           <span>交付</span>
@@ -49,8 +52,8 @@
     <section class="architecture-map">
       <div class="layer source">
         <span>01</span>
-        <h2>源材料 <small>Source Material</small></h2>
-        <p>业务文档、Java/XSLT、Excel mapping、lookup table、样例和澄清记录。</p>
+        <h2>Source Intake <small>Source Material</small></h2>
+        <p>业务文档、Java/XSLT、Excel mapping、lookup table、样例、locator、hash 和权限记录。</p>
       </div>
       <div class="layer govern">
         <span>02</span>
@@ -59,26 +62,26 @@
       </div>
       <div class="layer projection">
         <span>03</span>
-        <h2>运行时投影 <small>Runtime Projection</small></h2>
-        <p>已批准内容的运行包：release manifest、scope registry、object manifest、cards、L2、dependency。</p>
+        <h2>签核快照 <small>Canonical Snapshot</small></h2>
+        <p>把 validated KB 规范化成 JSON/JSONL，冻结 object semantics、hash、review decision 和 signoff。</p>
       </div>
       <div class="layer service">
         <span>04</span>
-        <h2>服务读取 <small>Service Read</small></h2>
-        <p>查询、索引、API、影响分析、内部 LLM 和外部 agent 都通过 projection 读取规则。</p>
+        <h2>运行时投影 <small>Runtime Projection</small></h2>
+        <p>已批准内容的运行包：release manifest、scope registry、object manifest、cards、L2、dependency。</p>
       </div>
       <div class="layer consume">
         <span>05</span>
-        <h2>复盘与演进 <small>Trace / Feedback</small></h2>
-        <p>调用 trace、review feedback 和新裁决回到治理流程，再发布新 projection。</p>
+        <h2>服务读取与派生输出 <small>Service / Derived</small></h2>
+        <p>查询、索引、HTML、LLM context、内部 LLM 和外部 agent 都从 projection 或服务工具派生读取。</p>
       </div>
     </section>
 
     <section class="architecture-legend">
       <div>
         <p class="kicker">KB 与投影的分工</p>
-        <h2>KB 保留完整知识上下文，runtime projection 提供运行时视图。</h2>
-        <p>KB 不是给人看的长文档集合，projection 也不是简单摘要。两者都是机器优先结构，只是承担的职责不同。</p>
+        <h2>KB 保留完整知识上下文，snapshot 负责签核冻结，runtime projection 提供运行时视图。</h2>
+        <p>KB 不是给人看的长文档集合，projection 也不是简单摘要。它们都是机器优先结构，中间由 snapshot 固定签核语义和可复现 hash。</p>
       </div>
       <div class="legend-grid">
         <article class="ok">
@@ -86,8 +89,8 @@
           <p>source、evidence、review、ambiguity、adjudication、signoff 和 lineage。</p>
         </article>
         <article class="warn">
-          <strong>Projection 关注"服务如何读取"</strong>
-          <p>release、scope、object manifest、L2、cards、dependency、governance summary 和 trace。</p>
+          <strong>Snapshot/Projection 关注"如何签核和服务读取"</strong>
+          <p>snapshot hash、signoff、release、scope、object manifest、L2、cards、dependency、governance summary 和 trace。</p>
         </article>
       </div>
     </section>
@@ -148,6 +151,7 @@
           <thead><tr><th>内容</th><th>主要用途</th><th>介绍时怎么说</th></tr></thead>
           <tbody>
             <tr><td>KB canonical objects</td><td>保存完整规则和治理上下文</td><td>这是规则知识资产本体</td></tr>
+            <tr><td>Canonical snapshot</td><td>冻结签核语义、对象 hash 和人工确认</td><td>这是发布前的签核证明</td></tr>
             <tr><td>Runtime projection</td><td>发布给服务读取的运行包</td><td>这是已批准规则的服务视图</td></tr>
             <tr><td>L2 runtime object</td><td>保存服务可读的结构化规则事实</td><td>回答事实时要回到这里</td></tr>
             <tr><td>Object card / L0 / L1</td><td>帮助搜索、导航和消歧</td><td>它是入口，不是最终规则正文</td></tr>
@@ -174,8 +178,8 @@
         <p>可以关注：规则来源能否追溯、发布版本是否清楚、后续能否支撑查询、审计、影响分析和自动化。</p>
       </div>
       <div class="tab-panel" data-tab-panel="developer">
-        <h3>关键结构是 KB 到 runtime projection 的分层。</h3>
-        <p>可以关注：manifest、scope、object manifest、L2 runtime object、object card、dependency、governance summary 和 trace。</p>
+        <h3>关键结构是 source、KB、snapshot 到 runtime projection 的分层。</h3>
+        <p>可以关注：source manifest、KB YAML、snapshot hash、release manifest、scope、object manifest、L2 runtime object、object card、dependency、governance summary 和 trace。</p>
       </div>
       <div class="tab-panel" data-tab-panel="agent">
         <h3>内置 LLM 是核心服务能力，但规则权威留在 KB 和 projection。</h3>
@@ -183,7 +187,7 @@
       </div>
       <div class="tab-panel" data-tab-panel="reviewer">
         <h3>重点是证据、歧义和裁决能否留存。</h3>
-        <p>KB 里要记录 source、evidence、review、open question、adjudication 和 signoff；projection 只发布运行时需要的视图。</p>
+        <p>KB 里要记录 source、evidence、review、open question 和 adjudication；snapshot 固定 signoff；projection 只发布运行时需要的视图。</p>
       </div>
     </section>
 
@@ -192,6 +196,7 @@
       <a href="docs/confirmed/project-alignment-summary-zh.html">项目总纲</a>
 <a href="docs/confirmed/kb-to-index-projection-contract-zh.html">Projection Contract</a>
 <a href="docs/confirmed/runtime-projection-product-guide-zh.html">Runtime Projection 产品说明</a>
+<a href="implementation-notes.html">实现备注</a>
     </section>
 
   </main>

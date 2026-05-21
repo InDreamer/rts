@@ -1,0 +1,31 @@
+schema_version: kb-pack-v1
+pack:
+  id: "{pack_id}"
+  name: "{workflow_name}"
+  status: candidate
+  version: "0.1.0"
+  canonical_revision: "{source_revision_or_capture_id}"
+source_bundle:
+  id: "{source_bundle_id}"
+  manifest: "../../sources/{source_bundle_id}/source-manifest.yaml"
+scope:
+  source_system: "{source_system}"
+  target_system: "{target_system}"
+  product_scope: "{product_scope}"
+  domain: "{workflow_domain}"
+  target_area: []
+objects:
+  rules: 0
+  lookups: 0
+  helpers: 0
+indexes:
+  evidence_index: evidence/evidence-index.yaml
+  review_index: review/review-index.yaml
+  extraction_report: reports/extraction-report.md
+  review_checklist: reports/review-checklist.md
+  closure_check: reports/closure-check.md
+release_eligibility:
+  intended_tier: demo
+  blocking_issues_count: 0
+  open_questions_count: 0
+modeling_decisions: []

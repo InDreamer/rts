@@ -139,7 +139,7 @@
         <strong>字段、边界和原始措辞以此为准</strong>
       </summary>
       <div class="markdown-body">
-        <h1 id="ai-first-format-follow-up-notes">AI-first Format Follow-up Notes<a class="headerlink" href="#ai-first-format-follow-up-notes" title="Permanent link">#</a></h1>
+<h1 id="ai-first-format-follow-up-notes">AI-first Format Follow-up Notes<a class="headerlink" href="#ai-first-format-follow-up-notes" title="Permanent link">#</a></h1>
 <blockquote>
 <p>状态：conversation follow-up note
 创建日期：2026-05-15
@@ -636,12 +636,14 @@ LLM context envelope 负责 per-request truth packaging。
 <li>HTML 应由 projection 或 analysis output 派生，不回流成 truth source。</li>
 </ul>
 <h2 id="14">14. 最终建议<a class="headerlink" href="#14" title="Permanent link">#</a></h2>
+<p>截至 2026-05-21，正式生成链路已由 <code>docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md</code> 固定为 source intake bundle -&gt; structured KB authoring package -&gt; canonical signoff snapshot -&gt; runtime projection release package -&gt; derived index / HTML / LLM context outputs。本文只保留对 <code>LLM Input Context Envelope</code> 的澄清；凡是本文早期三层表达与 final contract 不一致时，以 confirmed final contract 为准。</p>
 <p>当前项目格式路线是对的：</p>
-<pre><code class="language-text">KB YAML/Markdown
-  -&gt; runtime projection JSON/JSONL
-  -&gt; query/index/service gate
-  -&gt; per-request LLM input context envelope
-  -&gt; managed answer / scenario report / HTML presentation
+<pre><code class="language-text">Source intake YAML manifest + source refs
+  -&gt; KB YAML/Markdown authoring package
+  -&gt; canonical JSON/JSONL signoff snapshot
+  -&gt; runtime projection JSON/JSONL service release
+  -&gt; derived index / HTML / per-request LLM input context envelope
+  -&gt; managed answer / scenario report / presentation output
 </code></pre>
 <p>后续不建议大规模改格式。</p>
 <p>更应该做的是：</p>

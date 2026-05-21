@@ -1,0 +1,14 @@
+schema_version: evidence-index-v1
+pack_id: "{pack_id}"
+evidence:
+  - evidence_id: "{evidence_id}"
+    evidence_type: source_locator
+    object_refs:
+      - "{object_id}"
+    source_refs:
+      - source_id: "{source_id}"
+    locator_summary: "{short_locator_summary}"
+    quote_or_summary: "{short_behavior_summary_no_long_source_excerpt}"
+    confidence: medium
+    permission_state: allowed
+    redaction_state: not_required

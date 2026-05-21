@@ -10,6 +10,11 @@ documents:
   layer: 1
   parent: null
   summary: coding-agent document index and active development navigation for RTS
+- path: skills/AGENTS.md
+  role: agent
+  layer: 2
+  parent: AGENTS.md
+  summary: local navigation and safety rules for portable RTS source-to-KB skills
 - path: docs/INDEX.md
   role: entry
   layer: 1
@@ -36,6 +41,12 @@ documents:
   layer: 2
   parent: docs/INDEX.md
   summary: follow-up clarifications for AI-readable KB/projection format boundaries
+- path: docs/company-computer-kb-workflow-checklist-zh.md
+  role: leaf
+  layer: 2
+  parent: docs/INDEX.md
+  summary: company-computer checklist for running source profiling, KB pack generation,
+    KB review, and user-question handoff against restricted corporate workflow source
 - path: docs/confirmed/README.md
   role: domain
   layer: 2
@@ -57,6 +68,24 @@ documents:
   layer: 3
   parent: docs/confirmed/README.md
   summary: KB-to-index runtime projection contract
+- path: docs/confirmed/kb-runtime-index-layer-standard-zh.md
+  role: leaf
+  layer: 3
+  parent: docs/confirmed/README.md
+  summary: concrete KB, runtime projection, and index layer generation standard,
+    file format contract, publication order, and rejection checks
+- path: docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md
+  role: leaf
+  layer: 3
+  parent: docs/confirmed/README.md
+  summary: final executable source-to-KB-to-runtime projection contract, including
+    required file trees, publisher outputs, and rejection gates
+- path: docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md
+  role: leaf
+  layer: 3
+  parent: docs/confirmed/README.md
+  summary: skill and agent pipeline plan for converting full workflow source assets
+    into source profiles, KB packs, review questions, snapshots, and runtime skeletons
 - path: docs/confirmed/runtime-projection-product-guide-zh.md
   role: leaf
   layer: 3

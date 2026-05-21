@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation Notes | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="start-here.html">项目概览</a>
+      <a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
+      <a class="nav-link" href="kb-authoring-snapshot-runtime-final-choice.html">落地契约</a>
+      <a class="nav-link" href="company-migration-workbench.html">迁移工作包</a>
+      <a class="nav-link" href="library.html">来源文档</a>
+      <a class="nav-link" href="glossary.html">术语表</a>
+      <a class="nav-link active" href="implementation-notes.html">实现备注</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <p class="kicker">Implementation Notes</p>
+      <h1>本次文档整理的解释、取舍和待确认项。</h1>
+      <p>这个页面记录本次整理过程中对规格的解释方式。它不是 RTS confirmed baseline；字段契约、读写边界和发布规则仍以 confirmed Markdown 文档为准。</p>
+    </section>
+
+    <section class="story-panel">
+      <div class="section-heading compact">
+        <p class="kicker">Design Decisions</p>
+        <h2>设计决策</h2>
+      </div>
+      <div class="flow-line">
+        <article>
+          <span>01</span>
+          <h3>采用五层主链路</h3>
+          <p>所有入口统一为 source intake -> structured KB -> canonical signoff snapshot -> runtime projection -> derived outputs。旧的 KB/runtime/index 三层表达保留为子链路，不再作为完整生成路线。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>保留长 leaf 文档</h3>
+          <p>`kb-runtime-index-layer-standard-zh.md` 和 final contract 很长，但它们分别覆盖单一标准面和单一最终契约面。当前只处理校验警告，不为压行数强拆文档。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>HTML 是展示层</h3>
+          <p>HTML 输出用于阅读、导航和核对，不进入 truth 链。搜索索引和页面摘要只指向来源，不承担 service truth。</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>Implementation notes 独立</h3>
+          <p>本页记录本次整理的解释和开放问题，不加入 `docs/catalog.yaml`，避免被 future agent 当作 confirmed authority。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="warning-panel">
+      <div class="section-heading compact">
+        <p class="kicker">Deviations</p>
+        <h2>有意偏离或补充</h2>
+      </div>
+      <div class="decision-grid">
+        <article>
+          <h2>没有把所有历史 HTML 重生成</h2>
+          <p>当前站点是静态 HTML 与 Markdown 转换页混合形态，没有统一生成脚本。本次只同步活跃入口页、来源库、搜索索引和新增 notes，避免误改历史展示页。</p>
+        </article>
+        <article>
+          <h2>未把 notes 写入 confirmed docs</h2>
+          <p>用户要求的是实现备注，不是新的系统契约。因此本页作为交付说明留在 `html/`，不覆盖 confirmed Markdown。</p>
+        </article>
+        <article>
+          <h2>只清理 active 口径</h2>
+          <p>`docs/archive/` 仍保留历史措辞。archive 的职责是考古，不参与 active baseline，因此没有为了统一新口径改写历史材料。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="choice-panel">
+      <div class="section-heading compact">
+        <p class="kicker">Tradeoffs</p>
+        <h2>取舍</h2>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr><th>选择</th><th>没有选什么</th><th>原因</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>按 confirmed final contract 统一口径</td><td>重新设计文档树</td><td>当前 PD-3 校验已经 0 error，问题主要是入口措辞和展示面滞后。</td></tr>
+            <tr><td>把 snapshot 写进读者主线</td><td>继续只说 KB -> projection</td><td>新生产包必须通过 canonical signoff snapshot；省略它会误导 publisher 和 review 流程。</td></tr>
+            <tr><td>保留 demo/skeleton 边界</td><td>把 runtime skeleton 描述成可生产服务真相</td><td>deterministic publisher、canonical hash、signoff 和 smoke test 完成前不能宣称 production service truth。</td></tr>
+            <tr><td>用现有 HTML 风格补页</td><td>重做视觉系统</td><td>用户关注的是口径统一和最终 HTML 输出，现有样式足够承载本次 notes。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="story-panel">
+      <div class="section-heading compact">
+        <p class="kicker">Open Questions</p>
+        <h2>待确认项</h2>
+      </div>
+      <div class="flow-line">
+        <article>
+          <span>01</span>
+          <h3>Publisher 实现时间</h3>
+          <p>canonical snapshot publisher、production provenance gate 和 write-once release gate 仍是实现待办，不在本次文档清理中补代码。</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>公司电脑 source 权限</h3>
+          <p>真实 source scanning、DB/Excel/XSLT/Java/UT 读取权限需要在公司电脑上确认。</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Production actor 标识</h3>
+          <p>demo snapshot 可使用 role/process identity；production signoff 需要真实 actor 或批准 workflow identity。</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h3>HTML 自动生成策略</h3>
+          <p>当前没有统一 HTML 生成脚本。后续如果 HTML 会频繁发布，建议补一个从 catalog/Markdown 生成来源页和搜索索引的脚本。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="source-strip">
+      <p class="kicker">Source Documents</p>
+      <a href="docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.html">最终落地契约</a>
+      <a href="docs/confirmed/kb-runtime-index-layer-standard-zh.html">KB / Runtime / Index 标准</a>
+      <a href="docs/confirmed/source-to-kb-skill-pipeline-plan-zh.html">Source-to-KB Skill Pipeline</a>
+      <a href="docs/company-computer-kb-workflow-checklist-zh.html">公司电脑执行清单</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>本页仅记录本次整理的实现备注。正式契约以 confirmed docs 为准。</p>
+  </footer>
+  <script src="assets/search-index.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

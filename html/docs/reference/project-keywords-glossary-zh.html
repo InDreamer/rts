@@ -101,7 +101,7 @@
         </article>
 <article class="chapter-card">
           <h3>Common Confusions</h3>
-          <p>Runtime projection is not canonical source; it is a released service view. L0/L1/card helps find truth; L2 supports final facts. Search result is not truth. LLM answer is not truth.</p>
+          <p>Runtime projection is not canonical source; source bundle is evidence input, not service truth; canonical snapshot freezes signoff truth but unsigned/skeleton snapshot is not default query truth; search result, LLM answer, HTML/report/context envelope are not truth owners.</p>
         </article>
           </div>
         </section>
@@ -134,11 +134,11 @@
 </tr>
 <tr>
 <td>Knowledge Base</td>
-<td>RTS 内部治理知识和已发布 truth material 的统称，不等于普通文档库。</td>
+<td>结构化 KB authoring package；保存 rule、lookup、helper、evidence、review、reports 和进入签核前的 governed working truth，不等于普通文档库。</td>
 </tr>
 <tr>
 <td>canonical truth</td>
-<td>source/evidence/review/human adjudication/signoff 后成立的规则真相。</td>
+<td>source/evidence/review/human adjudication/signoff 后成立，并可通过 canonical snapshot/hash/provenance 证明的规则真相。</td>
 </tr>
 <tr>
 <td>candidate</td>
@@ -168,16 +168,24 @@
 </thead>
 <tbody>
 <tr>
-<td>Truth Layer</td>
-<td>管理 source、candidate、review、signoff、canonical pack。</td>
+<td>Source Intake Bundle</td>
+<td>source locator、revision、hash、permission 和 extraction notes；它是证据入口，不是规则 truth。</td>
 </tr>
 <tr>
-<td>Projection Layer</td>
-<td>把 approved truth 发布成服务运行视图。</td>
+<td>Structured KB Authoring Package</td>
+<td>YAML/Markdown 的 rule、lookup、helper、evidence、review、reports；它是可维护的 governed working truth。</td>
 </tr>
 <tr>
-<td>Retrieval/Index Layer</td>
-<td>帮助定位、导航、搜索、读取 truth；不决定 truth。</td>
+<td>Canonical Signoff Snapshot</td>
+<td>JSON/JSONL 的 write-once signoff freeze；它是 immutable signoff truth。</td>
+</tr>
+<tr>
+<td>Runtime Projection Release</td>
+<td>JSON/JSONL/L2 service release；它是 RTS runtime service 默认读取的 service truth。</td>
+</tr>
+<tr>
+<td>Derived Outputs</td>
+<td>index、HTML、Markdown view、LLM context envelope；它们只派生使用，不拥有 truth。</td>
 </tr>
 <tr>
 <td>Application Layer</td>
@@ -305,9 +313,12 @@
 <h2 id="common-confusions">Common Confusions<a class="headerlink" href="#common-confusions" title="Permanent link">#</a></h2>
 <ul>
 <li>Runtime projection is not canonical source; it is a released service view.</li>
+<li>Source bundle is evidence input, not service truth.</li>
+<li>Canonical snapshot freezes signoff truth, but unsigned/skeleton snapshot is not default query truth.</li>
 <li>L0/L1/card helps find truth; L2 supports final facts.</li>
 <li>Search result is not truth.</li>
 <li>LLM answer is not truth.</li>
+<li>HTML/report/context envelope is derived presentation or packaging, not truth owner.</li>
 <li>Memory can improve convenience, not authority.</li>
 <li>MCP/API/tool mode changes access style, not truth ownership.</li>
 <li>Vector/rerank can reorder candidates only after gates.</li>

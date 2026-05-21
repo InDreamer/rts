@@ -1,0 +1,86 @@
+schema_version: workflow-map-v1
+source_bundle_id: "{source_bundle_id}"
+workflow:
+  id: "{workflow_id}"
+  name: "{workflow_name}"
+  status: profiled
+entrypoints:
+  grpc:
+    status: needs_user_confirmation
+    service_classes: []
+    proto_files: []
+    handlers: []
+classification:
+  status: needs_user_confirmation
+  message_type_rules: []
+input_payload:
+  format: XML
+  business_schema: FpML
+  sample_refs: []
+transformation_flow:
+  - step_id: receive_grpc
+    kind: inbound
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: classify_message
+    kind: classification
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: parse_fpml
+    kind: parse
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: apply_java_rules
+    kind: java
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: apply_enum_or_config
+    kind: enum_or_config
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: apply_xslt
+    kind: xslt
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: apply_db_mapping
+    kind: db_mapping
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: apply_excel_mapping
+    kind: excel_mapping
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: build_scbml
+    kind: output_xml
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+  - step_id: publish_solace
+    kind: outbound
+    status: needs_user_confirmation
+    source_refs: []
+    summary: ""
+field_bindings:
+  - binding_id: "fb-example"
+    status: needs_user_confirmation
+    source_path: "FpML XPath or semantic field"
+    target_path: "SCBML XPath or semantic field"
+    via_steps: []
+    evidence_refs: []
+rule_candidates: []
+lookup_candidates: []
+helper_candidates: []
+fallbacks_and_defaults: []
+error_paths: []
+test_coverage:
+  unit_tests: []
+  integration_tests: []
+open_questions: []

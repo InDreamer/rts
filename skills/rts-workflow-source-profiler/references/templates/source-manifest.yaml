@@ -1,0 +1,38 @@
+schema_version: source-bundle-v1
+source_bundle:
+  id: "{source_bundle_id}"
+  name: "{workflow_name}"
+  status: captured
+  captured_at: "{iso_timestamp}"
+  captured_by: "agent"
+workflow:
+  id: "{workflow_id}"
+  inbound_protocol: grpc
+  upstream_payload: "FpML or specific upstream XML"
+  outbound_protocol: solace
+  downstream_payload: "SCBML or specific downstream XML"
+scope:
+  source_system: "{source_system}"
+  target_system: "{target_system}"
+  product_scope: "{product_scope}"
+  domain: "{workflow_domain}"
+source_revision:
+  repo_root: "{company_source_repo_root}"
+  repo_ref: "{git_commit_or_revision}"
+  capture_time: "{iso_timestamp}"
+hash_profile:
+  algorithm: sha256
+  normalization: raw-bytes-or-declared-normalization
+permissions:
+  classification: internal
+  allowed_purposes:
+    - authoring
+    - review
+    - publisher
+  redaction_required: false
+outputs:
+  source_index: source-index.yaml
+  workflow_map: workflow-map.yaml
+  extraction_notes: extraction-notes.md
+  unresolved_questions: unresolved-questions.yaml
+limitations: []

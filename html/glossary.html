@@ -13,8 +13,11 @@
       <a class="nav-link" href="index.html">首页</a>
 <a class="nav-link" href="start-here.html">项目概览</a>
 <a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
+<a class="nav-link" href="kb-authoring-snapshot-runtime-final-choice.html">落地契约</a>
+<a class="nav-link" href="company-migration-workbench.html">迁移工作包</a>
 <a class="nav-link" href="library.html">来源文档</a>
 <a class="nav-link active" href="glossary.html">术语表</a>
+<a class="nav-link" href="implementation-notes.html">实现备注</a>
     </nav>
   </header>
   <main>
@@ -39,7 +42,17 @@
         <article class="term-card">
           <strong>KB</strong>
           <span>Knowledge Base，业务规则知识库</span>
-          <p>保存规则逻辑、来源证据、review 结论、歧义和 signoff 的完整知识层。</p>
+          <p>保存规则逻辑、来源证据、review 结论和歧义的 YAML/Markdown authoring package，是进入签核前的 governed working truth。</p>
+        </article>
+        <article class="term-card">
+          <strong>Source Intake Bundle</strong>
+          <span>证据入口包</span>
+          <p>保存 source locator、revision、hash、权限和抽取说明。它证明规则从哪里来，但不是 service truth。</p>
+        </article>
+        <article class="term-card">
+          <strong>Canonical Snapshot</strong>
+          <span>签核快照</span>
+          <p>把 validated KB 规范化成 write-once JSON/JSONL，冻结 object semantics、hash、review decision 和 signoff。</p>
         </article>
         <article class="term-card">
           <strong>Rule Pack</strong>
@@ -49,7 +62,7 @@
         <article class="term-card">
           <strong>Runtime Projection</strong>
           <span>运行时投影</span>
-          <p>把已批准的 KB 内容发布成服务可读取的运行包，让查询、索引和后续消费有稳定输入。</p>
+          <p>从 signed snapshot 生成的服务运行包，让查询、索引、MCP/tool mode 和内置 LLM 有稳定输入。</p>
         </article>
         <article class="term-card">
           <strong>Release Manifest</strong>
@@ -80,6 +93,11 @@
           <strong>Index Document</strong>
           <span>索引文档</span>
           <p>从 projection 派生出的搜索和导航视图，负责召回定位，规则权威仍在 L2。</p>
+        </article>
+        <article class="term-card">
+          <strong>Derived Output</strong>
+          <span>派生输出</span>
+          <p>HTML、Markdown view、search index 和 LLM context envelope 等输出，只能从 projection 或授权 governance summary 派生，不拥有 truth。</p>
         </article>
         <article class="term-card">
           <strong>Governance View</strong>

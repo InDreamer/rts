@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>最终落地契约 | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .contract-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, .72fr);
+      gap: 28px;
+      align-items: center;
+      min-height: calc(100vh - 92px);
+      padding: 44px 0 60px;
+    }
+
+    .contract-hero h1 {
+      max-width: 940px;
+      margin: 0;
+      font-size: 4rem;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .contract-hero p {
+      max-width: 840px;
+      color: #33413b;
+      font-size: 1.08rem;
+    }
+
+    .contract-summary {
+      display: grid;
+      gap: 12px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .86);
+      box-shadow: var(--shadow);
+    }
+
+    .contract-summary article,
+    .contract-card,
+    .step-card,
+    .gate-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .contract-summary strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green-dark);
+      font-size: 1rem;
+    }
+
+    .contract-summary p,
+    .contract-card p,
+    .step-card p,
+    .gate-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .contract-preview {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      overflow: hidden;
+    }
+
+    .contract-preview img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .contract-preview figcaption {
+      padding: 12px 16px 14px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+
+    .contract-panel,
+    .layer-panel,
+    .matrix-panel,
+    .publisher-panel,
+    .close-panel {
+      margin: 28px 0;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+
+    .section-lead {
+      max-width: 880px;
+      color: #3d4a44;
+    }
+
+    .flow-board {
+      margin-top: 22px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .flow-board svg {
+      display: block;
+      min-width: 1120px;
+      width: 100%;
+      height: auto;
+    }
+
+    .flow-board rect {
+      stroke: rgba(17, 24, 39, .18);
+      stroke-width: 1.4;
+      rx: 8;
+    }
+
+    .flow-board .source { fill: #f7fafc; }
+    .flow-board .kb { fill: #e7f8f3; }
+    .flow-board .snapshot { fill: #e8f0ff; }
+    .flow-board .runtime { fill: #fff3d6; }
+    .flow-board .derived { fill: #ffe7ed; }
+    .flow-board text {
+      fill: var(--ink);
+      font-family: inherit;
+      letter-spacing: 0;
+    }
+    .flow-board .label {
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .flow-board .small {
+      fill: #52635c;
+      font-size: 12px;
+      font-weight: 740;
+    }
+    .flow-board line,
+    .flow-board path {
+      stroke: var(--green-dark);
+      stroke-width: 2.2;
+      fill: none;
+    }
+    .flow-board marker path {
+      fill: var(--green-dark);
+      stroke: none;
+    }
+
+    .contract-grid,
+    .steps-grid,
+    .gate-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .layers-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .layer-chip {
+      min-height: 152px;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+    }
+
+    .layer-chip span {
+      display: inline-flex;
+      min-width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 950;
+    }
+
+    .layer-chip h3,
+    .contract-card h3,
+    .step-card h3,
+    .gate-card h3 {
+      margin: 12px 0 8px;
+      letter-spacing: 0;
+    }
+
+    .tree-block,
+    .field-block {
+      margin-top: 16px;
+      border: 1px solid rgba(17, 24, 39, .16);
+      border-radius: 8px;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .tree-block header,
+    .field-block header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, .08);
+      color: #e5edf7;
+      font-weight: 850;
+      font-size: .9rem;
+    }
+
+    .tree-block code,
+    .field-block code,
+    .tree-block pre,
+    .field-block pre {
+      color: #dce8ff;
+    }
+
+    .tree-block pre,
+    .field-block pre {
+      margin: 0;
+      padding: 14px;
+      overflow-x: auto;
+      font-size: .84rem;
+      line-height: 1.55;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .table-wrap {
+      margin-top: 18px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    table {
+      width: 100%;
+      min-width: 780px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 12px 13px;
+      border-bottom: 1px solid rgba(17, 24, 39, .1);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--paper-strong);
+      color: var(--ink);
+      font-size: .9rem;
+    }
+
+    td {
+      color: #3d4a44;
+      font-size: .93rem;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .mono-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .mono-list code {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper-strong);
+      color: #1f2937;
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+
+    .close-panel {
+      background: linear-gradient(135deg, rgba(15, 118, 110, .12), rgba(37, 99, 235, .08));
+    }
+
+    .close-panel h2 {
+      max-width: 900px;
+      margin-bottom: 14px;
+    }
+
+    .close-panel p {
+      max-width: 900px;
+      color: #33413b;
+    }
+
+    .source-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    @media (max-width: 1080px) {
+      .contract-hero,
+      .layers-grid,
+      .contract-grid,
+      .steps-grid,
+      .gate-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contract-hero h1 {
+        font-size: 3rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .contract-hero h1 {
+        font-size: 2.55rem;
+      }
+
+      .contract-panel,
+      .layer-panel,
+      .matrix-panel,
+      .publisher-panel,
+      .close-panel {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="start-here.html">项目概览</a>
+      <a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
+      <a class="nav-link active" href="kb-authoring-snapshot-runtime-final-choice.html">落地契约</a>
+      <a class="nav-link" href="company-migration-workbench.html">迁移工作包</a>
+      <a class="nav-link" href="library.html">来源文档</a>
+      <a class="nav-link" href="glossary.html">术语表</a>
+      <a class="nav-link" href="implementation-notes.html">实现备注</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="contract-hero">
+      <div>
+        <p class="kicker">Final Contract · Source / KB / Snapshot / Runtime</p>
+        <h1>最终方案固定为一条可生成、可签核、可服务的文件契约。</h1>
+        <p>后续生成器就按这套结构输出：source 先变成证据入口，规则写进 YAML/Markdown KB，发布前冻结成 canonical JSON/JSONL snapshot，再生成不可变 runtime projection。搜索、HTML 和 LLM context 都只能从已发布内容派生。</p>
+      </div>
+      <aside class="contract-summary" aria-label="最终契约摘要">
+        <figure class="contract-preview">
+          <img src="final-choice-preview.png" alt="RTS 最终落地契约预览">
+          <figcaption>Source、KB、snapshot、runtime projection 和派生层的固定链路。</figcaption>
+        </figure>
+        <article>
+          <strong>下次生成 KB</strong>
+          <p>必须产出 `metadata.yaml`、`rules/*.yaml`、`lookups/*.yaml`、`helpers/*.yaml`、`evidence/`、`review/` 和 `reports/`。</p>
+        </article>
+        <article>
+          <strong>下次发布 projection</strong>
+          <p>必须先有 signed snapshot，再生成 `runtime-store/releases/{release_id}/`，release id 不允许原地覆盖。</p>
+        </article>
+        <article>
+          <strong>服务读取边界</strong>
+          <p>RTS runtime 默认只读 active runtime projection，不读 KB 草稿、source bundle 或 unsigned snapshot。</p>
+        </article>
+      </aside>
+    </section>
+
+    <section class="contract-panel">
+      <p class="kicker">固定链路</p>
+      <h2>五层各自负责一件事，不能互相越界。</h2>
+      <p class="section-lead">这不是“选 JSON 还是 YAML”的问题，而是把写作、证据、签核、服务读取和派生展示分开。每层的文件格式跟职责绑定，后续实现和生成器都按这个契约走。</p>
+
+      <div class="flow-board">
+        <svg viewBox="0 0 1200 300" role="img" aria-labelledby="contract-flow-title contract-flow-desc">
+          <title id="contract-flow-title">RTS source to runtime projection contract</title>
+          <desc id="contract-flow-desc">Source intake becomes structured KB authoring, then canonical signoff snapshot, then runtime projection, then derived index, HTML, and LLM context outputs.</desc>
+          <defs>
+            <marker id="contract-arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L8,3 z"></path>
+            </marker>
+          </defs>
+
+          <rect class="source" x="26" y="72" width="190" height="138"></rect>
+          <text class="label" x="50" y="111">Layer 0</text>
+          <text class="small" x="50" y="140">Source intake</text>
+          <text class="small" x="50" y="164">YAML manifest</text>
+          <text class="small" x="50" y="188">证据入口，不是 truth</text>
+
+          <line x1="216" y1="141" x2="252" y2="141" marker-end="url(#contract-arrow)"></line>
+
+          <rect class="kb" x="252" y="72" width="200" height="138"></rect>
+          <text class="label" x="278" y="111">Layer 1</text>
+          <text class="small" x="278" y="140">Structured KB</text>
+          <text class="small" x="278" y="164">YAML + Markdown</text>
+          <text class="small" x="278" y="188">governed working truth</text>
+
+          <line x1="452" y1="141" x2="488" y2="141" marker-end="url(#contract-arrow)"></line>
+
+          <rect class="snapshot" x="488" y="72" width="220" height="138"></rect>
+          <text class="label" x="514" y="111">Layer 1.5</text>
+          <text class="small" x="514" y="140">Signoff snapshot</text>
+          <text class="small" x="514" y="164">JSON + JSONL</text>
+          <text class="small" x="514" y="188">immutable signoff truth</text>
+
+          <line x1="708" y1="141" x2="744" y2="141" marker-end="url(#contract-arrow)"></line>
+
+          <rect class="runtime" x="744" y="72" width="220" height="138"></rect>
+          <text class="label" x="770" y="111">Layer 2</text>
+          <text class="small" x="770" y="140">Runtime projection</text>
+          <text class="small" x="770" y="164">JSON / JSONL / L2</text>
+          <text class="small" x="770" y="188">service truth</text>
+
+          <line x1="964" y1="141" x2="1000" y2="141" marker-end="url(#contract-arrow)"></line>
+
+          <rect class="derived" x="1000" y="72" width="174" height="138"></rect>
+          <text class="label" x="1024" y="111">Layer 3</text>
+          <text class="small" x="1024" y="140">Derived outputs</text>
+          <text class="small" x="1024" y="164">index / HTML / LLM</text>
+          <text class="small" x="1024" y="188">只能派生</text>
+        </svg>
+      </div>
+
+      <div class="layers-grid">
+        <article class="layer-chip">
+          <span>0</span>
+          <h3>Source</h3>
+          <p>保存 locator、revision、hash、权限和抽取说明，不保存最终规则结论。</p>
+        </article>
+        <article class="layer-chip">
+          <span>1</span>
+          <h3>KB</h3>
+          <p>规则、lookup、helper、evidence、review 的可维护结构化工作区。</p>
+        </article>
+        <article class="layer-chip">
+          <span>1.5</span>
+          <h3>Snapshot</h3>
+          <p>把 KB 规范化成 write-once JSON/JSONL，冻结 hash 和签核。</p>
+        </article>
+        <article class="layer-chip">
+          <span>2</span>
+          <h3>Runtime</h3>
+          <p>服务实际读取的 immutable release package。</p>
+        </article>
+        <article class="layer-chip">
+          <span>3</span>
+          <h3>Derived</h3>
+          <p>索引、HTML、报告和 LLM context，只做定位、展示和装箱。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="matrix-panel">
+      <p class="kicker">生成顺序</p>
+      <h2>从 source 到 projection，每一步都有固定产物。</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>步骤</th><th>必须输出</th><th>拒绝条件</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0. 选择 identity/scope</td><td>`pack_id`、`source_bundle_id`、`scope`、`canonical_revision`</td><td>scope 不唯一；pack id 冲突</td></tr>
+            <tr><td>1. Source intake</td><td>`source-manifest.yaml`、`source-index.yaml`、`extraction-notes.md`</td><td>没有 stable locator、source revision、hash 或权限状态</td></tr>
+            <tr><td>2. Structured KB</td><td>`metadata.yaml`、`rules/*.yaml`、`lookups/*.yaml`、`helpers/*.yaml`、`evidence/`、`review/`、`reports/`</td><td>object id 不稳定；ref 无法解析；scope 冲突</td></tr>
+            <tr><td>3. Snapshot + signoff</td><td>`snapshot-manifest.json`、`objects.jsonl`、`signoff.json`、`projection-map.jsonl`</td><td>hash 不可复现；signoff 未覆盖 projected objects</td></tr>
+            <tr><td>4. Runtime projection</td><td>`runtime-store/releases/{release_id}/...`</td><td>缺 snapshot id/hash/signoff id；release id 已存在；L2 hash 不匹配</td></tr>
+            <tr><td>5. Derived outputs</td><td>`index-artifacts/`、HTML/Markdown views、LLM context items</td><td>派生层新增业务断言；context 缺 uri/hash/role/trace</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="layer-panel">
+      <p class="kicker">Layer 0</p>
+      <h2>Source intake bundle：只做证据入口。</h2>
+      <p class="section-lead">Source 层负责回答“这条规则从哪里来”。它保存 source locator、revision、hash、权限和抽取说明，但不能被 runtime service 当 truth 读取。</p>
+      <div class="tree-block">
+        <header><span>目录必须长这样</span><code>sources/{source_bundle_id}/</code></header>
+        <pre><code>sources/{source_bundle_id}/
+  source-manifest.yaml
+  source-index.yaml
+  extraction-notes.md
+  raw/                         # optional
+  normalized/                  # optional
+  attachments/                 # optional</code></pre>
+      </div>
+      <div class="contract-grid">
+        <article class="contract-card">
+          <h3>`source-manifest.yaml` 必填</h3>
+          <div class="mono-list">
+            <code>schema_version</code><code>source_bundle.id</code><code>captured_at</code><code>scope</code><code>source_revision</code><code>hash_profile</code><code>permissions</code>
+          </div>
+        </article>
+        <article class="contract-card">
+          <h3>`source-index.yaml` 必填</h3>
+          <div class="mono-list">
+            <code>source_id</code><code>source_type</code><code>locator</code><code>content_hash</code><code>permission_state</code><code>redaction_state</code><code>used_by</code>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="layer-panel">
+      <p class="kicker">Layer 1</p>
+      <h2>Structured KB authoring package：规则的工作真相。</h2>
+      <p class="section-lead">KB 用 YAML/Markdown，是因为它要长期被 agent 和 reviewer 维护。它不是最终签核物，但它是进入签核前的 governed working truth。</p>
+      <div class="tree-block">
+        <header><span>KB 包必须长这样</span><code>kb/{pack_id}/</code></header>
+        <pre><code>kb/{pack_id}/
+  metadata.yaml
+  README.md
+  rules/{rule_id}.yaml
+  lookups/{lookup_id}.yaml
+  helpers/{helper_id}.yaml
+  evidence/evidence-index.yaml
+  review/review-index.yaml
+  reports/extraction-report.md
+  reports/review-checklist.md
+  reports/closure-check.md
+  attachments/                 # optional
+  snapshots/                   # generated after validation and signoff</code></pre>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>文件</th><th>固定格式</th><th>必须包含</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>`metadata.yaml`</td><td>YAML</td><td>pack id、status、canonical revision、source bundle、scope、object counts、indexes、release eligibility</td></tr>
+            <tr><td>`rules/*.yaml`</td><td>YAML</td><td>id、object type、status、revision、scope、source anchors、evidence refs、inputs、logic、target、dependencies、examples</td></tr>
+            <tr><td>`lookups/*.yaml`</td><td>YAML + CSV/TSV</td><td>key columns、normalization、return fields、fallback/missing policy、data or attachment ref</td></tr>
+            <tr><td>`helpers/*.yaml`</td><td>YAML</td><td>inputs、outputs、logic pipeline、consumers、dependencies、evidence refs</td></tr>
+            <tr><td>`evidence/evidence-index.yaml`</td><td>YAML</td><td>evidence id、object refs、source refs、locator summary、quote/summary、confidence、permission/redaction state</td></tr>
+            <tr><td>`review/review-index.yaml`</td><td>YAML</td><td>decision id、object refs、decision type、status、question、decision、decided by/at、evidence refs、remaining risk</td></tr>
+            <tr><td>`reports/*.md`</td><td>Markdown</td><td>抽取报告、review checklist、closure check；只能说明，不能保存唯一 truth</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="layer-panel">
+      <p class="kicker">Layer 1.5</p>
+      <h2>Canonical signoff snapshot：发布前的冻结物。</h2>
+      <p class="section-lead">Snapshot 把 YAML/Markdown KB 规范化成 deterministic JSON/JSONL。签核冻结的是对象语义、hash、review decision 和 human confirmation，不是 YAML 的空白和注释。</p>
+      <div class="tree-block">
+        <header><span>Snapshot 必须长这样</span><code>kb/{pack_id}/snapshots/{snapshot_id}/</code></header>
+        <pre><code>kb/{pack_id}/snapshots/{snapshot_id}/
+  snapshot-manifest.json
+  objects.jsonl
+  dependency-edges.jsonl
+  evidence-refs.jsonl
+  review-decisions.jsonl
+  human-confirmation-log.jsonl
+  change-log.jsonl
+  signoff.json
+  projection-map.jsonl</code></pre>
+      </div>
+      <div class="contract-grid">
+        <article class="contract-card">
+          <h3>签核冻结</h3>
+          <div class="mono-list">
+            <code>snapshot_id</code><code>snapshot_hash</code><code>normalization_profile</code><code>object hashes</code><code>signoff_id</code><code>release_tier</code>
+          </div>
+        </article>
+        <article class="contract-card">
+          <h3>证明链</h3>
+          <div class="mono-list">
+            <code>snapshot_object_id</code><code>snapshot_object_hash</code><code>runtime_uri</code><code>runtime_l2_hash</code><code>transform_profile</code>
+          </div>
+        </article>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>文件</th><th>用途</th><th>关键字段</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>`snapshot-manifest.json`</td><td>本次冻结的总入口</td><td>snapshot id、release tier、pack id、source bundle id、canonical revision、hash profile、snapshot hash</td></tr>
+            <tr><td>`objects.jsonl`</td><td>规范化对象语义</td><td>object id/type、scope、revision、content hash、source anchors、evidence refs、dependencies、release eligibility</td></tr>
+            <tr><td>`review-decisions.jsonl`</td><td>审核和裁决记录</td><td>decision id、status、question、decision、decided by/at、policy version、remaining risk</td></tr>
+            <tr><td>`human-confirmation-log.jsonl`</td><td>影响 truth 的人工确认</td><td>confirmation id、prompt hash、confirmed value、confirmed by/at、object revision</td></tr>
+            <tr><td>`signoff.json`</td><td>签核结果</td><td>signoff id、snapshot hash、signed off by、included object hashes、production gate</td></tr>
+            <tr><td>`projection-map.jsonl`</td><td>snapshot 到 L2 的映射证明</td><td>snapshot object hash、runtime uri、runtime L2 hash、transform profile</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="layer-panel">
+      <p class="kicker">Layer 2</p>
+      <h2>Runtime projection release：服务读取的真相包。</h2>
+      <p class="section-lead">Runtime projection 从 signed snapshot 生成，release 目录不可原地覆盖。API、MCP、managed LLM、index builder 都应该通过它或服务工具读取事实。</p>
+      <div class="tree-block">
+        <header><span>Runtime projection 必须长这样</span><code>runtime-store/releases/{release_id}/</code></header>
+        <pre><code>runtime-store/
+  active-release.json
+  releases/{release_id}/
+    release-manifest.json
+    scopes.jsonl
+    object-manifest.jsonl
+    caller-profiles.jsonl
+    l2/rules/{rule_id}.json
+    l2/lookups/{lookup_id}.json
+    l2/helpers/{helper_id}.json
+    navigation/object-cards.jsonl
+    navigation/l0-l1-views.jsonl
+    navigation/aliases.jsonl
+    navigation/confusables.jsonl
+    dependencies/dependency-edges.jsonl
+    dependencies/field-bindings.jsonl
+    governance/governance-access-refs.jsonl
+    governance/evidence-summaries/{object_or_pack_id}.json
+    governance/review-summaries/{object_or_pack_id}.json
+    governance/report-summaries/{pack_or_release_id}.json
+    index-artifacts/opensearch-docs.jsonl
+    index-artifacts/lucene/</code></pre>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>文件</th><th>必须包含</th><th>边界</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>`release-manifest.json`</td><td>release id、schema version、release tier、canonical snapshot id/hash、signoff id、content hash summary</td><td>production 不能只写 canonical revision</td></tr>
+            <tr><td>`object-manifest.jsonl`</td><td>uri、object id/type、scope id、L2 ref/hash、snapshot object id/hash、truth role、governance refs</td><td>每个 L2 都要能回溯 snapshot</td></tr>
+            <tr><td>`l2/**/*.json`</td><td>release id、uri、object id/type、truth role、snapshot refs、content hash、logic/lookup/helper body、dependencies</td><td>不能新增 snapshot 没有的业务断言</td></tr>
+            <tr><td>`navigation/*.jsonl`</td><td>object cards、L0/L1、aliases、confusables</td><td>只能定位和摘要，不能单独当 truth</td></tr>
+            <tr><td>`governance/*`</td><td>release-bound、permission-filtered、traceable summaries</td><td>不能旁路读取 raw evidence/review/chat</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="layer-panel">
+      <p class="kicker">Layer 3</p>
+      <h2>Index、HTML、LLM context 都是派生层。</h2>
+      <div class="contract-grid">
+        <article class="contract-card">
+          <h3>Index layer</h3>
+          <p>输出 `opensearch-docs.jsonl` 和 `lucene/`，用于定位、召回、排序。它可以删除重建，不能保存 projection 外的业务断言。</p>
+          <div class="mono-list"><code>uri</code><code>object_id</code><code>scope</code><code>aliases</code><code>target_paths</code><code>release_id</code><code>content_hash</code></div>
+        </article>
+        <article class="contract-card">
+          <h3>LLM context envelope</h3>
+          <p>请求时由 service 从 projection 和授权治理摘要装箱。每个 context item 都必须带来源、hash、角色、权限和 trace。</p>
+          <div class="mono-list"><code>source_uri</code><code>content_hash</code><code>truth_role</code><code>truth_eligible</code><code>permission_purpose</code><code>trace_id</code></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="publisher-panel">
+      <p class="kicker">Publisher contract</p>
+      <h2>唯一允许跨层发布的是 publisher 流程。</h2>
+      <div class="steps-grid">
+        <article class="step-card">
+          <h3>Publisher 输入</h3>
+          <div class="mono-list">
+            <code>source-manifest.yaml</code><code>source-index.yaml</code><code>metadata.yaml</code><code>rules/*.yaml</code><code>lookups/*.yaml</code><code>helpers/*.yaml</code><code>evidence-index.yaml</code><code>review-index.yaml</code>
+          </div>
+        </article>
+        <article class="step-card">
+          <h3>Publisher 输出</h3>
+          <div class="mono-list">
+            <code>snapshot-manifest.json</code><code>objects.jsonl</code><code>signoff.json</code><code>projection-map.jsonl</code><code>release-manifest.json</code><code>object-manifest.jsonl</code><code>l2/**/*.json</code><code>index-artifacts/</code>
+          </div>
+        </article>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Publisher 必须做</th><th>检查点</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Schema validation</td><td>source、KB、snapshot、runtime projection 都要过结构校验</td></tr>
+            <tr><td>Reference resolution</td><td>source locator、evidence refs、review refs、dependency refs 全部可解析</td></tr>
+            <tr><td>Canonical normalization</td><td>按 `rts-canonical-json-v1` 生成 deterministic JSON/hash</td></tr>
+            <tr><td>Signoff coverage</td><td>`signoff.json` 覆盖所有 projected objects</td></tr>
+            <tr><td>Projection proof</td><td>`projection-map.jsonl` 覆盖所有 runtime L2 objects</td></tr>
+            <tr><td>Smoke tests</td><td>证明服务能读 L2、验证 hash、走 dependency、组装 answer、写 trace</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="publisher-panel">
+      <p class="kicker">发布门槛</p>
+      <h2>production release 的拒绝条件要写死。</h2>
+      <div class="gate-grid">
+        <article class="gate-card">
+          <h3>必须接受前满足</h3>
+          <p>source locator 可追溯；KB 校验通过；snapshot hash 可复现；signoff 覆盖所有 projected objects；blocking issues 为 0；runtime manifest 引用 snapshot id/hash/signoff id；projection-map 覆盖所有 L2；service smoke test 通过。</p>
+        </article>
+        <article class="gate-card">
+          <h3>必须拒绝</h3>
+          <p>process-only signoff、缺 source bundle、缺 snapshot id/hash、缺 signoff id、unsigned snapshot、L2 无 snapshot object hash、runtime 内容无声明 transform 就偏离 snapshot、服务默认读 KB 或 source。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="matrix-panel">
+      <p class="kicker">文件选择</p>
+      <h2>每类文件用什么格式已经固定。</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>文件/目录</th><th>固定格式</th><th>原因</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>`sources/**/source-manifest.yaml`、`source-index.yaml`</td><td>YAML</td><td>locator、权限、revision 需要易读易审</td></tr>
+            <tr><td>`kb/**/metadata.yaml`、`rules/*.yaml`、`lookups/*.yaml`、`helpers/*.yaml`</td><td>YAML</td><td>规则 authoring 需要稳定 diff 和可维护结构</td></tr>
+            <tr><td>`kb/**/reports/*.md`</td><td>Markdown</td><td>报告和 checklist 是说明层，不是 truth owner</td></tr>
+            <tr><td>`kb/**/snapshots/*.json`、`*.jsonl`</td><td>JSON / JSONL</td><td>签核、hash、line records 需要 deterministic schema</td></tr>
+            <tr><td>`runtime-store/**/manifest.json`、`l2/**/*.json`</td><td>JSON</td><td>service truth object 和 manifest</td></tr>
+            <tr><td>`runtime-store/**/navigation/*.jsonl`、`dependencies/*.jsonl`</td><td>JSONL</td><td>图、视图、索引 friendly</td></tr>
+            <tr><td>`index-artifacts/opensearch-docs.jsonl`、`lucene/`</td><td>JSONL / Lucene binary</td><td>可移植搜索导出和本地重建索引</td></tr>
+            <tr><td>`html/*.html`</td><td>HTML</td><td>只做展示和 review，不进入 truth 链</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="close-panel">
+      <p class="kicker">最终口径</p>
+      <h2>以后从 source 到 runtime projection，就按这份契约生成。</h2>
+      <p>Source 固定成证据入口；KB 固定成 YAML/Markdown authoring package；snapshot 固定成 write-once canonical JSON/JSONL signoff freeze；runtime projection 固定成 immutable JSON/JSONL service release；index、HTML、LLM context 只从 projection 或 release-bound governance summaries 派生。</p>
+      <p class="source-note">详细契约见：<a href="docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.html">KB Authoring / Snapshot / Runtime Projection Final Contract</a></p>
+      <p class="source-note">本次整理过程中的解释和待确认项见：<a href="implementation-notes.html">Implementation Notes</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>本页是 confirmed final contract 的可视化说明。它固定生成器输出和发布边界；具体 schema 仍以 confirmed 文档和后续 validator 为准。</p>
+  </footer>
+</body>
+</html>

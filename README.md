@@ -33,6 +33,11 @@ AI 在 RTS 中不是 answer organizer，而是建立在 governed truth 之上的
 - `docs/confirmed/project-alignment-summary-zh.md` — 当前双核心总纲；先读它来统一 RTS 最终服务愿景、多源真相治理、AI-first review、人工裁决和服务边界。
 - `docs/confirmed/system-constitution-v1.md` — 系统底线；定义 truth-first、受控分析与表达、证据优先和不确定性处理原则。
 - `docs/confirmed/kb-to-index-projection-contract-zh.md` — KB 到索引/查询层的运行时投影契约，以及稳定原子能力面的边界。
+- `docs/confirmed/kb-runtime-index-layer-standard-zh.md` — KB、runtime projection、index layer 子链路的生成标准；固定三者的文件长相、格式、发布顺序、层间契约和拒收条件。
+- `docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md` — source intake、KB authoring、canonical signoff snapshot、runtime projection、derived views 的最终落地契约；固定生成顺序、目录长相、必填字段、publisher 输出和拒收门槛。
+- `docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md` — 从完整公司 workflow source 到 source profile、KB pack、KB review、用户问题、snapshot/runtime skeleton 的 skill 体系设计。
+- `docs/company-computer-kb-workflow-checklist-zh.md` — 上传到公司电脑后的执行清单；用于处理 gRPC/FpML 到 Solace/SCBML 的受限公司 source。
+- `skills/` — 随 repo 携带的 portable RTS skills：source profiling、source profile 到 KB pack、KB pack review。公司电脑上处理受限 source 前先读 `skills/AGENTS.md`。
 - `docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 managed mode、外部 tool mode、runtime projection access boundary 和场景接入的当前对齐结论。
 - `docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划。
 - `docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md` — Day1：建立受控真相源原子能力面和第一版 managed LLM harness。
@@ -56,6 +61,8 @@ AI 在 RTS 中不是 answer organizer，而是建立在 governed truth 之上的
 - 主名称统一使用 RTS；TRS 只作为历史名称或别名出现。
 - RTS 的核心叙事是“双核心规则真相服务”。
 - 核心对象必须一起理解：规则、规则包、证据链。
+- 新规则包生成链路固定为：source intake bundle -> structured KB authoring package -> canonical signoff snapshot -> immutable runtime projection -> derived index / HTML / LLM context outputs。
+- KB 是 YAML/Markdown authoring truth；canonical snapshot 是 JSON/JSONL signoff truth；runtime projection 是 service truth；index、HTML、LLM context envelope 只能派生使用，不能拥有 truth。
 - AI 应尽可能完成受控分析、结构校验、跨 source 验证、歧义发现、冲突简化、依赖解释、影响候选、测试候选和 reviewer-friendly 表达。
 - 人工 review 结论是冲突和歧义的最终裁决。
 - candidate-only / human decision 是权威边界，不是 AI 能力上限。

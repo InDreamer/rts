@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>迁移工作包 | RTS</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .migration-hero {
+      min-height: calc(100vh - 92px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(330px, .72fr);
+      gap: 28px;
+      align-items: center;
+      padding: 44px 0 60px;
+    }
+
+    .migration-hero h1 {
+      max-width: 940px;
+      margin: 0;
+      font-size: 4rem;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .migration-hero p {
+      max-width: 840px;
+      color: #33413b;
+      font-size: 1.08rem;
+    }
+
+    .ready-box,
+    .migration-panel,
+    .skill-panel,
+    .checklist-panel,
+    .pending-panel {
+      margin: 28px 0;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      box-shadow: var(--shadow);
+    }
+
+    .ready-box {
+      display: grid;
+      gap: 12px;
+      background: rgba(255, 255, 255, .88);
+    }
+
+    .ready-box article,
+    .skill-card,
+    .step-card,
+    .pending-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .ready-box strong,
+    .skill-card strong,
+    .step-card strong,
+    .pending-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green-dark);
+    }
+
+    .ready-box p,
+    .skill-card p,
+    .step-card p,
+    .pending-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .pipeline article {
+      min-height: 148px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .pipeline span {
+      display: inline-flex;
+      min-width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 950;
+    }
+
+    .pipeline h3 {
+      margin: 12px 0 8px;
+      letter-spacing: 0;
+    }
+
+    .skill-grid,
+    .step-grid,
+    .pending-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .step-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mono-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .mono-list code {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper-strong);
+      color: #1f2937;
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+
+    .prompt-block {
+      margin-top: 18px;
+      border: 1px solid rgba(17, 24, 39, .16);
+      border-radius: 8px;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .prompt-block header {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, .08);
+      color: #e5edf7;
+      font-weight: 850;
+    }
+
+    .prompt-block pre {
+      margin: 0;
+      padding: 14px;
+      overflow-x: auto;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #dce8ff;
+      font-size: .86rem;
+      line-height: 1.55;
+    }
+
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 1080px) {
+      .migration-hero,
+      .pipeline,
+      .skill-grid,
+      .step-grid,
+      .pending-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .migration-hero h1 {
+        font-size: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">RTS</a>
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="start-here.html">项目概览</a>
+      <a class="nav-link" href="kb-runtime-projection-design.html">真实规则包</a>
+      <a class="nav-link" href="kb-authoring-snapshot-runtime-final-choice.html">落地契约</a>
+      <a class="nav-link active" href="company-migration-workbench.html">迁移工作包</a>
+      <a class="nav-link" href="library.html">来源文档</a>
+      <a class="nav-link" href="glossary.html">术语表</a>
+      <a class="nav-link" href="implementation-notes.html">实现备注</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="migration-hero">
+      <div>
+        <p class="kicker">Portable Package · Company Computer Ready</p>
+        <h1>把 RTS repo 上传到公司电脑后，就按这条链路继续。</h1>
+        <p>这个工作包包含最终契约、三个 portable skills、公司电脑执行清单和 pending 边界。第一阶段只做到 source profile、KB pack、KB review、ask-user-questions，不直接宣称 production runtime projection。</p>
+      </div>
+      <aside class="ready-box" aria-label="迁移准备状态">
+        <article>
+          <strong>已经固定</strong>
+          <p>source -> structured KB -> canonical snapshot -> runtime projection -> derived outputs 的文件契约。</p>
+        </article>
+        <article>
+          <strong>已经随 repo 携带</strong>
+          <p>`skills/rts-workflow-source-profiler`、`rts-source-to-kb-pack`、`rts-kb-pack-review`。</p>
+        </article>
+        <article>
+          <strong>公司电脑再做</strong>
+          <p>真实 source 扫描、DB/Excel/XSLT/Java/UT 解析、KB 生成、用户确认。</p>
+        </article>
+      </aside>
+    </section>
+
+    <section class="migration-panel">
+      <p class="kicker">Pipeline</p>
+      <h2>第一阶段先收敛 source 和 KB，不抢跑 production projection。</h2>
+      <div class="pipeline">
+        <article><span>0</span><h3>契约</h3><p>固定文件树、字段、publisher 输出和拒收门槛。</p></article>
+        <article><span>1</span><h3>Source profile</h3><p>只读公司 source，生成 `sources/{source_bundle_id}/`。</p></article>
+        <article><span>2</span><h3>KB pack</h3><p>从 source profile 生成 `kb/{pack_id}/`。</p></article>
+        <article><span>3</span><h3>KB review</h3><p>独立检查完整度、证据、歧义和用户问题。</p></article>
+        <article><span>4</span><h3>Skeleton only</h3><p>snapshot/runtime 先 skeleton，production publisher 等 deterministic scripts。</p></article>
+      </div>
+    </section>
+
+    <section class="skill-panel">
+      <p class="kicker">Portable Skills</p>
+      <h2>三个 skill 都不假设公司代码结构。</h2>
+      <div class="skill-grid">
+        <article class="skill-card">
+          <strong>rts-workflow-source-profiler</strong>
+          <p>从完整 workflow source 生成 source manifest、source index、workflow map、extraction notes 和 unresolved questions。</p>
+          <div class="mono-list"><code>source-manifest.yaml</code><code>source-index.yaml</code><code>workflow-map.yaml</code></div>
+        </article>
+        <article class="skill-card">
+          <strong>rts-source-to-kb-pack</strong>
+          <p>基于 source profile 生成 metadata、rules、lookups、helpers、evidence、review 和 reports。</p>
+          <div class="mono-list"><code>rules/*.yaml</code><code>lookups/*.yaml</code><code>helpers/*.yaml</code></div>
+        </article>
+        <article class="skill-card">
+          <strong>rts-kb-pack-review</strong>
+          <p>独立 review KB pack，输出 review-index、closure-check 和 ask-user-questions。</p>
+          <div class="mono-list"><code>review-index.yaml</code><code>closure-check.md</code><code>ask-user-questions.json</code></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="checklist-panel">
+      <p class="kicker">Company Computer Steps</p>
+      <h2>上传后按清单跑，不需要重新翻对话。</h2>
+      <div class="step-grid">
+        <article class="step-card"><strong>先读</strong><p>`docs/company-computer-kb-workflow-checklist-zh.md`，再读 `skills/AGENTS.md`。</p></article>
+        <article class="step-card"><strong>第一条 prompt</strong><p>让 agent 使用 `skills/rts-workflow-source-profiler`，只读公司 source，输出 `sources/{source_bundle_id}/`。</p></article>
+        <article class="step-card"><strong>不要做</strong><p>不改公司源码、不复制长源码、不绕过 source profile、不直接 production signoff。</p></article>
+        <article class="step-card"><strong>完成线</strong><p>第一阶段以 KB review 和 blocking user questions 闭合为止。</p></article>
+      </div>
+      <div class="prompt-block">
+        <header>公司电脑第一条 agent prompt</header>
+        <pre><code>Use the skill at rts/skills/rts-workflow-source-profiler.
+
+Read the company source repo as read-only. Build an RTS source profile for the full workflow from gRPC inbound FpML/XML to Solace outbound SCBML/XML.
+
+Do not modify source code. Do not copy long source excerpts. Produce only locators, hashes, summaries, workflow map, evidence candidates, and unresolved questions.
+
+Output under rts/sources/{source_bundle_id}/:
+- source-manifest.yaml
+- source-index.yaml
+- workflow-map.yaml
+- extraction-notes.md
+- unresolved-questions.yaml</code></pre>
+      </div>
+    </section>
+
+    <section class="pending-panel">
+      <p class="kicker">Pending Boundary</p>
+      <h2>snapshot/runtime publisher 先不冒充 production。</h2>
+      <div class="pending-grid">
+        <article class="pending-card"><strong>Snapshot skeleton</strong><p>可以在 KB review blocking 为 0 后生成 skeleton，但 production signoff 需要 canonical hash 和 validator。</p></article>
+        <article class="pending-card"><strong>Runtime skeleton</strong><p>可以从 snapshot skeleton 生成 demo runtime 形状，但不能宣布 production service truth，也不能默认供业务调用方消费。</p></article>
+        <article class="pending-card"><strong>Production publisher</strong><p>必须等待 deterministic validator、hash、signoff、projection-map 和 service smoke tests。</p></article>
+      </div>
+      <div class="link-row">
+        <a class="button primary" href="kb-authoring-snapshot-runtime-final-choice.html">看最终契约</a>
+        <a class="button secondary" href="docs/company-computer-kb-workflow-checklist-zh.html">公司电脑清单</a>
+        <a class="button secondary" href="docs/confirmed/source-to-kb-skill-pipeline-plan-zh.html">Skill 体系文档</a>
+        <a class="button secondary" href="skills/AGENTS.html">Portable Skills</a>
+        <a class="button secondary" href="implementation-notes.html">实现备注</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>本页是 RTS 可迁移工作包入口。真实公司 source 扫描和 KB 生成必须在公司电脑上执行。</p>
+  </footer>
+</body>
+</html>

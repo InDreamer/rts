@@ -98,6 +98,48 @@ window.RTS_DOCS = [
     "url": "docs/confirmed/runtime-projection-product-guide-zh.html"
   },
   {
+    "title": "KB / Runtime / Index Layer Standard",
+    "path": "docs/confirmed/kb-runtime-index-layer-standard-zh.md",
+    "category": "已确认基线",
+    "summary": "固定 KB、runtime projection、index layer 的文件长相、格式、生成顺序、层间契约和拒收条件。",
+    "url": "docs/confirmed/kb-runtime-index-layer-standard-zh.html"
+  },
+  {
+    "title": "最终落地契约",
+    "path": "docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md",
+    "category": "已确认基线",
+    "summary": "固定 source、KB、canonical snapshot、runtime projection 和派生层的目录、字段、生成顺序和拒收门槛。",
+    "url": "docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.html"
+  },
+  {
+    "title": "迁移工作包",
+    "path": "docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md",
+    "category": "已确认基线",
+    "summary": "从完整公司 workflow source 到 source profile、KB pack、KB review、用户问题和 skeleton publisher 的 portable skill 体系。",
+    "url": "docs/confirmed/source-to-kb-skill-pipeline-plan-zh.html"
+  },
+  {
+    "title": "公司电脑执行清单",
+    "path": "docs/company-computer-kb-workflow-checklist-zh.md",
+    "category": "运行与调用",
+    "summary": "上传到公司电脑后，从受限公司 source 生成 source profile、KB pack、KB review 和用户问题的执行清单。",
+    "url": "docs/company-computer-kb-workflow-checklist-zh.html"
+  },
+  {
+    "title": "Portable RTS Skills",
+    "path": "skills/AGENTS.md",
+    "category": "Portable Skills",
+    "summary": "repo-bundled portable RTS skills 的使用顺序和安全边界。",
+    "url": "skills/AGENTS.html"
+  },
+  {
+    "title": "Implementation Notes",
+    "path": "html/implementation-notes.html",
+    "category": "交付备注",
+    "summary": "本次文档整理的设计决策、偏离、取舍和待确认项；不作为 confirmed baseline。",
+    "url": "implementation-notes.html"
+  },
+  {
     "title": "Java 服务运行手册",
     "path": "docs/java-service-runbook-zh.md",
     "category": "运行与调用",

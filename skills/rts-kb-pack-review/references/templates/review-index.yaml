@@ -1,0 +1,18 @@
+schema_version: review-index-v1
+pack_id: "{pack_id}"
+decisions: []
+findings:
+  - finding_id: "finding-example-001"
+    severity: blocking
+    category: workflow_closure
+    object_refs: []
+    source_refs: []
+    finding: "Workflow closure from gRPC inbound to Solace outbound is incomplete."
+    required_action: "Add missing source refs or mark the missing segment as unresolved."
+    blocks:
+      - snapshot
+summary:
+  blocking_count: 1
+  important_count: 0
+  clarifying_count: 0
+  readiness: not_ready_blocking_questions

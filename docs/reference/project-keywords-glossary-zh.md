@@ -14,6 +14,8 @@ source_of_truth:
   - docs/confirmed/project-alignment-summary-zh.md
   - docs/confirmed/system-constitution-v1.md
   - docs/confirmed/kb-to-index-projection-contract-zh.md
+  - docs/confirmed/kb-runtime-index-layer-standard-zh.md
+  - docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md
 -->
 
 # RTS Project Glossary
@@ -26,8 +28,8 @@ source_of_truth:
 | Term | Meaning |
 |---|---|
 | RTS service | 面向规则真相读取、解释、影响分析、测试规划和流程接入的服务边界。 |
-| Knowledge Base | RTS 内部治理知识和已发布 truth material 的统称，不等于普通文档库。 |
-| canonical truth | source/evidence/review/human adjudication/signoff 后成立的规则真相。 |
+| Knowledge Base | 结构化 KB authoring package；保存 rule、lookup、helper、evidence、review、reports 和进入签核前的 governed working truth，不等于普通文档库。 |
+| canonical truth | source/evidence/review/human adjudication/signoff 后成立，并可通过 canonical snapshot/hash/provenance 证明的规则真相。 |
 | candidate | 候选规则、候选解释、候选影响面或候选测试点，等待 review。 |
 | open question / ambiguity | 尚未裁决的问题或歧义，不能被模型硬答成事实。 |
 | LLM answer | 模型组织出的回答，不自动等于 truth。 |
@@ -37,10 +39,12 @@ source_of_truth:
 
 | Term | Meaning |
 |---|---|
-| Truth Layer | 管理 source、candidate、review、signoff、canonical pack。 |
-| Projection Layer | 把 approved truth 发布成服务运行视图。 |
-| Retrieval/Index Layer | 帮助定位、导航、搜索、读取 truth；不决定 truth。 |
-| Application Layer | API、MCP、Q&A、pipeline、workbench、agent tools 等消费入口。 |
+| Source Intake Bundle | source locator、revision、hash、permission 和 extraction notes；它是证据入口，不是规则 truth。 |
+| Structured KB Authoring Package | YAML/Markdown 的 rule、lookup、helper、evidence、review、reports；它是可维护的 governed working truth。 |
+| Canonical Signoff Snapshot | JSON/JSONL 的 write-once signoff freeze；它是 immutable signoff truth。 |
+| Runtime Projection Release | JSON/JSONL/L2 service release；它是 RTS runtime service 默认读取的 service truth。 |
+| Derived Outputs | index、HTML、Markdown view、LLM context envelope；它们只派生使用，不拥有 truth。 |
+| Application Layer | API、MCP、Q&A、pipeline、workbench、agent tools 等消费入口，必须通过 RTS service boundary 使用 truth。 |
 
 ## Object Terms
 
@@ -53,6 +57,8 @@ source_of_truth:
 | evidence | 支撑候选或规则判断的来源材料。 |
 | review | 对 candidate/rule/evidence 的人工或流程审核记录。 |
 | signoff | 使 truth 可以发布的最终治理动作。 |
+| source bundle | 公司 source 或样例 source 的受控证据包，只保存 locator、hash、summary 和权限状态。 |
+| canonical snapshot | KB 发布前的 deterministic JSON/JSONL 冻结物。 |
 
 ## Projection And Retrieval Terms
 
@@ -81,9 +87,12 @@ source_of_truth:
 ## Common Confusions
 
 - Runtime projection is not canonical source; it is a released service view.
+- Source bundle is evidence input, not service truth.
+- Canonical snapshot freezes signoff truth, but unsigned/skeleton snapshot is not default query truth.
 - L0/L1/card helps find truth; L2 supports final facts.
 - Search result is not truth.
 - LLM answer is not truth.
+- HTML/report/context envelope is derived presentation or packaging, not truth owner.
 - Memory can improve convenience, not authority.
 - MCP/API/tool mode changes access style, not truth ownership.
 - Vector/rerank can reorder candidates only after gates.
