@@ -6,6 +6,10 @@ signoff_status: unsigned
 revision: 1
 scope:
   inherits: pack
+claim_refs:
+  - "{claim_id}"
+claim_status_used:
+  - supported
 source_anchors:
   - source_id: "{source_id}"
     locator_ref: "../../sources/{source_bundle_id}/source-index.yaml#{source_id}"

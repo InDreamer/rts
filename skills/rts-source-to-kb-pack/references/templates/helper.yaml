@@ -6,6 +6,10 @@ signoff_status: unsigned
 revision: 1
 scope:
   inherits: pack
+claim_refs:
+  - "{claim_id}"
+claim_status_used:
+  - supported
 inputs: []
 outputs: []
 logic:

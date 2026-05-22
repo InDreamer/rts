@@ -1,5 +1,6 @@
 schema_version: source-index-v1
 source_bundle_id: "{source_bundle_id}"
+inventory_role: navigation_and_coverage_not_truth
 items:
   - source_id: "src-grpc-entrypoint-example"
     source_type: java
@@ -14,6 +15,8 @@ items:
     permission_state: allowed
     redaction_state: not_required
     summary: "Receives inbound gRPC message and starts the workflow."
+    claim_refs:
+      - "claim-example-001"
     used_by:
       - "workflow_step:receive_grpc"
   - source_id: "src-xslt-template-example"
@@ -29,6 +32,7 @@ items:
     permission_state: allowed
     redaction_state: not_required
     summary: "Builds downstream XML target structure."
+    claim_refs: []
     used_by:
       - "workflow_step:apply_xslt"
 unavailable_sources: []

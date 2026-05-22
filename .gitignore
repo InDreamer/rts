@@ -1,6 +1,8 @@
 .gradle/
 build/
 target/
+__pycache__/
+*.pyc
 /runtime-store/
 sample-projection/runtime-store/releases/*/lucene/
 sample-projection/runtime-store/releases/*/index-artifacts/lucene/

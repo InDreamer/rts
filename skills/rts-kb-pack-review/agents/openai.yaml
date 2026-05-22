@@ -1,4 +1,4 @@
 interface:
-  display_name: "RTS KB Pack Review"
-  short_description: "Review RTS KB pack and produce user questions"
-  default_prompt: "Review an RTS kb/{pack_id}/ package for format, completeness, workflow closure, evidence coverage, ambiguity, and produce ask-user-questions.json."
+  display_name: "RTS Source-Backed KB Review"
+  short_description: "Review RTS KB draft, claims, coverage, and blocker questions"
+  default_prompt: "Review an RTS kb/{pack_id}/ draft against source inventory and claims.jsonl. Check claim gates, source anchors, anchor laundering, coverage gaps, contradictions, runtime config gaps, and produce ask-user-questions.json plus completion-report.md."

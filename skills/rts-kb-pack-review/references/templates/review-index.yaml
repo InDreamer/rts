@@ -4,13 +4,14 @@ decisions: []
 findings:
   - finding_id: "finding-example-001"
     severity: blocking
-    category: workflow_closure
+    finding_type: coverage_gap
     object_refs: []
+    claim_refs: []
     source_refs: []
     finding: "Workflow closure from gRPC inbound to Solace outbound is incomplete."
     required_action: "Add missing source refs or mark the missing segment as unresolved."
     blocks:
-      - snapshot
+      - mvp_completion
 summary:
   blocking_count: 1
   important_count: 0

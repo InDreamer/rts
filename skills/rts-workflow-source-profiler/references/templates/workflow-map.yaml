@@ -1,9 +1,10 @@
 schema_version: workflow-map-v1
 source_bundle_id: "{source_bundle_id}"
+map_role: coverage_and_navigation_not_truth
 workflow:
   id: "{workflow_id}"
   name: "{workflow_name}"
-  status: profiled
+  status: inventory_captured
 entrypoints:
   grpc:
     status: needs_user_confirmation
@@ -22,51 +23,61 @@ transformation_flow:
     kind: inbound
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: classify_message
     kind: classification
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: parse_fpml
     kind: parse
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: apply_java_rules
     kind: java
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: apply_enum_or_config
     kind: enum_or_config
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: apply_xslt
     kind: xslt
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: apply_db_mapping
     kind: db_mapping
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: apply_excel_mapping
     kind: excel_mapping
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: build_scbml
     kind: output_xml
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
   - step_id: publish_solace
     kind: outbound
     status: needs_user_confirmation
     source_refs: []
+    claim_refs: []
     summary: ""
 field_bindings:
   - binding_id: "fb-example"
@@ -75,6 +86,7 @@ field_bindings:
     target_path: "SCBML XPath or semantic field"
     via_steps: []
     evidence_refs: []
+    claim_refs: []
 rule_candidates: []
 lookup_candidates: []
 helper_candidates: []

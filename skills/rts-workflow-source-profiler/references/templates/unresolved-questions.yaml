@@ -10,7 +10,7 @@ questions:
     suggested_next_step: "Inspect tests or ask domain owner."
     blocks:
       - kb_generation
-      - snapshot
+      - mvp_completion
 status_summary:
   blocking_count: 1
   important_count: 0

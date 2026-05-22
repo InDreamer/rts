@@ -45,4 +45,5 @@
 ## Next Required Review
 
 - Check workflow-map for full gRPC -> Solace closure.
-- Resolve unresolved-questions.yaml before production signoff.
+- Check claims.jsonl for source anchors and claim status gate.
+- Resolve blocking unresolved questions before MVP completion.

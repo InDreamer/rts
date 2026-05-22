@@ -1,4 +1,4 @@
 interface:
-  display_name: "RTS Source To KB Pack"
-  short_description: "Generate RTS KB pack from a source profile"
-  default_prompt: "Generate an RTS kb/{pack_id}/ package from an existing sources/{source_bundle_id}/ workflow profile, preserving evidence and unresolved questions."
+  display_name: "RTS Source-Backed KB Draft"
+  short_description: "Generate RTS KB draft from claims and source anchors"
+  default_prompt: "Generate an RTS kb/{pack_id}/ draft from sources/{source_bundle_id}/ claims.jsonl plus real source anchors. Treat source inventory as navigation only and preserve unsupported or inferred claims as review findings."

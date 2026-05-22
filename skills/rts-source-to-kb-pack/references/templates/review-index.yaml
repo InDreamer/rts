@@ -4,6 +4,8 @@ decisions:
   - decision_id: "{decision_id}"
     object_refs:
       - "{object_id}"
+    claim_refs:
+      - "{claim_id}"
     decision_type: requires_user_confirmation
     status: open
     question_or_conflict: "{question_or_conflict}"
@@ -15,4 +17,13 @@ decisions:
     remaining_risk:
       - "{risk}"
     production_gate: blocked
-findings: []
+findings:
+  - finding_id: "{finding_id}"
+    finding_type: unsupported_claim
+    severity: blocking
+    object_refs: []
+    claim_refs: []
+    source_refs: []
+    status: open
+    description: "{description}"
+    required_action: "{required_action}"

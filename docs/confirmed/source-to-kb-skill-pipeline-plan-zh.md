@@ -3,11 +3,11 @@ role: leaf
 layer: 3
 parent: docs/confirmed/README.md
 children: []
-summary: skill and agent pipeline plan for turning full workflow source assets into RTS source profiles, KB packs, review questions, snapshots, and runtime projection packages
+summary: company-executable source-backed KB draft MVP baseline for turning workflow source assets into source inventory, evidence-backed claims, KB draft, review questions, and completion reports
 read_when:
-  - 需要设计从公司代码库或完整 workflow source 生成 RTS KB pack 的 agent skill 体系
-  - 需要判断哪些步骤应该做成 skill，哪些步骤应该是 deterministic publisher 或 validator
-  - 需要把 gRPC 到 Solace、FpML 到 SCBML 的完整转换 workflow 纳入 KB 生成
+  - 需要设计从公司代码库或完整 workflow source 生成 RTS KB draft 的 MVP agent skill 体系
+  - 需要固定 source inventory / coverage map、claims.jsonl、KB draft、source-backed review 和 blocker questions 的边界
+  - 需要把 gRPC 到 Solace、FpML 到 SCBML 的完整转换 workflow 纳入 source-backed KB 生成
   - 需要规划在公司电脑上处理受限 source 资产前的执行边界
 skip_when:
   - 只需要查看已经生成好的 KB pack
@@ -19,17 +19,34 @@ source_of_truth:
   - docs/confirmed/kb-to-index-projection-contract-zh.md
 -->
 
-# Source to KB Skill Pipeline Plan
+# Source-Backed KB Draft MVP Pipeline Plan
 
-> 状态：confirmed planning baseline
+> 状态：confirmed MVP baseline
 > 日期：2026-05-21
-> 范围：固定 agent skill 体系，用于在公司电脑上从完整 workflow source 生成 `sources/`、`kb/`，并为 snapshot/runtime projection 做准备
-> 当前边界：本地没有公司代码库，因此本文只定义 skill、handoff artifact、验证门槛和公司电脑执行方式；真实 source scanning、KB 生成、测试运行在公司电脑上完成。
-> Portable skill 状态：前三个 skill 已随 repo 放在 `skills/` 下，可以复制到公司电脑后直接按路径使用或安装到本机 Codex skills 目录。
+> 范围：固定公司环境可执行的 source-backed KB draft MVP；本地只定义 docs、skills、contracts、templates、runbook 和验证门槛。
+> 当前边界：真实公司 source 不在本地，因此本文不声称已验证真实 source、准确完整 KB、production snapshot、formal signoff 或 production runtime readiness。
+> Portable skill 状态：前三个 skill 已随 repo 放在 `skills/` 下；本次 MVP 将它们约束为 source inventory / evidence-backed claims / source-backed review 链路。
 
-## 1. 背景和目标 workflow
+## 1. 两个方案的固定边界
 
-目标 workflow 不是单点 cutoff、timestamp 或某个局部字段，而是完整报文转换链路：
+本文同时固定两个层次，但二者不能混用：
+
+| 层次 | 当前最佳实践 / MVP | 未来最终实现 |
+|---|---|---|
+| 目标 | 生成可审核的 source-backed KB draft 和 blocker questions | 生成可发布、可审计、可服务的 truth release |
+| 主链路 | source codebase -> source inventory / coverage map -> evidence-backed claims -> KB draft -> source-backed review -> blocker questions -> completion report | source -> deterministic discovery / parsers / test execution -> source inventory -> evidence-first claim ledger -> governed KB -> validator/adversarial review -> frozen approved artifact -> machine-checkable signoff -> runtime activation/projection -> traced service responses |
+| source map 角色 | 薄导航和覆盖清单，不是 truth | 由 deterministic discovery 生成，带 hash/revision/tool version，仍不是 truth |
+| claims 角色 | 轻量 `claims.jsonl`，只让 eligible claims 进入 KB draft | 结构化 claim ledger，支持 validator、diff、coverage、contradiction search |
+| LLM/skill 角色 | 编排、回源阅读、整理产物、暴露不确定性 | 编排、解释候选、生成 draft；不得绕过 validator/publisher |
+| deterministic 能力 | `rg`、结构化 parser、测试发现、手工 source anchors；只做 bounded evidence extraction | AST/LSP/call graph/XML/XSLT/SQL/Excel parser/test execution/schema validator/hash validator/projection validator |
+| 发布链 | 不做 production snapshot/signoff/runtime projection | frozen artifact、signoff、runtime activation/projection 是发布控制，不重新解释业务 |
+| 成功标准 | unsupported claim rate、incorrect claim rate、coverage gap、review time、blocker quality 比 direct source -> KB 更好 | hash 可复现、activation 可追踪、release 可回滚、service answer 可 trace 到 release/object/evidence |
+
+MVP 不允许宣称未来最终实现已经完成。未来发布链也不允许把 snapshot/signoff/runtime projection 当作新的业务理解阶段。
+
+## 2. MVP 目标
+
+目标 workflow 仍然是完整报文转换链路：
 
 ```text
 gRPC inbound
@@ -40,197 +57,206 @@ gRPC inbound
   -> Solace outbound
 ```
 
-Source 类型包括：
-
-- Java 代码
-- enum
-- XSLT
-- Camel route / processor
-- PostgreSQL schema、SQL、seed/mapping data
-- unit tests / integration tests
-- Excel / CSV mapping
-- 上游 XML 样例，例如 FpML
-- 下游 XML 样例，例如 SCBML
-
-第一目标：
+MVP 公司执行链路固定为：
 
 ```text
-source assets
-  -> source profile
-  -> structured KB pack
-  -> KB review
-  -> user questions
+source codebase
+  -> source inventory / coverage map
+  -> evidence-backed claims
+  -> KB draft
+  -> source-backed review
+  -> blocker questions
+  -> completion report
 ```
 
-第二目标：
+MVP 产物用于生成可审核的 KB draft，不是 production truth。它必须让损失、缺口和不确定性显式可见，而不是把 agent 的中间摘要包装成事实。
+
+## 3. Truth 边界
+
+### 3.1 Source inventory 降权
+
+`sources/{source_bundle_id}/` 是 source inventory / coverage map，不是 source profile truth。它只能回答：
 
 ```text
-validated KB pack
-  -> canonical signoff snapshot skeleton
+读了哪些 source
+source 的类型、locator、revision/hash、权限状态是什么
+发现了哪些 workflow 区域和候选入口
+哪些区域 found / not_found / not_applicable / not_accessible / needs_user_confirmation
+哪些路径被排除以及原因
+哪些 claim_id 引用了这些 source anchors
 ```
 
-第三目标：
+它不能单独支持 KB truth，不能保存最终业务规则，不能保存未验证的端到端行为结论，也不能用来证明“没有 fallback/default/error path”。
+
+### 3.2 claims.jsonl 是硬输入
+
+`sources/{source_bundle_id}/claims.jsonl` 是 KB 生成的硬输入。每条非平凡 KB truth 都必须来自 claim，并且每条进入 KB truth 的 claim 必须有：
 
 ```text
-signed snapshot
-  -> runtime projection skeleton / release package
+claim_id
+claim_type
+status
+subject
+assertion
+source_anchors
+evidence_type
+extraction_method
+confidence
+limits
 ```
 
-不要第一步就追求完整 production runtime projection。没有经过 source profile、KB review 和用户确认的问题，直接生成 runtime projection 会把未确认的误读包装成 service truth。
+允许进入 KB truth 的 claim status 只有：
 
-## 2. 需要的 skill 和非 skill 组件
+```text
+supported
+user_confirmed
+runtime_observed
+```
 
-建议拆成五个能力，其中前三个先做 skill，后两个先做 skill + deterministic scripts/validators。
+以下状态不能进入 KB truth，只能进入 review、warning 或 blocker questions：
 
-| 编号 | 名称 | 类型 | 当前状态 | 目的 |
+```text
+blocked
+unsupported
+inferred
+contradicted
+not_accessible
+```
+
+### 3.3 Source-backed KB
+
+KB generator 必须同时读取真实 source anchors 和 `claims.jsonl`。`source-index.yaml`、`workflow-map.yaml` 或 coverage map 的摘要只能用于导航和覆盖检查，不能作为业务断言证据。
+
+每个 rule / lookup / helper 的非平凡事实必须引用 `claim_refs`，并能通过 claim 回到 source anchor、测试、样例、配置、DB/Excel evidence 或用户确认。
+
+### 3.4 Source-backed review
+
+Review 不是格式检查。Review 必须回源抽查或全查高风险 claims，并检查：
+
+```text
+unsupported claim
+anchor laundering
+coverage gap
+contradiction
+runtime config gap
+negative claim hallucination
+```
+
+`anchor laundering` 指 claim 引用了一个文件或附近代码，但该 anchor 不能证明该断言。`negative claim hallucination` 指仅因为没有搜到就声称不存在 fallback/default/error path。
+
+## 4. MVP 能力拆分
+
+| 编号 | 名称 | 类型 | 当前状态 | MVP 目的 |
 |---|---|---|---|---|
-| 1 | `rts-workflow-source-profiler` | portable repo skill | implemented at `skills/rts-workflow-source-profiler/` | 只分析 source，生成 workflow map 和 source evidence，不生成 KB truth |
-| 2 | `rts-source-to-kb-pack` | portable repo skill | implemented at `skills/rts-source-to-kb-pack/` | 基于 source profile 生成结构化 KB pack |
-| 3 | `rts-kb-pack-review` | portable repo skill | implemented at `skills/rts-kb-pack-review/` | 独立 review KB，生成必须问用户的问题 |
-| 4 | `rts-kb-to-snapshot-publisher` | skill + deterministic publisher/validator | pending | 从 validated KB 生成 canonical signoff snapshot |
-| 5 | `rts-snapshot-to-runtime-projection-publisher` | skill + deterministic publisher/validator | pending | 从 signed snapshot 生成 runtime projection |
+| 1 | `rts-workflow-source-profiler` | portable repo skill | implemented | 生成 source inventory / coverage map 和 `claims.jsonl`，不生成 KB truth |
+| 2 | `rts-source-to-kb-pack` | portable repo skill | implemented | 基于真实 source anchors + supported claims 生成 KB draft |
+| 3 | `rts-kb-pack-review` | portable repo skill | implemented | 做 source-backed review，输出 blocking count、blocker questions 和 completion report |
+| 4 | snapshot publisher | deterministic scripts/validator | out of MVP | 从 validated KB 生成 canonical snapshot |
+| 5 | runtime projection publisher | deterministic scripts/validator | out of MVP | 从 signed artifact 生成 runtime projection |
 
-必须拆开的原因：
-
-- Source profiling 是证据和 workflow 理解，不应该直接创造 KB truth。
-- KB generation 是结构化建模，不应该顺手完成 signoff。
-- KB review 必须独立于 generator，否则容易自证正确。
-- Snapshot 和 runtime projection 涉及 canonical hash、write-once、manifest provenance，不能靠纯 LLM 手写。
-
-## 3. Skill 1：`rts-workflow-source-profiler`
-
-### 3.1 职责
-
-从完整 workflow codebase 中建立 source profile，不生成 KB pack。
-
-必须回答：
+MVP 不包含：
 
 ```text
-gRPC 入口在哪里
-消息类型如何识别
-FpML / upstream XML 如何解析
-Java / Camel / XSLT / DB / Excel / enum 分别参与什么转换
-哪些字段由代码决定
-哪些字段由 XSLT 决定
-哪些字段由 DB mapping 决定
-哪些字段由 Excel 或配置决定
-哪些 fallback/default/error path 存在
-Solace outbound 在哪里构造和发送
-UT/IT 覆盖了哪些规则和场景
-哪些点无法确定，必须问用户
+production snapshot
+formal signoff workflow
+immutable runtime projection
+full AST/LSP/call graph platform
+本地真实 source 验证
+准确完整 KB 或 production readiness 声明
 ```
 
-### 3.2 输入
+## 5. Skill 1：Source Inventory / Coverage Map
 
-用户或公司电脑上的 agent 至少提供：
+### 5.1 职责
 
-```text
-source repo root
-workflow name
-inbound protocol: gRPC
-upstream payload type: FpML or specific XML
-outbound protocol: Solace
-downstream payload type: SCBML or specific XML
-allowed read paths
-forbidden paths, if any
-whether tests may run
-whether DB metadata or sample rows may be read
-```
+`rts-workflow-source-profiler` 保留现有目录名以避免破坏 repo skill 路径，但语义降权为 source inventory / coverage map generator。它不创建 KB truth。
 
-### 3.3 输出
-
-固定输出：
+它必须生成：
 
 ```text
 sources/{source_bundle_id}/
   source-manifest.yaml
   source-index.yaml
   workflow-map.yaml
+  claims.jsonl
   extraction-notes.md
   unresolved-questions.yaml
-  raw/                         # optional; only if allowed
-  normalized/                  # optional; extracted XML/table summaries
+  raw/                         # optional; only if explicitly allowed
+  normalized/                  # optional; only source-derived summaries/tables
 ```
 
-### 3.4 `workflow-map.yaml`
+### 5.2 Source inventory 覆盖项
 
-`workflow-map.yaml` 是 profiler 的核心产物。最小结构：
+每个 workflow 区域必须有明确状态：
 
-```yaml
-schema_version: workflow-map-v1
-workflow:
-  id: grpc-fpml-to-solace-scbml
-  name: gRPC FpML to Solace SCBML transformation
-  status: profiled
-entrypoints:
-  grpc:
-    service_classes: []
-    proto_files: []
-    handlers: []
-classification:
-  message_type_rules: []
-input_payload:
-  format: XML
-  business_schema: FpML
-  sample_refs: []
-transformation_flow:
-  - step_id: receive_grpc
-    kind: inbound
-    source_refs: []
-  - step_id: parse_fpml
-    kind: parse
-    source_refs: []
-  - step_id: apply_java_rules
-    kind: java
-    source_refs: []
-  - step_id: apply_xslt
-    kind: xslt
-    source_refs: []
-  - step_id: apply_db_mapping
-    kind: db_mapping
-    source_refs: []
-  - step_id: build_scbml
-    kind: output_xml
-    source_refs: []
-  - step_id: publish_solace
-    kind: outbound
-    source_refs: []
-field_bindings:
-  - binding_id: TBD
-    source_path: TBD
-    target_path: TBD
-    via_steps: []
-    evidence_refs: []
-rule_candidates: []
-lookup_candidates: []
-helper_candidates: []
-fallbacks_and_defaults: []
-error_paths: []
-test_coverage:
-  unit_tests: []
-  integration_tests: []
-open_questions: []
+```text
+found
+not_found
+not_applicable
+not_accessible
+needs_user_confirmation
 ```
 
-### 3.5 禁止行为
+覆盖项包括：
 
-Profiler 禁止：
+- gRPC inbound service、proto、handler 或 adapter
+- message classification 或 routing decision
+- upstream XML/FpML parse 和 semantic field extraction
+- Java transformation logic
+- enum/config static mapping
+- XSLT template 和 target XML construction
+- Camel route 或 processor flow
+- PostgreSQL schema、SQL、repository 或 mapping table
+- Excel/CSV mapping
+- downstream XML/SCBML assembly
+- Solace producer/topic/queue publication
+- tests and fixtures proving behavior
+- fallback/default/error paths
 
-- 修改公司源码。
-- 把代码长片段复制进 RTS 文档。
-- 把未确认 inference 当作 KB truth。
-- 直接生成 runtime projection。
-- 只看局部字段后声称覆盖完整 workflow。
+每个 workflow step 必须有 `source_refs` 或 unresolved question；不能留下 silent gap。
 
-## 4. Skill 2：`rts-source-to-kb-pack`
+### 5.3 claims.jsonl
 
-### 4.1 职责
+`claims.jsonl` 每行一个 claim。最小结构：
 
-把 source profile 转换成结构化 KB pack。
+```json
+{"schema_version":"source-claim-v1","claim_id":"claim-example-001","claim_type":"field_mapping","status":"supported","subject":"target.exampleField","assertion":"Example field is populated from upstream XPath X when condition Y holds.","source_anchors":[{"source_id":"src-example","path":"src/main/java/...","line_range":[84,112],"anchor_type":"code_path"}],"evidence_type":"code_path","extraction_method":"manual_source_read","confidence":"medium","limits":[]}
+```
 
-它必须以 `sources/{source_bundle_id}/workflow-map.yaml` 和 `source-index.yaml` 为主要输入。不能绕过 source profile 直接从源码拍脑袋写 KB。
+Claim types 至少包括：
 
-### 4.2 输出
+```text
+structural_fact
+field_mapping
+lookup_mapping
+helper_logic
+workflow_edge
+fallback_default
+error_path
+test_observation
+runtime_observation
+user_confirmation
+unresolved_question
+```
+
+## 6. Skill 2：Source-Backed KB Draft
+
+### 6.1 职责
+
+`rts-source-to-kb-pack` 生成 KB draft。它必须读取：
+
+```text
+sources/{source_bundle_id}/source-manifest.yaml
+sources/{source_bundle_id}/source-index.yaml
+sources/{source_bundle_id}/workflow-map.yaml
+sources/{source_bundle_id}/claims.jsonl
+sources/{source_bundle_id}/unresolved-questions.yaml
+真实 source anchors 指向的公司 source
+```
+
+它不得只依据 workflow map 或 source inventory 摘要生成 KB truth。
+
+### 6.2 输出
 
 固定输出：
 
@@ -246,10 +272,22 @@ kb/{pack_id}/
   reports/extraction-report.md
   reports/review-checklist.md
   reports/closure-check.md
+  reports/completion-report.md
   attachments/                 # optional
 ```
 
-### 4.3 建模原则
+每个 rule / lookup / helper 必须包含：
+
+```text
+claim_refs
+source_anchors 或 evidence_refs
+claim_status_used
+warnings
+```
+
+只有 `supported`、`user_confirmed`、`runtime_observed` claims 可以进入 rule/lookup/helper truth。`blocked`、`unsupported`、`inferred`、`contradicted`、`not_accessible` 必须进入 review 或 warning。
+
+### 6.3 建模原则
 
 Rule / Lookup / Helper 拆分标准：
 
@@ -259,7 +297,7 @@ Rule / Lookup / Helper 拆分标准：
 | Lookup | DB/Excel/enum/config 支撑的可复用映射表或枚举 |
 | Helper | 可复用解析、拼接、标准化、fallback 或选择逻辑 |
 
-对完整 workflow，KB 必须覆盖：
+KB 必须覆盖完整 workflow，不只覆盖局部字段：
 
 - inbound entrypoint
 - message classification
@@ -269,235 +307,171 @@ Rule / Lookup / Helper 拆分标准：
 - fallback/default/error path
 - field binding
 - dependency graph
-- tests as evidence
+- tests as evidence or explicit test gap
 - unresolved ambiguity
 
-### 4.4 不确定性处理
+## 7. Skill 3：Source-Backed KB Review
 
-如果无法确定，必须写入 `review/review-index.yaml` 和 `reports/closure-check.md`，而不是沉默。
+### 7.1 职责
 
-必须标记：
+`rts-kb-pack-review` 独立 review KB draft。默认 review-only，不静默改写 truth。
 
-```text
-missing_source
-conflicting_source
-weak_evidence
-inferred_behavior
-requires_runtime_db_sample
-requires_user_confirmation
-out_of_scope
-```
-
-## 5. Skill 3：`rts-kb-pack-review`
-
-### 5.1 职责
-
-独立 review 已生成 KB pack，包括格式、完整度、歧义、证据覆盖和 workflow 闭合性。
-
-Review 不应该默认修改 KB truth。默认只输出 review 结果和用户问题。只有用户明确要求“根据 review 修复 KB”，才修改 KB。
-
-### 5.2 检查项
-
-必须检查：
+Review 必须检查：
 
 ```text
-目录和文件是否符合 contract
-metadata scope 是否稳定
-source bundle 是否可追溯
-每个 rule/lookup/helper 是否有 evidence_refs
-grpc -> parse -> transform -> scbml -> solace 是否闭合
-Java / XSLT / DB / Excel / enum 是否覆盖到各自参与的规则
-field binding 是否能解释 source XML 到 target XML
-dependencies 是否闭合
-fallback/default/error path 是否记录
-UT/IT 是否被纳入 evidence 或 gap
-report prose 是否没有承担唯一 truth
-是否存在必须用户确认的问题
+required files and directories
+metadata scope
+source inventory traceability
+claims.jsonl presence and parseability
+claim_refs resolve
+claim status gate
+source anchors resolve where company source is available
+unsupported claim
+anchor laundering
+coverage gap
+contradiction
+runtime config gap
+negative claim hallucination
+workflow closure
+dependency closure
+test evidence or test gap
+blocking count
+blocker questions
+completion report
 ```
 
-### 5.3 输出
+### 7.2 输出
 
-固定输出：
+固定输出或更新：
 
 ```text
 kb/{pack_id}/reports/review-checklist.md
 kb/{pack_id}/reports/closure-check.md
+kb/{pack_id}/reports/completion-report.md
 kb/{pack_id}/review/review-index.yaml
 kb/{pack_id}/review/ask-user-questions.json
 ```
 
-### 5.4 `ask-user-questions.json`
+### 7.3 Readiness
 
-该文件是 askUserQuestionTool 的输入前体。最小结构：
-
-```json
-{
-  "schema_version": "ask-user-questions-v1",
-  "pack_id": "grpc-fpml-to-solace-scbml",
-  "questions": [
-    {
-      "question_id": "q-primary-source-of-truth-001",
-      "severity": "blocking",
-      "object_refs": ["rule_example"],
-      "question": "DB mapping and XSLT disagree on this target field. Which source should win?",
-      "why_needed": "Production signoff cannot proceed with conflicting truth sources.",
-      "options": [
-        {
-          "label": "DB mapping wins",
-          "effect": "Rule will reference DB mapping as primary evidence."
-        },
-        {
-          "label": "XSLT wins",
-          "effect": "Rule will reference XSLT as primary evidence."
-        }
-      ],
-      "freeform_allowed": true,
-      "blocks": ["snapshot", "runtime_projection"]
-    }
-  ]
-}
-```
-
-Severity:
+允许 readiness 值：
 
 ```text
-blocking        # blocks snapshot/runtime projection
-important       # should be answered before production signoff
-clarifying      # improves KB but can remain as documented uncertainty
+not_ready_blocking_questions
+not_ready_missing_source_inventory
+not_ready_missing_claims
+not_ready_contract_errors
+ready_for_kb_draft_mvp_completion
 ```
 
-### 5.5 何时调用 askUserQuestionTool
+MVP review 不输出 `ready_for_production_signoff` 或 `ready_for_production_runtime_projection`。
 
-如果运行环境支持 askUserQuestionTool，review agent 应该只对 `severity=blocking` 或用户要求立即对齐的问题调用。
+## 8. 公司环境执行顺序
 
-限制：
-
-- 一次问 1 到 3 个短问题。
-- 问题必须是用户能裁决的问题，不要问“要不要继续”这类流程问题。
-- 每个问题必须说明如果用户选择某项，会改变哪些 object 或 gate。
-- 不能把 source 能自己验证的问题推给用户。
-
-## 6. Skill 4：`rts-kb-to-snapshot-publisher`
-
-当前先 pending，不建议只做成 prompt skill。
-
-原因：
-
-- 需要 canonical JSON normalization。
-- 需要 deterministic hash。
-- 需要 write-once snapshot。
-- 需要引用解析和 signoff coverage。
-- 需要 golden tests。
-
-建议形态：
+完整公司环境执行顺序固定为：
 
 ```text
-skill instructions
-  -> scripts/validate_kb_pack.py
-  -> scripts/canonicalize_snapshot.py
-  -> scripts/validate_snapshot.py
+1. 确认公司 source repo 只读可访问。
+2. 收集 workflow scope、allowed read paths、forbidden paths、test/DB/Excel 访问权限。
+3. 运行 rts-workflow-source-profiler，生成 source inventory / coverage map 和 claims.jsonl。
+4. 快速检查 coverage map：每个 workflow 区域都有状态，没有 silent gap。
+5. 运行 rts-source-to-kb-pack，基于真实 source anchors + supported claims 生成 KB draft。
+6. 运行 rts-kb-pack-review，执行 source-backed review。
+7. 读取 ask-user-questions.json，只处理 blocking blocker questions。
+8. 根据用户确认更新 claims/review/KB。
+9. 重跑 review，直到 blocking count 为 0 或明确记录 deferred blocker。
+10. 写 completion-report.md。
 ```
 
-固定输出：
+公司电脑第一轮目标是可审核 KB draft 和清楚的 blocker questions，不是 production release。
+
+## 9. Completion report
+
+`reports/completion-report.md` 必须记录：
 
 ```text
-kb/{pack_id}/snapshots/{snapshot_id}/
-  snapshot-manifest.json
-  objects.jsonl
-  dependency-edges.jsonl
-  evidence-refs.jsonl
-  review-decisions.jsonl
-  human-confirmation-log.jsonl
-  change-log.jsonl
-  signoff.json
-  projection-map.jsonl
+source bundle id
+pack id
+company source revision / hash / unavailable reason
+workflow scope
+coverage summary
+claim counts by status
+KB object counts
+unsupported / inferred / blocked / contradicted / not_accessible counts
+blocking count
+blocker questions path
+test execution status
+runtime config access status
+what was not verified
+MVP completion decision
+explicit non-production statement
 ```
 
-在没有 deterministic publisher 前，最多生成 snapshot skeleton，不要宣布 production signoff。
+如果真实 source 不可访问，completion report 必须写明不可完成 company execution，不能声称验证通过。
 
-## 7. Skill 5：`rts-snapshot-to-runtime-projection-publisher`
+## 10. 未来最终实现的升级门槛
 
-当前也先 pending，不建议只做成 prompt skill。
+只有当 MVP 证明 `source inventory + claims + source-backed review` 明显优于 direct source -> KB，才进入未来最终实现。证明标准至少包括：
 
-原因：
+- unsupported claim rate 下降。
+- incorrect claim rate 下降。
+- 重要 workflow 区域漏扫率下降。
+- 工程师 review 时间下降或 review 质量提升。
+- blocker questions 被用户认为必要，而不是流程噪音。
+- 重新生成后 KB diff 能解释“为什么变了”。
 
-- Runtime projection 是 service truth。
-- `release-manifest.json`、`object-manifest.jsonl`、L2 hash、dependency、navigation、governance summary 都需要一致性校验。
-- Release id 必须 write-once。
-- Java store 还需要 production provenance validation。
-
-建议形态：
+未来最终实现必须新增这些机器边界：
 
 ```text
-skill instructions
-  -> scripts/validate_snapshot.py
-  -> scripts/generate_runtime_projection.py
-  -> scripts/validate_runtime_projection.py
-  -> service smoke tests
+deterministic source discovery/index
+claim ledger schema validator
+source anchor resolver
+contradiction and omission checker
+KB package validator
+frozen approved artifact hash
+machine-checkable signoff record
+runtime activation record
+service trace to release/object/claim/evidence
 ```
 
-固定输出：
+发布链最小形态可以先压缩为：
 
 ```text
-runtime-store/releases/{release_id}/
-  release-manifest.json
-  scopes.jsonl
-  object-manifest.jsonl
-  caller-profiles.jsonl
-  l2/**/*.json
-  navigation/*.jsonl
-  dependencies/*.jsonl
-  governance/*
-  index-artifacts/*
+source evidence
+  -> reviewed KB
+  -> approved release manifest + frozen runtime JSON
+  -> active-release pointer
+  -> traced service responses
 ```
 
-## 8. 公司电脑执行模式
+只有在多消费者、多视图、严格审计或 KB 到服务格式存在非平凡转换时，才拆成完整 canonical snapshot + signoff + runtime projection 三层。无论是否拆层，发布阶段都不能新增业务断言。
 
-将 RTS repo 上传到公司电脑后，建议执行顺序：
+## 11. 本地可完成与公司环境才可完成
 
-```text
-1. 确认公司 source repo 只读可访问
-2. 运行 rts-workflow-source-profiler
-3. 人工快速检查 workflow-map.yaml
-4. 运行 rts-source-to-kb-pack
-5. 运行 rts-kb-pack-review
-6. 对 blocking ask-user-questions 做人工确认
-7. 根据确认修订 KB
-8. 再跑 review，直到 blocking 为 0
-9. 生成 snapshot skeleton
-10. 再决定是否进入 runtime projection skeleton
-```
+本地可完成：
 
-公司电脑上第一轮不要直接 production signoff。第一轮目标是得到一个能被 review 的 KB pack 和清楚的问题清单。
+- 更新 confirmed plan、skills、contracts、templates、runbook。
+- 运行文档 contract 校验。
+- 确认 repo 没有 archive 修改。
 
-## 9. 当前 repo 应先准备什么
-
-不依赖公司资产、可以现在完成：
-
-- 固定本设计文档。
-- 固定公司电脑执行清单。
-- 创建前三个 repo-bundled portable skills，但不要写死公司代码结构。
-- 后续可以补 `workflow-map-v1`、`ask-user-questions-v1` 的 schema 草案。
-- 后续可以补 KB pack validator 的最小脚本。
-
-依赖公司资产、必须到公司电脑完成：
+公司环境才可完成：
 
 - 真实 source scanning。
-- Java/Camel/XSLT/DB/Excel/UT 解析。
-- workflow-map 生成。
-- KB pack 生成和 review。
-- 用户问题确认。
-- source-backed evidence 校验。
-- 运行公司测试。
+- source inventory / coverage map 生成。
+- `claims.jsonl` 真实 evidence capture。
+- source-backed KB draft 生成。
+- source-backed review。
+- blocker questions 确认。
+- completion report 对真实 source 的结论。
 
-## 10. 最短版
+## 12. 最短版
 
 ```text
-先不要让 agent 从公司代码直接生成 runtime projection。
-
-第一步只 profile 完整 workflow source。
-第二步从 profile 生成 KB。
-第三步独立 review KB 并问用户 blocking questions。
-第四步再做 snapshot publisher。
-第五步最后做 runtime projection publisher。
+不要把 source profile 当 truth。
+不要让 KB 只吃 source map 摘要。
+先生成 source inventory / coverage map。
+再生成 evidence-backed claims。
+KB truth 只接受 supported / user_confirmed / runtime_observed claims。
+Review 必须回源查 unsupported claim、anchor laundering、coverage gap、contradiction、runtime config gap、negative claim hallucination。
+MVP 到 completion report 为止，不包含 production snapshot、formal signoff 或 immutable runtime projection。
 ```

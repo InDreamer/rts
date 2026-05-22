@@ -6,7 +6,7 @@ Ask the user only when:
 
 - source evidence conflicts and cannot be resolved by further inspection
 - business priority or source authority needs human decision
-- production signoff would otherwise choose between plausible interpretations
+- KB truth or MVP completion would otherwise choose between plausible interpretations
 - missing source access blocks truth and the user can provide direction
 
 Do not ask when:
@@ -28,6 +28,7 @@ Each question must have:
 - `question_id`
 - `severity`
 - `object_refs`
+- `claim_refs`
 - `question`
 - `why_needed`
 - `options`

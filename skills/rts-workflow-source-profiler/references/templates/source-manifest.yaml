@@ -33,6 +33,7 @@ permissions:
 outputs:
   source_index: source-index.yaml
   workflow_map: workflow-map.yaml
+  claims: claims.jsonl
   extraction_notes: extraction-notes.md
   unresolved_questions: unresolved-questions.yaml
 limitations: []

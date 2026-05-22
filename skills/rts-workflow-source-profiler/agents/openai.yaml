@@ -1,4 +1,4 @@
 interface:
-  display_name: "RTS Workflow Source Profiler"
-  short_description: "Profile full workflow source into RTS source bundle"
-  default_prompt: "Profile a read-only company workflow source repo into an RTS sources/{source_bundle_id}/ bundle with workflow-map and unresolved questions."
+  display_name: "RTS Source Inventory Builder"
+  short_description: "Build source inventory, coverage map, and evidence-backed claims"
+  default_prompt: "Read a company workflow source repo as read-only. Build RTS sources/{source_bundle_id}/ with source inventory, workflow coverage map, claims.jsonl, extraction notes, and unresolved questions. Do not generate KB truth."

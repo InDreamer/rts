@@ -8,6 +8,7 @@ children:
   - docs/day1-sample-pack-test-commands.md
   - docs/ai-first-format-conversation-followup-zh.md
   - docs/company-computer-kb-workflow-checklist-zh.md
+  - docs/company-source-to-kb-mvp-runbook-zh.md
   - docs/confirmed/README.md
   - docs/reference/README.md
   - docs/archive/README.md
@@ -36,7 +37,8 @@ This is the primary documentation router for RTS.
 - `docs/api-caller-guide-zh.md` — API 调用方如何发起 deterministic truth/information 查询、managed analysis 请求、场景分析请求，并理解降级语义。
 - `docs/day1-sample-pack-test-commands.md` — 当前 sample runtime projection 的手工 curl 验证命令。
 - `docs/ai-first-format-conversation-followup-zh.md` — 展示型 HTML 格式讨论的补充澄清；只用于理解 KB/projection/LLM input context 的格式边界，正式生成链路以 confirmed final contract 为准。
-- `docs/company-computer-kb-workflow-checklist-zh.md` — 把 RTS repo 上传到公司电脑后，从受限公司 source 生成 source profile、KB pack、KB review 和用户问题的执行清单。
+- `docs/company-source-to-kb-mvp-runbook-zh.md` — 公司环境执行 source-backed KB draft MVP：source inventory、claims.jsonl、KB draft、source-backed review、blocker questions 和 completion report。
+- `docs/company-computer-kb-workflow-checklist-zh.md` — 公司电脑快速清单；MVP 细节以 `docs/company-source-to-kb-mvp-runbook-zh.md` 为准。
 - `skills/AGENTS.md` — repo-bundled portable skills 的使用和安全边界；上传到公司电脑后处理受限 source 前阅读。
 - `docs/archive/README.md` — 历史材料。只在明确需要追溯旧讨论、旧产物或 archived prototype 时打开。
 

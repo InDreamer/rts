@@ -14,7 +14,7 @@ documents:
   role: agent
   layer: 2
   parent: AGENTS.md
-  summary: local navigation and safety rules for portable RTS source-to-KB skills
+  summary: local navigation and safety rules for portable RTS source-backed KB draft MVP skills
 - path: docs/INDEX.md
   role: entry
   layer: 1
@@ -45,8 +45,16 @@ documents:
   role: leaf
   layer: 2
   parent: docs/INDEX.md
-  summary: company-computer checklist for running source profiling, KB pack generation,
-    KB review, and user-question handoff against restricted corporate workflow source
+  summary: company-computer checklist for running source inventory, evidence-backed
+    claims, KB draft generation, source-backed review, and blocker-question handoff
+    against restricted corporate workflow source
+- path: docs/company-source-to-kb-mvp-runbook-zh.md
+  role: leaf
+  layer: 2
+  parent: docs/INDEX.md
+  summary: company-executable runbook for source-backed KB draft MVP using source
+    inventory, evidence-backed claims, KB draft, source-backed review, blocker
+    questions, and completion report
 - path: docs/confirmed/README.md
   role: domain
   layer: 2
@@ -84,8 +92,9 @@ documents:
   role: leaf
   layer: 3
   parent: docs/confirmed/README.md
-  summary: skill and agent pipeline plan for converting full workflow source assets
-    into source profiles, KB packs, review questions, snapshots, and runtime skeletons
+  summary: company-executable source-backed KB draft MVP and future pipeline boundary
+    for source inventory, evidence-backed claims, KB drafts, source-backed review,
+    completion reports, and later deterministic signoff/runtime release
 - path: docs/confirmed/runtime-projection-product-guide-zh.md
   role: leaf
   layer: 3

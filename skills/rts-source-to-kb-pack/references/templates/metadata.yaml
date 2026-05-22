@@ -24,8 +24,21 @@ indexes:
   extraction_report: reports/extraction-report.md
   review_checklist: reports/review-checklist.md
   closure_check: reports/closure-check.md
+  completion_report: reports/completion-report.md
 release_eligibility:
-  intended_tier: demo
+  intended_tier: mvp_draft
   blocking_issues_count: 0
   open_questions_count: 0
+claim_gate:
+  required_claim_source: sources/{source_bundle_id}/claims.jsonl
+  allowed_truth_statuses:
+    - supported
+    - user_confirmed
+    - runtime_observed
+  disallowed_truth_statuses:
+    - blocked
+    - unsupported
+    - inferred
+    - contradicted
+    - not_accessible
 modeling_decisions: []

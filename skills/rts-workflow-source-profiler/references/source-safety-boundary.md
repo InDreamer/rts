@@ -28,5 +28,6 @@ source_type: postgresql
 reason: "Runtime table rows are not accessible in this environment."
 impact: "Lookup behavior can be modeled from schema but not confirmed from data."
 blocks:
-  - production_signoff
+  - kb_truth
+  - mvp_completion
 ```

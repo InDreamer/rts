@@ -22,4 +22,4 @@ This KB pack models the transformation workflow from gRPC inbound upstream XML t
 
 ## Current Status
 
-This is KB authoring material. It is not a signed snapshot and not runtime projection truth.
+This is source-backed KB draft material. Nontrivial truth claims must trace to `claim_refs` backed by source anchors. It is not a signed snapshot, formal signoff, immutable runtime projection, production service truth, or a claim of complete validation.

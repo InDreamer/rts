@@ -5,6 +5,8 @@ evidence:
     evidence_type: source_locator
     object_refs:
       - "{object_id}"
+    claim_refs:
+      - "{claim_id}"
     source_refs:
       - source_id: "{source_id}"
     locator_summary: "{short_locator_summary}"

@@ -10,8 +10,11 @@
       "object_refs": [
         "{object_id}"
       ],
+      "claim_refs": [
+        "{claim_id}"
+      ],
       "question": "Which source should be treated as authoritative for this target field?",
-      "why_needed": "The KB has conflicting evidence and cannot proceed to snapshot skeleton without a truth decision.",
+      "why_needed": "The KB has conflicting evidence and cannot complete MVP review without a truth decision.",
       "options": [
         {
           "label": "Java transformation wins",
@@ -24,8 +27,8 @@
       ],
       "freeform_allowed": true,
       "blocks": [
-        "snapshot",
-        "runtime_projection"
+        "kb_truth",
+        "mvp_completion"
       ]
     }
   ]

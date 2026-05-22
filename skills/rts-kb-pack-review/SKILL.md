@@ -1,13 +1,15 @@
 ---
 name: rts-kb-pack-review
-description: Independently review an RTS KB pack for contract compliance, workflow completeness, source evidence coverage, dependency closure, ambiguity, and readiness for snapshot skeleton. Use when Codex needs to inspect kb/{pack_id}/ generated from source profiles, update review/review-index.yaml, reports/review-checklist.md, reports/closure-check.md, and produce review/ask-user-questions.json for blocking questions without silently rewriting truth or claiming production runtime projection.
+description: Independently review an RTS KB draft for contract compliance, workflow completeness, source-backed claim evidence, anchor laundering, coverage gaps, contradictions, runtime config gaps, negative-claim hallucination, dependency closure, ambiguity, blocking count, and blocker questions without silently rewriting truth or claiming production runtime projection.
 ---
 
-# RTS KB Pack Review
+# RTS Source-Backed KB Pack Review
 
 ## Purpose
 
-Review a generated RTS KB pack independently from the generator. Default to review-only: report findings, update review artifacts, and produce user questions. Modify KB truth only when the user explicitly asks for fixes.
+Review a generated RTS KB draft independently from the generator. Default to review-only: report findings, update review artifacts, produce blocker questions, and write a completion report. Modify KB truth only when the user explicitly asks for fixes.
+
+This review must be source-backed when company source is available. A KB object that merely cites a source inventory summary is not sufficiently supported.
 
 ## Required References
 
@@ -18,6 +20,7 @@ Open these before review:
 - `references/templates/ask-user-questions.json`
 - `references/templates/review-index.yaml`
 - `references/templates/closure-check.md`
+- `references/templates/completion-report.md`
 
 If this skill is used inside the RTS repo, also read:
 
@@ -28,23 +31,37 @@ If this skill is used inside the RTS repo, also read:
 
 1. Read `kb/{pack_id}/metadata.yaml`.
 2. Read all rules, lookups, helpers, evidence index, review index, and reports.
-3. If a matching `sources/{source_bundle_id}/` exists, read `source-index.yaml` and `workflow-map.yaml`.
-4. Check contract compliance:
+3. Read matching source inventory:
+   - `sources/{source_bundle_id}/source-index.yaml`
+   - `sources/{source_bundle_id}/workflow-map.yaml`
+   - `sources/{source_bundle_id}/claims.jsonl`
+4. When company source is available, inspect the source anchors for high-risk and sampled KB claims.
+5. Check contract compliance:
    - required files
    - required fields
    - stable ids and object types
    - scope consistency
-   - evidence refs and source anchors
-5. Check workflow completeness:
+   - `claim_refs`, evidence refs, and source anchors
+6. Check claim gate:
+   - KB truth uses only `supported`, `user_confirmed`, or `runtime_observed` claims
+   - `blocked`, `unsupported`, `inferred`, `contradicted`, and `not_accessible` claims appear only in review/warning material
+7. Check workflow completeness:
    - gRPC inbound
    - message classification
    - FpML/XML parse
    - Java/Camel/XSLT/DB/Excel/enum transformation
+   - runtime config or explicit gap
    - SCBML/XML assembly
    - Solace outbound
-6. Check dependency closure and field binding coverage.
-7. Check ambiguity and conflict handling.
-8. Write or update review artifacts.
+8. Check hallucination and omission risks:
+   - unsupported claim
+   - anchor laundering
+   - coverage gap
+   - contradiction
+   - runtime config gap
+   - negative claim hallucination
+9. Check dependency closure and field binding coverage.
+10. Write or update review artifacts.
 
 ## Output
 
@@ -53,6 +70,7 @@ Produce or update:
 ```text
 kb/{pack_id}/reports/review-checklist.md
 kb/{pack_id}/reports/closure-check.md
+kb/{pack_id}/reports/completion-report.md
 kb/{pack_id}/review/review-index.yaml
 kb/{pack_id}/review/ask-user-questions.json
 ```
@@ -61,8 +79,8 @@ kb/{pack_id}/review/ask-user-questions.json
 
 Use:
 
-- `blocking`: must be answered before snapshot/runtime skeleton.
-- `important`: should be answered before production signoff.
+- `blocking`: must be answered before MVP completion.
+- `important`: should be answered before any demo release or later snapshot work.
 - `clarifying`: improves KB but can remain documented.
 
 ## askUserQuestionTool Boundary
@@ -74,6 +92,7 @@ Every question must include:
 - question id
 - severity
 - object refs
+- claim refs when available
 - the exact question
 - why it is needed
 - 2 to 3 suggested options when possible
@@ -83,16 +102,17 @@ Every question must include:
 
 Do not ask the user questions that source analysis can answer. Reinspect source or KB first.
 
-## Snapshot / Runtime Boundary
+## MVP Boundary
 
-This skill may say whether the KB appears ready for snapshot skeleton. It must not claim production signoff or production runtime projection.
+This skill may say whether the KB draft appears ready for MVP completion. It must not claim production signoff, production snapshot, or production runtime projection readiness.
 
 Allowed conclusion examples:
 
 - `not_ready_blocking_questions`
-- `ready_for_snapshot_skeleton`
-- `ready_for_demo_runtime_skeleton`
-- `not_ready_missing_source_profile`
+- `not_ready_missing_source_inventory`
+- `not_ready_missing_claims`
+- `not_ready_contract_errors`
+- `ready_for_kb_draft_mvp_completion`
 
 ## Completion Check
 
@@ -100,6 +120,7 @@ Before finishing, verify:
 
 - review checklist exists.
 - closure check states blocking count and readiness.
+- completion report exists and includes explicit non-production statement.
 - review-index contains structured findings.
 - ask-user-questions.json contains only questions requiring user judgment.
-- no production signoff claim was made.
+- no production signoff, production snapshot, or production runtime projection claim was made.

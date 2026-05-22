@@ -35,9 +35,10 @@ AI 在 RTS 中不是 answer organizer，而是建立在 governed truth 之上的
 - `docs/confirmed/kb-to-index-projection-contract-zh.md` — KB 到索引/查询层的运行时投影契约，以及稳定原子能力面的边界。
 - `docs/confirmed/kb-runtime-index-layer-standard-zh.md` — KB、runtime projection、index layer 子链路的生成标准；固定三者的文件长相、格式、发布顺序、层间契约和拒收条件。
 - `docs/confirmed/kb-authoring-snapshot-runtime-final-choice-zh.md` — source intake、KB authoring、canonical signoff snapshot、runtime projection、derived views 的最终落地契约；固定生成顺序、目录长相、必填字段、publisher 输出和拒收门槛。
-- `docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md` — 从完整公司 workflow source 到 source profile、KB pack、KB review、用户问题、snapshot/runtime skeleton 的 skill 体系设计。
-- `docs/company-computer-kb-workflow-checklist-zh.md` — 上传到公司电脑后的执行清单；用于处理 gRPC/FpML 到 Solace/SCBML 的受限公司 source。
-- `skills/` — 随 repo 携带的 portable RTS skills：source profiling、source profile 到 KB pack、KB pack review。公司电脑上处理受限 source 前先读 `skills/AGENTS.md`。
+- `docs/confirmed/source-to-kb-skill-pipeline-plan-zh.md` — 从完整公司 workflow source 到 source inventory、claims.jsonl、KB draft、source-backed review、blocker questions 和 completion report 的 MVP 体系设计。
+- `docs/company-source-to-kb-mvp-runbook-zh.md` — 上传到公司电脑后的 MVP 执行 runbook；用于处理 gRPC/FpML 到 Solace/SCBML 的受限公司 source。
+- `docs/company-computer-kb-workflow-checklist-zh.md` — 公司电脑快速清单；MVP 细节以 runbook 为准。
+- `skills/` — 随 repo 携带的 portable RTS skills：source inventory/claims、source-backed KB draft、source-backed KB review。公司电脑上处理受限 source 前先读 `skills/AGENTS.md`。
 - `docs/confirmed/llm-harness-and-agent-integration-alignment-zh.md` — RTS 内置 managed mode、外部 tool mode、runtime projection access boundary 和场景接入的当前对齐结论。
 - `docs/confirmed/internal-llm-agent-service-implementation-plan-zh.md` — RTS service 内部 LLM agent 接入的完整非阶段性落地计划。
 - `docs/confirmed/day1-query-service-and-llm-harness-plan-zh.md` — Day1：建立受控真相源原子能力面和第一版 managed LLM harness。
